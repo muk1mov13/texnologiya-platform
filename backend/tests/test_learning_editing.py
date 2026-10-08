@@ -6,7 +6,7 @@ from app.auth.models import Role
 from app.core.errors import AppError
 from app.learning import editing
 from app.learning.models import STEP_KINDS_IN_ORDER, Step
-from app.learning.schemas import SubjectCreate, TopicCreate
+from app.learning.schemas import SubjectCreate, SubjectUpdate, TopicCreate
 from tests.factories import make_user
 
 
@@ -34,6 +34,35 @@ async def test_create_subject_rejects_taken_explicit_slug(db: AsyncSession) -> N
     await editing.create_subject(db, SubjectCreate(title="Praktikum", slug="praktikum"))
     with pytest.raises(AppError) as exc:
         await editing.create_subject(db, SubjectCreate(title="Boshqa", slug="praktikum"))
+    assert exc.value.code == "SLUG_TAKEN"
+
+
+async def test_create_subject_translates_slug_race_to_slug_taken(
+    db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    await editing.create_subject(db, SubjectCreate(title="Fan", slug="fan"))
+
+    async def _never_exists(_db: AsyncSession, _slug: str) -> bool:
+        return False
+
+    monkeypatch.setattr(editing, "_slug_exists", _never_exists)
+    with pytest.raises(AppError) as exc:
+        await editing.create_subject(db, SubjectCreate(title="Boshqa fan", slug="fan"))
+    assert exc.value.code == "SLUG_TAKEN"
+
+
+async def test_update_subject_translates_slug_race_to_slug_taken(
+    db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    first = await editing.create_subject(db, SubjectCreate(title="Birinchi", slug="birinchi"))
+    second = await editing.create_subject(db, SubjectCreate(title="Ikkinchi", slug="ikkinchi"))
+
+    async def _never_exists(_db: AsyncSession, _slug: str) -> bool:
+        return False
+
+    monkeypatch.setattr(editing, "_slug_exists", _never_exists)
+    with pytest.raises(AppError) as exc:
+        await editing.update_subject(db, second, SubjectUpdate(slug=first.slug))
     assert exc.value.code == "SLUG_TAKEN"
 
 

@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from sqlalchemy import ColumnElement, delete, func, insert, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import Role, User
@@ -91,7 +92,13 @@ async def create_subject(db: AsyncSession, data: SubjectCreate) -> Subject:
         is_published=data.is_published,
     )
     db.add(subject)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        # Ikki parallel so'rov pre-check'dan bir vaqtda o'tib ketdi: unique
+        # constraint bu yerda ushlanadi.
+        await db.rollback()
+        raise AppError(409, "SLUG_TAKEN", "Bu slug band") from None
     return subject
 
 
@@ -103,7 +110,11 @@ async def update_subject(db: AsyncSession, subject: Subject, data: SubjectUpdate
     for field, value in values.items():
         if value is not None:
             setattr(subject, field, value)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise AppError(409, "SLUG_TAKEN", "Bu slug band") from None
     return subject
 
 
