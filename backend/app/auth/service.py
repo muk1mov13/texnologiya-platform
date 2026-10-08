@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import RefreshSession, User, UserStatus
@@ -36,7 +37,15 @@ async def register_user(db: AsyncSession, data: RegisterIn) -> User:
         locale=data.locale,
     )
     db.add(user)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        # Ikki parallel so'rov pre-check'dan bir vaqtda o'tib ketdi: unique
+        # constraint bu yerda ushlanadi.
+        await db.rollback()
+        raise AppError(
+            409, "EMAIL_TAKEN", "Bu email bilan allaqachon ro'yxatdan o'tilgan"
+        ) from None
     return user
 
 
@@ -94,7 +103,17 @@ async def rotate_refresh(
     user = await db.get(User, session.user_id)
     if user is None or user.status == UserStatus.blocked:
         raise AppError(403, "ACCOUNT_BLOCKED", "Akkaunt bloklangan")
-    session.revoked_at = utcnow()
+    result = await db.execute(
+        update(RefreshSession)
+        .where(RefreshSession.id == session.id, RefreshSession.revoked_at.is_(None))
+        .values(revoked_at=utcnow())
+    )
+    if result.rowcount == 0:
+        # Boshqa bir parallel so'rov ushbu sessiyani SELECT va UPDATE orasida
+        # allaqachon bekor qilgan: token o'g'irlangan bo'lishi mumkin.
+        await revoke_all_sessions(db, session.user_id)
+        await db.commit()
+        raise AppError(401, "REFRESH_REUSED", "Sessiya bekor qilingan")
     access, new_raw = await issue_tokens(db, user, settings, user_agent)
     return user, access, new_raw
 

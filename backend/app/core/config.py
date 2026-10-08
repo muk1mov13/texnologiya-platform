@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     def _require_prod_secret(self) -> "Settings":
         if self.env == "prod" and self.jwt_secret == DEV_JWT_SECRET:
             raise ValueError("JWT_SECRET must be set in production")
+        if self.env == "prod" and not self.cookie_secure:
+            raise ValueError("COOKIE_SECURE must be true in production")
         return self
 
 

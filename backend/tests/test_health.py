@@ -17,3 +17,13 @@ async def test_health_returns_ok() -> None:
 def test_prod_requires_real_jwt_secret() -> None:
     with pytest.raises(ValidationError):
         Settings(env="prod")
+
+
+def test_prod_requires_secure_cookie() -> None:
+    with pytest.raises(ValidationError):
+        Settings(env="prod", jwt_secret="h" * 40, cookie_secure=False)
+
+
+def test_prod_with_secure_cookie_and_real_secret_constructs() -> None:
+    settings = Settings(env="prod", jwt_secret="h" * 40, cookie_secure=True)
+    assert settings.cookie_secure is True

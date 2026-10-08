@@ -1,10 +1,15 @@
 from datetime import timedelta
 
+import pytest
+from fastapi import FastAPI
 from httpx import AsyncClient, Response
-from sqlalchemy import update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import service
 from app.auth.models import RefreshSession, User, UserStatus
+from app.core.errors import AppError
+from app.core.security import hash_token
 from app.core.types import utcnow
 from tests.factories import DEFAULT_PASSWORD, make_user
 
@@ -76,3 +81,43 @@ async def test_logout_revokes_session_and_clears_cookie(
     assert response.status_code == 204
     assert 'refresh_token=""' in response.headers["set-cookie"]
     assert (await refresh(client, raw)).status_code == 401
+
+
+async def test_concurrent_refresh_rotation_detects_reuse(
+    client: AsyncClient,
+    db: AsyncSession,
+    app: FastAPI,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Ikki parallel refresh bir xil sessiyani bir vaqtda bekor qilmoqchi bo'lsa,
+    faqat bittasi muvaffaqiyatli bo'lishi, ikkinchisi REFRESH_REUSED olishi kerak.
+
+    SQLite'da haqiqiy ikki tranzaksiyani asyncio.gather bilan deterministik tarzda
+    poyga holatiga keltirish mumkin emas (fayl darajasidagi lock "database is
+    locked" xatosiga olib kelishi mumkin), shuning uchun monkeypatch orqali
+    SELECT va atomik UPDATE o'rtasidagi oynani simulyatsiya qilamiz: boshqa bir
+    "parallel" sessiya shu oraliqda xuddi shu refresh sessiyasini bekor qiladi.
+    """
+    raw = await login_raw_refresh(client, db)
+    session_row = await db.scalar(
+        select(RefreshSession).where(RefreshSession.token_hash == hash_token(raw))
+    )
+    assert session_row is not None
+
+    original_get = AsyncSession.get
+
+    async def racing_get(self: AsyncSession, *args: object, **kwargs: object) -> object:
+        async with app.state.sessionmaker() as other:
+            await other.execute(
+                update(RefreshSession)
+                .where(RefreshSession.id == session_row.id)
+                .values(revoked_at=utcnow())
+            )
+            await other.commit()
+        return await original_get(self, *args, **kwargs)
+
+    monkeypatch.setattr(AsyncSession, "get", racing_get)
+
+    with pytest.raises(AppError) as exc_info:
+        await service.rotate_refresh(db, raw, app.state.settings, None)
+    assert exc_info.value.code == "REFRESH_REUSED"

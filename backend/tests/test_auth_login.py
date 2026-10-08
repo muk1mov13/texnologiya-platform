@@ -1,7 +1,11 @@
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import service
 from app.auth.models import UserStatus
+from app.auth.schemas import RegisterIn
+from app.core.errors import AppError
 from tests.factories import DEFAULT_PASSWORD, make_user
 
 REGISTER = {
@@ -93,3 +97,21 @@ async def test_login_is_rate_limited_after_failures(client: AsyncClient, db: Asy
     )
     assert response.status_code == 429
     assert response.json()["code"] == "TOO_MANY_ATTEMPTS"
+
+
+async def test_register_race_translates_integrity_error_to_email_taken(
+    db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ikki parallel so'rov pre-check'dan bir vaqtda o'tib ketsa, unique constraint
+    IntegrityError'ni AppError(EMAIL_TAKEN)'ga aylantirishi kerak."""
+    data = RegisterIn(email="race@mail.uz", password=DEFAULT_PASSWORD, full_name="Race User")
+    await service.register_user(db, data)
+
+    async def fake_get_user_by_email(_db: AsyncSession, _email: str) -> None:
+        return None
+
+    monkeypatch.setattr(service, "get_user_by_email", fake_get_user_by_email)
+
+    with pytest.raises(AppError) as exc_info:
+        await service.register_user(db, data)
+    assert exc_info.value.code == "EMAIL_TAKEN"
