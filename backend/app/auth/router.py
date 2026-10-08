@@ -3,8 +3,16 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, Request, Response
 
 from app.auth import service
+from app.auth.deps import CurrentUser
 from app.auth.models import User
-from app.auth.schemas import LoginIn, RegisterIn, TokenOut, UserOut
+from app.auth.schemas import (
+    LoginIn,
+    MeUpdateIn,
+    PasswordChangeIn,
+    RegisterIn,
+    TokenOut,
+    UserOut,
+)
 from app.core.config import Settings
 from app.core.deps import AppSettings, DbSession, LoginLimiter
 from app.core.errors import AppError
@@ -95,3 +103,27 @@ async def logout(
     response = Response(status_code=204)
     clear_refresh_cookie(response, settings)
     return response
+
+
+_NON_NULLABLE_PROFILE_FIELDS = frozenset({"full_name", "locale"})
+
+
+@router.get("/me", response_model=UserOut)
+async def me(user: CurrentUser) -> User:
+    return user
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_me(data: MeUpdateIn, user: CurrentUser, db: DbSession) -> User:
+    for field, value in data.model_dump(exclude_unset=True).items():
+        if value is None and field in _NON_NULLABLE_PROFILE_FIELDS:
+            continue
+        setattr(user, field, value)
+    await db.commit()
+    return user
+
+
+@router.post("/me/password", status_code=204)
+async def change_password(data: PasswordChangeIn, user: CurrentUser, db: DbSession) -> Response:
+    await service.change_password(db, user, data.current_password, data.new_password)
+    return Response(status_code=204)
