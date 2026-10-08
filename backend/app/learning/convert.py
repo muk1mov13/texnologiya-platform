@@ -1,0 +1,65 @@
+import asyncio
+import shutil
+import subprocess
+from pathlib import Path
+
+import pymupdf
+
+
+class ConversionError(Exception):
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+def _resolve_soffice(soffice: str) -> str | None:
+    found = shutil.which(soffice)
+    if found:
+        return found
+    return soffice if Path(soffice).is_file() else None
+
+
+async def convert_to_pdf(
+    source: Path,
+    out_dir: Path,
+    *,
+    soffice: str,
+    timeout: int,  # noqa: ASYNC109 (subprocess uchun, asyncio scope emas)
+) -> Path:
+    """LibreOffice (headless) yordamida PPT/PPTX/DOC/DOCX faylni PDF'ga aylantiradi."""
+    executable = _resolve_soffice(soffice)
+    if executable is None:
+        raise ConversionError("LIBREOFFICE_NOT_FOUND")
+    command = [
+        executable,
+        "--headless",
+        "--norestore",
+        "--convert-to",
+        "pdf",
+        "--outdir",
+        str(out_dir),
+        str(source),
+    ]
+    try:
+        # Windows'da ham ishonchli ishlashi uchun subprocess alohida thread'da ishga tushiriladi.
+        result = await asyncio.to_thread(
+            subprocess.run, command, capture_output=True, timeout=timeout, check=False
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise ConversionError("CONVERSION_TIMEOUT") from exc
+    output = out_dir / f"{source.stem}.pdf"
+    if result.returncode != 0 or not output.is_file():
+        raise ConversionError("CONVERSION_FAILED")
+    return output
+
+
+def count_pages(pdf: Path) -> int:
+    try:
+        with pymupdf.open(pdf) as document:
+            if not document.is_pdf:
+                raise ConversionError("INVALID_PDF")
+            return int(document.page_count)
+    except ConversionError:
+        raise
+    except Exception as exc:
+        raise ConversionError("INVALID_PDF") from exc

@@ -1,5 +1,7 @@
 from collections.abc import Sequence
 
+import pymupdf
+from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -66,3 +68,31 @@ async def step_of(db: AsyncSession, topic: Topic, kind: StepKind) -> Step:
     step = await db.scalar(select(Step).where(Step.topic_id == topic.id, Step.kind == kind))
     assert step is not None
     return step
+
+
+def make_pdf_bytes(pages: int = 2) -> bytes:
+    document = pymupdf.open()
+    for _ in range(pages):
+        document.new_page()
+    data = document.tobytes()
+    document.close()
+    return data
+
+
+async def add_ready_pdf(
+    client: AsyncClient,
+    headers: dict[str, str],
+    step_id: int,
+    *,
+    title: str = "Mavzu bayoni",
+    pages: int = 2,
+) -> dict[str, object]:
+    response = await client.post(
+        f"/api/teach/steps/{step_id}/materials",
+        headers=headers,
+        data={"title": title},
+        files={"file": ("bayon.pdf", make_pdf_bytes(pages), "application/pdf")},
+    )
+    assert response.status_code == 201, response.text
+    body: dict[str, object] = response.json()
+    return body
