@@ -46,7 +46,10 @@ def decode_access_token(token: str, settings: Settings) -> int:
         raise AppError(401, "INVALID_TOKEN", "Token yaroqsiz") from exc
     if payload.get("type") != "access":
         raise AppError(401, "INVALID_TOKEN", "Token yaroqsiz")
-    return int(payload["sub"])
+    try:
+        return int(payload["sub"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise AppError(401, "INVALID_TOKEN", "Token yaroqsiz") from exc
 
 
 def new_refresh_token() -> str:

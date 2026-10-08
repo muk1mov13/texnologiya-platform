@@ -1,8 +1,12 @@
+from datetime import timedelta
+
+import jwt
 import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import (
+    ALGORITHM,
     create_access_token,
     decode_access_token,
     generate_temp_password,
@@ -11,6 +15,7 @@ from app.core.security import (
     new_refresh_token,
     verify_password,
 )
+from app.core.types import utcnow
 
 SETTINGS = Settings(env="test", jwt_secret="s" * 40)
 
@@ -44,6 +49,15 @@ def test_token_signed_with_other_secret_is_rejected() -> None:
     token = create_access_token(1, "student", Settings(env="test", jwt_secret="o" * 40))
     with pytest.raises(AppError):
         decode_access_token(token, SETTINGS)
+
+
+def test_token_with_non_numeric_sub_is_rejected() -> None:
+    payload = {"sub": "abc", "type": "access", "exp": utcnow() + timedelta(minutes=5)}
+    token = jwt.encode(payload, SETTINGS.jwt_secret, algorithm=ALGORITHM)
+    with pytest.raises(AppError) as exc:
+        decode_access_token(token, SETTINGS)
+    assert exc.value.status_code == 401
+    assert exc.value.code == "INVALID_TOKEN"
 
 
 def test_refresh_tokens_are_random_and_hash_is_stable() -> None:
