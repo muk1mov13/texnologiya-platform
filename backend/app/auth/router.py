@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request, Response
+from typing import Annotated
+
+from fastapi import APIRouter, Cookie, Request, Response
 
 from app.auth import service
 from app.auth.models import User
@@ -63,3 +65,33 @@ async def login(
     access, raw = await service.issue_tokens(db, user, settings, request.headers.get("user-agent"))
     set_refresh_cookie(response, raw, settings)
     return TokenOut(access_token=access, user=UserOut.model_validate(user))
+
+
+@router.post("/auth/refresh", response_model=TokenOut)
+async def refresh(
+    request: Request,
+    response: Response,
+    db: DbSession,
+    settings: AppSettings,
+    refresh_token: Annotated[str | None, Cookie()] = None,
+) -> TokenOut:
+    if not refresh_token:
+        raise AppError(401, "NO_REFRESH_TOKEN", "Sessiya topilmadi")
+    user, access, raw = await service.rotate_refresh(
+        db, refresh_token, settings, request.headers.get("user-agent")
+    )
+    set_refresh_cookie(response, raw, settings)
+    return TokenOut(access_token=access, user=UserOut.model_validate(user))
+
+
+@router.post("/auth/logout", status_code=204)
+async def logout(
+    db: DbSession,
+    settings: AppSettings,
+    refresh_token: Annotated[str | None, Cookie()] = None,
+) -> Response:
+    if refresh_token:
+        await service.revoke_refresh(db, refresh_token)
+    response = Response(status_code=204)
+    clear_refresh_cookie(response, settings)
+    return response
