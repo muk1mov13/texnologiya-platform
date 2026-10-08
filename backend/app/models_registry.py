@@ -2,3 +2,5 @@
 
 Har bir yangi modul modeli shu yerga qo'shiladi.
 """
+
+import app.auth.models  # noqa: F401
