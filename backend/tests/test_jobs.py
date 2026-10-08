@@ -50,3 +50,17 @@ async def test_failing_job_is_logged_not_raised(tmp_path: Path, caplog: Any) -> 
 async def test_unknown_job_name_is_rejected(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         await _runner(tmp_path).enqueue("does_not_exist")
+
+
+async def test_duplicate_job_name_is_rejected() -> None:
+    @job("test_dup")
+    async def first(ctx: JobContext) -> None:
+        pass
+
+    try:
+        with pytest.raises(ValueError):
+            @job("test_dup")
+            async def second(ctx: JobContext) -> None:
+                pass
+    finally:
+        JOB_REGISTRY.pop("test_dup")

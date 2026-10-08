@@ -27,6 +27,8 @@ def job(name: str) -> Callable[[JobFunc], JobFunc]:
     """Fon ishini nom bilan ro'yxatdan o'tkazadi. Funksiya `(ctx, **kwargs)` qabul qiladi."""
 
     def register(func: JobFunc) -> JobFunc:
+        if name in JOB_REGISTRY:
+            raise ValueError(f"Job already registered: {name}")
         JOB_REGISTRY[name] = func
         return func
 
