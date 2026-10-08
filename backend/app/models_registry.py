@@ -1,0 +1,4 @@
+"""Barcha ORM modellarini import qiladi: Alembic autogenerate va testlardagi create_all uchun.
+
+Har bir yangi modul modeli shu yerga qo'shiladi.
+"""
