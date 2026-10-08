@@ -68,6 +68,25 @@ worker (arq) <── Redis navbati ── api
 - **Redis.** arq navbati, rate limit hisoblagichlari va qisqa muddatli kesh.
 - **nginx.** HTTPS (Let's Encrypt), React build'ni beradi, `/api`ni proksilaydi. Himoyalangan fayllarni api ruxsat tekshirgandan keyin `X-Accel-Redirect` orqali beradi.
 
+### Lokal ishlab chiqish (Docker'siz)
+
+Docker, PostgreSQL va Redis faqat serverga joylashda (4-bosqich) sozlanadi. Lokal muhitda hech qanday tashqi servis kerak emas:
+
+| Narsa | Lokal (dev/test) | Server (prod) |
+|---|---|---|
+| Baza | SQLite (`aiosqlite`) | PostgreSQL 16 (+ pgvector, 3-bosqichdan) |
+| Fon ishlari | `InlineJobRunner`: shu jarayon ichida `asyncio` task | arq + Redis worker |
+| Login rate limit | xotirada (`InMemoryRateLimiter`) | Redis |
+| PPT → PDF | o'rnatilgan bo'lsa LibreOffice; bo'lmasa material `failed` (`LIBREOFFICE_NOT_FOUND`) | LibreOffice konteynerda |
+| Fayllarni berish | `FileResponse` | nginx `X-Accel-Redirect` |
+
+Kod ikkala bazada ishlaydigan qilib yoziladi:
+- enumlar `VARCHAR` sifatida saqlanadi;
+- vaqt maydonlari uchun maxsus `UTCDateTime` turi ishlatiladi;
+- PK turi `BigInteger`, SQLite'da esa `Integer` varianti.
+
+Ishlar `JobRunner` interfeysi orqali yuboriladi. Shuning uchun inline'dan arq'ga o'tish faqat sozlama orqali bo'ladi.
+
 ### Texnologiyalar
 
 - **Backend:** Python 3.12, FastAPI, SQLAlchemy 2 (async, asyncpg), Alembic, Pydantic v2, arq, redis-py, argon2-cffi, PyJWT, PyMuPDF, python-docx. Paketlar `uv` bilan boshqariladi.
@@ -267,7 +286,8 @@ Fayl o'chirilsa yoki almashtirilsa, uning bo'laklari ham o'chiriladi yoki qayta 
 
 - **Backend:**
   - har bir modulning `service` va `router` qismlari uchun pytest;
-  - haqiqiy PostgreSQL (testcontainers) ishlatiladi;
+  - lokal muhitda testlar xotiradagi SQLite'da ishlaydi;
+  - GitHub Actions'da xuddi shu testlar `TEST_DATABASE_URL` orqali haqiqiy PostgreSQL servisida ham ishga tushadi;
   - AI uchun `FakeProvider` (deterministik javoblar);
   - asosiy holatlar: ruxsatlar, to'g'ri javob talabaga chiqib ketmasligi, XP ikki marta berilmasligi, AI rad etish chegarasi.
 - **Frontend:** Vitest + RTL bilan komponent va hook'lar testlanadi.
@@ -307,7 +327,11 @@ texnologiya-platform/
 Har bir bosqich oxirida ishlaydigan va testlangan sayt bo'ladi. Har bosqich uchun alohida implementatsiya rejasi yoziladi. 2–4-bosqichlar uchun ish boshlanishidan oldin shu spec asosida qisqa qo'shimcha spec tuziladi.
 
 ### 1-bosqich: Asos (ushbu spec'ning to'liq qamrovi)
-- **Infratuzilma:** monorepo; backend va frontend skeleti; dev uchun Docker Compose (api, worker, postgres+pgvector, redis); Alembic; CI.
+1-bosqich ikkita implementatsiya rejasiga bo'linadi:
+- **1A — Backend:** API, testlar, migratsiyalar, CI.
+- **1B — Frontend:** dizayn tizimi, sahifalar, i18n, E2E.
+
+- **Infratuzilma:** monorepo; backend va frontend skeleti; Docker'siz lokal muhit (SQLite, inline job runner); Alembic; CI (GitHub Actions, PostgreSQL servisi bilan). Docker Compose, arq/Redis va nginx 4-bosqichda qo'shiladi.
 - **auth:** ro'yxatdan o'tish (`pending`), kirish, refresh, chiqish, `/me`, til tanlash, parol almashtirish. Admin: tasdiqlash navbati, rol va holatni o'zgartirish, vaqtinchalik parol berish.
 - **learning:** fanlar va o'qituvchi biriktirish (admin); mavzular (o'qituvchi); 7 bosqichni avtomatik yaratish; materiallarni yuklash; worker'da PPT/PPTX/DOC/DOCX → PDF konvertatsiyasi; glossariy; adabiyotlar; `step_progress`.
 - **Frontend:**
@@ -330,7 +354,7 @@ Har bir bosqich oxirida ishlaydigan va testlangan sayt bo'ladi. Har bosqich uchu
   - `GET /me/continue`, `GET /me/progress`;
   - `GET /materials/{id}/file` (ruxsat tekshirilgach, X-Accel-Redirect).
 - **o'qituvchi:**
-  - `GET /teach/subjects`;
+  - `GET /teach/subjects`, `GET /teach/topics/{id}` (muharrir uchun to'liq mavzu: bosqichlar, barcha materiallar holati bilan, glossariy, adabiyotlar);
   - `POST /teach/subjects/{id}/topics`, `PATCH /teach/topics/{id}`, `DELETE /teach/topics/{id}`, `PUT /teach/subjects/{id}/topics/order`;
   - `POST /teach/steps/{id}/materials` (multipart), `DELETE /teach/materials/{id}`, `POST /teach/materials/{id}/retry`;
   - `GET|POST|PATCH|DELETE /teach/topics/{id}/glossary[/{term_id}]`;
