@@ -635,6 +635,8 @@ export function setLanguage(lang: Language): void {
     "TOPIC_NOT_FOUND": "Mavzu topilmadi",
     "STEP_NOT_FOUND": "Bosqich topilmadi",
     "MATERIAL_NOT_FOUND": "Material topilmadi",
+    "GLOSSARY_TERM_NOT_FOUND": "Atama topilmadi",
+    "LITERATURE_NOT_FOUND": "Adabiyot topilmadi",
     "SLUG_TAKEN": "Bu slug band. Boshqasini kiriting",
     "INVALID_ORDER": "Mavzular ro'yxati eskirgan. Sahifani yangilang",
     "STEP_DOES_NOT_ACCEPT_FILES": "Bu bosqichga fayl yuklab bo'lmaydi",
@@ -764,7 +766,7 @@ export function setLanguage(lang: Language): void {
     "topicSaved": "Mavzu saqlandi",
     "stepsLabel": "Mavzu bosqichlari",
     "comingSoon": "Bu bosqich keyingi yangilanishda qo'shiladi",
-    "comingSoonText": "Testlar, ha/yo'q savollari, krossvord va vazifalar 2-bosqichda paydo bo'ladi",
+    "comingSoonText": "Testlar, ha/yo'q savollari, krossvord va vazifalar platformaning keyingi versiyasida paydo bo'ladi",
     "materialTitle": "Material nomi",
     "materialFile": "Fayl",
     "materialFileHint": "PDF, PPT, PPTX, DOC yoki DOCX · 50 MB gacha",
@@ -880,7 +882,7 @@ export function setLanguage(lang: Language): void {
     "year": "Год — четырёхзначное число от 1900 до 2100",
     "url": "Ссылка должна начинаться с http:// или https://",
     "slug": "Только строчные латинские буквы, цифры и дефис (-)",
-    "order": "Введите целое число от 0"
+    "order": "Введите целое число не меньше 0"
   },
   "errors": {
     "NETWORK": "Не удалось связаться с сервером. Проверьте подключение и попробуйте снова",
@@ -908,6 +910,8 @@ export function setLanguage(lang: Language): void {
     "TOPIC_NOT_FOUND": "Тема не найдена",
     "STEP_NOT_FOUND": "Этап не найден",
     "MATERIAL_NOT_FOUND": "Материал не найден",
+    "GLOSSARY_TERM_NOT_FOUND": "Термин не найден",
+    "LITERATURE_NOT_FOUND": "Источник не найден",
     "SLUG_TAKEN": "Такой slug уже занят. Введите другой",
     "INVALID_ORDER": "Список тем устарел. Обновите страницу",
     "STEP_DOES_NOT_ACCEPT_FILES": "На этот этап нельзя загружать файлы",
@@ -968,7 +972,7 @@ export function setLanguage(lang: Language): void {
     "password": "Пароль",
     "passwordConfirm": "Повторите пароль",
     "passwordHint": "Не менее 8 символов",
-    "fullName": "Полное имя",
+    "fullName": "Имя и фамилия",
     "phone": "Телефон",
     "phoneHint": "Необязательно",
     "login": { "title": "Вход", "submit": "Войти", "noAccount": "Нет аккаунта?" },
@@ -1046,14 +1050,14 @@ export function setLanguage(lang: Language): void {
     "noMaterials": "На этом этапе пока нет материалов",
     "deleteMaterialTitle": "Удаление материала",
     "deleteMaterialText": "Материал «{{title}}» будет удалён.",
-    "pagesCount": "стр.: {{count}}",
+    "pagesCount": "{{count}} стр.",
     "status": { "processing": "Обрабатывается", "ready": "Готово", "failed": "Ошибка" },
     "term": "Термин",
     "definition": "Определение",
     "addTerm": "Новый термин",
     "noGlossary": "Глоссарий пока пуст",
     "deleteTermTitle": "Удаление термина",
-    "deleteItemText": "«{{title}}» будет удалено.",
+    "deleteItemText": "Элемент «{{title}}» будет удалён.",
     "litTitle": "Название",
     "litAuthor": "Автор",
     "litYear": "Год",
@@ -1114,10 +1118,11 @@ export function setLanguage(lang: Language): void {
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach } from 'vitest'
-import { i18n } from '@/i18n'
+import { setLanguage } from '@/i18n'
 
-beforeEach(async () => {
-  await i18n.changeLanguage('uz')
+beforeEach(() => {
+  // Til, localStorage'dagi tanlov va <html lang> har test oldidan tiklanadi.
+  setLanguage('uz')
 })
 
 afterEach(() => {
@@ -1957,10 +1962,11 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach } from 'vitest'
 import { clearToasts } from '@/components/ui/toast-store'
-import { i18n } from '@/i18n'
+import { setLanguage } from '@/i18n'
 
-beforeEach(async () => {
-  await i18n.changeLanguage('uz')
+beforeEach(() => {
+  // Til, localStorage'dagi tanlov va <html lang> har test oldidan tiklanadi.
+  setLanguage('uz')
 })
 
 afterEach(() => {
@@ -2281,15 +2287,16 @@ import { cleanup } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest'
 import { resetAuthHandlers, setAccessToken } from '@/api/client'
 import { clearToasts } from '@/components/ui/toast-store'
-import { i18n } from '@/i18n'
+import { setLanguage } from '@/i18n'
 import { server } from './server'
 
 beforeAll(() => {
   server.listen({ onUnhandledFrame: 'error' })
 })
 
-beforeEach(async () => {
-  await i18n.changeLanguage('uz')
+beforeEach(() => {
+  // Til, localStorage'dagi tanlov va <html lang> har test oldidan tiklanadi.
+  setLanguage('uz')
 })
 
 afterEach(() => {
