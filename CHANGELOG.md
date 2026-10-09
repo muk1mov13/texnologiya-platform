@@ -19,6 +19,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - Dizayn tizimi: Button, Card, Badge, Spinner, EmptyState, Field komponentlari.
 - UI: ProgressRing, Modal/ConfirmDialog, Tabs, Toast.
 - UI tuzatishlari: tab ostidagi chiziq, xatoli maydonlarda fokus ko'rinishi, modalda fokus tutish va scroll qulfi, maydon xatolari aria-describedby orqali bog'landi, toast taymerlari tozalanadi.
+- 1B rejasiga Task 3–4 review tuzatishlari haqida eslatma qo'shildi (haqiqiy manba — repodagi komponentlar).
 
 ## 2026-10-09 — 1A yopildi va GitHub'ga joylandi
 

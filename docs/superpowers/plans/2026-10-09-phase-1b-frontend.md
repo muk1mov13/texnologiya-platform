@@ -1994,6 +1994,13 @@ git commit -m "feat(frontend): progress ring, modal, tabs and toast components"
 
 ---
 
+> **Amalga oshirishdagi farqlar (Task 3–4, kod review'dan keyin, `27eb657`):** quyidagi komponentlar yuqoridagi koddan biroz farq qiladi, haqiqiy manba — repodagi fayllar.
+> - `Tabs`: chiziq `shadow-[inset_...]` bilan chiziladi, `-mb-0.5` yo'q.
+> - `Field`: fokus halqasi (`focus:ring-*`) qo'shildi. Xato va izoh matnlari `aria-describedby`/`aria-invalid` orqali kontekst bilan `Input`/`Textarea`/`Select`ga bog'lanadi.
+> - `Modal`: Tab tugmasi bilan fokus oyna ichida qoladi, sahifa scroll'i qulflanadi, `describedBy` prop'i bor. `ConfirmDialog` `pending` paytida yopilmaydi.
+> - `toast-store`: taymerlar tozalanadi, xato toast'i 10 soniya turadi.
+> - `Button`: primary va danger variantlarida `border-transparent`, fokus chizig'i `brand-700` rangida.
+
 ### Task 5: API qatlami — tiplar, client (refresh bilan), xatolar, QueryClient
 
 **Files:**
