@@ -70,11 +70,14 @@ async function toApiError(response: Response): Promise<ApiError> {
 }
 
 const AUTH_LOCK_NAME = 'auth-refresh'
-const REFRESH_TIMEOUT_MS = 15_000
+const AUTH_REQUEST_TIMEOUT_MS = 15_000
+
+function hasWebLocks(): boolean {
+  return typeof navigator !== 'undefined' && !!navigator.locks
+}
 
 function withAuthLock<T>(run: () => Promise<T>): Promise<T> {
-  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks
-  if (locks) return locks.request(AUTH_LOCK_NAME, run)
+  if (hasWebLocks()) return navigator.locks.request(AUTH_LOCK_NAME, run)
   return run()
 }
 
@@ -82,7 +85,7 @@ function fetchRefresh(): Promise<Response> {
   return fetch('/api/auth/refresh', {
     method: 'POST',
     credentials: 'same-origin',
-    signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
+    signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT_MS),
   })
 }
 
@@ -96,7 +99,11 @@ function requestRefresh(): Promise<Response> {
 }
 
 function fetchLogout(): Promise<Response> {
-  return fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+  return fetch('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'same-origin',
+    signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT_MS),
+  })
 }
 
 function requestLogout(): Promise<Response> {
@@ -147,10 +154,17 @@ export function refreshSession(): Promise<TokenOut | null> {
  * o'zgarganini ko'rib, eskirgan natijani e'tiborsiz qoldiradi.
  */
 export function logoutRequest(): Promise<void> {
+  const previousRefresh = refreshing
   slotOwner += 1
   const ownToken = slotOwner
   const promise: Promise<TokenOut | null> = (async () => {
     try {
+      if (!hasWebLocks() && previousRefresh) {
+        // Web Locks yo'q brauzerlarda tartibni o'zimiz ta'minlaymiz: eski refresh tugaguncha
+        // logout so'rovini yubormaymiz (xatosi bu yerda ahamiyatsiz) — aks holda ikkisi bir
+        // vaqtda ketib, backend'da refresh token qayta ishlatilgandek ko'rinishi mumkin.
+        await previousRefresh.catch(() => {})
+      }
       const response = await requestLogout()
       if (!response.ok) throw await toApiError(response)
       return null
@@ -186,6 +200,7 @@ function send(path: string, options: RequestOptions, token: string | null): Prom
 
 async function request(path: string, options: RequestOptions): Promise<Response> {
   const tokenUsed = accessToken
+  const startGeneration = generation
   let response = await send(path, options, tokenUsed)
   if (response.status === 401 && options.auth !== false) {
     const error = await toApiError(response.clone())
@@ -197,7 +212,9 @@ async function request(path: string, options: RequestOptions): Promise<Response>
         const session = await refreshSession()
         if (session) {
           response = await send(path, options, session.access_token)
-        } else {
+        } else if (generation === startGeneration) {
+          // null faqat eskirgan natija bo'lgani uchun bo'lishi mumkin (shu orada login/logout
+          // bo'lgan) — bu holda sessiya aslida yo'qolmagan, onLost chaqirilmaydi.
           handlers.onLost()
         }
       }

@@ -64,7 +64,7 @@ test('parol almashtirilgach logout chaqiriladi va sessiya null bo\'ladi', async 
   expect(getAccessToken()).toBeNull()
 })
 
-test('mahalliy refresh kutilayotganda logout qilinsa, uning natijasi e\'tiborsiz qoladi va sessiya null qoladi', async () => {
+test('mahalliy refresh kutilayotganda logout qilinsa, u avval tugaydi va logout keyin sessiyani tozalaydi', async () => {
   const user = makeUser()
   const queryClient = createQueryClient()
   queryClient.setQueryData(sessionKey, user)
@@ -87,16 +87,20 @@ test('mahalliy refresh kutilayotganda logout qilinsa, uning natijasi e\'tiborsiz
 
   const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper(queryClient) })
   result.current.mutate()
+
+  // Web Locks yo'q (jsdom): logout avval kutilayotgan refresh tugashini kutadi, shuning uchun
+  // mutatsiya faqat gate ochilgandan keyin "isSuccess" bo'lishi mumkin.
+  releaseRefresh()
+  await expect(pendingRefresh).resolves.toMatchObject({ access_token: 'new-token' })
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-  releaseRefresh()
-  await expect(pendingRefresh).resolves.toBeNull()
-
+  // Refresh muvaffaqiyatli tugagan bo'lsa ham, undan keyin ishga tushgan logout
+  // sessiyani oxir-oqibat tozalaydi.
   expect(queryClient.getQueryData(sessionKey)).toBeNull()
   expect(getAccessToken()).toBeNull()
 })
 
-test('sessiya so\'rovi hali yuklanayotganda logout qilinsa, foydalanuvchi qaytarilmaydi', async () => {
+test('sessiya so\'rovi hali yuklanayotganda logout qilinsa, oxirida foydalanuvchi qaytarilmaydi', async () => {
   const user = makeUser()
   const queryClient = createQueryClient()
   queryClient.setQueryData(sessionKey, user)
@@ -122,14 +126,12 @@ test('sessiya so\'rovi hali yuklanayotganda logout qilinsa, foydalanuvchi qaytar
 
   const { result } = renderHook(() => useLogout(), { wrapper })
   result.current.mutate()
-  await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-  // Sessiya logout paytida allaqachon null bo'lishi kerak — kutilayotgan (bekor qilingan)
-  // refetch keyinroq hal bo'lganda uni qaytarmasligi kerak.
-  expect(queryClient.getQueryData(sessionKey)).toBeNull()
-
+  // Web Locks yo'q (jsdom): logout avval kutilayotgan refetch'ning refresh so'rovi
+  // tugashini kutadi, shuning uchun uni shu yerda ochamiz.
   releaseRefresh()
   await refetchPromise.catch(() => {})
+  await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
   expect(queryClient.getQueryData(sessionKey)).toBeNull()
 })

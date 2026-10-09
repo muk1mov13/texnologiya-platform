@@ -199,3 +199,49 @@ test('refresh va logout bitta "auth-refresh" nomli Web Lock orqali navbatlanadi'
   }
   expect(lockNames).toEqual(['auth-refresh', 'auth-refresh'])
 })
+
+test('mehmon sifatida boshlangan refresh login\'dan keyin null qaytarsa, onLost chaqirilmaydi', async () => {
+  const onLost = vi.fn()
+  setAuthHandlers({ onRefreshed: vi.fn(), onLost })
+  server.use(
+    http.post('/api/auth/refresh', () => {
+      // refreshSession() shu yerga kelganda (401 aniqlanib, o'z so'rovini boshlagandan keyin)
+      // "boshqa joyda" login sodir bo'ladi: generation yangilanadi, lekin bu so'rov
+      // muvaffaqiyatli tugaydi — natija shu sababli eskirgan deb e'tiborsiz qoldiriladi.
+      resetSession()
+      setAccessToken('new-login-token')
+      return HttpResponse.json(session)
+    }),
+    http.get('/api/subjects', invalidToken),
+  )
+  await expect(apiFetch('/api/subjects')).rejects.toMatchObject({ code: 'INVALID_TOKEN' })
+  expect(onLost).not.toHaveBeenCalled()
+})
+
+test('Web Locks yo\'q paytda logout avval kutilayotgan refresh tugashini kutadi', async () => {
+  let logoutCalled = false
+  let releaseRefresh = () => {}
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  server.use(
+    http.post('/api/auth/refresh', async () => {
+      await refreshGate
+      return HttpResponse.json(session)
+    }),
+    http.post('/api/auth/logout', () => {
+      logoutCalled = true
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
+  const pendingRefresh = refreshSession()
+  const pendingLogout = logoutRequest()
+
+  // Refresh hali tugamagan — logout hali so'rovni yubormagan bo'lishi kerak.
+  expect(logoutCalled).toBe(false)
+
+  releaseRefresh()
+  await pendingRefresh
+  await pendingLogout
+  expect(logoutCalled).toBe(true)
+})
