@@ -57,12 +57,15 @@ async def course(db: AsyncSession, settings: Settings) -> dict[str, Any]:
     }
 
 
+PPTX_SIGNATURE = b"PK\x03\x04"
+
+
 async def upload_pptx(client: AsyncClient, course: dict[str, Any]) -> dict[str, Any]:
     response = await client.post(
         f"/api/teach/steps/{course['lecture_id']}/materials",
         headers=course["headers"],
         data={"title": "Taqdimot"},
-        files={"file": ("slaydlar.pptx", b"PK fake pptx", PPTX_MIME)},
+        files={"file": ("slaydlar.pptx", PPTX_SIGNATURE + b"fake pptx", PPTX_MIME)},
     )
     assert response.status_code == 201, response.text
     body: dict[str, Any] = response.json()
@@ -123,10 +126,29 @@ async def test_upload_rejects_broken_pdf(client: AsyncClient, course: dict[str, 
         f"/api/teach/steps/{course['lecture_id']}/materials",
         headers=course["headers"],
         data={"title": "Buzuq"},
-        files={"file": ("buzuq.pdf", b"not a pdf", "application/pdf")},
+        files={
+            "file": (
+                "buzuq.pdf",
+                b"%PDF-1.4\nnot a real pdf body, just garbage after the header\n%%EOF",
+                "application/pdf",
+            )
+        },
     )
     assert response.status_code == 400
     assert response.json()["code"] == "INVALID_PDF"
+
+
+async def test_upload_rejects_file_signature_mismatch(
+    client: AsyncClient, course: dict[str, Any]
+) -> None:
+    response = await client.post(
+        f"/api/teach/steps/{course['lecture_id']}/materials",
+        headers=course["headers"],
+        data={"title": "Soxta"},
+        files={"file": ("soxta.pptx", b"this is not actually a pptx file", PPTX_MIME)},
+    )
+    assert response.status_code == 400
+    assert response.json()["code"] == "UNSUPPORTED_FILE_TYPE"
 
 
 async def test_upload_rejects_encrypted_pdf(client: AsyncClient, course: dict[str, Any]) -> None:

@@ -20,6 +20,26 @@ ALLOWED_MATERIAL_EXT = frozenset({".pdf", ".ppt", ".pptx", ".doc", ".docx"})
 CONVERT_JOB = "convert_material"
 MAX_CONVERSION_ATTEMPTS = 3
 
+# Kengaytma mos kelsa ham, fayl mazmuni boshqa formatda bo'lishi mumkin (masalan
+# nomi o'zgartirilgan .exe). Har bir ruxsat etilgan kengaytma uchun "magic bytes"
+# orqali haqiqiy formatni tekshiramiz.
+FILE_SIGNATURES: dict[str, tuple[bytes, ...]] = {
+    ".pdf": (b"%PDF-",),
+    ".pptx": (b"PK\x03\x04",),
+    ".docx": (b"PK\x03\x04",),
+    ".ppt": (b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1",),
+    ".doc": (b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1",),
+}
+
+
+def _signature_matches(path: Path, ext: str) -> bool:
+    signatures = FILE_SIGNATURES.get(ext)
+    if not signatures:
+        return True
+    with path.open("rb") as fh:
+        header = fh.read(8)
+    return any(header.startswith(signature) for signature in signatures)
+
 
 async def add_material(
     db: AsyncSession,
@@ -40,6 +60,9 @@ async def add_material(
         allowed_ext=ALLOWED_MATERIAL_EXT,
         max_bytes=settings.max_material_mb * 1024 * 1024,
     )
+    if not _signature_matches(storage.path(rel), Path(rel).suffix.lower()):
+        storage.delete(rel)
+        raise AppError(400, "UNSUPPORTED_FILE_TYPE", "Fayl mazmuni e'lon qilingan turga mos emas")
     material = Material(
         step_id=step.id,
         title=title.strip(),
