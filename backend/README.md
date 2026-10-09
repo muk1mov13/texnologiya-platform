@@ -9,8 +9,10 @@ cd backend
 uv sync
 cp .env.example .env
 uv run alembic upgrade head
-uv run python -m app.cli create-admin --email admin@example.uz --password "kuchli-parol-123" --name "Administrator"
+uv run python -m app.cli create-admin --email admin@example.uz --name "Administrator"
 ```
+
+`--password` ko'rsatilmasa, parol `ADMIN_PASSWORD` muhit o'zgaruvchisidan olinadi, u ham bo'lmasa terminalda ikki marta (tasdiqlash uchun) so'raladi — parol terminal buyruqlar tarixida qolmaydi. Xuddi shunday, `--email` o'rniga `ADMIN_EMAIL` ishlatilishi mumkin.
 
 ## Ishga tushirish
 

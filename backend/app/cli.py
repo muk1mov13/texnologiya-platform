@@ -1,5 +1,7 @@
 import argparse
 import asyncio
+import getpass
+import os
 import sys
 
 from sqlalchemy import select
@@ -37,23 +39,47 @@ async def create_admin(settings: Settings, email: str, password: str, full_name:
         await engine.dispose()
 
 
+def _resolve_email(args: argparse.Namespace) -> str:
+    email = args.email or os.environ.get("ADMIN_EMAIL")
+    if not email:
+        raise ValueError("--email yoki ADMIN_EMAIL muhit o'zgaruvchisi ko'rsatilishi kerak")
+    return email
+
+
+def _resolve_password(args: argparse.Namespace) -> str:
+    password = args.password or os.environ.get("ADMIN_PASSWORD")
+    if password:
+        return password
+    # --password/ADMIN_PASSWORD berilmagan bo'lsa, terminal buyruq tarixida yoki
+    # jarayon muhitida qolmasligi uchun interaktiv so'rov orqali olinadi.
+    first = getpass.getpass("Parol: ")
+    second = getpass.getpass("Parolni tasdiqlang: ")
+    if first != second:
+        raise ValueError("Parollar bir xil emas")
+    return first
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
     create = commands.add_parser(
         "create-admin", help="Admin yaratish yoki mavjud foydalanuvchini admin qilish"
     )
-    create.add_argument("--email", required=True)
-    create.add_argument("--password", required=True)
+    create.add_argument("--email", default=None, help="Berilmasa, ADMIN_EMAIL o'zgaruvchisi")
+    create.add_argument(
+        "--password", default=None, help="Berilmasa, ADMIN_PASSWORD yoki interaktiv so'rov"
+    )
     create.add_argument("--name", default="Administrator")
     args = parser.parse_args(argv)
 
     try:
-        result = asyncio.run(create_admin(get_settings(), args.email, args.password, args.name))
+        email = _resolve_email(args)
+        password = _resolve_password(args)
+        result = asyncio.run(create_admin(get_settings(), email, password, args.name))
     except ValueError as exc:
         print(f"Xato: {exc}", file=sys.stderr)
         return 1
-    print(f"Admin {result}: {normalize_email(args.email)}")
+    print(f"Admin {result}: {normalize_email(email)}")
     return 0
 
 
