@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     jwt_secret: str = DEV_JWT_SECRET
     access_token_minutes: int = 15
     refresh_token_days: int = 30
+    refresh_reuse_grace_seconds: int = 30
     cookie_secure: bool = False
     cors_origins: list[str] = ["http://localhost:5173"]
     media_root: str = "./media"

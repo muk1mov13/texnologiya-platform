@@ -94,8 +94,16 @@ async def rotate_refresh(
     if session is None:
         raise AppError(401, "INVALID_REFRESH_TOKEN", "Sessiya topilmadi")
     if session.revoked_at is not None:
-        # Bekor qilingan token qayta ishlatildi: o'g'irlangan bo'lishi mumkin,
-        # hamma sessiyalarni yopamiz.
+        grace = timedelta(seconds=settings.refresh_reuse_grace_seconds)
+        if utcnow() - session.revoked_at <= grace:
+            # Imtiyoz oynasi: token yaqinda (grace soniya ichida) rotatsiya qilingan.
+            # Bu odatda parallel tablar bir vaqtda refresh qilganda yoki sahifa
+            # yangilanishi server rotatsiyadan keyin javobni uzib qo'yganda
+            # (brauzerda eski cookie qolganda) bo'ladi. Faqat shu so'rovni rad
+            # etamiz, foydalanuvchining boshqa sessiyalariga tegmaymiz.
+            raise AppError(401, "REFRESH_ROTATED", "Sessiya yangilangan, qayta kiring")
+        # Imtiyoz oynasidan keyin bekor qilingan token qayta ishlatildi:
+        # o'g'irlangan bo'lishi mumkin, hamma sessiyalarni yopamiz.
         await revoke_all_sessions(db, session.user_id)
         await db.commit()
         raise AppError(401, "REFRESH_REUSED", "Sessiya bekor qilingan")
@@ -114,10 +122,10 @@ async def rotate_refresh(
     )
     if result.rowcount == 0:
         # Boshqa bir parallel so'rov ushbu sessiyani SELECT va UPDATE orasida
-        # allaqachon bekor qilgan: token o'g'irlangan bo'lishi mumkin.
-        await revoke_all_sessions(db, session.user_id)
-        await db.commit()
-        raise AppError(401, "REFRESH_REUSED", "Sessiya bekor qilingan")
+        # (ya'ni hozirgina) bekor qilgan: bu imtiyoz oynasi ichida, shuning uchun
+        # boshqa sessiyalarni yopmasdan faqat shu so'rovni rad etamiz.
+        await db.rollback()
+        raise AppError(401, "REFRESH_ROTATED", "Sessiya yangilangan, qayta kiring")
     access, new_raw = await issue_tokens(db, user, settings, user_agent)
     return user, access, new_raw
 

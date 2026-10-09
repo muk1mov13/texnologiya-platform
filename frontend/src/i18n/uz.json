@@ -61,6 +61,7 @@
     "INVALID_REFRESH_TOKEN": "Sessiya yaroqsiz. Qayta kiring",
     "REFRESH_EXPIRED": "Sessiya muddati tugadi. Qayta kiring",
     "REFRESH_REUSED": "Xavfsizlik uchun sessiya yopildi. Qayta kiring",
+    "REFRESH_ROTATED": "Sessiya yangilangan. Qayta kiring",
     "FORBIDDEN": "Bu amal uchun ruxsat yo'q",
     "NOT_SUBJECT_TEACHER": "Siz bu fanga biriktirilmagansiz",
     "NOT_A_TEACHER": "Faqat o'qituvchilarni biriktirish mumkin",
