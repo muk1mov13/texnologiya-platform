@@ -12,12 +12,33 @@ interface ModalProps {
   describedBy?: string
 }
 
-const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+const FOCUSABLE_SELECTOR =
+  'a[href], button, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])'
 
 function getFocusable(panel: HTMLElement): HTMLElement[] {
   return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-    (el) => !el.matches(':disabled'),
+    (el) => !el.matches(':disabled') && el.tabIndex >= 0,
   )
+}
+
+// Bir vaqtda bir nechta modal ochilishi mumkin: faqat birinchisi scroll'ni
+// qulflaydi va faqat oxirgisi yopilganda avvalgi qiymat tiklanadi.
+let openModalCount = 0
+let savedBodyOverflow = ''
+
+function lockBodyScroll(): void {
+  if (openModalCount === 0) {
+    savedBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+  }
+  openModalCount += 1
+}
+
+function unlockBodyScroll(): void {
+  openModalCount = Math.max(0, openModalCount - 1)
+  if (openModalCount === 0) {
+    document.body.style.overflow = savedBodyOverflow
+  }
 }
 
 export function Modal({ open, title, onClose, children, footer, describedBy }: ModalProps) {
@@ -32,8 +53,7 @@ export function Modal({ open, title, onClose, children, footer, describedBy }: M
 
   useEffect(() => {
     if (!open) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    lockBodyScroll()
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const panel = panelRef.current
     const firstField = panel?.querySelector<HTMLElement>(
@@ -60,10 +80,11 @@ export function Modal({ open, title, onClose, children, footer, describedBy }: M
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
       const active = document.activeElement
-      if (event.shiftKey && active === first) {
+      const outside = active === node || !node.contains(active)
+      if (event.shiftKey && (active === first || outside)) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && active === last) {
+      } else if (!event.shiftKey && (active === last || outside)) {
         event.preventDefault()
         first.focus()
       }
@@ -72,7 +93,7 @@ export function Modal({ open, title, onClose, children, footer, describedBy }: M
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previousOverflow
+      unlockBodyScroll()
       previous?.focus()
     }
   }, [open])
@@ -93,7 +114,7 @@ export function Modal({ open, title, onClose, children, footer, describedBy }: M
         aria-labelledby={titleId}
         aria-describedby={describedBy}
         tabIndex={-1}
-        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl outline-hidden"
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <h2 id={titleId} className="text-lg font-bold">
@@ -137,7 +158,7 @@ export function ConfirmDialog({ open, title, text, confirmLabel, onConfirm, onCa
       describedBy={textId}
       footer={
         <>
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={pending}>
             {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={pending}>
