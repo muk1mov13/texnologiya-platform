@@ -4305,9 +4305,20 @@ test('review/practice/task "Tugatdim" bilan yakunlanmaydi', () => {
 > karta eskirmasin), `useCompleteStep.onSuccess`da natijani darhol keshga yozish (refetch
 > muvaffaqiyatsiz bo'lsa ham holat qayta "ochiq"ga qaytmasin) va PDF kaliti `studentKeys.pdf()`
 > orqali (pastroq `gcTime`). Pastdagi kod shu tuzatilgan holat.
+>
+> **Code-review tuzatishi (Task 10):** "Tugatdim" toast'i endi shu yerda, `onSuccess` ichida
+> `i18n.t(...)` orqali chiqariladi (`errors.ts`/`auth.ts`dagi kabi — boshqa non-component kod ham
+> shunday qiladi), chunki `StepContent`dagi chaqiruvga xos `onSuccess` callback'i komponent
+> unmount bo'lsa o'tkazib yuboriladi ("Tugatdim" ketidan tezda "Keyingi →" bosilganda toast
+> yo'qolib qolardi). `useCompleteStep` endi `topic.progress.completed`ni ham patch qiladi (avval
+> faqat `steps[].status` yangilanardi): bosqich ENDI tugatilgan bo'lsa (avval tugatilmagan bo'lsa)
+> hisoblagich +1 (`total`dan oshmaydi) — shunda sidebar ✓ va progress halqasi refetch kutilayotganda
+> ham izchil qoladi.
 
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { pushToast } from '@/components/ui/toast-store'
+import { i18n } from '@/i18n'
 import { apiBuffer, apiFetch } from './client'
 import type { ContinueTarget, StepBrief, StepContent, SubjectCard, SubjectDetail, TopicDetail } from './types'
 
@@ -4373,11 +4384,22 @@ export function useCompleteStep(topicId: number) {
       queryClient.setQueryData<StepContent>(studentKeys.step(step.id), (old) =>
         old ? { ...old, status: step.status } : old,
       )
-      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) =>
-        old
-          ? { ...old, steps: old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s)) }
-          : old,
-      )
+      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) => {
+        if (!old) return old
+        const previous = old.steps.find((s) => s.id === step.id)
+        const steps = old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s))
+        // Progress halqasi: faqat bosqich ENDI tugatilgan bo'lsa (avval tugatilmagan bo'lsa)
+        // hisoblagich oshiriladi — refetch kutilayotganda ham sidebar/halqa izchil ko'rsatadi.
+        const progress =
+          previous?.status !== 'completed' && step.status === 'completed'
+            ? { ...old.progress, completed: Math.min(old.progress.completed + 1, old.progress.total) }
+            : old.progress
+        return { ...old, steps, progress }
+      })
+      // Toast shu yerda (hook darajasida) chiqariladi: komponent darhol unmount bo'lsa ham
+      // (masalan, "Tugatdim" ketidan tezda "Keyingi →" bosilsa), chaqiruvga xos onSuccess
+      // callback'i o'tkazib yuborilishi mumkin, ammo hook darajasidagi bu handler har doim ishlaydi.
+      pushToast('success', i18n.t('player.completedToast'))
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: studentKeys.topic(topicId) }),
         queryClient.invalidateQueries({ queryKey: studentKeys.step(step.id) }),
@@ -4791,6 +4813,21 @@ git commit -m "feat(frontend): student subjects list and topic path"
 
 PDF faylni olish uchun Bearer token kerak, shuning uchun `PdfViewer` faylni `apiBuffer` orqali `ArrayBuffer` qilib oladi va react-pdf'ga `{ data }` sifatida beradi. pdf.js buferni "detach" qiladi, shu sababli keshdagi buferning nusxasi uzatiladi. Unit testlarda `PdfViewer` mock qilinadi, PDF'ning haqiqiy chizilishi E2E testda tekshiriladi.
 
+> **Code-review tuzatishi:** birinchi implementatsiyadan keyingi review quyidagilarni talab qildi —
+> 1) "Tugatdim" toast'i `StepContent`dagi chaqiruvga xos `onSuccess`dan `useCompleteStep`
+> (`api/student.ts`) hook darajasidagi `onSuccess`ga ko'chirildi — komponent darhol unmount
+> bo'lsa (masalan, "Tugatdim" ketidan tezda "Keyingi →" bosilsa) chaqiruvga xos callback
+> o'tkazib yuborilardi, toast yo'qolib qolardi; 2) `useCompleteStep` endi `topic.progress.completed`ni
+> ham patch qiladi, avval faqat `steps[].status` yangilanardi — sidebar ✓ va progress halqasi
+> refetch kutilayotganda ham izchil qoladi; 3) `StepContentView` endi fayl bosqichida BIR vaqtda
+> faqat BITTA materialni (`FileMaterials` ichki komponenti) chizadi — bir nechta material bo'lsa,
+> `aria-pressed` tugmali tanlagich ko'rsatiladi, aks holda hamma PDF bir vaqtda yuklanib, xotirada
+> ikki nusxada saqlanardi; 4) `StepLink`da tugatilgan bosqich doirachasi `bg-brand-500`dan
+> `bg-brand-600`ga o'zgartirildi — faol (`bg-brand-700`) bilan vizual farqlansin, ikkisi ham oq
+> matn/belgi bilan yetarli kontrastda qolsin. Pastdagi kod shu tuzatilgan holat; qo'shimcha
+> testlar (bir nechta material, bosqich kontentini olishda xato, noma'lum `kind`, kontentli
+> bosqichi yo'q mavzu) Step 1'ga qo'shilgan.
+
 - [ ] **Step 1: Muvaffaqiyatsiz testni yozish**
 
 `frontend/src/features/student/PlayerPage.test.tsx`:
@@ -4879,6 +4916,76 @@ test('bosqichlar ro\'yxatida joriy bosqich belgilangan', async () => {
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
   const current = await screen.findByRole('link', { current: 'step' })
   expect(current).toHaveTextContent(i18n.t('steps.glossary'))
+})
+
+// --- Code-review tuzatishi: qo'shimcha testlar ---
+
+test('bir nechta material bo\'lsa faqat tanlangani ko\'rsatiladi', async () => {
+  mockTopic(() => false)
+  server.use(
+    http.get('/api/steps/101', () =>
+      HttpResponse.json(
+        stepContent({
+          materials: [
+            { id: 500, title: "Kirish ma'ruzasi", page_count: 3, file_url: '/api/materials/500/file' },
+            { id: 501, title: "Qo'shimcha material", page_count: 2, file_url: '/api/materials/501/file' },
+          ],
+        }),
+      ),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  expect(await screen.findByTestId('pdf')).toHaveTextContent("Kirish ma'ruzasi|/api/materials/500/file")
+  expect(screen.getAllByTestId('pdf')).toHaveLength(1)
+
+  const secondButton = screen.getByRole('button', { name: "Qo'shimcha material" })
+  expect(secondButton).toHaveAttribute('aria-pressed', 'false')
+  await userEvent.click(secondButton)
+
+  expect(await screen.findByTestId('pdf')).toHaveTextContent("Qo'shimcha material|/api/materials/501/file")
+  expect(screen.getAllByTestId('pdf')).toHaveLength(1)
+  expect(secondButton).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('bosqich kontentini olishda xato bo\'lsa qayta urinish bilan xato holati ko\'rsatiladi', async () => {
+  mockTopic(() => false)
+  let attempt = 0
+  server.use(
+    http.get('/api/steps/101', () => {
+      attempt += 1
+      if (attempt === 1) return HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 })
+      return HttpResponse.json(stepContent())
+    }),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  expect(await screen.findByText(i18n.t('errors.INTERNAL_ERROR'))).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('common.retry') }))
+  expect(await screen.findByTestId('pdf')).toBeInTheDocument()
+})
+
+test('manzilda noma\'lum bosqich turi bo\'lsa birinchi kontentli bosqichga yo\'naltiriladi', async () => {
+  mockTopic(() => false)
+  const { router } = renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/exam', user: studentUser })
+  await waitFor(() => expect(router.state.location.pathname).toBe('/app/topics/10/lecture'))
+})
+
+test('kontentli bosqich bo\'lmagan mavzuda birinchi bosqich ko\'rsatiladi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json(
+        topicDetail({
+          steps: [
+            { id: 100, kind: 'review', order: 1, has_content: false, status: null },
+            { id: 103, kind: 'practice', order: 2, has_content: false, status: null },
+          ],
+          progress: { completed: 0, total: 0 },
+        }),
+      ),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: new RegExp(i18n.t('steps.review')) })).toBeInTheDocument()
 })
 ```
 
@@ -4978,17 +5085,18 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
 - [ ] **Step 4: `frontend/src/features/student/StepContent.tsx`**
 
 ```tsx
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCompleteStep, useStep } from '@/api/student'
-import type { GlossaryTerm, LiteratureItem, StepBrief, StepKind } from '@/api/types'
+import type { GlossaryTerm, LiteratureItem, MaterialView, StepBrief, StepKind } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { pushToast } from '@/components/ui/toast-store'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
 import { PdfViewer } from './PdfViewer'
 
@@ -5012,10 +5120,7 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
   const data = content.data
   return (
     <div className="flex flex-col gap-6">
-      {FILE_KINDS.has(data.kind) &&
-        data.materials.map((material) => (
-          <PdfViewer key={material.id} url={material.file_url} title={material.title} />
-        ))}
+      {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
       {data.kind === 'glossary' && <GlossaryList items={data.glossary} />}
       {data.kind === 'literature' && <LiteratureList items={data.literature} />}
       {SELF_COMPLETE_KINDS.has(data.kind) && (
@@ -5023,12 +5128,9 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
           {data.status === 'completed' ? (
             <Badge tone="green">✓ {t('player.completed')}</Badge>
           ) : (
-            <Button
-              loading={complete.isPending}
-              onClick={() =>
-                complete.mutate(step.id, { onSuccess: () => pushToast('success', t('player.completedToast')) })
-              }
-            >
+            // Toast endi hook darajasida (useCompleteStep.onSuccess) chiqariladi — bu yerda
+            // chaqiruvga xos onSuccess yo'q, chunki komponent unmount bo'lsa u o'tkazib yuboriladi.
+            <Button loading={complete.isPending} onClick={() => complete.mutate(step.id)}>
               {t('player.complete')}
             </Button>
           )}
@@ -5039,6 +5141,46 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Bitta vaqtda faqat bitta material (PDF) chiziladi: bir nechta material bo'lsa, tanlagich
+ * ko'rsatiladi — aks holda hamma PDF bir vaqtda yuklab olinib, ikki nusxa xotirada saqlanardi.
+ */
+function FileMaterials({ materials }: { materials: MaterialView[] }) {
+  const { t } = useTranslation()
+  const [selectedId, setSelectedId] = useState(materials[0]?.id)
+  if (materials.length === 0) return null
+  const selected = materials.find((material) => material.id === selectedId) ?? materials[0]
+  return (
+    <div className="flex flex-col gap-4">
+      {materials.length > 1 && (
+        <div role="group" aria-label={t('player.materials')} className="flex flex-wrap gap-2">
+          {materials.map((material) => {
+            const isSelected = material.id === selected.id
+            return (
+              <button
+                key={material.id}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedId(material.id)}
+                className={cx(
+                  'rounded-xl border-2 px-3 py-1.5 text-sm font-semibold transition',
+                  isSelected
+                    ? 'border-brand-700 bg-brand-100 text-brand-900'
+                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+                  FOCUS_RING,
+                )}
+              >
+                {material.title}
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <PdfViewer key={selected.id} url={selected.file_url} title={selected.title} />
     </div>
   )
 }
@@ -5174,7 +5316,9 @@ function StepLink({ topicId, step, active }: { topicId: number; step: StepBrief;
         aria-hidden="true"
         className={cx(
           'grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold',
-          completed ? 'bg-brand-500 text-white' : active ? 'bg-brand-700 text-white' : 'bg-slate-200 text-slate-600',
+          // completed/active bir-biridan ajralib turishi va o'qilishi uchun: brand-600 (tugatilgan)
+          // brand-700 (joriy, faol)dan bir pog'ona yengilroq — ikkisi ham oq matn bilan yetarli kontrastda.
+          completed ? 'bg-brand-600 text-white' : active ? 'bg-brand-700 text-white' : 'bg-slate-200 text-slate-600',
         )}
       >
         {completed ? '✓' : step.order}

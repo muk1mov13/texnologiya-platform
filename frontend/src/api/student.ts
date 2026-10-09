@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { pushToast } from '@/components/ui/toast-store'
+import { i18n } from '@/i18n'
 import { apiBuffer, apiFetch } from './client'
 import type { ContinueTarget, StepBrief, StepContent, SubjectCard, SubjectDetail, TopicDetail } from './types'
 
@@ -64,11 +66,22 @@ export function useCompleteStep(topicId: number) {
       queryClient.setQueryData<StepContent>(studentKeys.step(step.id), (old) =>
         old ? { ...old, status: step.status } : old,
       )
-      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) =>
-        old
-          ? { ...old, steps: old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s)) }
-          : old,
-      )
+      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) => {
+        if (!old) return old
+        const previous = old.steps.find((s) => s.id === step.id)
+        const steps = old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s))
+        // Progress halqasi: faqat bosqich ENDI tugatilgan bo'lsa (avval tugatilmagan bo'lsa)
+        // hisoblagich oshiriladi — refetch kutilayotganda ham sidebar/halqa izchil ko'rsatadi.
+        const progress =
+          previous?.status !== 'completed' && step.status === 'completed'
+            ? { ...old.progress, completed: Math.min(old.progress.completed + 1, old.progress.total) }
+            : old.progress
+        return { ...old, steps, progress }
+      })
+      // Toast shu yerda (hook darajasida) chiqariladi: komponent darhol unmount bo'lsa ham
+      // (masalan, "Tugatdim" ketidan tezda "Keyingi →" bosilsa), chaqiruvga xos onSuccess
+      // callback'i o'tkazib yuborilishi mumkin, ammo hook darajasidagi bu handler har doim ishlaydi.
+      pushToast('success', i18n.t('player.completedToast'))
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: studentKeys.topic(topicId) }),
         queryClient.invalidateQueries({ queryKey: studentKeys.step(step.id) }),
