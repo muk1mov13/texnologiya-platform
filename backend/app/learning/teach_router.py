@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Response
 
 from app.auth.deps import StaffUser
@@ -12,6 +14,8 @@ from app.learning.schemas import (
     TopicOrderIn,
     TopicUpdate,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/teach", tags=["teach"])
 
@@ -60,5 +64,8 @@ async def delete_topic(
 ) -> Response:
     topic = await editing.ensure_can_edit_topic(db, user, topic_id)
     for path in await editing.delete_topic(db, topic):
-        storage.delete(path)
+        try:
+            storage.delete(path)
+        except OSError:
+            logger.warning("Faylni o'chirib bo'lmadi: %s", path)
     return Response(status_code=204)

@@ -299,6 +299,21 @@ async def test_delete_material_removes_files(
     assert await lecture_materials(client, course) == []
 
 
+async def test_delete_material_survives_locked_file(
+    client: AsyncClient, course: dict[str, Any], settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    material = await add_ready_pdf(client, course["headers"], course["lecture_id"])
+
+    def failing_delete(self: Storage, rel: str | None) -> None:
+        raise OSError("faylga ruxsat yo'q")
+
+    monkeypatch.setattr(Storage, "delete", failing_delete)
+    response = await client.delete(
+        f"/api/teach/materials/{material['id']}", headers=course["headers"]
+    )
+    assert response.status_code == 204
+
+
 async def test_unassigned_teacher_cannot_upload(
     client: AsyncClient, db: AsyncSession, settings: Settings, course: dict[str, Any]
 ) -> None:

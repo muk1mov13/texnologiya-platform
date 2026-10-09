@@ -1,10 +1,19 @@
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import Role, User
 from app.core.config import Settings
-from app.learning.models import Subject
-from tests.factories import auth_headers, make_subject, make_topic, make_user
+from app.core.storage import Storage
+from app.learning.models import StepKind, Subject
+from tests.factories import (
+    add_ready_pdf,
+    auth_headers,
+    make_subject,
+    make_topic,
+    make_user,
+    step_of,
+)
 
 
 async def teacher_with_subject(db: AsyncSession) -> tuple[User, Subject]:
@@ -100,6 +109,23 @@ async def test_update_and_delete_topic(
     missing = await client.get(f"/api/teach/topics/{topic.id}", headers=headers)
     assert missing.status_code == 404
     assert missing.json()["code"] == "TOPIC_NOT_FOUND"
+
+
+async def test_delete_topic_survives_locked_file(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    teacher, subject = await teacher_with_subject(db)
+    topic = await make_topic(db, subject)
+    headers = auth_headers(teacher, settings)
+    lecture = await step_of(db, topic, StepKind.lecture)
+    await add_ready_pdf(client, headers, lecture.id)
+
+    def failing_delete(self: Storage, rel: str | None) -> None:
+        raise OSError("faylga ruxsat yo'q")
+
+    monkeypatch.setattr(Storage, "delete", failing_delete)
+    response = await client.delete(f"/api/teach/topics/{topic.id}", headers=headers)
+    assert response.status_code == 204
 
 
 async def test_reorder_topics(client: AsyncClient, db: AsyncSession, settings: Settings) -> None:

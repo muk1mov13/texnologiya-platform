@@ -124,7 +124,12 @@ async def delete_material(db: AsyncSession, material: Material, storage: Storage
     await db.delete(material)
     await db.commit()
     for path in paths:
-        storage.delete(path)
+        try:
+            storage.delete(path)
+        except OSError:
+            # DB o'chirish muvaffaqiyatli bo'ldi; qulflangan/ruxsatsiz fayl
+            # tufayli bu so'rovni 500'ga aylantirmaymiz.
+            logger.warning("Faylni o'chirib bo'lmadi: %s", path)
 
 
 async def retry_material(db: AsyncSession, material: Material, jobs: JobRunner) -> Material:

@@ -1,11 +1,20 @@
+import pytest
 from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import Role
 from app.core.config import Settings
-from app.learning.models import Topic
-from tests.factories import auth_headers, make_subject, make_topic, make_user
+from app.core.storage import Storage
+from app.learning.models import StepKind, Topic
+from tests.factories import (
+    add_ready_pdf,
+    auth_headers,
+    make_subject,
+    make_topic,
+    make_user,
+    step_of,
+)
 
 
 async def admin_headers(db: AsyncSession, settings: Settings) -> dict[str, str]:
@@ -62,6 +71,25 @@ async def test_delete_subject_removes_topics(
     response = await client.delete(f"/api/admin/subjects/{subject.id}", headers=headers)
     assert response.status_code == 204
     assert (await client.get("/api/admin/subjects", headers=headers)).json() == []
+    assert await db.scalar(select(func.count()).select_from(Topic)) == 0
+
+
+async def test_delete_subject_survives_locked_file(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    headers = await admin_headers(db, settings)
+    teacher = await make_user(db, email="ustoz2@mail.uz", role=Role.teacher)
+    subject = await make_subject(db, teachers=[teacher])
+    topic = await make_topic(db, subject)
+    lecture = await step_of(db, topic, StepKind.lecture)
+    await add_ready_pdf(client, auth_headers(teacher, settings), lecture.id)
+
+    def failing_delete(self: Storage, rel: str | None) -> None:
+        raise OSError("faylga ruxsat yo'q")
+
+    monkeypatch.setattr(Storage, "delete", failing_delete)
+    response = await client.delete(f"/api/admin/subjects/{subject.id}", headers=headers)
+    assert response.status_code == 204
     assert await db.scalar(select(func.count()).select_from(Topic)) == 0
 
 
