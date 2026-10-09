@@ -26,6 +26,7 @@ API hujjatlari: http://localhost:8000/api/docs
 
 ```bash
 uv run pytest -q
+uv run ruff format --check .
 uv run ruff check .
 uv run mypy app
 ```
