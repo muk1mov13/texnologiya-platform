@@ -1,6 +1,7 @@
 from datetime import timedelta
+from typing import cast
 
-from sqlalchemy import select, update
+from sqlalchemy import CursorResult, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -103,10 +104,13 @@ async def rotate_refresh(
     user = await db.get(User, session.user_id)
     if user is None or user.status == UserStatus.blocked:
         raise AppError(403, "ACCOUNT_BLOCKED", "Akkaunt bloklangan")
-    result = await db.execute(
-        update(RefreshSession)
-        .where(RefreshSession.id == session.id, RefreshSession.revoked_at.is_(None))
-        .values(revoked_at=utcnow())
+    result = cast(
+        CursorResult[tuple[int]],
+        await db.execute(
+            update(RefreshSession)
+            .where(RefreshSession.id == session.id, RefreshSession.revoked_at.is_(None))
+            .values(revoked_at=utcnow())
+        ),
     )
     if result.rowcount == 0:
         # Boshqa bir parallel so'rov ushbu sessiyani SELECT va UPDATE orasida

@@ -1,10 +1,10 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy.engine import Connection
 
 import app.models_registry  # noqa: F401
-from alembic import context
 from app.core.config import get_settings
 from app.core.db import Base, make_engine
 

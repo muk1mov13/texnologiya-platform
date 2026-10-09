@@ -59,6 +59,7 @@ async def test_duplicate_job_name_is_rejected() -> None:
 
     try:
         with pytest.raises(ValueError):
+
             @job("test_dup")
             async def second(ctx: JobContext) -> None:
                 pass

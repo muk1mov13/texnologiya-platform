@@ -1,12 +1,12 @@
 from pathlib import Path
 
 import sqlalchemy as sa
+from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.config import Config
 from alembic.migration import MigrationContext
 
 import app.models_registry  # noqa: F401
-from alembic import command
 from app.core.db import Base
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
