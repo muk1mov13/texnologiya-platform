@@ -30,8 +30,12 @@ async def convert_to_pdf(
     executable = _resolve_soffice(soffice)
     if executable is None:
         raise ConversionError("LIBREOFFICE_NOT_FOUND")
+    # Har bir konvertatsiya o'ziga xos profil bilan ishga tushadi: parallel yoki
+    # timeout bo'lib qolgan jarayonlar standart profil qulfini bo'lishib olmaydi.
+    profile_dir = (out_dir / "lo-profile").resolve()
     command = [
         executable,
+        f"-env:UserInstallation={profile_dir.as_uri()}",
         "--headless",
         "--norestore",
         "--convert-to",
@@ -57,6 +61,8 @@ def count_pages(pdf: Path) -> int:
     try:
         with pymupdf.open(pdf) as document:
             if not document.is_pdf:
+                raise ConversionError("INVALID_PDF")
+            if document.needs_pass or document.page_count == 0:
                 raise ConversionError("INVALID_PDF")
             return int(document.page_count)
     except ConversionError:

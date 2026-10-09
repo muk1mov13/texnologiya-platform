@@ -1,7 +1,9 @@
+import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
+import pymupdf
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
@@ -9,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import Role
 from app.core.config import Settings
+from app.core.storage import Storage
 from app.learning import convert
 from app.learning.models import StepKind
 from tests.factories import (
@@ -113,6 +116,21 @@ async def test_upload_rejects_broken_pdf(client: AsyncClient, course: dict[str, 
     assert response.json()["code"] == "INVALID_PDF"
 
 
+async def test_upload_rejects_encrypted_pdf(client: AsyncClient, course: dict[str, Any]) -> None:
+    document = pymupdf.open()
+    document.new_page()
+    data = document.tobytes(encryption=pymupdf.PDF_ENCRYPT_AES_256, user_pw="x", owner_pw="y")
+    document.close()
+    response = await client.post(
+        f"/api/teach/steps/{course['lecture_id']}/materials",
+        headers=course["headers"],
+        data={"title": "Maxfiy"},
+        files={"file": ("sir.pdf", data, "application/pdf")},
+    )
+    assert response.status_code == 400
+    assert response.json()["code"] == "INVALID_PDF"
+
+
 async def test_pptx_is_converted_in_background(
     app: FastAPI, client: AsyncClient, course: dict[str, Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -176,6 +194,51 @@ async def test_missing_libreoffice_fails_then_retry_succeeds(
     await app.state.jobs.drain()
     [ready] = await lecture_materials(client, course)
     assert (ready["status"], ready["error"]) == ("ready", None)
+
+
+async def test_storage_failure_during_import_marks_material_failed(
+    app: FastAPI, client: AsyncClient, course: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(convert, "convert_to_pdf", fake_converter(pages=1))
+
+    def failing_import(self: Storage, source: Path, subdir: str, ext: str) -> str:
+        raise OSError("disk full")
+
+    monkeypatch.setattr(Storage, "import_file", failing_import)
+    await upload_pptx(client, course)
+    await app.state.jobs.drain()
+    [material] = await lecture_materials(client, course)
+    assert (material["status"], material["error"]) == ("failed", "STORAGE_FAILED")
+
+
+async def test_delete_blocked_while_material_is_processing(
+    app: FastAPI, client: AsyncClient, course: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    release = asyncio.Event()
+
+    async def pending(
+        source: Path,
+        out_dir: Path,
+        *,
+        soffice: str,
+        timeout: int,  # noqa: ASYNC109
+    ) -> Path:
+        await release.wait()
+        return await fake_converter(2)(source, out_dir, soffice=soffice, timeout=timeout)
+
+    monkeypatch.setattr(convert, "convert_to_pdf", pending)
+    uploaded = await upload_pptx(client, course)
+
+    response = await client.delete(
+        f"/api/teach/materials/{uploaded['id']}", headers=course["headers"]
+    )
+    assert response.status_code == 409
+    assert response.json()["code"] == "MATERIAL_PROCESSING"
+
+    release.set()
+    await app.state.jobs.drain()
+    [material] = await lecture_materials(client, course)
+    assert material["status"] == "ready"
 
 
 async def test_retry_requires_failed_status(client: AsyncClient, course: dict[str, Any]) -> None:

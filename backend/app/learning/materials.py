@@ -1,7 +1,9 @@
+import logging
 import tempfile
 from pathlib import Path
 
 from fastapi import UploadFile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User
@@ -11,6 +13,8 @@ from app.core.jobs import JobContext, JobRunner, job
 from app.core.storage import Storage
 from app.learning import convert, editing
 from app.learning.models import FILE_STEP_KINDS, Material, MaterialStatus, Step
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_MATERIAL_EXT = frozenset({".pdf", ".ppt", ".pptx", ".doc", ".docx"})
 CONVERT_JOB = "convert_material"
@@ -75,6 +79,8 @@ async def ensure_can_edit_material(db: AsyncSession, user: User, material_id: in
 
 
 async def delete_material(db: AsyncSession, material: Material, storage: Storage) -> None:
+    if material.status == MaterialStatus.processing:
+        raise AppError(409, "MATERIAL_PROCESSING", "Material hali qayta ishlanmoqda")
     paths = {material.original_file, material.pdf_file}
     await db.delete(material)
     await db.commit()
@@ -94,36 +100,76 @@ async def retry_material(db: AsyncSession, material: Material, jobs: JobRunner) 
     return material
 
 
-@job(CONVERT_JOB)
-async def convert_material_job(ctx: JobContext, material_id: int) -> None:
+async def _mark_failed_if_processing(ctx: JobContext, material_id: int, error: str) -> None:
+    async with ctx.sessionmaker() as db:
+        material = await db.get(Material, material_id)
+        if material is not None and material.status == MaterialStatus.processing:
+            material.status = MaterialStatus.failed
+            material.error = error
+            await db.commit()
+
+
+async def _run_conversion(ctx: JobContext, material_id: int) -> None:
+    # Material faqat boshida (fayl yo'lini olish uchun) va oxirida (natijani yozish
+    # uchun) qisqa muddatli sessiyalar bilan o'qiladi/yoziladi — konvertatsiya
+    # (subprocess, bir necha urinish) davomida DB sessiyasi/tranzaksiyasi ochiq
+    # qolmaydi, aks holda parallel so'rovlar (masalan, o'chirish) SQLite'da qulflanib
+    # qolishi mumkin.
     async with ctx.sessionmaker() as db:
         material = await db.get(Material, material_id)
         if material is None or material.status != MaterialStatus.processing:
             return
-        source = ctx.storage.path(material.original_file)
-        error = "CONVERSION_FAILED"
-        for _ in range(MAX_CONVERSION_ATTEMPTS):
-            try:
-                with tempfile.TemporaryDirectory() as tmp:
-                    pdf = await convert.convert_to_pdf(
-                        source,
-                        Path(tmp),
-                        soffice=ctx.settings.soffice_path,
-                        timeout=ctx.settings.conversion_timeout_seconds,
-                    )
-                    page_count = convert.count_pages(pdf)
-                    rel = ctx.storage.import_file(pdf, "materials", ".pdf")
-            except convert.ConversionError as exc:
-                error = exc.code
-                if exc.code == "LIBREOFFICE_NOT_FOUND":
-                    break
-                continue
+        original_file = material.original_file
+
+    source = ctx.storage.path(original_file)
+    error = "CONVERSION_FAILED"
+    for _ in range(MAX_CONVERSION_ATTEMPTS):
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                pdf = await convert.convert_to_pdf(
+                    source,
+                    Path(tmp),
+                    soffice=ctx.settings.soffice_path,
+                    timeout=ctx.settings.conversion_timeout_seconds,
+                )
+                page_count = convert.count_pages(pdf)
+                rel = ctx.storage.import_file(pdf, "materials", ".pdf")
+        except convert.ConversionError as exc:
+            error = exc.code
+            if exc.code == "LIBREOFFICE_NOT_FOUND":
+                break
+            continue
+        except OSError:
+            # Masalan, disk to'lib qolgan yoki saqlash joyiga yozib bo'lmadi — bu ham
+            # vaqtincha xato sifatida qaraladi va qayta urinish davom etadi.
+            error = "STORAGE_FAILED"
+            continue
+        async with ctx.sessionmaker() as db:
+            # Urinish davomida material o'chirilgan/o'zgargan bo'lishi mumkin —
+            # natijani yozishdan oldin yangi so'rov bilan tekshiramiz.
+            fresh_status = await db.scalar(
+                select(Material.status).where(Material.id == material_id)
+            )
+            if fresh_status != MaterialStatus.processing:
+                ctx.storage.delete(rel)
+                return
+            material = await db.get(Material, material_id)
+            assert material is not None
             material.pdf_file = rel
             material.page_count = page_count
             material.status = MaterialStatus.ready
             material.error = None
             await db.commit()
-            return
-        material.status = MaterialStatus.failed
-        material.error = error
-        await db.commit()
+        return
+    await _mark_failed_if_processing(ctx, material_id, error)
+
+
+@job(CONVERT_JOB)
+async def convert_material_job(ctx: JobContext, material_id: int) -> None:
+    try:
+        await _run_conversion(ctx, material_id)
+    except Exception:
+        # Kutilmagan xato (bug, DB uzilishi va h.k.) material'ni "processing"
+        # holatida abadiy ushlab turmasligi kerak.
+        logger.exception("Material konvertatsiyasida kutilmagan xato: material_id=%s", material_id)
+        await _mark_failed_if_processing(ctx, material_id, "CONVERSION_FAILED")
