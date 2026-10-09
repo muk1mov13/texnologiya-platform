@@ -144,7 +144,8 @@
     "title": "Tasdiq kutilmoqda",
     "textUser": "{{name}}, akkauntingiz administrator tasdig'ini kutmoqda. Tasdiqlangach, platformadan to'liq foydalanishingiz mumkin.",
     "textGuest": "Ro'yxatdan o'tdingiz! Administrator akkauntingizni tasdiqlagach, tizimga kira olasiz.",
-    "check": "Holatni tekshirish"
+    "check": "Holatni tekshirish",
+    "stillPending": "Hali tasdiqlanmagan. Birozdan so'ng qayta tekshiring."
   },
   "student": {
     "hello": "Salom, {{name}}!",

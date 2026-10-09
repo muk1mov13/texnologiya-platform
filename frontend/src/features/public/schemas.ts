@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const loginSchema = z.object({
   email: z.email({ error: 'validation.email' }),
-  password: z.string().min(1, { error: 'validation.required' }),
+  password: z.string().min(1, { error: 'validation.required' }).max(128, { error: 'validation.tooLong' }),
 })
 
 export type LoginValues = z.infer<typeof loginSchema>

@@ -21,9 +21,17 @@ async function fillAndSubmit(email: string, password: string) {
 }
 
 test("noto'g'ri email validatsiya xatosini ko'rsatadi va so'rov yubormaydi", async () => {
+  let calls = 0
+  server.use(
+    http.post('/api/auth/login', () => {
+      calls += 1
+      return HttpResponse.json({ access_token: 'tok', token_type: 'bearer', user: studentUser })
+    }),
+  )
   renderRoutes(routes, { url: '/login' })
   await fillAndSubmit('emas-email', 'parol12345')
   expect(await screen.findByText(i18n.t('validation.email'))).toBeInTheDocument()
+  expect(calls).toBe(0)
 })
 
 test("noto'g'ri parol tarjima qilingan xatoni ko'rsatadi", async () => {

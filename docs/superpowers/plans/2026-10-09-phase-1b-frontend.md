@@ -3580,13 +3580,15 @@ git commit -m "feat(frontend): router, public/app layouts, language switch and p
 **Files:**
 - Create: `frontend/src/features/public/schemas.ts`, `frontend/src/features/public/AuthCard.tsx`
 - Modify (stub → to'liq): `frontend/src/features/public/HomePage.tsx`, `LoginPage.tsx`, `RegisterPage.tsx`, `PendingPage.tsx`
-- Modify: `frontend/src/i18n/uz.json` va `ru.json` — `pending` bo'limiga `"check"` kaliti qo'shiladi (uz: `"Holatni tekshirish"`, ru: `"Проверить статус"`)
-- Test: `frontend/src/features/public/LoginPage.test.tsx`, `RegisterPage.test.tsx`, `PendingPage.test.tsx`
+- Modify: `frontend/src/i18n/uz.json` va `ru.json` — `pending` bo'limiga `"check"` va `"stillPending"` kalitlari qo'shiladi (uz: `"Holatni tekshirish"` / `"Hali tasdiqlanmagan. Birozdan so'ng qayta tekshiring."`, ru: `"Проверить статус"` / `"Пока не подтверждено. Попробуйте позже."`)
+- Modify: `frontend/src/app/SessionGate.tsx` — sessiya code-review tuzatishi: faqat BIRINCHI yuklash xatosi butun ilovani yopadi (quyidagi "Code-review tuzatishi" bo'limiga qarang)
+- Test: `frontend/src/features/public/LoginPage.test.tsx`, `RegisterPage.test.tsx`, `PendingPage.test.tsx`, `frontend/src/app/SessionGate.test.tsx`
 
 **Oqim:**
 1. Ro'yxatdan o'tgan foydalanuvchi `pending` holatida bo'ladi va avtomatik kirmaydi. U `/pending` sahifasiga o'tadi, u yerda "admin tasdiqlashini kuting" deyiladi.
 2. `pending` foydalanuvchi login qila oladi (backend ruxsat beradi), lekin `homePathFor` uni `/pending`ga yuboradi.
 3. Login muvaffaqiyatli bo'lgach, yo'naltirishni `RedirectIfAuthed` bajaradi (Task 6). `LoginPage`ning o'zi navigatsiya qilmaydi.
+4. `/pending`dagi "Holatni tekshirish" tugmasi aniq natijalarga ega: tasdiqlangan → `<Navigate>` avtomatik ishlaydi; hali kutilmoqda → sahifada xabar; sessiya tugagan (401/403 → `null`) → `/login`ga o'tadi; 5xx/tarmoq xatosi → sahifa ochiq qoladi, xato umumiy toast orqali ko'rinadi.
 
 Formalarda `noValidate` ishlatiladi: brauzerning o'z tekshiruvi o'rniga zod xabarlari (i18n kalitlari) ko'rsatiladi.
 
@@ -3597,7 +3599,7 @@ import { z } from 'zod'
 
 export const loginSchema = z.object({
   email: z.email({ error: 'validation.email' }),
-  password: z.string().min(1, { error: 'validation.required' }),
+  password: z.string().min(1, { error: 'validation.required' }).max(128, { error: 'validation.tooLong' }),
 })
 
 export type LoginValues = z.infer<typeof loginSchema>
@@ -3650,9 +3652,17 @@ async function fillAndSubmit(email: string, password: string) {
 }
 
 test('noto\'g\'ri email validatsiya xatosini ko\'rsatadi va so\'rov yubormaydi', async () => {
+  let calls = 0
+  server.use(
+    http.post('/api/auth/login', () => {
+      calls += 1
+      return HttpResponse.json({ access_token: 'tok', token_type: 'bearer', user: studentUser })
+    }),
+  )
   renderRoutes(routes, { url: '/login' })
   await fillAndSubmit('emas-email', 'parol12345')
   expect(await screen.findByText(i18n.t('validation.email'))).toBeInTheDocument()
+  expect(calls).toBe(0)
 })
 
 test('noto\'g\'ri parol tarjima qilingan xatoni ko\'rsatadi', async () => {
@@ -3765,6 +3775,7 @@ import { PendingPage } from './PendingPage'
 const routes = [
   { path: '/pending', element: <PendingPage /> },
   { path: '/app', element: <p>talaba sahifa</p> },
+  { path: '/login', element: <p>login sahifa</p> },
 ]
 
 test('pending foydalanuvchi ismi bilan kutish xabarini ko\'radi', () => {
@@ -3784,6 +3795,36 @@ test('"Holatni tekshirish" sessiyani qayta so\'raydi; tasdiqlangan bo\'lsa bosh 
   await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
 })
 
+test('"Holatni tekshirish" hali tasdiqlanmagan bo\'lsa xabar ko\'rsatadi', async () => {
+  server.use(
+    http.post('/api/auth/refresh', () =>
+      HttpResponse.json({ access_token: 'tok', token_type: 'bearer', user: pendingUser }),
+    ),
+  )
+  renderRoutes(routes, { url: '/pending', user: pendingUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
+  expect(await screen.findByRole('status')).toHaveTextContent(i18n.t('pending.stillPending'))
+})
+
+test('"Holatni tekshirish" 401 qaytarsa sessiya tugaganini bildirib /login ga o\'tadi', async () => {
+  server.use(
+    http.post('/api/auth/refresh', () =>
+      HttpResponse.json({ code: 'INVALID_REFRESH_TOKEN', message: 'x', details: {} }, { status: 401 }),
+    ),
+  )
+  const { router } = renderRoutes(routes, { url: '/pending', user: pendingUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
+  await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+})
+
+test('"Holatni tekshirish" 500 qaytarsa sahifa ko\'rinishda qoladi va xato ko\'rsatiladi', async () => {
+  server.use(http.post('/api/auth/refresh', () => new HttpResponse(null, { status: 500 })))
+  renderRoutes(routes, { url: '/pending', user: pendingUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(i18n.t('errors.INTERNAL_ERROR'))
+  expect(screen.getByText(i18n.t('pending.title'))).toBeInTheDocument()
+})
+
 test('mehmon kirish havolasini ko\'radi', () => {
   renderRoutes(routes, { url: '/pending' })
   expect(screen.getByRole('link', { name: i18n.t('nav.login') })).toHaveAttribute('href', '/login')
@@ -3793,7 +3834,23 @@ test('faol foydalanuvchi bosh sahifasiga yo\'naltiriladi', async () => {
   const { router } = renderRoutes(routes, { url: '/pending', user: studentUser })
   await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
 })
+
+test('tasdiq kutish sahifasidan chiqish /login ga olib boradi', async () => {
+  let logoutCalls = 0
+  server.use(
+    http.post('/api/auth/logout', () => {
+      logoutCalls += 1
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
+  const { router } = renderRoutes(routes, { url: '/pending', user: pendingUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('nav.logout') }))
+  await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+  expect(logoutCalls).toBe(1)
+})
 ```
+
+**Code-review tuzatishi (dastlabki implementatsiyadan keyin):** sifat sharhi "Holatni tekshirish"ning asl `invalidateQueries`ga asoslangan versiyasi aniq natijalarni ajratmasligini va `SessionGate` muvaffaqiyatsiz refetch'ni to'liq ilova xatosiga aylantirishini aniqladi. Yakuniy `PendingPage.tsx` va `SessionGate.tsx` kodi — pastda, Step 7 va alohida eslatmada.
 
 - [ ] **Step 3: Testlar yiqilishini tekshirish**
 
@@ -3971,10 +4028,11 @@ export function RegisterPage() {
 - [ ] **Step 7: `frontend/src/features/public/PendingPage.tsx`**
 
 ```tsx
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from '@tanstack/react-query'
-import { Link, Navigate } from 'react-router'
-import { sessionKey, useCurrentUser, useLogout, useSession } from '@/api/auth'
+import { Link, Navigate, useNavigate } from 'react-router'
+import { useCurrentUser, useLogout, useSession } from '@/api/auth'
+import type { User } from '@/api/types'
 import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
@@ -3985,9 +4043,29 @@ export function PendingPage() {
   const user = useCurrentUser()
   const logout = useLogout()
   const session = useSession()
-  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  // "Holatni tekshirish" aniq natijalarga ega bo'lishi uchun `invalidateQueries` o'rniga
+  // lokal mutatsiya ishlatiladi: `session.refetch()` natijasini o'zi tekshiradi va
+  // muvaffaqiyatsizlikda xatoni uloqtiradi (shunda `check.isError`/`check.error` ishlaydi).
+  const check = useMutation({
+    mutationFn: async (): Promise<User | null> => {
+      const result = await session.refetch()
+      if (result.isError) throw result.error
+      return result.data ?? null
+    },
+    onSuccess: (data) => {
+      // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va refresh
+      // 401/403 qaytargan — ikkisi ham `client.ts`da `null`ga tushadi). Faol foydalanuvchi
+      // uchun pastdagi <Navigate /> yetarli.
+      if (data === null) navigate('/login', { replace: true })
+    },
+    // meta.silent yo'q — xato global toast orqali ko'rsatiladi (api/queryClient.ts).
+  })
 
   if (user && user.status === 'active') return <Navigate to={homePathFor(user)} replace />
+
+  const stillPending = check.isSuccess && check.data?.status === 'pending'
 
   return (
     <Card className="mx-auto flex max-w-lg flex-col items-center gap-3 p-8 text-center">
@@ -3998,16 +4076,18 @@ export function PendingPage() {
       <p className="text-slate-600">
         {user ? t('pending.textUser', { name: user.full_name }) : t('pending.textGuest')}
       </p>
+      {stillPending && <p role="status">{t('pending.stillPending')}</p>}
       {user ? (
         <div className="flex flex-wrap justify-center gap-2">
-          {/* Sessiya keshda abadiy saqlanadi — admin tasdiqlaganini bilish uchun refresh orqali qayta so'raladi. */}
-          <Button
-            loading={session.isFetching}
-            onClick={() => void queryClient.invalidateQueries({ queryKey: sessionKey })}
-          >
+          <Button loading={check.isPending} onClick={() => check.mutate()}>
             {t('pending.check')}
           </Button>
-          <Button variant="secondary" loading={logout.isPending} onClick={() => logout.mutate()}>
+          {/* AppLayout'dagi chiqish bilan bir xil: qaytish manzilisiz /login'ga o'tiladi. */}
+          <Button
+            variant="secondary"
+            loading={logout.isPending}
+            onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+          >
             {t('nav.logout')}
           </Button>
         </div>
@@ -4020,6 +4100,8 @@ export function PendingPage() {
   )
 }
 ```
+
+**Eslatma — `SessionGate.tsx` ham shu bosqichda tuzatildi:** TanStack Query v5'da muvaffaqiyatsiz *refetch* ham `isError`ni o'rnatadi, garchi `data` oldingi muvaffaqiyatli natijani saqlab qolsa ham. Shu sababli `app/SessionGate.tsx`dagi shart `session.isError` dan `session.isError && session.data === undefined`ga o'zgartirildi — butun ilova faqat BIRINCHI yuklash muvaffaqiyatsiz bo'lganda (data hali aniqlanmagan) xato ekraniga almashtiriladi; "Holatni tekshirish" kabi keyingi refetch xatolari esa ilovani yopib qo'ymaydi. Mehmon uchun `data` muvaffaqiyatli `null` bo'ladi, shuning uchun bu o'zgarish ularga ta'sir qilmaydi. `frontend/src/app/SessionGate.test.tsx`ga mos test qo'shildi: dastlabki yuklash muvaffaqiyatli, keyingi `queryClient.refetchQueries({ queryKey: sessionKey })` 503 bilan tugaydi, bolalar (`children`) hali ko'rinishda qoladi.
 
 - [ ] **Step 8: `frontend/src/features/public/HomePage.tsx`** (skelet; yakuniy dizayni 4-bosqichda)
 

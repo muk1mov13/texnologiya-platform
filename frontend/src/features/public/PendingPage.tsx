@@ -1,7 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Link, Navigate } from 'react-router'
-import { sessionKey, useCurrentUser, useLogout, useSession } from '@/api/auth'
+import { Link, Navigate, useNavigate } from 'react-router'
+import { useCurrentUser, useLogout, useSession } from '@/api/auth'
+import type { User } from '@/api/types'
 import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
@@ -12,9 +13,25 @@ export function PendingPage() {
   const user = useCurrentUser()
   const logout = useLogout()
   const session = useSession()
-  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const check = useMutation({
+    mutationFn: async (): Promise<User | null> => {
+      const result = await session.refetch()
+      if (result.isError) throw result.error
+      return result.data ?? null
+    },
+    onSuccess: (data) => {
+      // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va refresh
+      // 401/403 qaytargan). Faol foydalanuvchi uchun pastdagi <Navigate /> yetarli.
+      if (data === null) navigate('/login', { replace: true })
+    },
+    // meta.silent yo'q — xato global toast orqali ko'rsatiladi (api/queryClient.ts).
+  })
 
   if (user && user.status === 'active') return <Navigate to={homePathFor(user)} replace />
+
+  const stillPending = check.isSuccess && check.data?.status === 'pending'
 
   return (
     <Card className="mx-auto flex max-w-lg flex-col items-center gap-3 p-8 text-center">
@@ -25,16 +42,18 @@ export function PendingPage() {
       <p className="text-slate-600">
         {user ? t('pending.textUser', { name: user.full_name }) : t('pending.textGuest')}
       </p>
+      {stillPending && <p role="status">{t('pending.stillPending')}</p>}
       {user ? (
         <div className="flex flex-wrap justify-center gap-2">
           {/* Sessiya keshda abadiy saqlanadi — admin tasdiqlaganini bilish uchun refresh orqali qayta so'raladi. */}
-          <Button
-            loading={session.isFetching}
-            onClick={() => void queryClient.invalidateQueries({ queryKey: sessionKey })}
-          >
+          <Button loading={check.isPending} onClick={() => check.mutate()}>
             {t('pending.check')}
           </Button>
-          <Button variant="secondary" loading={logout.isPending} onClick={() => logout.mutate()}>
+          <Button
+            variant="secondary"
+            loading={logout.isPending}
+            onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+          >
             {t('nav.logout')}
           </Button>
         </div>

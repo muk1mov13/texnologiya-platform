@@ -67,3 +67,34 @@ test('refresh 503 qaytarsa (ikki urinishda ham) xato holati va qayta urinish tug
   expect(await screen.findByRole('button', { name: i18n.t('common.retry') })).toBeInTheDocument()
   expect(calls).toBeGreaterThanOrEqual(2)
 })
+
+test('dastlabki yuklash muvaffaqiyatli bo\'lgach, keyingi refetch xatosi ilovani yopib qo\'ymaydi', async () => {
+  const user = makeUser()
+  let calls = 0
+  server.use(
+    http.post('/api/auth/refresh', () => {
+      calls += 1
+      if (calls === 1) {
+        return HttpResponse.json({ access_token: 'restored', token_type: 'bearer', user })
+      }
+      return new HttpResponse(null, { status: 503 })
+    }),
+  )
+  const queryClient = createQueryClient()
+  // Qayta urinishlarni darhol bajarish uchun (eksponensial kechikishni kutmaslik).
+  queryClient.setDefaultOptions({ queries: { retryDelay: 0 } })
+  render(
+    <QueryClientProvider client={queryClient}>
+      <SessionGate>
+        <p>ilova</p>
+      </SessionGate>
+    </QueryClientProvider>,
+  )
+  expect(await screen.findByText('ilova')).toBeInTheDocument()
+
+  await queryClient.refetchQueries({ queryKey: sessionKey }).catch(() => {})
+
+  // `data` oldingi muvaffaqiyatli natija bo'lib qoladi — ilova butunlay yopilmaydi.
+  expect(screen.getByText('ilova')).toBeInTheDocument()
+  expect(queryClient.getQueryData(sessionKey)).toEqual(user)
+})
