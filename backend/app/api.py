@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.auth.admin_router import router as admin_users_router
 from app.auth.router import router as auth_router
 from app.learning.admin_router import router as admin_subjects_router
+from app.learning.progress_router import router as progress_router
 from app.learning.router import router as learning_router
 from app.learning.teach_items_router import router as teach_items_router
 from app.learning.teach_materials_router import router as teach_materials_router
@@ -23,3 +24,4 @@ api_router.include_router(teach_router)
 api_router.include_router(teach_materials_router)
 api_router.include_router(teach_items_router)
 api_router.include_router(learning_router)
+api_router.include_router(progress_router)
