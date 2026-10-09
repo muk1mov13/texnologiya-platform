@@ -261,13 +261,13 @@ Fayl o'chirilsa yoki almashtirilsa, uning bo'laklari ham o'chiriladi yoki qayta 
 
 ## 6. Xavfsizlik
 
-- **Tokenlar:** JWT access token 15 daqiqa amal qiladi. Refresh token `httpOnly`, `Secure`, `SameSite=Lax` cookie'da, 30 kun amal qiladi va har ishlatilganda almashtiriladi. Bazada faqat token hash saqlanadi. Chiqish, parol o'zgarishi yoki bloklashda barcha sessiyalar bekor qilinadi.
+- **Tokenlar:** JWT access token 15 daqiqa amal qiladi. Refresh token `httpOnly`, `Secure`, `SameSite=Lax` cookie'da, 30 kun amal qiladi va har ishlatilganda almashtiriladi. Bazada faqat token hash saqlanadi. Chiqishda faqat joriy qurilmadagi sessiya yopiladi. Parol o'zgarganda, admin vaqtinchalik parol berganda yoki foydalanuvchi bloklanganda barcha sessiyalar bekor qilinadi. Bekor qilingan refresh token qayta ishlatilsa (o'g'irlangan bo'lishi mumkin), shu foydalanuvchining barcha sessiyalari yopiladi.
 - **Parollar:** argon2id bilan saqlanadi, kamida 8 belgi. Kirishga urinishlar IP va login bo'yicha cheklanadi (15 daqiqada 10 ta).
-- **Birinchi admin:** `ADMIN_EMAIL` / `ADMIN_PASSWORD` orqali CLI buyrug'i bilan yaratiladi. Kodda standart parol bo'lmaydi.
+- **Birinchi admin:** `python -m app.cli create-admin` buyrug'i bilan yaratiladi. Email va parol `ADMIN_EMAIL` / `ADMIN_PASSWORD` muhit o'zgaruvchilaridan olinadi. Ular berilmagan bo'lsa, parol klaviaturadan so'raladi. Kodda standart parol bo'lmaydi.
 - **Production rejimi:** debug o'chiq, `/docs` (OpenAPI) faqat dev muhitida. Ichki xatolar foydalanuvchiga faqat `request_id` bilan qaytadi, tafsilotlar logga yoziladi.
 - **Ruxsatlar:** har bir endpoint backend tomonda rolni tekshiradi (`require_role`). O'qituvchi faqat `subject_teachers` orqali biriktirilgan fanlarni tahrirlay oladi. `pending` va `blocked` foydalanuvchilar `/app` API'lariga kira olmaydi.
 - **Fayllar:**
-  - kengaytma va MIME tekshiriladi: pdf, ppt, pptx, doc, docx, rasmlar;
+  - kengaytma va fayl boshidagi imzo (magic bytes) tekshiriladi: pdf, ppt, pptx, doc, docx, rasmlar. Shifrlangan yoki bo'sh PDF qabul qilinmaydi;
   - hajm cheklovi: material 50 MB, vazifa javobi 20 MB;
   - fayl nomi UUID bilan almashtiriladi;
   - himoyalangan fayllar `X-Accel-Redirect` orqali beriladi;
