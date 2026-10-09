@@ -18,6 +18,11 @@ export default defineConfig([
     languageOptions: { ecmaVersion: 2023, globals: globals.browser },
   },
   {
+    files: ['**/*.{js,mjs}'],
+    extends: [js.configs.recommended],
+    languageOptions: { ecmaVersion: 2023, globals: globals.node },
+  },
+  {
     // Test yordamchilari komponent va funksiyalarni birga export qiladi — HMR bu yerda ahamiyatsiz.
     files: ['src/test/**/*.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
     rules: { 'react-refresh/only-export-components': 'off' },
