@@ -219,7 +219,7 @@ test('mehmon sifatida boshlangan refresh login\'dan keyin null qaytarsa, onLost 
 })
 
 test('Web Locks yo\'q paytda logout avval kutilayotgan refresh tugashini kutadi', async () => {
-  let logoutCalled = false
+  const order: string[] = []
   let releaseRefresh = () => {}
   const refreshGate = new Promise<void>((resolve) => {
     releaseRefresh = resolve
@@ -227,10 +227,11 @@ test('Web Locks yo\'q paytda logout avval kutilayotgan refresh tugashini kutadi'
   server.use(
     http.post('/api/auth/refresh', async () => {
       await refreshGate
+      order.push('refresh-done')
       return HttpResponse.json(session)
     }),
     http.post('/api/auth/logout', () => {
-      logoutCalled = true
+      order.push('logout')
       return new HttpResponse(null, { status: 204 })
     }),
   )
@@ -238,10 +239,13 @@ test('Web Locks yo\'q paytda logout avval kutilayotgan refresh tugashini kutadi'
   const pendingLogout = logoutRequest()
 
   // Refresh hali tugamagan — logout hali so'rovni yubormagan bo'lishi kerak.
-  expect(logoutCalled).toBe(false)
+  // Bir necha tick kutamiz: Web Locks yo'q bo'lsa ham logout o'z navbatini
+  // kutayotganini (darhol yuborilmaganini) tasdiqlash uchun.
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  expect(order).toEqual([])
 
   releaseRefresh()
   await pendingRefresh
   await pendingLogout
-  expect(logoutCalled).toBe(true)
+  expect(order).toEqual(['refresh-done', 'logout'])
 })

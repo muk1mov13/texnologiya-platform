@@ -104,7 +104,9 @@ async def test_refresh_without_cookie(client: AsyncClient) -> None:
     response = await client.post("/api/auth/refresh")
     assert response.status_code == 401
     assert response.json()["code"] == "NO_REFRESH_TOKEN"
-    assert_refresh_cookie_cleared(response)
+    # Cookie umuman yuborilmagan — o'chiriladigan narsa yo'q, shuning uchun
+    # bu holatda Set-Cookie header'i bo'lmasligi kerak (poyga holatidan qochish).
+    assert "set-cookie" not in response.headers
 
 
 async def test_failed_refresh_clears_cookie(client: AsyncClient, db: AsyncSession) -> None:

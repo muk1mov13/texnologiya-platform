@@ -84,12 +84,18 @@ async def refresh(
     settings: AppSettings,
     refresh_token: Annotated[str | None, Cookie()] = None,
 ) -> TokenOut | JSONResponse:
-    # Har qanday muvaffaqiyatsiz refresh cookie'ni o'chiradi: aks holda uzilgan
-    # sahifa yangilanishidan keyin brauzer rotatsiya qilingan eski tokenni
-    # qayta-qayta yuboradi va imtiyoz oynasi o'tgach barcha sessiyalar yopiladi.
+    # Muvaffaqiyatsiz refresh cookie'ni o'chiradi: aks holda uzilgan sahifa
+    # yangilanishidan keyin brauzer rotatsiya qilingan eski tokenni qayta-qayta
+    # yuboradi va imtiyoz oynasi o'tgach barcha sessiyalar yopiladi. Cookie
+    # umuman kelmagan bo'lsa (NO_REFRESH_TOKEN) o'chiriladigan narsa yo'q —
+    # bu holatda o'chirish buyrug'i yangi login qo'ygan cookie bilan poyga
+    # holatiga kirib, uni bekor qilib qo'yishi mumkin.
+    if not refresh_token:
+        failed = JSONResponse(
+            error_body("NO_REFRESH_TOKEN", "Sessiya topilmadi", {}), status_code=401
+        )
+        return failed
     try:
-        if not refresh_token:
-            raise AppError(401, "NO_REFRESH_TOKEN", "Sessiya topilmadi")
         user, access, raw = await service.rotate_refresh(
             db, refresh_token, settings, request.headers.get("user-agent")
         )
