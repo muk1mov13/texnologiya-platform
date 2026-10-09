@@ -4,6 +4,7 @@ from fastapi import APIRouter, Form, Response, UploadFile
 
 from app.auth.deps import StaffUser
 from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
+from app.core.types import DbIdPath
 from app.learning import editing, materials
 from app.learning.models import Material
 from app.learning.schemas import MaterialOut
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/teach", tags=["teach"])
 
 @router.post("/steps/{step_id}/materials", response_model=MaterialOut, status_code=201)
 async def upload_material(
-    step_id: int,
+    step_id: DbIdPath,
     title: Annotated[str, Form(min_length=1, max_length=200)],
     file: UploadFile,
     user: StaffUser,
@@ -37,7 +38,7 @@ async def upload_material(
 
 @router.delete("/materials/{material_id}", status_code=204)
 async def delete_material(
-    material_id: int, user: StaffUser, db: DbSession, storage: AppStorage
+    material_id: DbIdPath, user: StaffUser, db: DbSession, storage: AppStorage
 ) -> Response:
     material = await materials.ensure_can_edit_material(db, user, material_id)
     await materials.delete_material(db, material, storage)
@@ -45,6 +46,8 @@ async def delete_material(
 
 
 @router.post("/materials/{material_id}/retry", response_model=MaterialOut)
-async def retry_material(material_id: int, user: StaffUser, db: DbSession, jobs: Jobs) -> Material:
+async def retry_material(
+    material_id: DbIdPath, user: StaffUser, db: DbSession, jobs: Jobs
+) -> Material:
     material = await materials.ensure_can_edit_material(db, user, material_id)
     return await materials.retry_material(db, material, jobs)

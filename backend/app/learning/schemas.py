@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core.types import DbId, Order31
 from app.learning.models import MaterialStatus, StepKind
 
 SLUG_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
@@ -10,7 +11,7 @@ class SubjectCreate(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     slug: str | None = Field(default=None, max_length=220, pattern=SLUG_PATTERN)
     description: str = Field(default="", max_length=5000)
-    order: int = 0
+    order: Order31 = 0
     is_published: bool = False
 
 
@@ -18,7 +19,7 @@ class SubjectUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=2, max_length=200)
     slug: str | None = Field(default=None, max_length=220, pattern=SLUG_PATTERN)
     description: str | None = Field(default=None, max_length=5000)
-    order: int | None = None
+    order: Order31 | None = None
     is_published: bool | None = None
 
 
@@ -36,7 +37,7 @@ class SubjectAdminOut(BaseModel):
 
 
 class TeachersIn(BaseModel):
-    teacher_ids: list[int] = Field(max_length=50)
+    teacher_ids: list[DbId] = Field(max_length=50)
 
 
 class TopicCreate(BaseModel):
@@ -52,7 +53,7 @@ class TopicUpdate(BaseModel):
 
 
 class TopicOrderIn(BaseModel):
-    topic_ids: list[int]
+    topic_ids: list[DbId]
 
 
 class MaterialOut(BaseModel):

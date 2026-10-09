@@ -25,6 +25,17 @@ async def test_save_upload_uses_uuid_name_and_lowercase_extension(tmp_path: Path
     assert storage.path(rel).read_bytes() == b"%PDF-1.4"
 
 
+async def test_save_upload_truncates_long_original_filename(tmp_path: Path) -> None:
+    storage = Storage(tmp_path)
+    long_name = ("a" * 300) + ".pdf"
+    rel, original = await storage.save_upload(
+        _upload(b"%PDF-1.4", long_name), "materials", allowed_ext=PDF_ONLY, max_bytes=1024
+    )
+    assert len(original) <= 255
+    assert original.endswith(".pdf")
+    assert storage.path(rel).read_bytes() == b"%PDF-1.4"
+
+
 async def test_save_upload_rejects_unknown_extension(tmp_path: Path) -> None:
     with pytest.raises(AppError) as exc:
         await Storage(tmp_path).save_upload(

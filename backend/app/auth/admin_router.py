@@ -11,6 +11,7 @@ from app.auth.schemas import AdminUserUpdateIn, TempPasswordOut, UserOut
 from app.core.deps import DbSession
 from app.core.errors import AppError
 from app.core.security import generate_temp_password, hash_password
+from app.core.types import DbIdPath
 
 router = APIRouter(prefix="/admin/users", tags=["admin"])
 
@@ -44,7 +45,7 @@ async def _get_target(db: AsyncSession, admin: User, user_id: int) -> User:
 
 @router.patch("/{user_id}", response_model=UserOut)
 async def update_user(
-    user_id: int, data: AdminUserUpdateIn, admin: AdminUser, db: DbSession
+    user_id: DbIdPath, data: AdminUserUpdateIn, admin: AdminUser, db: DbSession
 ) -> User:
     user = await _get_target(db, admin, user_id)
     if data.role is not None:
@@ -58,7 +59,7 @@ async def update_user(
 
 
 @router.post("/{user_id}/temp-password", response_model=TempPasswordOut)
-async def set_temp_password(user_id: int, admin: AdminUser, db: DbSession) -> TempPasswordOut:
+async def set_temp_password(user_id: DbIdPath, admin: AdminUser, db: DbSession) -> TempPasswordOut:
     user = await _get_target(db, admin, user_id)
     temp = generate_temp_password()
     user.password_hash = hash_password(temp)

@@ -7,6 +7,18 @@ from fastapi import UploadFile
 from app.core.errors import AppError
 
 CHUNK_SIZE = 1024 * 1024
+MAX_ORIGINAL_NAME_LENGTH = 255
+
+
+def _truncate_filename(name: str, max_length: int = MAX_ORIGINAL_NAME_LENGTH) -> str:
+    """`name`ni kengaytmasini saqlab, `max_length` belgigacha qisqartiradi."""
+    if len(name) <= max_length:
+        return name
+    suffix = Path(name).suffix
+    if len(suffix) >= max_length:
+        return name[:max_length]
+    stem = Path(name).stem
+    return stem[: max_length - len(suffix)] + suffix
 
 
 class Storage:
@@ -32,8 +44,9 @@ class Storage:
         allowed_ext: frozenset[str],
         max_bytes: int,
     ) -> tuple[str, str]:
-        original_name = Path(upload.filename or "").name
-        ext = Path(original_name).suffix.lower()
+        raw_name = Path(upload.filename or "").name
+        ext = Path(raw_name).suffix.lower()
+        original_name = _truncate_filename(raw_name)
         if ext not in allowed_ext:
             raise AppError(
                 400,

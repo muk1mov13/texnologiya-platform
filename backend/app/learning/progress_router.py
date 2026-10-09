@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 
 from app.auth.deps import ActiveUser
 from app.core.deps import AppSettings, AppStorage, DbSession
+from app.core.types import DbIdPath
 from app.learning import resume
 from app.learning.student_schemas import ContinueOut, SubjectProgressOut
 
@@ -21,7 +22,7 @@ async def my_progress(user: ActiveUser, db: DbSession) -> list[SubjectProgressOu
 
 @router.get("/materials/{material_id}/file", response_class=Response)
 async def material_file(
-    material_id: int,
+    material_id: DbIdPath,
     user: ActiveUser,
     db: DbSession,
     settings: AppSettings,

@@ -94,6 +94,18 @@ async def test_unknown_user_is_404(
     assert response.json()["code"] == "USER_NOT_FOUND"
 
 
+async def test_out_of_range_user_id_is_422(
+    client: AsyncClient, db: AsyncSession, settings: Settings
+) -> None:
+    admin = await make_admin(db)
+    response = await client.patch(
+        "/api/admin/users/99999999999999999999",
+        headers=auth_headers(admin, settings),
+        json={"status": "active"},
+    )
+    assert response.status_code == 422
+
+
 async def test_temp_password_replaces_old_one(
     client: AsyncClient, db: AsyncSession, settings: Settings
 ) -> None:

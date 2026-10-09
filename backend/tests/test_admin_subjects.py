@@ -89,6 +89,18 @@ async def test_assign_teachers(client: AsyncClient, db: AsyncSession, settings: 
     assert bad.json()["details"] == {"user_ids": [student.id]}
 
 
+async def test_create_subject_with_out_of_range_order_is_422(
+    client: AsyncClient, db: AsyncSession, settings: Settings
+) -> None:
+    headers = await admin_headers(db, settings)
+    response = await client.post(
+        "/api/admin/subjects",
+        headers=headers,
+        json={"title": "Katta tartib", "order": 3_000_000_000},
+    )
+    assert response.status_code == 422
+
+
 async def test_unknown_subject_is_404(
     client: AsyncClient, db: AsyncSession, settings: Settings
 ) -> None:
