@@ -18,9 +18,12 @@ test('ochiq modal dialog sifatida ko\'rinadi va Escape bilan yopiladi', async ()
 
 test('oxirgi fokuslanadigan elementdan Tab bilan birinchisiga qaytiladi', async () => {
   render(
-    <Modal open title="Fan" onClose={() => {}}>
-      <input aria-label="Nomi" />
-    </Modal>,
+    <>
+      <button>outside</button>
+      <Modal open title="Fan" onClose={() => {}}>
+        <input aria-label="Nomi" />
+      </Modal>
+    </>,
   )
   const closeButton = screen.getByRole('button', { name: i18n.t('common.close') })
   const input = screen.getByLabelText('Nomi')
@@ -32,9 +35,12 @@ test('oxirgi fokuslanadigan elementdan Tab bilan birinchisiga qaytiladi', async 
 
 test('Shift+Tab bilan birinchi elementdan oxirgisiga o\'tiladi', async () => {
   render(
-    <Modal open title="Fan" onClose={() => {}}>
-      <input aria-label="Nomi" />
-    </Modal>,
+    <>
+      <button>outside</button>
+      <Modal open title="Fan" onClose={() => {}}>
+        <input aria-label="Nomi" />
+      </Modal>
+    </>,
   )
   const closeButton = screen.getByRole('button', { name: i18n.t('common.close') })
   const input = screen.getByLabelText('Nomi')
@@ -46,9 +52,12 @@ test('Shift+Tab bilan birinchi elementdan oxirgisiga o\'tiladi', async () => {
 
 test('panelning o\'ziga fokus bo\'lsa, Shift+Tab oxirgi elementga o\'tkazadi', async () => {
   render(
-    <Modal open title="Fan" onClose={() => {}}>
-      <input aria-label="Nomi" />
-    </Modal>,
+    <>
+      <button>outside</button>
+      <Modal open title="Fan" onClose={() => {}}>
+        <input aria-label="Nomi" />
+      </Modal>
+    </>,
   )
   const dialog = screen.getByRole('dialog')
   const input = screen.getByLabelText('Nomi')
