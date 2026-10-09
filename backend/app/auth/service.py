@@ -93,6 +93,11 @@ async def rotate_refresh(
     )
     if session is None:
         raise AppError(401, "INVALID_REFRESH_TOKEN", "Sessiya topilmadi")
+    # Muddat qayta ishlatish tekshiruvidan oldin: muddati o'tgan token (bekor
+    # qilingan bo'lsa ham) shunchaki rad etiladi va hech qachon barcha
+    # sessiyalarni yopishga olib kelmaydi.
+    if session.expires_at <= utcnow():
+        raise AppError(401, "REFRESH_EXPIRED", "Sessiya muddati tugagan")
     if session.revoked_at is not None:
         grace = timedelta(seconds=settings.refresh_reuse_grace_seconds)
         if utcnow() - session.revoked_at <= grace:
@@ -107,8 +112,6 @@ async def rotate_refresh(
         await revoke_all_sessions(db, session.user_id)
         await db.commit()
         raise AppError(401, "REFRESH_REUSED", "Sessiya bekor qilingan")
-    if session.expires_at <= utcnow():
-        raise AppError(401, "REFRESH_EXPIRED", "Sessiya muddati tugagan")
     user = await db.get(User, session.user_id)
     if user is None or user.status == UserStatus.blocked:
         raise AppError(403, "ACCOUNT_BLOCKED", "Akkaunt bloklangan")

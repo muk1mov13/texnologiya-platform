@@ -3,11 +3,13 @@ from datetime import timedelta
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
+from pydantic import ValidationError
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import service
 from app.auth.models import RefreshSession, User, UserStatus
+from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import hash_token
 from app.core.types import utcnow
@@ -89,10 +91,69 @@ async def test_reused_refresh_token_after_grace_window_revokes_all_sessions(
     assert (await refresh(client, other_device)).status_code == 401
 
 
+def assert_refresh_cookie_cleared(response: Response) -> None:
+    cookies = [c for c in response.headers.get_list("set-cookie") if "refresh_token=" in c]
+    assert len(cookies) == 1, cookies
+    cookie = cookies[0].lower()
+    assert cookie.startswith('refresh_token="";') or cookie.startswith("refresh_token=;")
+    assert "max-age=0" in cookie
+    assert "path=/api/auth" in cookie
+
+
 async def test_refresh_without_cookie(client: AsyncClient) -> None:
     response = await client.post("/api/auth/refresh")
     assert response.status_code == 401
     assert response.json()["code"] == "NO_REFRESH_TOKEN"
+    assert_refresh_cookie_cleared(response)
+
+
+async def test_failed_refresh_clears_cookie(client: AsyncClient, db: AsyncSession) -> None:
+    """Uzilgan sahifa yangilanishidan keyin brauzer eski cookie'ni qayta-qayta
+    yubormasligi uchun muvaffaqiyatsiz refresh cookie'ni o'chiradi."""
+    first = await login_raw_refresh(client, db)
+    assert (await refresh(client, first)).status_code == 200
+    reused = await refresh(client, first)
+    assert reused.status_code == 401
+    assert reused.json() == {
+        "code": "REFRESH_ROTATED",
+        "message": "Sessiya yangilangan, qayta kiring",
+        "details": {},
+    }
+    assert_refresh_cookie_cleared(reused)
+
+    unknown = await refresh(client, "not-a-real-token")
+    assert unknown.status_code == 401
+    assert unknown.json()["code"] == "INVALID_REFRESH_TOKEN"
+    assert_refresh_cookie_cleared(unknown)
+
+
+async def test_expired_revoked_token_does_not_revoke_other_sessions(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    """Muddati o'tgan token (bekor qilingan bo'lsa ham) faqat REFRESH_EXPIRED oladi
+    va hech qachon barcha sessiyalarni yopmaydi."""
+    first = await login_raw_refresh(client, db)
+    other_device = await login_again(client)
+    assert (await refresh(client, first)).status_code == 200
+    await db.execute(
+        update(RefreshSession)
+        .where(RefreshSession.token_hash == hash_token(first))
+        .values(
+            revoked_at=utcnow() - timedelta(seconds=60),
+            expires_at=utcnow() - timedelta(seconds=1),
+        )
+    )
+    await db.commit()
+
+    response = await refresh(client, first)
+    assert response.status_code == 401
+    assert response.json()["code"] == "REFRESH_EXPIRED"
+    assert (await refresh(client, other_device)).status_code == 200
+
+
+def test_negative_refresh_reuse_grace_is_rejected() -> None:
+    with pytest.raises(ValidationError):
+        Settings(refresh_reuse_grace_seconds=-1)
 
 
 async def test_expired_refresh_token(client: AsyncClient, db: AsyncSession) -> None:
