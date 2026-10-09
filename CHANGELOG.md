@@ -17,6 +17,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - i18n: yetishmagan xato kodlari (GLOSSARY_TERM_NOT_FOUND, LITERATURE_NOT_FOUND) qo'shildi, testlarda til holati to'liq tiklanadi, matnlar aniqlashtirildi.
 - 1B rejasi kod bilan sinxronlandi: test setup tilni `setLanguage('uz')` bilan tiklaydi, lug'atga yangi xato kodlari va aniqlashtirilgan matnlar kiritildi.
 - Dizayn tizimi: Button, Card, Badge, Spinner, EmptyState, Field komponentlari.
+- UI: ProgressRing, Modal/ConfirmDialog, Tabs, Toast.
 
 ## 2026-10-09 — 1A yopildi va GitHub'ga joylandi
 
