@@ -3240,6 +3240,7 @@ test('chiqish tugmasi sessiyani yopadi va /login ga olib boradi', async () => {
   const { router } = renderRoutes(routes, { url: '/app', user: studentUser })
   await userEvent.click(screen.getByRole('button', { name: i18n.t('nav.logout') }))
   await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+  expect(router.state.location.state).toBeNull()
 })
 
 test('til almashtirilganda PATCH /me yuboriladi', async () => {
@@ -3383,7 +3384,7 @@ export function PublicLayout() {
 
 ```tsx
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 import { useCurrentUser, useLogout } from '@/api/auth'
 import { Button } from '@/components/ui/Button'
 import { cx } from '@/lib/cx'
@@ -3400,6 +3401,7 @@ export function AppLayout() {
   const { t } = useTranslation()
   const user = useCurrentUser()
   const logout = useLogout()
+  const navigate = useNavigate()
   if (!user) return null
 
   return (
@@ -3426,7 +3428,13 @@ export function AppLayout() {
               <span className="hidden md:inline">{user.full_name}</span>
               <span className="sr-only md:hidden">{t('nav.profile')}</span>
             </NavLink>
-            <Button variant="ghost" size="sm" loading={logout.isPending} onClick={() => logout.mutate()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              loading={logout.isPending}
+              // Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
+              onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+            >
               {t('nav.logout')}
             </Button>
           </div>
@@ -3572,6 +3580,7 @@ git commit -m "feat(frontend): router, public/app layouts, language switch and p
 **Files:**
 - Create: `frontend/src/features/public/schemas.ts`, `frontend/src/features/public/AuthCard.tsx`
 - Modify (stub → to'liq): `frontend/src/features/public/HomePage.tsx`, `LoginPage.tsx`, `RegisterPage.tsx`, `PendingPage.tsx`
+- Modify: `frontend/src/i18n/uz.json` va `ru.json` — `pending` bo'limiga `"check"` kaliti qo'shiladi (uz: `"Holatni tekshirish"`, ru: `"Проверить статус"`)
 - Test: `frontend/src/features/public/LoginPage.test.tsx`, `RegisterPage.test.tsx`, `PendingPage.test.tsx`
 
 **Oqim:**
@@ -3746,8 +3755,11 @@ test('band email xatosi ko\'rsatiladi', async () => {
 
 ```tsx
 import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw/http'
 import { i18n } from '@/i18n'
 import { pendingUser, renderRoutes, studentUser } from '@/test/render'
+import { server } from '@/test/server'
 import { PendingPage } from './PendingPage'
 
 const routes = [
@@ -3759,6 +3771,17 @@ test('pending foydalanuvchi ismi bilan kutish xabarini ko\'radi', () => {
   renderRoutes(routes, { url: '/pending', user: pendingUser })
   expect(screen.getByText(i18n.t('pending.textUser', { name: pendingUser.full_name }))).toBeInTheDocument()
   expect(screen.getByRole('button', { name: i18n.t('nav.logout') })).toBeInTheDocument()
+})
+
+test('"Holatni tekshirish" sessiyani qayta so\'raydi; tasdiqlangan bo\'lsa bosh sahifaga o\'tadi', async () => {
+  server.use(
+    http.post('/api/auth/refresh', () =>
+      HttpResponse.json({ access_token: 'tok', token_type: 'bearer', user: { ...pendingUser, status: 'active' } }),
+    ),
+  )
+  const { router } = renderRoutes(routes, { url: '/pending', user: pendingUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
+  await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
 })
 
 test('mehmon kirish havolasini ko\'radi', () => {
@@ -3949,8 +3972,9 @@ export function RegisterPage() {
 
 ```tsx
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, Navigate } from 'react-router'
-import { useCurrentUser, useLogout } from '@/api/auth'
+import { sessionKey, useCurrentUser, useLogout, useSession } from '@/api/auth'
 import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
@@ -3960,6 +3984,8 @@ export function PendingPage() {
   const { t } = useTranslation()
   const user = useCurrentUser()
   const logout = useLogout()
+  const session = useSession()
+  const queryClient = useQueryClient()
 
   if (user && user.status === 'active') return <Navigate to={homePathFor(user)} replace />
 
@@ -3973,9 +3999,18 @@ export function PendingPage() {
         {user ? t('pending.textUser', { name: user.full_name }) : t('pending.textGuest')}
       </p>
       {user ? (
-        <Button variant="secondary" loading={logout.isPending} onClick={() => logout.mutate()}>
-          {t('nav.logout')}
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2">
+          {/* Sessiya keshda abadiy saqlanadi — admin tasdiqlaganini bilish uchun refresh orqali qayta so'raladi. */}
+          <Button
+            loading={session.isFetching}
+            onClick={() => void queryClient.invalidateQueries({ queryKey: sessionKey })}
+          >
+            {t('pending.check')}
+          </Button>
+          <Button variant="secondary" loading={logout.isPending} onClick={() => logout.mutate()}>
+            {t('nav.logout')}
+          </Button>
+        </div>
       ) : (
         <Link to="/login" className={buttonClasses('primary')}>
           {t('nav.login')}
