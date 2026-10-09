@@ -39,6 +39,7 @@ test('interpolatsiya o\'zgaruvchilari ikkala tilda bir xil', () => {
 
 test('setLanguage tilni almashtiradi va html lang ni yangilaydi', () => {
   setLanguage('ru')
+  expect(localStorage.getItem('locale')).toBe('ru')
   expect(i18n.t('steps.lecture')).toBe(flatRu['steps.lecture'])
   expect(document.documentElement.lang).toBe('ru')
   setLanguage('uz')
