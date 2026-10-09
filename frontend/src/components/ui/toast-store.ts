@@ -6,10 +6,12 @@ export interface ToastItem {
   text: string
 }
 
-const TOAST_MS = 5000
+const DEFAULT_MS = 5000
+const ERROR_MS = 10000
 let items: ToastItem[] = []
 let nextId = 1
 const subscribers = new Set<() => void>()
+const timers = new Map<number, ReturnType<typeof setTimeout>>()
 
 function emit(): void {
   subscribers.forEach((notify) => notify())
@@ -19,16 +21,23 @@ export function pushToast(kind: ToastKind, text: string): void {
   const id = nextId++
   items = [...items, { id, kind, text }]
   emit()
-  setTimeout(() => dismissToast(id), TOAST_MS)
+  const ms = kind === 'error' ? ERROR_MS : DEFAULT_MS
+  timers.set(id, setTimeout(() => dismissToast(id), ms))
 }
 
 export function dismissToast(id: number): void {
+  if (!items.some((item) => item.id === id)) return
   items = items.filter((item) => item.id !== id)
+  const timer = timers.get(id)
+  if (timer) clearTimeout(timer)
+  timers.delete(id)
   emit()
 }
 
 export function clearToasts(): void {
   items = []
+  timers.forEach((timer) => clearTimeout(timer))
+  timers.clear()
   emit()
 }
 

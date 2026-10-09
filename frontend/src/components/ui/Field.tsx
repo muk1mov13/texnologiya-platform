@@ -1,10 +1,18 @@
-import type { ComponentProps, ReactNode } from 'react'
+import { createContext, useContext, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cx } from '@/lib/cx'
 
 const CONTROL =
-  'w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-base outline-none transition ' +
-  'focus:border-brand-500 aria-[invalid=true]:border-red-400 disabled:bg-slate-50'
+  'w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-base outline-hidden transition ' +
+  'focus:border-brand-600 focus:ring-2 focus:ring-brand-500/30 aria-[invalid=true]:border-red-400 ' +
+  'aria-[invalid=true]:focus:ring-red-400/30 disabled:bg-slate-50'
+
+interface FieldContextValue {
+  describedBy?: string
+  invalid: boolean
+}
+
+const FieldContext = createContext<FieldContextValue | null>(null)
 
 interface FieldProps {
   id: string
@@ -16,15 +24,22 @@ interface FieldProps {
 
 export function Field({ id, label, error, hint, children }: FieldProps) {
   const { t } = useTranslation()
+  const hintId = `${id}-hint`
+  const errorId = `${id}-error`
+  const describedBy = error ? errorId : hint ? hintId : undefined
   return (
     <div className="flex flex-col gap-1">
       <label htmlFor={id} className="text-sm font-semibold text-slate-700">
         {label}
       </label>
-      {children}
-      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
+      <FieldContext.Provider value={{ describedBy, invalid: Boolean(error) }}>{children}</FieldContext.Provider>
+      {hint && !error && (
+        <p id={hintId} className="text-xs text-slate-500">
+          {hint}
+        </p>
+      )}
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p id={errorId} role="alert" className="text-sm text-red-600">
           {t(error)}
         </p>
       )}
@@ -32,16 +47,57 @@ export function Field({ id, label, error, hint, children }: FieldProps) {
   )
 }
 
-export function Input({ className, ...rest }: ComponentProps<'input'>) {
-  return <input className={cx(CONTROL, className)} {...rest} />
+export function Input({
+  className,
+  'aria-describedby': describedBy,
+  'aria-invalid': invalid,
+  ...rest
+}: ComponentProps<'input'>) {
+  const field = useContext(FieldContext)
+  return (
+    <input
+      className={cx(CONTROL, className)}
+      aria-describedby={describedBy ?? field?.describedBy}
+      aria-invalid={invalid ?? (field?.invalid ? true : undefined)}
+      {...rest}
+    />
+  )
 }
 
-export function Textarea({ className, rows = 4, ...rest }: ComponentProps<'textarea'>) {
-  return <textarea rows={rows} className={cx(CONTROL, 'resize-y', className)} {...rest} />
+export function Textarea({
+  className,
+  rows = 4,
+  'aria-describedby': describedBy,
+  'aria-invalid': invalid,
+  ...rest
+}: ComponentProps<'textarea'>) {
+  const field = useContext(FieldContext)
+  return (
+    <textarea
+      rows={rows}
+      className={cx(CONTROL, 'resize-y', className)}
+      aria-describedby={describedBy ?? field?.describedBy}
+      aria-invalid={invalid ?? (field?.invalid ? true : undefined)}
+      {...rest}
+    />
+  )
 }
 
-export function Select({ className, ...rest }: ComponentProps<'select'>) {
-  return <select className={cx(CONTROL, 'pr-8', className)} {...rest} />
+export function Select({
+  className,
+  'aria-describedby': describedBy,
+  'aria-invalid': invalid,
+  ...rest
+}: ComponentProps<'select'>) {
+  const field = useContext(FieldContext)
+  return (
+    <select
+      className={cx(CONTROL, 'pr-8', className)}
+      aria-describedby={describedBy ?? field?.describedBy}
+      aria-invalid={invalid ?? (field?.invalid ? true : undefined)}
+      {...rest}
+    />
+  )
 }
 
 export function Checkbox({ label, className, ...rest }: ComponentProps<'input'> & { label: string }) {

@@ -9,9 +9,18 @@ interface ModalProps {
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
+  describedBy?: string
 }
 
-export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+
+function getFocusable(panel: HTMLElement): HTMLElement[] {
+  return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (el) => !el.matches(':disabled'),
+  )
+}
+
+export function Modal({ open, title, onClose, children, footer, describedBy }: ModalProps) {
   const { t } = useTranslation()
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
@@ -23,18 +32,47 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
 
   useEffect(() => {
     if (!open) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const panel = panelRef.current
-    const first =
-      panel?.querySelector<HTMLElement>('input, select, textarea') ??
-      panel?.querySelector<HTMLElement>('button')
-    first?.focus()
+    const firstField = panel?.querySelector<HTMLElement>(
+      'input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled])',
+    )
+    const firstButton = panel?.querySelector<HTMLElement>('button:not([disabled])')
+    const initial = firstField ?? firstButton ?? panel
+    initial?.focus()
+
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onCloseRef.current()
+      if (event.key === 'Escape') {
+        onCloseRef.current()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const node = panelRef.current
+      if (!node) return
+      const focusable = getFocusable(node)
+      if (focusable.length === 0) {
+        event.preventDefault()
+        node.focus()
+        return
+      }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      if (event.shiftKey && active === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
+
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = previousOverflow
       previous?.focus()
     }
   }, [open])
@@ -53,7 +91,9 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        aria-describedby={describedBy}
+        tabIndex={-1}
+        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <h2 id={titleId} className="text-lg font-bold">
@@ -88,11 +128,13 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({ open, title, text, confirmLabel, onConfirm, onCancel, pending }: ConfirmDialogProps) {
   const { t } = useTranslation()
+  const textId = useId()
   return (
     <Modal
       open={open}
       title={title}
-      onClose={onCancel}
+      onClose={pending ? () => {} : onCancel}
+      describedBy={textId}
       footer={
         <>
           <Button variant="secondary" onClick={onCancel}>
@@ -104,7 +146,9 @@ export function ConfirmDialog({ open, title, text, confirmLabel, onConfirm, onCa
         </>
       }
     >
-      <p className="text-slate-700">{text}</p>
+      <p id={textId} className="text-slate-700">
+        {text}
+      </p>
     </Modal>
   )
 }

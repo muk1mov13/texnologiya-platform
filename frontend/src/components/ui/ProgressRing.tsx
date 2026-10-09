@@ -11,7 +11,7 @@ export function ProgressRing({ completed, total, size = 56 }: ProgressRingProps)
   const stroke = 6
   const radius = (size - stroke) / 2
   const circumference = 2 * Math.PI * radius
-  const ratio = total > 0 ? Math.min(completed / total, 1) : 0
+  const ratio = total > 0 ? Math.max(0, Math.min(completed / total, 1)) : 0
   const center = size / 2
   return (
     <svg

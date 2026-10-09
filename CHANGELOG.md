@@ -18,6 +18,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - 1B rejasi kod bilan sinxronlandi: test setup tilni `setLanguage('uz')` bilan tiklaydi, lug'atga yangi xato kodlari va aniqlashtirilgan matnlar kiritildi.
 - Dizayn tizimi: Button, Card, Badge, Spinner, EmptyState, Field komponentlari.
 - UI: ProgressRing, Modal/ConfirmDialog, Tabs, Toast.
+- UI tuzatishlari: tab ostidagi chiziq, xatoli maydonlarda fokus ko'rinishi, modalda fokus tutish va scroll qulfi, maydon xatolari aria-describedby orqali bog'landi, toast taymerlari tozalanadi.
 
 ## 2026-10-09 — 1A yopildi va GitHub'ga joylandi
 
