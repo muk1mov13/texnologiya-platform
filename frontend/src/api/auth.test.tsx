@@ -4,8 +4,8 @@ import { http, HttpResponse } from 'msw/http'
 import type { ReactNode } from 'react'
 import { makeUser } from '@/test/render'
 import { server } from '@/test/server'
-import { sessionKey, useChangePassword, useLogout } from './auth'
-import { getAccessToken, setAccessToken } from './client'
+import { installAuthHandlers, sessionKey, useChangePassword, useLogout, useSession } from './auth'
+import { getAccessToken, refreshSession, setAccessToken } from './client'
 import { createQueryClient } from './queryClient'
 
 function makeWrapper(queryClient: ReturnType<typeof createQueryClient>) {
@@ -62,4 +62,74 @@ test('parol almashtirilgach logout chaqiriladi va sessiya null bo\'ladi', async 
   expect(logout).toHaveBeenCalledOnce()
   expect(queryClient.getQueryData(sessionKey)).toBeNull()
   expect(getAccessToken()).toBeNull()
+})
+
+test('mahalliy refresh kutilayotganda logout qilinsa, uning natijasi e\'tiborsiz qoladi va sessiya null qoladi', async () => {
+  const user = makeUser()
+  const queryClient = createQueryClient()
+  queryClient.setQueryData(sessionKey, user)
+  setAccessToken('old-token')
+  installAuthHandlers(queryClient)
+
+  let releaseRefresh = () => {}
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  server.use(
+    http.post('/api/auth/refresh', async () => {
+      await refreshGate
+      return HttpResponse.json({ access_token: 'new-token', token_type: 'bearer', user })
+    }),
+    http.post('/api/auth/logout', () => new HttpResponse(null, { status: 204 })),
+  )
+
+  const pendingRefresh = refreshSession()
+
+  const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper(queryClient) })
+  result.current.mutate()
+  await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+  releaseRefresh()
+  await expect(pendingRefresh).resolves.toBeNull()
+
+  expect(queryClient.getQueryData(sessionKey)).toBeNull()
+  expect(getAccessToken()).toBeNull()
+})
+
+test('sessiya so\'rovi hali yuklanayotganda logout qilinsa, foydalanuvchi qaytarilmaydi', async () => {
+  const user = makeUser()
+  const queryClient = createQueryClient()
+  queryClient.setQueryData(sessionKey, user)
+  setAccessToken('old-token')
+  installAuthHandlers(queryClient)
+
+  let releaseRefresh = () => {}
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  server.use(
+    http.post('/api/auth/refresh', async () => {
+      await refreshGate
+      return HttpResponse.json({ access_token: 'new-token', token_type: 'bearer', user })
+    }),
+    http.post('/api/auth/logout', () => new HttpResponse(null, { status: 204 })),
+  )
+
+  const wrapper = makeWrapper(queryClient)
+  // Query'ning queryFn'i ro'yxatdan o'tishi uchun kamida bitta kuzatuvchi kerak.
+  renderHook(() => useSession(), { wrapper })
+  const refetchPromise = queryClient.refetchQueries({ queryKey: sessionKey })
+
+  const { result } = renderHook(() => useLogout(), { wrapper })
+  result.current.mutate()
+  await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+  // Sessiya logout paytida allaqachon null bo'lishi kerak — kutilayotgan (bekor qilingan)
+  // refetch keyinroq hal bo'lganda uni qaytarmasligi kerak.
+  expect(queryClient.getQueryData(sessionKey)).toBeNull()
+
+  releaseRefresh()
+  await refetchPromise.catch(() => {})
+
+  expect(queryClient.getQueryData(sessionKey)).toBeNull()
 })

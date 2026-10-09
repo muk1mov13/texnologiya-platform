@@ -4,7 +4,12 @@ import type { Role } from '@/api/types'
 import { homePathFor } from './paths'
 
 function isSafeInternalPath(value: unknown): value is string {
-  return typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')
+  return (
+    typeof value === 'string' &&
+    value.startsWith('/') &&
+    !value.startsWith('//') &&
+    !value.includes('\\')
+  )
 }
 
 export function RequireAuth({ roles }: { roles?: Role[] }) {

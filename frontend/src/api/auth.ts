@@ -1,13 +1,25 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { pushToast } from '@/components/ui/toast-store'
 import { i18n, setLanguage } from '@/i18n'
-import { apiFetch, refreshSession, resetSession, setAccessToken, setAuthHandlers, waitForRefresh } from './client'
+import { apiFetch, logoutRequest, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
 import type { LoginIn, MeUpdateIn, PasswordChangeIn, RegisterIn, TokenOut, User } from './types'
 
 export const sessionKey = ['session'] as const
 
 const removeNonSessionQueries = (queryClient: QueryClient): void =>
   queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== sessionKey[0] })
+
+/**
+ * Sessiyani zo'rlab yopadi: token/generation tozalanadi, kutilayotgan so'rovlar bekor qilinadi
+ * (avval cancel, keyin null — aks holda QueryClient bekor qilingan so'rovni eski holatga
+ * "revert" qilib, foydalanuvchini qayta tiklab qo'yishi mumkin), so'ng boshqa barcha kesh o'chadi.
+ */
+function endSession(queryClient: QueryClient): void {
+  resetSession()
+  void queryClient.cancelQueries()
+  queryClient.setQueryData(sessionKey, null)
+  removeNonSessionQueries(queryClient)
+}
 
 /** Client refresh/sessiya yo'qolishi haqida xabar berganda keshni yangilaydi. */
 export function installAuthHandlers(queryClient: QueryClient): void {
@@ -21,7 +33,7 @@ export function installAuthHandlers(queryClient: QueryClient): void {
       queryClient.setQueryData(sessionKey, session.user)
       setLanguage(session.user.locale)
     },
-    onLost: () => queryClient.setQueryData(sessionKey, null),
+    onLost: () => endSession(queryClient),
   })
 }
 
@@ -46,16 +58,12 @@ export function useCurrentUser(): User | null {
 }
 
 function startSession(queryClient: QueryClient, session: TokenOut): void {
+  // Generation'ni ham yangilaymiz: eski (boshqa foydalanuvchiga tegishli bo'lishi mumkin bo'lgan)
+  // kechikkan refresh natijasi ushbu yangi sessiyaga aralashmasligi kerak.
+  resetSession()
   setAccessToken(session.access_token)
   queryClient.setQueryData(sessionKey, session.user)
   setLanguage(session.user.locale)
-}
-
-function endSession(queryClient: QueryClient): void {
-  resetSession()
-  queryClient.setQueryData(sessionKey, null)
-  void queryClient.cancelQueries()
-  removeNonSessionQueries(queryClient)
 }
 
 export function useLogin() {
@@ -79,11 +87,9 @@ export function useRegister() {
 export function useLogout() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async () => {
-      // Parallel refresh tugashini kutamiz: aks holda u yangi cookie o'rnatib, bu logout'ni "eskirgan" qilib qo'yishi mumkin.
-      await waitForRefresh()
-      return apiFetch<void>('/api/auth/logout', { method: 'POST', auth: false })
-    },
+    // logoutRequest refresh bilan bitta navbatda turadi (client.ts), shuning uchun bu yerda
+    // qo'shimcha kutish kerak emas.
+    mutationFn: () => logoutRequest(),
     onSuccess: () => endSession(queryClient),
     // meta.silent yo'q: tarmoq xatosida sessiya saqlanadi va umumiy toast orqali qayta urinish mumkin bo'ladi.
   })
@@ -112,7 +118,7 @@ export function useChangePassword() {
     onSuccess: async () => {
       // Backend parolni almashtirgach refresh cookie'ni ham bekor qiladi, ammo brauzerdagi
       // cookie'ni tozalash uchun logout so'rovi yuboriladi — xatosi e'tiborsiz qoladi.
-      await apiFetch('/api/auth/logout', { method: 'POST', auth: false }).catch(() => {})
+      await logoutRequest().catch(() => {})
       endSession(queryClient)
       pushToast('success', i18n.t('profile.passwordChanged'))
     },

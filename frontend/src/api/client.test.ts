@@ -1,6 +1,15 @@
 import { http, HttpResponse } from 'msw/http'
 import { server } from '@/test/server'
-import { ApiError, apiFetch, getAccessToken, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
+import {
+  ApiError,
+  apiFetch,
+  getAccessToken,
+  logoutRequest,
+  refreshSession,
+  resetSession,
+  setAccessToken,
+  setAuthHandlers,
+} from './client'
 import type { TokenOut } from './types'
 
 const session: TokenOut = {
@@ -164,4 +173,29 @@ test('resetSession() dan keyin kelgan refresh natijasi e\'tiborsiz qoladi', asyn
   await expect(pending).resolves.toBeNull()
   expect(getAccessToken()).toBeNull()
   expect(onRefreshed).not.toHaveBeenCalled()
+})
+
+test('refresh va logout bitta "auth-refresh" nomli Web Lock orqali navbatlanadi', async () => {
+  const lockNames: string[] = []
+  const fakeLocks = {
+    request: (name: string, callback: () => Promise<unknown>) => {
+      lockNames.push(name)
+      return Promise.resolve(callback())
+    },
+  }
+  // jsdom'ning Navigator'i brand-tekshiruvi tufayli prototip orqali almashtirib bo'lmaydi
+  // (vi.stubGlobal bilan to'liq navigator'ni almashtirish MSW ichkarisida xato beradi),
+  // shuning uchun asl obyektga faqat `locks`ni vaqtincha qo'shib, keyin olib tashlaymiz.
+  Object.defineProperty(navigator, 'locks', { value: fakeLocks, configurable: true })
+  try {
+    server.use(
+      http.post('/api/auth/refresh', () => HttpResponse.json(session)),
+      http.post('/api/auth/logout', () => new HttpResponse(null, { status: 204 })),
+    )
+    await refreshSession()
+    await logoutRequest()
+  } finally {
+    Reflect.deleteProperty(navigator, 'locks')
+  }
+  expect(lockNames).toEqual(['auth-refresh', 'auth-refresh'])
 })

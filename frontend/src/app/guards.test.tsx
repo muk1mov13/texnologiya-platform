@@ -76,3 +76,12 @@ test('xavfli qaytish manzili (//) e\'tiborsiz qoldiriladi va bosh sahifaga o\'ti
   })
   await waitFor(() => expect(router.state.location.pathname).toBe('/teach'))
 })
+
+test('orqa chiziqli qaytish manzili (/\\) ham e\'tiborsiz qoldiriladi', async () => {
+  const { router } = renderRoutes(loginTree, {
+    url: '/login',
+    state: { from: '/\\evil.example' },
+    user: teacherUser,
+  })
+  await waitFor(() => expect(router.state.location.pathname).toBe('/teach'))
+})

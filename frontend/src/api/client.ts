@@ -26,6 +26,9 @@ let accessToken: string | null = null
 let generation = 0
 let handlers: AuthHandlers = NOOP_HANDLERS
 let refreshing: Promise<TokenOut | null> | null = null
+// refreshSession/logoutRequest o'z slot egaligini promise identifikatori o'rniga shu hisoblagich
+// bilan tekshiradi — shunda funksiya o'ziga (hali to'liq tayinlanmagan promise'ga) ishora qilmaydi.
+let slotOwner = 0
 
 export function getAccessToken(): string | null {
   return accessToken
@@ -66,8 +69,21 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, fallback)
 }
 
+const AUTH_LOCK_NAME = 'auth-refresh'
+const REFRESH_TIMEOUT_MS = 15_000
+
+function withAuthLock<T>(run: () => Promise<T>): Promise<T> {
+  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks
+  if (locks) return locks.request(AUTH_LOCK_NAME, run)
+  return run()
+}
+
 function fetchRefresh(): Promise<Response> {
-  return fetch('/api/auth/refresh', { method: 'POST', credentials: 'same-origin' })
+  return fetch('/api/auth/refresh', {
+    method: 'POST',
+    credentials: 'same-origin',
+    signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
+  })
 }
 
 /**
@@ -76,23 +92,34 @@ function fetchRefresh(): Promise<Response> {
  * faqat bitta tab haqiqiy so'rov yuborishi kerak — Web Locks API orqali navbatlanadi.
  */
 function requestRefresh(): Promise<Response> {
-  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks
-  if (locks) return locks.request('auth-refresh', () => fetchRefresh())
-  return fetchRefresh()
+  return withAuthLock(() => fetchRefresh())
+}
+
+function fetchLogout(): Promise<Response> {
+  return fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+}
+
+function requestLogout(): Promise<Response> {
+  return withAuthLock(() => fetchLogout())
 }
 
 /** Refresh cookie orqali yangi access token oladi. Parallel chaqiruvlar bitta so'rovni bo'lishadi. */
 export function refreshSession(): Promise<TokenOut | null> {
-  refreshing ??= (async () => {
+  if (refreshing) return refreshing
+  slotOwner += 1
+  const ownToken = slotOwner
+  const promise: Promise<TokenOut | null> = (async () => {
     const startGeneration = generation
     try {
       const response = await requestRefresh()
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          accessToken = null
+          // Shu orada resetSession() chaqirilgan bo'lsa (logout/parol almashtirish), token
+          // allaqachon null — uni qayta tozalashning hojati yo'q, holatni buzmaymiz.
+          if (generation === startGeneration) accessToken = null
           return null
         }
-        // 5xx yoki boshqa kutilmagan xato: sessiya haqiqatan yo'qolganini bilmaymiz, token saqlanadi.
+        // 5xx, tarmoq xatosi yoki timeout: sessiya haqiqatan yo'qolganini bilmaymiz, token saqlanadi.
         throw await toApiError(response)
       }
       const session = (await response.json()) as TokenOut
@@ -104,20 +131,35 @@ export function refreshSession(): Promise<TokenOut | null> {
       handlers.onRefreshed(session)
       return session
     } finally {
-      refreshing = null
+      // Boshqa chaqiruv (masalan, logoutRequest) slotni allaqachon egallab olgan bo'lishi mumkin —
+      // bu holda uni bekor qilmaymiz.
+      if (slotOwner === ownToken) refreshing = null
     }
   })()
-  return refreshing
+  refreshing = promise
+  return promise
 }
 
-/** Parallel ishlayotgan refresh tugashini kutadi (logout oqimi uchun); xatosini yutadi. */
-export async function waitForRefresh(): Promise<void> {
-  if (!refreshing) return
-  try {
-    await refreshing
-  } catch {
-    // Logout davom etishi kerak, refresh xatosi bu yerda ahamiyatsiz.
-  }
+/**
+ * Logout so'rovi ham bir xil tab-ichi navbatda turadi: ishlayotgan vaqtida `refreshing`
+ * slotini egallaydi, shunda parallel refreshSession() chaqiruvlari o'z so'rovini
+ * boshlamasdan shu (null bilan tugaydigan) natijani kutib oladi va keyin generation
+ * o'zgarganini ko'rib, eskirgan natijani e'tiborsiz qoldiradi.
+ */
+export function logoutRequest(): Promise<void> {
+  slotOwner += 1
+  const ownToken = slotOwner
+  const promise: Promise<TokenOut | null> = (async () => {
+    try {
+      const response = await requestLogout()
+      if (!response.ok) throw await toApiError(response)
+      return null
+    } finally {
+      if (slotOwner === ownToken) refreshing = null
+    }
+  })()
+  refreshing = promise
+  return promise.then(() => undefined)
 }
 
 export interface RequestOptions {
