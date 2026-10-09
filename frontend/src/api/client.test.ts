@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw/http'
 import { server } from '@/test/server'
-import { ApiError, apiFetch, getAccessToken, setAccessToken, setAuthHandlers } from './client'
+import { ApiError, apiFetch, getAccessToken, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
 import type { TokenOut } from './types'
 
 const session: TokenOut = {
@@ -66,14 +66,25 @@ test('401 da bitta refresh, so\'ng so\'rovlar yangi token bilan qayta yuboriladi
   const onRefreshed = vi.fn()
   setAuthHandlers({ onRefreshed, onLost: vi.fn() })
   let refreshCalls = 0
+  let unauthorizedCount = 0
+  // Refresh ikkala so'rov ham 401 olguncha ushlab turiladi — shundagina single-flight haqiqatan
+  // sinaladi, aks holda tezkor javoblarda ikkinchi so'rov allaqachon yangi token bilan ketishi mumkin.
+  let releaseRefresh = () => {}
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
   server.use(
-    http.post('/api/auth/refresh', () => {
+    http.post('/api/auth/refresh', async () => {
       refreshCalls += 1
+      await refreshGate
       return HttpResponse.json(session)
     }),
-    http.get('/api/subjects', ({ request }) =>
-      request.headers.get('Authorization') === 'Bearer new-token' ? HttpResponse.json([]) : invalidToken(),
-    ),
+    http.get('/api/subjects', ({ request }) => {
+      if (request.headers.get('Authorization') === 'Bearer new-token') return HttpResponse.json([])
+      unauthorizedCount += 1
+      if (unauthorizedCount === 2) releaseRefresh()
+      return invalidToken()
+    }),
   )
   await expect(Promise.all([apiFetch('/api/subjects'), apiFetch('/api/subjects')])).resolves.toEqual([[], []])
   expect(refreshCalls).toBe(1)
@@ -106,4 +117,51 @@ test('auth: false so\'rovlarda refresh qilinmaydi', async () => {
     code: 'INVALID_TOKEN',
   })
   expect(refresh).not.toHaveBeenCalled()
+})
+
+test('refresh 503 qaytarsa so\'rov HTTP_503 bilan rad etiladi, sessiya buzilmaydi', async () => {
+  setAccessToken('old')
+  const onLost = vi.fn()
+  setAuthHandlers({ onRefreshed: vi.fn(), onLost })
+  server.use(
+    http.post('/api/auth/refresh', () => new HttpResponse(null, { status: 503 })),
+    http.get('/api/subjects', invalidToken),
+  )
+  await expect(apiFetch('/api/subjects')).rejects.toMatchObject({ status: 503, code: 'HTTP_503' })
+  expect(onLost).not.toHaveBeenCalled()
+  expect(getAccessToken()).toBe('old')
+})
+
+test('403 ACCOUNT_BLOCKED kelsa onLost chaqiriladi', async () => {
+  setAccessToken('blocked-token')
+  const onLost = vi.fn()
+  setAuthHandlers({ onRefreshed: vi.fn(), onLost })
+  server.use(
+    http.get('/api/subjects', () =>
+      HttpResponse.json({ code: 'ACCOUNT_BLOCKED', message: 'Bloklangan', details: {} }, { status: 403 }),
+    ),
+  )
+  await expect(apiFetch('/api/subjects')).rejects.toMatchObject({ status: 403, code: 'ACCOUNT_BLOCKED' })
+  expect(onLost).toHaveBeenCalledOnce()
+})
+
+test('resetSession() dan keyin kelgan refresh natijasi e\'tiborsiz qoladi', async () => {
+  const onRefreshed = vi.fn()
+  setAuthHandlers({ onRefreshed, onLost: vi.fn() })
+  let releaseRefresh = () => {}
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  server.use(
+    http.post('/api/auth/refresh', async () => {
+      await refreshGate
+      return HttpResponse.json(session)
+    }),
+  )
+  const pending = refreshSession()
+  resetSession()
+  releaseRefresh()
+  await expect(pending).resolves.toBeNull()
+  expect(getAccessToken()).toBeNull()
+  expect(onRefreshed).not.toHaveBeenCalled()
 })

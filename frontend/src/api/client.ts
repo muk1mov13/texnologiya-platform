@@ -23,6 +23,7 @@ const NOOP_HANDLERS: AuthHandlers = { onRefreshed: () => {}, onLost: () => {} }
 const REFRESHABLE_CODES = new Set(['INVALID_TOKEN', 'NOT_AUTHENTICATED'])
 
 let accessToken: string | null = null
+let generation = 0
 let handlers: AuthHandlers = NOOP_HANDLERS
 let refreshing: Promise<TokenOut | null> | null = null
 
@@ -32,6 +33,12 @@ export function getAccessToken(): string | null {
 
 export function setAccessToken(token: string | null): void {
   accessToken = token
+}
+
+/** Sessiya zo'rlab yopilganda (logout, parol almashtirish) chaqiriladi: kechikkan refresh natijasi e'tiborsiz qoladi. */
+export function resetSession(): void {
+  accessToken = null
+  generation += 1
 }
 
 export function setAuthHandlers(next: AuthHandlers): void {
@@ -59,16 +66,40 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, fallback)
 }
 
+function fetchRefresh(): Promise<Response> {
+  return fetch('/api/auth/refresh', { method: 'POST', credentials: 'same-origin' })
+}
+
+/**
+ * Tablar bitta cookie jar'ni bo'lishadi: refresh rotatsiya qilgach, eski refresh tokendan
+ * qayta foydalanish backend tomonida BARCHA sessiyalarni bekor qiladi. Shu sababli bir vaqtda
+ * faqat bitta tab haqiqiy so'rov yuborishi kerak — Web Locks API orqali navbatlanadi.
+ */
+function requestRefresh(): Promise<Response> {
+  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks
+  if (locks) return locks.request('auth-refresh', () => fetchRefresh())
+  return fetchRefresh()
+}
+
 /** Refresh cookie orqali yangi access token oladi. Parallel chaqiruvlar bitta so'rovni bo'lishadi. */
 export function refreshSession(): Promise<TokenOut | null> {
   refreshing ??= (async () => {
+    const startGeneration = generation
     try {
-      const response = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'same-origin' })
+      const response = await requestRefresh()
       if (!response.ok) {
-        accessToken = null
-        return null
+        if (response.status === 401 || response.status === 403) {
+          accessToken = null
+          return null
+        }
+        // 5xx yoki boshqa kutilmagan xato: sessiya haqiqatan yo'qolganini bilmaymiz, token saqlanadi.
+        throw await toApiError(response)
       }
       const session = (await response.json()) as TokenOut
+      if (generation !== startGeneration) {
+        // Shu orada resetSession() chaqirilgan (logout/parol almashtirish) — natija e'tiborsiz qoladi.
+        return null
+      }
       accessToken = session.access_token
       handlers.onRefreshed(session)
       return session
@@ -77,6 +108,16 @@ export function refreshSession(): Promise<TokenOut | null> {
     }
   })()
   return refreshing
+}
+
+/** Parallel ishlayotgan refresh tugashini kutadi (logout oqimi uchun); xatosini yutadi. */
+export async function waitForRefresh(): Promise<void> {
+  if (!refreshing) return
+  try {
+    await refreshing
+  } catch {
+    // Logout davom etishi kerak, refresh xatosi bu yerda ahamiyatsiz.
+  }
 }
 
 export interface RequestOptions {
@@ -120,7 +161,13 @@ async function request(path: string, options: RequestOptions): Promise<Response>
       }
     }
   }
-  if (!response.ok) throw await toApiError(response)
+  if (!response.ok) {
+    const error = await toApiError(response)
+    if (response.status === 403 && error.code === 'ACCOUNT_BLOCKED') {
+      handlers.onLost()
+    }
+    throw error
+  }
   return response
 }
 

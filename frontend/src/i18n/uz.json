@@ -81,7 +81,8 @@
     "FILE_TOO_LARGE": "Fayl hajmi juda katta (50 MB gacha)",
     "INVALID_PDF": "PDF fayl buzilgan, shifrlangan yoki bo'sh",
     "MATERIAL_PROCESSING": "Material hali qayta ishlanmoqda. Tugashini kuting",
-    "MATERIAL_NOT_FAILED": "Faqat xato bilan tugagan materialni qayta ishlash mumkin"
+    "MATERIAL_NOT_FAILED": "Faqat xato bilan tugagan materialni qayta ishlash mumkin",
+    "UNKNOWN": "Kutilmagan xato yuz berdi"
   },
   "materialErrors": {
     "CONVERSION_FAILED": "Faylni PDF'ga aylantirib bo'lmadi. Faylni tekshirib, qayta urinib ko'ring",

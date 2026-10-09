@@ -22,6 +22,12 @@ test('mehmon /login ga yo\'naltiriladi va qaytish manzili saqlanadi', async () =
   expect(router.state.location.state).toEqual({ from: '/secret' })
 })
 
+test('qaytish manzili query-string bilan birga saqlanadi', async () => {
+  const { router } = renderRoutes(adminOnly, { url: '/secret?tab=2', user: null })
+  await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+  expect(router.state.location.state).toEqual({ from: '/secret?tab=2' })
+})
+
 test('pending foydalanuvchi /pending ga yo\'naltiriladi', async () => {
   const { router } = renderRoutes(adminOnly, { url: '/secret', user: pendingUser })
   await waitFor(() => expect(router.state.location.pathname).toBe('/pending'))
@@ -60,4 +66,13 @@ test('kirgan foydalanuvchi saqlangan qaytish manziliga o\'tadi', async () => {
 test('mehmon login formasini ko\'radi', () => {
   renderRoutes(loginTree, { url: '/login', user: null })
   expect(screen.getByText('login forma')).toBeInTheDocument()
+})
+
+test('xavfli qaytish manzili (//) e\'tiborsiz qoldiriladi va bosh sahifaga o\'tiladi', async () => {
+  const { router } = renderRoutes(loginTree, {
+    url: '/login',
+    state: { from: '//evil.example' },
+    user: teacherUser,
+  })
+  await waitFor(() => expect(router.state.location.pathname).toBe('/teach'))
 })
