@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.core.types import DbId, Order31
+from app.core.types import DbId, Order31, trimmed_str
 from app.learning.models import MaterialStatus, StepKind
 
 SLUG_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
@@ -8,7 +8,7 @@ URL_PATTERN = r"^https?://\S+$"
 
 
 class SubjectCreate(BaseModel):
-    title: str = Field(min_length=2, max_length=200)
+    title: trimmed_str(min_length=2, max_length=200)  # type: ignore[valid-type]
     slug: str | None = Field(default=None, max_length=220, pattern=SLUG_PATTERN)
     description: str = Field(default="", max_length=5000)
     order: Order31 = 0
@@ -16,7 +16,7 @@ class SubjectCreate(BaseModel):
 
 
 class SubjectUpdate(BaseModel):
-    title: str | None = Field(default=None, min_length=2, max_length=200)
+    title: trimmed_str(min_length=2, max_length=200) | None = None  # type: ignore[valid-type]
     slug: str | None = Field(default=None, max_length=220, pattern=SLUG_PATTERN)
     description: str | None = Field(default=None, max_length=5000)
     order: Order31 | None = None
@@ -41,13 +41,13 @@ class TeachersIn(BaseModel):
 
 
 class TopicCreate(BaseModel):
-    title: str = Field(min_length=2, max_length=200)
+    title: trimmed_str(min_length=2, max_length=200)  # type: ignore[valid-type]
     summary: str = Field(default="", max_length=5000)
     is_published: bool = False
 
 
 class TopicUpdate(BaseModel):
-    title: str | None = Field(default=None, min_length=2, max_length=200)
+    title: trimmed_str(min_length=2, max_length=200) | None = None  # type: ignore[valid-type]
     summary: str | None = Field(default=None, max_length=5000)
     is_published: bool | None = None
 
@@ -69,13 +69,13 @@ class MaterialOut(BaseModel):
 
 
 class GlossaryIn(BaseModel):
-    term: str = Field(min_length=1, max_length=200)
-    definition: str = Field(min_length=1, max_length=5000)
+    term: trimmed_str(min_length=1, max_length=200)  # type: ignore[valid-type]
+    definition: trimmed_str(min_length=1, max_length=5000)  # type: ignore[valid-type]
 
 
 class GlossaryUpdate(BaseModel):
-    term: str | None = Field(default=None, min_length=1, max_length=200)
-    definition: str | None = Field(default=None, min_length=1, max_length=5000)
+    term: trimmed_str(min_length=1, max_length=200) | None = None  # type: ignore[valid-type]
+    definition: trimmed_str(min_length=1, max_length=5000) | None = None  # type: ignore[valid-type]
 
 
 class GlossaryOut(BaseModel):
@@ -88,14 +88,14 @@ class GlossaryOut(BaseModel):
 
 
 class LiteratureIn(BaseModel):
-    title: str = Field(min_length=1, max_length=300)
+    title: trimmed_str(min_length=1, max_length=300)  # type: ignore[valid-type]
     author: str = Field(default="", max_length=200)
     year: int | None = Field(default=None, ge=1900, le=2100)
     url: str | None = Field(default=None, max_length=500, pattern=URL_PATTERN)
 
 
 class LiteratureUpdate(BaseModel):
-    title: str | None = Field(default=None, min_length=1, max_length=300)
+    title: trimmed_str(min_length=1, max_length=300) | None = None  # type: ignore[valid-type]
     author: str | None = Field(default=None, max_length=200)
     year: int | None = Field(default=None, ge=1900, le=2100)
     url: str | None = Field(default=None, max_length=500, pattern=URL_PATTERN)

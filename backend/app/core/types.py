@@ -1,9 +1,9 @@
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Path
-from pydantic import Field
+from pydantic import Field, StringConstraints
 from sqlalchemy import BigInteger, DateTime, Dialect, Enum, Integer
 from sqlalchemy.types import TypeDecorator
 
@@ -23,6 +23,16 @@ DbIdPath = Annotated[int, Path(ge=1, le=DB_ID_MAX)]
 
 # PostgreSQL INTEGER (4-bayt, signed) ustunlariga mos "order" kabi maydonlar uchun.
 Order31 = Annotated[int, Field(ge=0, le=2**31 - 1)]
+
+
+def trimmed_str(*, min_length: int = 1, max_length: int) -> Any:
+    """Bo'sh joylarni kesib tashlaydigan va shundan keyin ham `min_length`ni
+    talab qiladigan matn maydoni (masalan "   " kabi faqat bo'sh joydan
+    iborat qiymatlarni 422 bilan rad etadi)."""
+    return Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=min_length, max_length=max_length),
+    ]
 
 
 def utcnow() -> datetime:

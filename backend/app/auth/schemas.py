@@ -1,12 +1,13 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.auth.models import Locale, Role, UserStatus
+from app.core.types import trimmed_str
 
 
 class RegisterIn(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
-    full_name: str = Field(min_length=2, max_length=150)
+    full_name: trimmed_str(min_length=2, max_length=150)  # type: ignore[valid-type]
     phone: str | None = Field(default=None, max_length=32)
     locale: Locale = Locale.uz
 
@@ -35,7 +36,7 @@ class TokenOut(BaseModel):
 
 
 class MeUpdateIn(BaseModel):
-    full_name: str | None = Field(default=None, min_length=2, max_length=150)
+    full_name: trimmed_str(min_length=2, max_length=150) | None = None  # type: ignore[valid-type]
     phone: str | None = Field(default=None, max_length=32)
     locale: Locale | None = None
 

@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Form, Response, UploadFile
+from pydantic import AfterValidator
 
 from app.auth.deps import StaffUser
 from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
@@ -12,10 +13,20 @@ from app.learning.schemas import MaterialOut
 router = APIRouter(prefix="/teach", tags=["teach"])
 
 
+def _reject_blank(value: str) -> str:
+    stripped = value.strip()
+    if not stripped:
+        raise ValueError("Bo'sh bo'lishi mumkin emas")
+    return stripped
+
+
+TitleForm = Annotated[str, Form(min_length=1, max_length=200), AfterValidator(_reject_blank)]
+
+
 @router.post("/steps/{step_id}/materials", response_model=MaterialOut, status_code=201)
 async def upload_material(
     step_id: DbIdPath,
-    title: Annotated[str, Form(min_length=1, max_length=200)],
+    title: TitleForm,
     file: UploadFile,
     user: StaffUser,
     db: DbSession,

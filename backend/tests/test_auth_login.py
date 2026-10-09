@@ -38,6 +38,12 @@ async def test_register_rejects_short_password(client: AsyncClient) -> None:
     assert response.json()["code"] == "VALIDATION_ERROR"
 
 
+async def test_register_rejects_whitespace_only_full_name(client: AsyncClient) -> None:
+    response = await client.post("/api/auth/register", json={**REGISTER, "full_name": "   "})
+    assert response.status_code == 422
+    assert response.json()["code"] == "VALIDATION_ERROR"
+
+
 async def test_login_returns_access_token_and_refresh_cookie(
     client: AsyncClient, db: AsyncSession
 ) -> None:

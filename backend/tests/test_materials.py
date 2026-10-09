@@ -95,6 +95,18 @@ async def test_upload_to_review_step_is_rejected(
     assert response.json()["code"] == "STEP_DOES_NOT_ACCEPT_FILES"
 
 
+async def test_upload_rejects_whitespace_only_title(
+    client: AsyncClient, course: dict[str, Any]
+) -> None:
+    response = await client.post(
+        f"/api/teach/steps/{course['lecture_id']}/materials",
+        headers=course["headers"],
+        data={"title": "   "},
+        files={"file": ("a.pdf", make_pdf_bytes(), "application/pdf")},
+    )
+    assert response.status_code == 422
+
+
 async def test_upload_rejects_unsupported_type(client: AsyncClient, course: dict[str, Any]) -> None:
     response = await client.post(
         f"/api/teach/steps/{course['lecture_id']}/materials",

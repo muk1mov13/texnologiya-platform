@@ -46,6 +46,16 @@ async def test_glossary_crud(client: AsyncClient, topic_ctx: dict[str, Any]) -> 
     assert [t["term"] for t in listed.json()] == ["Texnika"]
 
 
+async def test_glossary_rejects_whitespace_only_term(
+    client: AsyncClient, topic_ctx: dict[str, Any]
+) -> None:
+    headers, base = topic_ctx["headers"], topic_ctx["base"]
+    response = await client.post(
+        f"{base}/glossary", headers=headers, json={"term": "   ", "definition": "Mehnat turi"}
+    )
+    assert response.status_code == 422
+
+
 async def test_glossary_term_of_other_topic_is_404(
     client: AsyncClient, topic_ctx: dict[str, Any]
 ) -> None:
