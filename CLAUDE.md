@@ -8,6 +8,8 @@ A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learni
 
 Code comments, docstrings, user-facing error messages and docs are written in **Uzbek (Latin script)**. Keep new ones in Uzbek to match.
 
+**Change log:** every change (commits, merges, PRs, repo or infra actions) must be recorded in `CHANGELOG.md` (Uzbek, newest first, dated sections with short commit hashes). Update it in the same commit or right after, then commit.
+
 ## Commands
 
 All backend commands run from `backend/` and use `uv`:
