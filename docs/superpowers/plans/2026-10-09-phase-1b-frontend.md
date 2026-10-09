@@ -322,6 +322,9 @@ export default defineConfig([
 
 `frontend/src/index.css` ("Yorqin ilova" tokenlari; Onest shrifti Google Fonts o'rniga `@fontsource` orqali o'z serverimizdan beriladi — xuddi shu shrift, lekin tashqi so'rovsiz va CSP uchun qulay):
 
+> **Code-review tuzatishi (Task 9):** `--shadow-press` endi `brand-900`ga tayanadi, chunki
+> asosiy tugma/karta foni kontrast uchun `brand-700`ga o'tdi — soya fondan doim to'qroq qolishi kerak.
+
 ```css
 @import "tailwindcss";
 @import "@fontsource-variable/onest";
@@ -337,7 +340,7 @@ export default defineConfig([
   --color-brand-700: #0f766e;
   --color-brand-900: #134e4a;
 
-  --shadow-press: 0 3px 0 var(--color-brand-700);
+  --shadow-press: 0 3px 0 var(--color-brand-900);
   --shadow-press-slate: 0 3px 0 var(--color-slate-300);
   --shadow-press-danger: 0 3px 0 var(--color-red-700);
 }
@@ -1163,29 +1166,40 @@ Dizayn qoidalari (spec, "Yorqin ilova"):
 
 `frontend/src/lib/cx.ts`:
 
+> **Code-review tuzatishi (Task 9):** `FOCUS_RING` qo'shildi — `Button`dagi klaviatura fokusi
+> halqasi endi oddiy `Link`larda ham qayta ishlatiladi.
+
 ```ts
 export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ')
 }
+
+/** `Button`dagi kabi klaviatura fokusi halqasi — oddiy `Link`larda ham qayta ishlatiladi. */
+export const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700'
 ```
 
 `frontend/src/components/ui/button-classes.ts` (`Link`ni tugma ko'rinishida chiqarish uchun ham ishlatiladi):
 
+> **Code-review tuzatishi (Task 9):** `primary` varianti oq matn bilan WCAG AA kontrastini
+> ta'minlamagan edi (`brand-500` ~2.5:1); endi `brand-700`/`hover:brand-900`. Fokus halqasi
+> endi umumiy `FOCUS_RING` konstantasi orqali.
+
 ```ts
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 export type ButtonSize = 'sm' | 'md'
 
 const PRESS = 'active:translate-y-[3px] active:shadow-none motion-reduce:active:translate-y-0'
 
+// brand-700: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: cx('bg-brand-500 text-white shadow-press hover:bg-brand-600', PRESS),
+  primary: cx('border-2 border-transparent bg-brand-700 text-white shadow-press hover:bg-brand-900', PRESS),
   secondary: cx(
     'border-2 border-slate-200 bg-white text-slate-800 shadow-press-slate hover:bg-slate-50',
     PRESS,
   ),
-  danger: cx('bg-red-500 text-white shadow-press-danger hover:bg-red-600', PRESS),
+  danger: cx('border-2 border-transparent bg-red-500 text-white shadow-press-danger hover:bg-red-600', PRESS),
   ghost: 'text-brand-700 hover:bg-brand-50',
 }
 
@@ -1201,8 +1215,8 @@ export function buttonClasses(
 ): string {
   return cx(
     'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition',
-    'motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2',
-    'focus-visible:outline-brand-500 disabled:pointer-events-none disabled:opacity-60',
+    'motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-60',
+    FOCUS_RING,
     VARIANTS[variant],
     SIZES[size],
     className,
@@ -3291,6 +3305,9 @@ Expected: FAIL — layout modullari topilmaydi.
 
 - [ ] **Step 4: `frontend/src/app/layouts/LanguageSwitch.tsx`**
 
+> **Code-review tuzatishi (Task 9):** faol til tugmasi foni `brand-500`dan `brand-700`ga
+> o'zgartirildi (oq matn bilan WCAG AA kontrasti uchun).
+
 ```tsx
 import { useTranslation } from 'react-i18next'
 import { useCurrentUser, useUpdateMe } from '@/api/auth'
@@ -3324,7 +3341,8 @@ export function LanguageSwitch() {
             onClick={() => choose(lang)}
             className={cx(
               'rounded-lg px-2 py-1 text-xs font-bold uppercase',
-              active ? 'bg-brand-500 text-white' : 'text-slate-600 hover:bg-slate-100',
+              // brand-700: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
+              active ? 'bg-brand-700 text-white' : 'text-slate-600 hover:bg-slate-100',
             )}
           >
             {lang}
@@ -4282,6 +4300,12 @@ test('review/practice/task "Tugatdim" bilan yakunlanmaydi', () => {
 
 - [ ] **Step 2: `frontend/src/api/student.ts`**
 
+> **Code-review tuzatishi:** birinchi implementatsiyadan keyingi review quyidagilarni talab qildi —
+> `useContinue` uchun `staleTime: 0` (bosqich ochilishi `resume.continue_target`ni o'zgartiradi,
+> karta eskirmasin), `useCompleteStep.onSuccess`da natijani darhol keshga yozish (refetch
+> muvaffaqiyatsiz bo'lsa ham holat qayta "ochiq"ga qaytmasin) va PDF kaliti `studentKeys.pdf()`
+> orqali (pastroq `gcTime`). Pastdagi kod shu tuzatilgan holat.
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiBuffer, apiFetch } from './client'
@@ -4293,6 +4317,7 @@ export const studentKeys = {
   topic: (id: number) => ['topics', id] as const,
   step: (id: number) => ['steps', id] as const,
   continue: ['me', 'continue'] as const,
+  pdf: (fileUrl: string) => ['pdf', fileUrl] as const,
 }
 
 export function useSubjects() {
@@ -4331,6 +4356,10 @@ export function useContinue() {
   return useQuery({
     queryKey: studentKeys.continue,
     queryFn: ({ signal }) => apiFetch<ContinueTarget | null>('/api/me/continue', { signal }),
+    // staleTime: 0 — GET /api/steps/{id} oxirgi ochilgan bosqichni (resume.continue_target)
+    // belgilaydi, shuning uchun bu natija har safar sahifaga qaytilganda yangilanishi kerak,
+    // aks holda karta eski (allaqachon ko'rilgan) bosqichga ishora qilib qolishi mumkin.
+    staleTime: 0,
   })
 }
 
@@ -4338,23 +4367,37 @@ export function useCompleteStep(topicId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (stepId: number) => apiFetch<StepBrief>(`/api/steps/${stepId}/complete`, { method: 'POST' }),
-    onSuccess: (step) =>
-      Promise.all([
+    onSuccess: (step) => {
+      // Natija darhol keshga yoziladi: refetch muvaffaqiyatsiz bo'lsa ham (masalan, tarmoq
+      // uzilsa), "Tugatdim" tugmasi server allaqachon yakunlagan bosqichni qayta ko'rsatmaydi.
+      queryClient.setQueryData<StepContent>(studentKeys.step(step.id), (old) =>
+        old ? { ...old, status: step.status } : old,
+      )
+      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) =>
+        old
+          ? { ...old, steps: old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s)) }
+          : old,
+      )
+      return Promise.all([
         queryClient.invalidateQueries({ queryKey: studentKeys.topic(topicId) }),
         queryClient.invalidateQueries({ queryKey: studentKeys.step(step.id) }),
+        // ['subjects'] prefiks bo'yicha qisman moslashtiriladi (exact: false, sukut bo'yicha),
+        // shuning uchun bu bitta chaqiruv ro'yxatni (studentKeys.subjects) HAM fan tafsilotini
+        // (studentKeys.subject(slug) === ['subjects', slug]) invalidatsiya qiladi.
         queryClient.invalidateQueries({ queryKey: studentKeys.subjects }),
         queryClient.invalidateQueries({ queryKey: studentKeys.continue }),
-      ]),
+      ])
+    },
   })
 }
 
 /** Himoyalangan PDF Bearer token bilan yuklanadi (refresh mantiqi ham shu yerda ishlaydi). */
 export function useMaterialPdf(fileUrl: string) {
   return useQuery({
-    queryKey: ['pdf', fileUrl],
+    queryKey: studentKeys.pdf(fileUrl),
     queryFn: ({ signal }) => apiBuffer(fileUrl, signal),
     staleTime: Infinity,
-    gcTime: 5 * 60_000,
+    gcTime: 60_000,
   })
 }
 ```
@@ -4509,6 +4552,11 @@ Expected: FAIL — `steps.test.ts` `./steps`ni topmaydi, sahifa testlari stub tu
 
 - [ ] **Step 6: `frontend/src/features/student/SubjectsPage.tsx`**
 
+> **Code-review tuzatishi:** oq matn `brand-500` fonida WCAG AA kontrastini ta'minlamaydi
+> (~2.5:1), shuning uchun `ContinueCard` foni `brand-700`/`hover:brand-900`ga, ikkinchi darajali
+> matn `brand-100`dan `brand-50`ga o'zgartirildi. Havolalarga `Button`dagiga o'xshash
+> `focus-visible` halqasi (`FOCUS_RING`, `@/lib/cx`) qo'shildi.
+
 ```tsx
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
@@ -4519,6 +4567,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { PageSpinner } from '@/components/ui/Spinner'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { STEP_ICONS } from '@/lib/steps'
 
 export function SubjectsPage() {
@@ -4544,15 +4593,19 @@ function ContinueCard({ target }: { target: ContinueTarget }) {
   return (
     <Link
       to={`/app/topics/${target.topic_id}/${target.step_kind}`}
-      className="group flex items-center gap-4 rounded-2xl bg-brand-500 p-5 text-white shadow-press transition hover:bg-brand-600"
+      // brand-700/brand-50: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
+      className={cx(
+        'group flex items-center gap-4 rounded-2xl bg-brand-700 p-5 text-white shadow-press transition hover:bg-brand-900',
+        FOCUS_RING,
+      )}
     >
       <span className="text-4xl" aria-hidden="true">
         {STEP_ICONS[target.step_kind]}
       </span>
       <span className="flex flex-1 flex-col">
-        <span className="text-sm font-semibold uppercase tracking-wide text-brand-100">{t('student.continue')}</span>
+        <span className="text-sm font-semibold uppercase tracking-wide text-brand-50">{t('student.continue')}</span>
         <span className="text-lg font-bold">{target.topic_title}</span>
-        <span className="text-sm text-brand-100">
+        <span className="text-sm text-brand-50">
           {target.subject_title} · {t(`steps.${target.step_kind}`)}
         </span>
       </span>
@@ -4587,7 +4640,10 @@ function SubjectTile({ subject }: { subject: SubjectCard }) {
   return (
     <Link
       to={`/app/subjects/${subject.slug}`}
-      className="flex h-full items-start gap-4 rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-brand-200 hover:shadow-md"
+      className={cx(
+        'flex h-full items-start gap-4 rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-brand-200 hover:shadow-md',
+        FOCUS_RING,
+      )}
     >
       <span className="flex flex-1 flex-col gap-1">
         <span className="text-lg font-bold">{subject.title}</span>
@@ -4604,34 +4660,59 @@ function SubjectTile({ subject }: { subject: SubjectCard }) {
 
 - [ ] **Step 7: `frontend/src/features/student/SubjectPage.tsx`** (Duolingo uslubidagi "zigzag" mavzu yo'li)
 
+> **Code-review tuzatishi:** `sm:ml-48` + `sm:max-w-md` 640px kerak qilardi, 640–672px oralig'ida
+> esa 608px bor edi — gorizontal scroll paydo bo'lardi; siljish endi faqat `md:`dan boshlanadi.
+> Qayta urinish endi faqat 5xx/tarmoq xatosida ko'rsatiladi (`ApiError.status < 500`da yo'q),
+> "← Barcha fanlar" havolasi endi har doim (yuklanish/xato holatida ham) ko'rinadi, Badge ichidagi
+> ✓ `aria-hidden`ga o'raldi, havolalarga `FOCUS_RING` qo'shildi.
+
 ```tsx
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
+import { ApiError } from '@/api/client'
 import { useSubject } from '@/api/student'
+import type { SubjectDetail } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 
-// Katta ekranda mavzular chap-o'ng siljib, yo'l (path) shaklini hosil qiladi.
-const OFFSETS = ['sm:ml-0', 'sm:ml-24', 'sm:ml-48', 'sm:ml-24']
+// Katta ekranda (md: va undan yuqori) mavzular chap-o'ng siljib, yo'l (path) shaklini hosil qiladi.
+// Kichik ekranlarda (sm va undan past) siljishsiz to'liq kenglikda qoladi — aks holda
+// eng kattasi (ml-48 + max-w-md) sm (640px) kengligida konteynerdan tashqariga chiqib ketadi.
+const OFFSETS = ['md:ml-0', 'md:ml-24', 'md:ml-48', 'md:ml-24']
 
 export function SubjectPage() {
   const { t } = useTranslation()
   const { slug = '' } = useParams()
   const subject = useSubject(slug)
+  // 4xx (masalan, "fan topilmadi") qayta urinish bilan tuzatilmaydi — faqat 5xx/tarmoq
+  // xatosida "Qayta urinish" tugmasi ko'rsatiladi.
+  const canRetry = !(subject.error instanceof ApiError) || subject.error.status >= 500
 
-  if (subject.isPending) return <PageSpinner />
-  if (subject.isError) return <ErrorState error={subject.error} onRetry={() => void subject.refetch()} />
-
-  const { title, description, topics } = subject.data
   return (
     <div className="flex flex-col gap-6">
-      <Link to="/app" className="text-sm font-semibold text-brand-700 hover:underline">
+      <Link to="/app" className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}>
         ← {t('student.allSubjects')}
       </Link>
+      {subject.isPending ? (
+        <PageSpinner />
+      ) : subject.isError ? (
+        <ErrorState error={subject.error} onRetry={canRetry ? () => void subject.refetch() : undefined} />
+      ) : (
+        <SubjectBody subject={subject.data} />
+      )}
+    </div>
+  )
+}
+
+function SubjectBody({ subject }: { subject: SubjectDetail }) {
+  const { t } = useTranslation()
+  const { title, description, topics } = subject
+  return (
+    <>
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
         {description && <p className="max-w-2xl text-slate-600">{description}</p>}
@@ -4643,10 +4724,13 @@ export function SubjectPage() {
           {topics.map((topic, index) => {
             const done = topic.progress.total > 0 && topic.progress.completed >= topic.progress.total
             return (
-              <li key={topic.id} className={cx('w-full sm:max-w-md', OFFSETS[index % OFFSETS.length])}>
+              <li key={topic.id} className={cx('w-full md:max-w-md', OFFSETS[index % OFFSETS.length])}>
                 <Link
                   to={`/app/topics/${topic.id}`}
-                  className="flex items-center gap-4 rounded-2xl border-2 border-slate-100 bg-white p-4 transition hover:border-brand-200 hover:shadow-md"
+                  className={cx(
+                    'flex items-center gap-4 rounded-2xl border-2 border-slate-100 bg-white p-4 transition hover:border-brand-200 hover:shadow-md',
+                    FOCUS_RING,
+                  )}
                 >
                   <ProgressRing completed={topic.progress.completed} total={topic.progress.total} />
                   <span className="flex flex-1 flex-col">
@@ -4655,14 +4739,18 @@ export function SubjectPage() {
                     </span>
                     <span className="font-bold">{topic.title}</span>
                   </span>
-                  {done && <Badge tone="green">✓ {t('student.topicDone')}</Badge>}
+                  {done && (
+                    <Badge tone="green">
+                      <span aria-hidden="true">✓</span> {t('student.topicDone')}
+                    </Badge>
+                  )}
                 </Link>
               </li>
             )
           })}
         </ol>
       )}
-    </div>
+    </>
   )
 }
 ```
@@ -4671,6 +4759,11 @@ export function SubjectPage() {
 
 Run: `npm test && npm run lint && npm run typecheck`
 Expected: PASS, xatosiz.
+
+> **Code-review tuzatishi:** `useCompleteStep` (kesh patch + invalidatsiya) va `useMaterialPdf`
+> (Bearer token, 401 → refresh → qayta so'rov) uchun `frontend/src/api/student.test.tsx` qo'shildi
+> — Task 10 shu hook'larga tayanadi. `SubjectPage.test.tsx`ga 404'da qayta urinish tugmasi
+> yo'qligi/ortga havola borligini va 5xx'da qayta urinish borligini tekshiruvchi testlar qo'shildi.
 
 - [ ] **Step 9: CHANGELOG va commit**
 

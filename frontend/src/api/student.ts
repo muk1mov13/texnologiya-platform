@@ -8,6 +8,7 @@ export const studentKeys = {
   topic: (id: number) => ['topics', id] as const,
   step: (id: number) => ['steps', id] as const,
   continue: ['me', 'continue'] as const,
+  pdf: (fileUrl: string) => ['pdf', fileUrl] as const,
 }
 
 export function useSubjects() {
@@ -46,6 +47,10 @@ export function useContinue() {
   return useQuery({
     queryKey: studentKeys.continue,
     queryFn: ({ signal }) => apiFetch<ContinueTarget | null>('/api/me/continue', { signal }),
+    // staleTime: 0 — GET /api/steps/{id} oxirgi ochilgan bosqichni (resume.continue_target)
+    // belgilaydi, shuning uchun bu natija har safar sahifaga qaytilganda yangilanishi kerak,
+    // aks holda karta eski (allaqachon ko'rilgan) bosqichga ishora qilib qolishi mumkin.
+    staleTime: 0,
   })
 }
 
@@ -53,22 +58,36 @@ export function useCompleteStep(topicId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (stepId: number) => apiFetch<StepBrief>(`/api/steps/${stepId}/complete`, { method: 'POST' }),
-    onSuccess: (step) =>
-      Promise.all([
+    onSuccess: (step) => {
+      // Natija darhol keshga yoziladi: refetch muvaffaqiyatsiz bo'lsa ham (masalan, tarmoq
+      // uzilsa), "Tugatdim" tugmasi server allaqachon yakunlagan bosqichni qayta ko'rsatmaydi.
+      queryClient.setQueryData<StepContent>(studentKeys.step(step.id), (old) =>
+        old ? { ...old, status: step.status } : old,
+      )
+      queryClient.setQueryData<TopicDetail>(studentKeys.topic(topicId), (old) =>
+        old
+          ? { ...old, steps: old.steps.map((s) => (s.id === step.id ? { ...s, status: step.status } : s)) }
+          : old,
+      )
+      return Promise.all([
         queryClient.invalidateQueries({ queryKey: studentKeys.topic(topicId) }),
         queryClient.invalidateQueries({ queryKey: studentKeys.step(step.id) }),
+        // ['subjects'] prefiks bo'yicha qisman moslashtiriladi (exact: false, sukut bo'yicha),
+        // shuning uchun bu bitta chaqiruv ro'yxatni (studentKeys.subjects) HAM fan tafsilotini
+        // (studentKeys.subject(slug) === ['subjects', slug]) invalidatsiya qiladi.
         queryClient.invalidateQueries({ queryKey: studentKeys.subjects }),
         queryClient.invalidateQueries({ queryKey: studentKeys.continue }),
-      ]),
+      ])
+    },
   })
 }
 
 /** Himoyalangan PDF Bearer token bilan yuklanadi (refresh mantiqi ham shu yerda ishlaydi). */
 export function useMaterialPdf(fileUrl: string) {
   return useQuery({
-    queryKey: ['pdf', fileUrl],
+    queryKey: studentKeys.pdf(fileUrl),
     queryFn: ({ signal }) => apiBuffer(fileUrl, signal),
     staleTime: Infinity,
-    gcTime: 5 * 60_000,
+    gcTime: 60_000,
   })
 }

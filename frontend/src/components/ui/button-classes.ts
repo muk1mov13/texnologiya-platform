@@ -1,12 +1,13 @@
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 export type ButtonSize = 'sm' | 'md'
 
 const PRESS = 'active:translate-y-[3px] active:shadow-none motion-reduce:active:translate-y-0'
 
+// brand-700: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: cx('border-2 border-transparent bg-brand-500 text-white shadow-press hover:bg-brand-600', PRESS),
+  primary: cx('border-2 border-transparent bg-brand-700 text-white shadow-press hover:bg-brand-900', PRESS),
   secondary: cx(
     'border-2 border-slate-200 bg-white text-slate-800 shadow-press-slate hover:bg-slate-50',
     PRESS,
@@ -27,8 +28,8 @@ export function buttonClasses(
 ): string {
   return cx(
     'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition',
-    'motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2',
-    'focus-visible:outline-brand-700 disabled:pointer-events-none disabled:opacity-60',
+    'motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-60',
+    FOCUS_RING,
     VARIANTS[variant],
     SIZES[size],
     className,

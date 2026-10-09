@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { PageSpinner } from '@/components/ui/Spinner'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { STEP_ICONS } from '@/lib/steps'
 
 export function SubjectsPage() {
@@ -32,15 +33,19 @@ function ContinueCard({ target }: { target: ContinueTarget }) {
   return (
     <Link
       to={`/app/topics/${target.topic_id}/${target.step_kind}`}
-      className="group flex items-center gap-4 rounded-2xl bg-brand-500 p-5 text-white shadow-press transition hover:bg-brand-600"
+      // brand-700/brand-50: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
+      className={cx(
+        'group flex items-center gap-4 rounded-2xl bg-brand-700 p-5 text-white shadow-press transition hover:bg-brand-900',
+        FOCUS_RING,
+      )}
     >
       <span className="text-4xl" aria-hidden="true">
         {STEP_ICONS[target.step_kind]}
       </span>
       <span className="flex flex-1 flex-col">
-        <span className="text-sm font-semibold uppercase tracking-wide text-brand-100">{t('student.continue')}</span>
+        <span className="text-sm font-semibold uppercase tracking-wide text-brand-50">{t('student.continue')}</span>
         <span className="text-lg font-bold">{target.topic_title}</span>
-        <span className="text-sm text-brand-100">
+        <span className="text-sm text-brand-50">
           {target.subject_title} · {t(`steps.${target.step_kind}`)}
         </span>
       </span>
@@ -75,7 +80,10 @@ function SubjectTile({ subject }: { subject: SubjectCard }) {
   return (
     <Link
       to={`/app/subjects/${subject.slug}`}
-      className="flex h-full items-start gap-4 rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-brand-200 hover:shadow-md"
+      className={cx(
+        'flex h-full items-start gap-4 rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-brand-200 hover:shadow-md',
+        FOCUS_RING,
+      )}
     >
       <span className="flex flex-1 flex-col gap-1">
         <span className="text-lg font-bold">{subject.title}</span>

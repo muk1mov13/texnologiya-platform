@@ -12,7 +12,7 @@
   --color-brand-700: #0f766e;
   --color-brand-900: #134e4a;
 
-  --shadow-press: 0 3px 0 var(--color-brand-700);
+  --shadow-press: 0 3px 0 var(--color-brand-900);
   --shadow-press-slate: 0 3px 0 var(--color-slate-300);
   --shadow-press-danger: 0 3px 0 var(--color-red-700);
 }

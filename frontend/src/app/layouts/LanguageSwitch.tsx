@@ -30,7 +30,8 @@ export function LanguageSwitch() {
             onClick={() => choose(lang)}
             className={cx(
               'rounded-lg px-2 py-1 text-xs font-bold uppercase',
-              active ? 'bg-brand-500 text-white' : 'text-slate-600 hover:bg-slate-100',
+              // brand-700: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
+              active ? 'bg-brand-700 text-white' : 'text-slate-600 hover:bg-slate-100',
             )}
           >
             {lang}
