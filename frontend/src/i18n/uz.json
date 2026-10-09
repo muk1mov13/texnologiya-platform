@@ -143,7 +143,8 @@
   "pending": {
     "title": "Tasdiq kutilmoqda",
     "textUser": "{{name}}, akkauntingiz administrator tasdig'ini kutmoqda. Tasdiqlangach, platformadan to'liq foydalanishingiz mumkin.",
-    "textGuest": "Ro'yxatdan o'tdingiz! Administrator akkauntingizni tasdiqlagach, tizimga kira olasiz."
+    "textGuest": "Ro'yxatdan o'tdingiz! Administrator akkauntingizni tasdiqlagach, tizimga kira olasiz.",
+    "check": "Holatni tekshirish"
   },
   "student": {
     "hello": "Salom, {{name}}!",
