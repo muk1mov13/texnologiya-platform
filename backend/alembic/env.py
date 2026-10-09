@@ -33,10 +33,28 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
+    is_sqlite = connection.dialect.name == "sqlite"
+    if is_sqlite:
+        # render_as_batch'da SQLite ustun turi/cheklovini o'zgartirish jadvalni
+        # to'liq qayta yaratadi (yangi jadval, ko'chirish, eskisini DROP qilish).
+        # foreign_keys=ON bo'lsa, eski jadvalni DROP qilish ON DELETE CASCADE
+        # orqali bola qatorlarni ham o'chirib yuboradi. PRAGMA faqat tranzaksiya
+        # ochiq bo'lmaganda ta'sir qiladi, shu sababli avval ochiq tranzaksiyani
+        # yopamiz.
+        if connection.in_transaction():
+            connection.commit()
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        # `exec_driver_sql` avtomatik ravishda yangi tranzaksiyani boshlab
+        # yuboradi (SQLAlchemy "autobegin"); keyinroq Alembic'ning o'z
+        # `begin_transaction()`'i tranzaksiyani boshlab, oxirida committ
+        # qilishi uchun ulanish tozalanishi kerak, aks holda Alembic uni
+        # o'zi boshlamagani uchun commit qilmay qoladi.
+        if connection.in_transaction():
+            connection.commit()
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
-        render_as_batch=connection.dialect.name == "sqlite",
+        render_as_batch=is_sqlite,
         compare_type=True,
     )
     with context.begin_transaction():
