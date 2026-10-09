@@ -36,11 +36,14 @@ test("\"Holatni tekshirish\" hali tasdiqlanmagan bo'lsa xabar ko'rsatadi", async
     ),
   )
   renderRoutes(routes, { url: '/pending', user: pendingUser })
+  // `role="status"` elementi doim DOM'da turadi (bo'sh holatda `sr-only`) — shuning uchun
+  // mavjudligini emas, matnini kutamiz.
+  expect(screen.getByRole('status')).toHaveTextContent('')
   await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
-  expect(await screen.findByRole('status')).toHaveTextContent(i18n.t('pending.stillPending'))
+  await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(i18n.t('pending.stillPending')))
 })
 
-test('"Holatni tekshirish" 401 qaytarsa sessiya tugaganini bildirib /login ga o\'tadi', async () => {
+test('"Holatni tekshirish" sessiya tugagan bo\'lsa (401) /login ga yo\'naltiradi', async () => {
   server.use(
     http.post('/api/auth/refresh', () =>
       HttpResponse.json({ code: 'INVALID_REFRESH_TOKEN', message: 'x', details: {} }, { status: 401 }),

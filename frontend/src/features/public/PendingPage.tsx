@@ -7,6 +7,7 @@ import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { Card } from '@/components/ui/Card'
+import { cx } from '@/lib/cx'
 
 export function PendingPage() {
   const { t } = useTranslation()
@@ -15,23 +16,21 @@ export function PendingPage() {
   const session = useSession()
   const navigate = useNavigate()
 
+  // "Holatni tekshirish" aniq natijalarga ega bo'lishi uchun `invalidateQueries` o'rniga
+  // lokal mutatsiya ishlatiladi: `session.refetch()` natijasini o'zi tekshiradi va
+  // muvaffaqiyatsizlikda xatoni uloqtiradi (shunda `check.isError`/`check.error` ishlaydi).
   const check = useMutation({
     mutationFn: async (): Promise<User | null> => {
       const result = await session.refetch()
       if (result.isError) throw result.error
       return result.data ?? null
     },
-    onSuccess: (data) => {
-      // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va refresh
-      // 401/403 qaytargan). Faol foydalanuvchi uchun pastdagi <Navigate /> yetarli.
-      if (data === null) navigate('/login', { replace: true })
-    },
     // meta.silent yo'q — xato global toast orqali ko'rsatiladi (api/queryClient.ts).
   })
 
   if (user && user.status === 'active') return <Navigate to={homePathFor(user)} replace />
 
-  const stillPending = check.isSuccess && check.data?.status === 'pending'
+  const stillPendingText = check.isSuccess && check.data?.status === 'pending' ? t('pending.stillPending') : ''
 
   return (
     <Card className="mx-auto flex max-w-lg flex-col items-center gap-3 p-8 text-center">
@@ -42,17 +41,38 @@ export function PendingPage() {
       <p className="text-slate-600">
         {user ? t('pending.textUser', { name: user.full_name }) : t('pending.textGuest')}
       </p>
-      {stillPending && <p role="status">{t('pending.stillPending')}</p>}
+      {/* Doim DOM'da turadi — faqat matn almashadi, shunda ekran o'quvchi o'zgarishni e'lon qiladi.
+          Bo'sh bo'lganda `sr-only`: ko'rinmaydi va joy egallamaydi, lekin live region sifatida qoladi. */}
+      <p role="status" className={cx(!stillPendingText && 'sr-only')}>
+        {stillPendingText}
+      </p>
       {user ? (
         <div className="flex flex-wrap justify-center gap-2">
-          {/* Sessiya keshda abadiy saqlanadi — admin tasdiqlaganini bilish uchun refresh orqali qayta so'raladi. */}
-          <Button loading={check.isPending} onClick={() => check.mutate()}>
+          <Button
+            loading={check.isPending}
+            onClick={() =>
+              check.mutate(undefined, {
+                // Call-level callback: komponent unmount bo'lgach chaqirilmaydi — kechikkan
+                // javob allaqachon boshqa sahifaga o'tgan foydalanuvchini qaytarib yubormaydi.
+                onSuccess: (data) => {
+                  // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va
+                  // refresh 401/403 qaytargan — ikkisi ham `client.ts`da `null`ga tushadi).
+                  if (data === null) navigate('/login', { replace: true, flushSync: true })
+                },
+              })
+            }
+          >
             {t('pending.check')}
           </Button>
+          {/* AppLayout'dagi chiqish bilan bir xil: qaytish manzilisiz, flushSync bilan /login'ga o'tiladi. */}
           <Button
             variant="secondary"
             loading={logout.isPending}
-            onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+            onClick={() =>
+              logout.mutate(undefined, {
+                onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+              })
+            }
           >
             {t('nav.logout')}
           </Button>

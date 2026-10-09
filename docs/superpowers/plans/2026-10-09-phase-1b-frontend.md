@@ -2770,7 +2770,9 @@ interface RenderOptions {
 export function renderRoutes(routes: RouteObject[], { url = '/', state, user = null }: RenderOptions = {}) {
   const queryClient = createQueryClient()
   queryClient.setDefaultOptions({
-    queries: { retry: false, refetchOnWindowFocus: false, staleTime: 30_000 },
+    // `retryDelay: 0`: `useSession`ning o'zi `retry: 1`ni belgilaydi (shu yerdagi `retry: false`ni
+    // bosib qo'yadi) — kechikishsiz, testlar `findBy*` timeout'iga tirmashib qolmaydi.
+    queries: { retry: false, retryDelay: 0, refetchOnWindowFocus: false, staleTime: 30_000 },
     mutations: { retry: false },
   })
   queryClient.setQueryData(sessionKey, user)
@@ -2796,6 +2798,8 @@ export function renderRoute(
   return renderRoutes([{ path, element }], { url: options.url ?? path, ...options })
 }
 ```
+
+**Code-review tuzatishi (Task 8'dan keyin):** `retryDelay: 0` qo'shildi — 2-bosqich (Task 8) review'i "Holatni tekshirish" 500 testining haqiqiy 1 soniyalik qayta urinish kechikishiga tirmashib qolishini aniqladi.
 
 - [ ] **Step 2: Muvaffaqiyatsiz testlarni yozish**
 
@@ -3433,7 +3437,15 @@ export function AppLayout() {
               size="sm"
               loading={logout.isPending}
               // Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
-              onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+              // `flushSync`: sessiya tozalanishi (setQueryData) React'ning navigatsiya
+              // tranzitsiyasidan OLDIN qo'llanilishi mumkin — aks holda `RequireAuth` hali
+              // eski `/app` manzilida qayta render bo'lib, `state: {from: '/app'}` bilan
+              // o'ziga xos Navigate qaytarib, shu toza navigatsiyani bosib qo'yishi mumkin edi.
+              onClick={() =>
+                logout.mutate(undefined, {
+                  onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+                })
+              }
             >
               {t('nav.logout')}
             </Button>
@@ -3447,6 +3459,8 @@ export function AppLayout() {
   )
 }
 ```
+
+**Code-review tuzatishi (Task 8'dan keyin — logout navigatsiya poygasi):** `useLogout`ning `endSession`i `setQueryData(sessionKey, null)`ni chaqiradi; kuzatuvchilar bu haqda `setTimeout(0)` orqali xabar oladi. Shu orada `navigate`ning o'zi `React.startTransition` ichida (`setImmediate` orqali keyinroq) qo'llaniladi. Agar timer birinchi bo'lib ishga tushsa, React manzil hali `/app` bo'lgan holda shoshilinch render qiladi — `RequireAuth` esa `state: {from: '/app'}` bilan o'zining `<Navigate>`ini qaytarib, toza navigatsiyani bosib qo'yadi (keyingi kirgan foydalanuvchi oldingisining sahifasiga tushib qolishi mumkin bo'lgan haqiqiy xato). `flushSync: true` navigatsiyani sinxron qiladi, poyga yo'qoladi. `PendingPage`dagi ikki navigatsiyaga (chiqish va "Holatni tekshirish" sessiya tugaganda) ham bir xillik uchun qo'shildi.
 
 - [ ] **Step 7: `frontend/src/app/router.tsx`**
 
@@ -3802,11 +3816,14 @@ test('"Holatni tekshirish" hali tasdiqlanmagan bo\'lsa xabar ko\'rsatadi', async
     ),
   )
   renderRoutes(routes, { url: '/pending', user: pendingUser })
+  // `role="status"` elementi doim DOM'da turadi (bo'sh holatda `sr-only`) — shuning uchun
+  // mavjudligini emas, matnini kutamiz.
+  expect(screen.getByRole('status')).toHaveTextContent('')
   await userEvent.click(screen.getByRole('button', { name: i18n.t('pending.check') }))
-  expect(await screen.findByRole('status')).toHaveTextContent(i18n.t('pending.stillPending'))
+  await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(i18n.t('pending.stillPending')))
 })
 
-test('"Holatni tekshirish" 401 qaytarsa sessiya tugaganini bildirib /login ga o\'tadi', async () => {
+test('"Holatni tekshirish" sessiya tugagan bo\'lsa (401) /login ga yo\'naltiradi', async () => {
   server.use(
     http.post('/api/auth/refresh', () =>
       HttpResponse.json({ code: 'INVALID_REFRESH_TOKEN', message: 'x', details: {} }, { status: 401 }),
@@ -4037,6 +4054,7 @@ import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { Card } from '@/components/ui/Card'
+import { cx } from '@/lib/cx'
 
 export function PendingPage() {
   const { t } = useTranslation()
@@ -4054,18 +4072,12 @@ export function PendingPage() {
       if (result.isError) throw result.error
       return result.data ?? null
     },
-    onSuccess: (data) => {
-      // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va refresh
-      // 401/403 qaytargan — ikkisi ham `client.ts`da `null`ga tushadi). Faol foydalanuvchi
-      // uchun pastdagi <Navigate /> yetarli.
-      if (data === null) navigate('/login', { replace: true })
-    },
     // meta.silent yo'q — xato global toast orqali ko'rsatiladi (api/queryClient.ts).
   })
 
   if (user && user.status === 'active') return <Navigate to={homePathFor(user)} replace />
 
-  const stillPending = check.isSuccess && check.data?.status === 'pending'
+  const stillPendingText = check.isSuccess && check.data?.status === 'pending' ? t('pending.stillPending') : ''
 
   return (
     <Card className="mx-auto flex max-w-lg flex-col items-center gap-3 p-8 text-center">
@@ -4076,17 +4088,38 @@ export function PendingPage() {
       <p className="text-slate-600">
         {user ? t('pending.textUser', { name: user.full_name }) : t('pending.textGuest')}
       </p>
-      {stillPending && <p role="status">{t('pending.stillPending')}</p>}
+      {/* Doim DOM'da turadi — faqat matn almashadi, shunda ekran o'quvchi o'zgarishni e'lon qiladi.
+          Bo'sh bo'lganda `sr-only`: ko'rinmaydi va joy egallamaydi, lekin live region sifatida qoladi. */}
+      <p role="status" className={cx(!stillPendingText && 'sr-only')}>
+        {stillPendingText}
+      </p>
       {user ? (
         <div className="flex flex-wrap justify-center gap-2">
-          <Button loading={check.isPending} onClick={() => check.mutate()}>
+          <Button
+            loading={check.isPending}
+            onClick={() =>
+              check.mutate(undefined, {
+                // Call-level callback: komponent unmount bo'lgach chaqirilmaydi — kechikkan
+                // javob allaqachon boshqa sahifaga o'tgan foydalanuvchini qaytarib yubormaydi.
+                onSuccess: (data) => {
+                  // `null` — sessiya tugagan (masalan, rad etilgan foydalanuvchi bloklangan va
+                  // refresh 401/403 qaytargan — ikkisi ham `client.ts`da `null`ga tushadi).
+                  if (data === null) navigate('/login', { replace: true, flushSync: true })
+                },
+              })
+            }
+          >
             {t('pending.check')}
           </Button>
-          {/* AppLayout'dagi chiqish bilan bir xil: qaytish manzilisiz /login'ga o'tiladi. */}
+          {/* AppLayout'dagi chiqish bilan bir xil: qaytish manzilisiz, flushSync bilan /login'ga o'tiladi. */}
           <Button
             variant="secondary"
             loading={logout.isPending}
-            onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+            onClick={() =>
+              logout.mutate(undefined, {
+                onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+              })
+            }
           >
             {t('nav.logout')}
           </Button>
@@ -4102,6 +4135,8 @@ export function PendingPage() {
 ```
 
 **Eslatma — `SessionGate.tsx` ham shu bosqichda tuzatildi:** TanStack Query v5'da muvaffaqiyatsiz *refetch* ham `isError`ni o'rnatadi, garchi `data` oldingi muvaffaqiyatli natijani saqlab qolsa ham. Shu sababli `app/SessionGate.tsx`dagi shart `session.isError` dan `session.isError && session.data === undefined`ga o'zgartirildi — butun ilova faqat BIRINCHI yuklash muvaffaqiyatsiz bo'lganda (data hali aniqlanmagan) xato ekraniga almashtiriladi; "Holatni tekshirish" kabi keyingi refetch xatolari esa ilovani yopib qo'ymaydi. Mehmon uchun `data` muvaffaqiyatli `null` bo'ladi, shuning uchun bu o'zgarish ularga ta'sir qilmaydi. `frontend/src/app/SessionGate.test.tsx`ga mos test qo'shildi: dastlabki yuklash muvaffaqiyatli, keyingi `queryClient.refetchQueries({ queryKey: sessionKey })` 503 bilan tugaydi, bolalar (`children`) hali ko'rinishda qoladi.
+
+**2-tur code-review tuzatishi (logout navigatsiya poygasi):** real-suite'da `AppLayout.test.tsx`dagi chiqish testi 8 martadan 6 marta yiqilgan (yakkaxon ishga tushganda — hech qachon). Sabab Task 7'dagi eslatmada tushuntirilgan poyga edi. Tuzatish: `navigate(..., { flushSync: true })` — ham `AppLayout.tsx`da, ham shu yerdagi ikki navigatsiyada (chiqish va "Holatni tekshirish" sessiya tugaganda). Shu bilan birga: (1) "Holatni tekshirish"ning `/login` navigatsiyasi `useMutation({ onSuccess })` dan `check.mutate(undefined, { onSuccess })`ga ko'chirildi — call-level callback unmount bo'lgach chaqirilmaydi, shunda kechikkan 401 javobi allaqachon boshqa joyga o'tgan foydalanuvchini qaytarib yubormaydi; (2) status xabari endi doim DOM'da (bo'sh bo'lsa `sr-only`), shunda ekran o'quvchi o'zgarishni e'lon qiladi; (3) `frontend/src/test/render.tsx`ga `retryDelay: 0` qo'shildi (Task 5'dagi kod bloki ham yangilandi) — `useSession`ning `retry: 1`i sinovlardagi `retry: false`ni bosib qo'yib, 500-test haqiqiy 1 soniyalik kechikishga tirmashib qolardi; (4) 401 testi nomi "sessiya tugaganini bildirib" demaydi (toast ko'rsatilmaydi) — endi "sessiya tugagan bo'lsa (401) /login ga yo'naltiradi".
 
 - [ ] **Step 8: `frontend/src/features/public/HomePage.tsx`** (skelet; yakuniy dizayni 4-bosqichda)
 

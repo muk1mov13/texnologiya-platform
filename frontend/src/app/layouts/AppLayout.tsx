@@ -48,7 +48,15 @@ export function AppLayout() {
               size="sm"
               loading={logout.isPending}
               // Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
-              onClick={() => logout.mutate(undefined, { onSuccess: () => void navigate('/login', { replace: true }) })}
+              // `flushSync`: sessiya tozalanishi (setQueryData) React'ning navigatsiya
+              // tranzitsiyasidan OLDIN qo'llanilishi mumkin — aks holda `RequireAuth` hali
+              // eski `/app` manzilida qayta render bo'lib, `state: {from: '/app'}` bilan
+              // o'ziga xos Navigate qaytarib, shu toza navigatsiyani bosib qo'yishi mumkin edi.
+              onClick={() =>
+                logout.mutate(undefined, {
+                  onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+                })
+              }
             >
               {t('nav.logout')}
             </Button>

@@ -36,7 +36,9 @@ interface RenderOptions {
 export function renderRoutes(routes: RouteObject[], { url = '/', state, user = null }: RenderOptions = {}) {
   const queryClient = createQueryClient()
   queryClient.setDefaultOptions({
-    queries: { retry: false, refetchOnWindowFocus: false, staleTime: 30_000 },
+    // `retryDelay: 0`: `useSession`ning o'zi `retry: 1`ni belgilaydi (bu yerdagi `retry: false`ni
+    // bosib qo'yadi) — kechikishsiz, testlar `findBy*` timeout'iga tirmashib qolmaydi.
+    queries: { retry: false, retryDelay: 0, refetchOnWindowFocus: false, staleTime: 30_000 },
     mutations: { retry: false },
   })
   queryClient.setQueryData(sessionKey, user)
