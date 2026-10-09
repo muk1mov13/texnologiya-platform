@@ -3,3 +3,9 @@ node_modules/
 .venv/
 __pycache__/
 .env
+*.db
+media/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+resource/
