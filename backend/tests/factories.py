@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 import pymupdf
 from httpx import AsyncClient
@@ -96,3 +97,55 @@ async def add_ready_pdf(
     assert response.status_code == 201, response.text
     body: dict[str, object] = response.json()
     return body
+
+
+@dataclass
+class Course:
+    teacher: User
+    student: User
+    subject: Subject
+    topic1: Topic
+    topic2: Topic
+    hidden_topic: Topic
+    teacher_headers: dict[str, str]
+    student_headers: dict[str, str]
+    material_ids: dict[str, int]
+
+
+async def build_course(client: AsyncClient, db: AsyncSession, settings: Settings) -> Course:
+    """Nashr qilingan fan: topic1 (bayon PDF + glossariy), topic2 (bayon PDF),
+    hidden_topic (nashr qilinmagan, bayon PDF). Talaba uchun kontentli bosqichlar soni: 3."""
+    teacher = await make_user(
+        db, email="ustoz@mail.uz", role=Role.teacher, full_name="Nozima Hamdamova"
+    )
+    student = await make_user(db, email="talaba@mail.uz", full_name="Dilnoza Karimova")
+    subject = await make_subject(db, teachers=[teacher])
+    topic1 = await make_topic(db, subject, title="1-mavzu")
+    topic2 = await make_topic(db, subject, title="2-mavzu")
+    hidden = await make_topic(db, subject, title="Qoralama mavzu", published=False)
+    teacher_headers = auth_headers(teacher, settings)
+
+    material_ids: dict[str, int] = {}
+    for key, topic in (("topic1", topic1), ("topic2", topic2), ("hidden", hidden)):
+        lecture = await step_of(db, topic, StepKind.lecture)
+        material = await add_ready_pdf(client, teacher_headers, lecture.id)
+        material_ids[key] = int(str(material["id"]))
+
+    response = await client.post(
+        f"/api/teach/topics/{topic1.id}/glossary",
+        headers=teacher_headers,
+        json={"term": "Kasb", "definition": "Mehnat faoliyati turi"},
+    )
+    assert response.status_code == 201, response.text
+
+    return Course(
+        teacher=teacher,
+        student=student,
+        subject=subject,
+        topic1=topic1,
+        topic2=topic2,
+        hidden_topic=hidden,
+        teacher_headers=teacher_headers,
+        student_headers=auth_headers(student, settings),
+        material_ids=material_ids,
+    )
