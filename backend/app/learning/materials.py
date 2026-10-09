@@ -3,8 +3,8 @@ import tempfile
 from pathlib import Path
 
 from fastapi import UploadFile
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.auth.models import User
 from app.core.config import Settings
@@ -68,6 +68,22 @@ async def add_material(
     if material.status == MaterialStatus.processing:
         await jobs.enqueue(CONVERT_JOB, material_id=material.id)
     return material
+
+
+async def recover_interrupted_conversions(
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """InlineJobRunner fon ishlarini faqat xotirada saqlaydi: jarayon to'xtaganda
+    "processing" holatidagi materiallar abadiy shu holatda qolib ketadi (o'chirish
+    409, qayta urinish 400 qaytaradi). Server qayta ishga tushganda ularni "failed"
+    qilib belgilaymiz, shunda o'qituvchi ularni qayta yuklashi mumkin."""
+    async with sessionmaker() as db:
+        await db.execute(
+            update(Material)
+            .where(Material.status == MaterialStatus.processing)
+            .values(status=MaterialStatus.failed, error="INTERRUPTED")
+        )
+        await db.commit()
 
 
 async def ensure_can_edit_material(db: AsyncSession, user: User, material_id: int) -> Material:

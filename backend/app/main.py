@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -11,6 +13,17 @@ from app.core.jobs import InlineJobRunner, JobContext
 from app.core.middleware import install_request_id
 from app.core.ratelimit import InMemoryRateLimiter
 from app.core.storage import Storage
+from app.learning.materials import recover_interrupted_conversions
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # InlineJobRunner fon ishlarini faqat xotirada saqlaydi: jarayon qulab tushganda
+    # "processing" holatidagi materiallar abadiy shu holatda qolib ketadi. Prod'dagi
+    # tashqi navbat runner uchun bu kerak emas (ishlar navbatda saqlanadi).
+    if isinstance(app.state.jobs, InlineJobRunner):
+        await recover_interrupted_conversions(app.state.sessionmaker)
+    yield
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -20,6 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs_url=None if settings.is_prod else "/api/docs",
         openapi_url=None if settings.is_prod else "/api/openapi.json",
         redoc_url=None,
+        lifespan=_lifespan,
     )
     engine = make_engine(settings.database_url)
     sessionmaker = make_sessionmaker(engine)

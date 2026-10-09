@@ -13,7 +13,8 @@ from app.auth.models import Role
 from app.core.config import Settings
 from app.core.storage import Storage
 from app.learning import convert
-from app.learning.models import StepKind
+from app.learning.materials import recover_interrupted_conversions
+from app.learning.models import Material, MaterialStatus, StepKind
 from tests.factories import (
     add_ready_pdf,
     auth_headers,
@@ -276,3 +277,57 @@ async def test_unassigned_teacher_cannot_upload(
     )
     assert response.status_code == 403
     assert response.json()["code"] == "NOT_SUBJECT_TEACHER"
+
+
+async def test_recover_interrupted_conversions_fails_processing_materials(
+    app: FastAPI, db: AsyncSession, course: dict[str, Any]
+) -> None:
+    processing = Material(
+        step_id=course["lecture_id"],
+        title="Jarayonda",
+        original_file="materials/a.pptx",
+        original_name="a.pptx",
+        status=MaterialStatus.processing,
+    )
+    ready = Material(
+        step_id=course["lecture_id"],
+        title="Tayyor",
+        original_file="materials/b.pdf",
+        original_name="b.pdf",
+        pdf_file="materials/b.pdf",
+        page_count=1,
+        status=MaterialStatus.ready,
+    )
+    db.add_all([processing, ready])
+    await db.commit()
+
+    await recover_interrupted_conversions(app.state.sessionmaker)
+
+    await db.refresh(processing)
+    await db.refresh(ready)
+    assert (processing.status, processing.error) == (MaterialStatus.failed, "INTERRUPTED")
+    assert (ready.status, ready.error) == (MaterialStatus.ready, None)
+
+
+async def test_lifespan_recovers_interrupted_conversions_on_startup(
+    app: FastAPI, course: dict[str, Any]
+) -> None:
+    async with app.state.sessionmaker() as setup_db:
+        material = Material(
+            step_id=course["lecture_id"],
+            title="Jarayonda",
+            original_file="materials/a.pptx",
+            original_name="a.pptx",
+            status=MaterialStatus.processing,
+        )
+        setup_db.add(material)
+        await setup_db.commit()
+        material_id = material.id
+
+    async with app.router.lifespan_context(app):
+        pass
+
+    async with app.state.sessionmaker() as check_db:
+        refreshed = await check_db.get(Material, material_id)
+    assert refreshed is not None
+    assert (refreshed.status, refreshed.error) == (MaterialStatus.failed, "INTERRUPTED")
