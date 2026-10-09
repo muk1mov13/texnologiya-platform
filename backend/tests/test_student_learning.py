@@ -1,9 +1,11 @@
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import Role, UserStatus
 from app.core.config import Settings
-from app.learning.models import Material, MaterialStatus, StepKind
+from app.learning import progress as progress_module
+from app.learning.models import Material, MaterialStatus, ProgressStatus, StepKind, StepProgress
 from tests.factories import auth_headers, build_course, make_subject, make_user, step_of
 
 
@@ -156,3 +158,45 @@ async def test_pending_users_cannot_browse(
     response = await client.get("/api/subjects", headers=auth_headers(pending, settings))
     assert response.status_code == 403
     assert response.json()["code"] == "ACCOUNT_PENDING"
+
+
+async def test_concurrent_progress_creation_does_not_500(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ikki parallel so'rov bir xil user+step uchun StepProgress yaratishga urinishi mumkin.
+    `_progress_row`'ni birinchi chaqiruvda `None` qaytarib (go'yoki qator hali yo'q),
+    lekin qatorning allaqachon mavjud ekanligini simulyatsiya qilamiz: `_get_or_create_progress`
+    unique constraint xatosini ushlab, mavjud qatorni qayta o'qishi va 500 bermasligi kerak."""
+    course = await build_course(client, db, settings)
+    lecture = await step_of(db, course.topic1, StepKind.lecture)
+    db.add(
+        StepProgress(
+            user_id=course.student.id, step_id=lecture.id, status=ProgressStatus.in_progress
+        )
+    )
+    await db.commit()
+
+    original = progress_module._progress_row
+
+    def flaky_once() -> object:
+        calls = {"n": 0}
+
+        async def wrapper(db_: AsyncSession, user_id: int, step_id: int) -> StepProgress | None:
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return None
+            return await original(db_, user_id, step_id)
+
+        return wrapper
+
+    monkeypatch.setattr(progress_module, "_progress_row", flaky_once())
+    response = await client.get(f"/api/steps/{lecture.id}", headers=course.student_headers)
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "in_progress"
+
+    monkeypatch.setattr(progress_module, "_progress_row", flaky_once())
+    complete = await client.post(
+        f"/api/steps/{lecture.id}/complete", headers=course.student_headers
+    )
+    assert complete.status_code == 200, complete.text
+    assert complete.json()["status"] == "completed"

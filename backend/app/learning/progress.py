@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User
@@ -157,18 +158,36 @@ async def _progress_row(db: AsyncSession, user_id: int, step_id: int) -> StepPro
     )
 
 
+async def _get_or_create_progress(db: AsyncSession, user_id: int, step_id: int) -> StepProgress:
+    """`StepProgress`'ni o'qiydi, topilmasa yaratadi. Ikki parallel so'rov bir xil
+    user+step uchun bir vaqtda qator yaratishga urinsa, unique constraint
+    violatsiyasi SAVEPOINT ichida ushlanadi va boshqa so'rov yaratgan qator
+    qayta o'qib qaytariladi (500 o'rniga)."""
+    row = await _progress_row(db, user_id, step_id)
+    if row is not None:
+        return row
+    row = StepProgress(user_id=user_id, step_id=step_id, status=ProgressStatus.in_progress)
+    try:
+        async with db.begin_nested():
+            db.add(row)
+            await db.flush()
+    except IntegrityError:
+        # SAVEPOINT rollback'i `row`'ni sessiyadan avtomatik chiqarib tashlaydi.
+        existing = await _progress_row(db, user_id, step_id)
+        if existing is None:
+            raise
+        return existing
+    return row
+
+
 async def step_content(db: AsyncSession, user: User, step_id: int) -> StepContentOut:
     step = await editing.get_step(db, step_id)
     topic, _ = await get_visible_topic(db, user, step.topic_id)
     infos = (await load_step_infos(db, [topic.id]))[topic.id]
     info = next(i for i in infos if i.id == step.id)
 
-    row = await _progress_row(db, user.id, step.id)
-    if row is None:
-        row = StepProgress(user_id=user.id, step_id=step.id, status=ProgressStatus.in_progress)
-        db.add(row)
-    else:
-        row.updated_at = utcnow()  # "davom ettirish" uchun oxirgi ochilgan bosqich
+    row = await _get_or_create_progress(db, user.id, step.id)
+    row.updated_at = utcnow()  # "davom ettirish" uchun oxirgi ochilgan bosqich
     await db.commit()
 
     materials: list[MaterialView] = []
@@ -219,10 +238,7 @@ async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepBrief
     if not next(i for i in infos if i.id == step.id).has_content:
         raise AppError(400, "STEP_EMPTY", "Bu bosqichda hali material yo'q")
 
-    row = await _progress_row(db, user.id, step.id)
-    if row is None:
-        row = StepProgress(user_id=user.id, step_id=step.id, status=ProgressStatus.in_progress)
-        db.add(row)
+    row = await _get_or_create_progress(db, user.id, step.id)
     if row.status != ProgressStatus.completed:
         row.status = ProgressStatus.completed
         row.completed_at = utcnow()
