@@ -80,7 +80,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - ESLint va `tsc` xatosiz.
   - Eslatma: birinchi to'liq ishga tushirishda deyarli barcha fayllar o'zgarishga aloqasi bo'lmagan holda ochilish bosqichida yiqildi. Bitta fayl alohida, keyin to'liq suite qayta ishga tushirilganda xatosiz o'tdi. Ehtimol sabab yana kam xotira (bo'sh RAM ~0.8 GB); aniq sababi ushlanmadi.
 
-### B-band: o'qituvchi o'zgarishlaridan keyin talaba bosqich keshi ham yangilanadi
+### `f1e561b` — B-band: o'qituvchi o'zgarishlaridan keyin talaba bosqich keshi ham yangilanadi
 - `frontend/src/api/teach.ts`:
   - `invalidateStudentCaches` endi `['subjects']` va `['topics']` dan tashqari `['steps']` ni ham yangilaydi. Bosqich kontenti (materiallar, glossariy, adabiyotlar) shu keshda turadi.
   - Material yuklash, o'chirish va qayta urinish (`useUploadMaterial`, `useDeleteMaterial`, `useRetryMaterial`) talaba keshlarini ham yangilaydi. Ilgari faqat o'qituvchi muharriri yangilanardi.
