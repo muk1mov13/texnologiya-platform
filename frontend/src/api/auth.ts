@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router'
 import { pushToast } from '@/components/ui/toast-store'
 import { i18n, setLanguage } from '@/i18n'
 import { apiFetch, logoutRequest, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
@@ -108,10 +109,16 @@ export function useUpdateMe() {
 
 /**
  * Backend parol almashganda barcha sessiyalarni bekor qiladi, shuning uchun lokal sessiya ham yopiladi.
- * Toast shu yerda chiqariladi: sessiya yopilgach profil sahifasi unmount bo'ladi.
+ * Toast va navigatsiya shu yerda — hook darajasida — amalga oshiriladi: `mutate()`ga
+ * komponent darajasida berilgan `onSuccess` faqat kuzatuvchi hali mavjud bo'lsa chaqiriladi
+ * (TanStack Query, `MutationObserver#notify`), sessiya yopilib `ProfilePage` unmount
+ * bo'lgandan keyin esa bu kafolat yo'qoladi. Shu sabab navigatsiya PasswordForm'ning
+ * `mutate(..., { onSuccess })`iga emas, shu yerga yozilgan — xuddi logout kabi, lekin
+ * poyga xavfisiz bo'lishi uchun komponent tashqarisida.
  */
 export function useChangePassword() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   return useMutation({
     mutationFn: (data: PasswordChangeIn) =>
       apiFetch<void>('/api/me/password', { method: 'POST', json: data }),
@@ -121,6 +128,12 @@ export function useChangePassword() {
       await logoutRequest().catch(() => {})
       endSession(queryClient)
       pushToast('success', i18n.t('profile.passwordChanged'))
+      // Qaytish manzilisiz (AppLayout logoutidagi kabi) — aks holda keyingi kirgan
+      // foydalanuvchi oldingisining sahifasiga tushib qolardi. `flushSync`: sessiya
+      // tozalanishi `RequireAuth`ning navigatsiya tranzitsiyasidan OLDIN qo'llanilishi
+      // mumkin, aks holda u hali eski manzilda qayta render bo'lib, o'ziga xos
+      // `state: {from}` bilan Navigate qaytarib, shu toza navigatsiyani bosib qo'yardi.
+      navigate('/login', { replace: true, flushSync: true })
     },
     meta: { silent: true },
   })

@@ -2,15 +2,22 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import type { ReactNode } from 'react'
+import { MemoryRouter } from 'react-router'
 import { makeUser } from '@/test/render'
 import { server } from '@/test/server'
 import { installAuthHandlers, sessionKey, useChangePassword, useLogout, useSession } from './auth'
 import { getAccessToken, refreshSession, setAccessToken } from './client'
 import { createQueryClient } from './queryClient'
 
+// `MemoryRouter`: `useChangePassword` parol almashgach `useNavigate()` orqali /login'ga
+// o'tadi, shuning uchun bu yerda ham Router konteksti kerak.
 function makeWrapper(queryClient: ReturnType<typeof createQueryClient>) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    return (
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
+    )
   }
 }
 

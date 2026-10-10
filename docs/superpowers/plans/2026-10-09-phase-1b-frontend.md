@@ -5833,8 +5833,12 @@ test('parol almashgach sessiya yopiladi va /login ga o\'tiladi', async () => {
   await submitPassword('eski-parol-123')
   await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
   expect(screen.getByText(i18n.t('profile.passwordChanged'))).toBeInTheDocument()
+  // Logout bilan bir xil sabab: qaytish manzilisiz — AppLayout logout testiga qarang.
+  expect(router.state.location.state).toBeNull()
 })
 ```
+
+**Code-review tuzatishi:** oxirgi testga `router.state.location.state` ni `null` bo'lishini tekshiruvchi qator qo'shildi — logout oqimidagi xavfning xuddi shunisi (qaytish manzili keyingi foydalanuvchiga tushib qolishi) parol almashtirishda ham bor.
 
 - [ ] **Step 3: Test yiqilishini tekshirish**
 
@@ -5905,6 +5909,7 @@ function ProfileForm({ user }: { user: User }) {
           ),
         )}
       >
+        {updateMe.error && <FormError error={updateMe.error} />}
         <Field id="full_name" label={t('auth.fullName')} error={errors.full_name?.message}>
           <Input id="full_name" autoComplete="name" aria-invalid={Boolean(errors.full_name)} {...register('full_name')} />
         </Field>
@@ -5985,6 +5990,11 @@ function PasswordForm() {
 ```
 
 Parol almashgani haqidagi toast `useChangePassword` hook'ining o'zida chiqariladi (Task 6, `api/auth.ts`). Sessiya yopilgach sahifa unmount bo'ladi, shuning uchun komponentdagi `mutate(..., { onSuccess })` callback'iga tayanib bo'lmaydi.
+
+**Code-review tuzatishi:**
+- `ProfileForm`ga `{updateMe.error && <FormError error={updateMe.error} />}` qo'shildi — server tomonidagi xato (masalan tarmoq yoki 5xx) ko'rsatilmay qolmasligi uchun (`LoginPage`/`RegisterPage` bilan bir xil naqsh).
+- `/login`ga navigatsiya **komponentda emas**, `useChangePassword`ning o'zida (`frontend/src/api/auth.ts`) amalga oshiriladi: TanStack Query'da `mutate(vars, { onSuccess })`ga berilgan callback faqat kuzatuvchi (komponent) hali ulangan bo'lsagina chaqiriladi (`MutationObserver#notify`, `this.hasListeners()` tekshiruvi — `node_modules/@tanstack/query-core/build/modern/mutationObserver.js`). Parol almashgach sessiya shu hook ichida yopiladi va `ProfilePage` (`if (!user) return null`) unmount bo'ladi, shuning uchun `PasswordForm`ning `mutate(..., { onSuccess })`iga navigatsiyani qo'yish poyga holatida ishlamay qolishi mumkin edi. Shu sabab `useChangePassword` o'zi `useNavigate()`dan foydalanib, `endSession` va toast'dan keyin `navigate('/login', { replace: true, flushSync: true })` chaqiradi — xuddi `AppLayout`dagi logout kabi, qaytish manzilisiz.
+- Shu o'zgarish `frontend/src/api/auth.test.tsx`dagi `makeWrapper`ni ham `MemoryRouter` bilan o'rab qo'yishni talab qildi (`useChangePassword` endi Router konteksti talab qiladi).
 
 - [ ] **Step 5: Testlar o'tishini tekshirish**
 
