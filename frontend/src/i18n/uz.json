@@ -108,6 +108,11 @@
     "text": "Havola eskirgan yoki noto'g'ri yozilgan bo'lishi mumkin",
     "home": "Bosh sahifaga"
   },
+  "routeError": {
+    "title": "Nimadir xato ketdi",
+    "text": "Sahifani ko'rsatib bo'lmadi. Sahifani qayta yuklab ko'ring",
+    "reload": "Sahifani qayta yuklash"
+  },
   "home": {
     "badge": "BuxDPI · Texnologik ta'lim",
     "title": "Bo'lajak texnologiya o'qituvchilari uchun metodik platforma",

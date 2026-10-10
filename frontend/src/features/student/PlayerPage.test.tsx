@@ -20,14 +20,9 @@ function mockTopic(glossaryCompleted: () => boolean) {
       topic.steps[5].status = glossaryCompleted() ? 'completed' : null
       return HttpResponse.json(topic)
     }),
-    // StepContentView endi HAR bir bosqich uchun (kontentli yoki yo'q) GET /api/steps/{id}'ni
-    // chaqiradi — backend bu so'rovni har doim qo'llab-quvvatlaydi (`data.has_content` asosida
-    // UI tanlanadi, mavzu ro'yxatidagi eskirgan `has_content`ga emas).
-    http.get('/api/steps/100', () =>
-      HttpResponse.json(
-        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
-      ),
-    ),
+    // StepContentView faqat `step.has_content` rost bo'lgan bosqichlar uchun GET /api/steps/{id}'ni
+    // chaqiradi (gibrid "has_content" filtri) — shuning uchun bu yerda faqat kontentli
+    // bosqichlar (lecture=101, glossary=105) uchun mock kerak; review (100) kontentsiz.
     http.get('/api/steps/101', () => HttpResponse.json(stepContent())),
     http.get('/api/steps/105', () =>
       HttpResponse.json(
@@ -155,11 +150,6 @@ test('kontentli bosqich bo\'lmagan mavzuda birinchi bosqich ko\'rsatiladi', asyn
         }),
       ),
     ),
-    http.get('/api/steps/100', () =>
-      HttpResponse.json(
-        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
-      ),
-    ),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
   expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
@@ -231,6 +221,13 @@ test('"Keyingi bosqich" bosilganda fokus yangi bosqich sarlavhasiga o\'tadi', as
   )
 })
 
+test('birinchi yuklanishda sarlavhaga fokus o\'g\'irlanmaydi', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  await screen.findByTestId('pdf')
+  expect(screen.getByRole('heading', { name: i18n.t('steps.lecture') })).not.toHaveFocus()
+})
+
 // --- Code-review tuzatishi 8: "Keyingi bosqich" bo'sh bosqichlarni o'tkazib yuboradi ---
 
 test('"Keyingi bosqich" kontentsiz bosqichlarni o\'tkazib yuboradi', async () => {
@@ -247,4 +244,18 @@ test('oxirgi kontentli bosqichda "Keyingi bosqich" havolasi yo\'q', async () => 
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
   await screen.findByText('Mehnat faoliyati turi')
   expect(screen.queryByRole('link', { name: new RegExp(i18n.t('player.next')) })).not.toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi (3-tur): gibrid has_content filtri ---
+
+test('mavzu kontentli deb bilgan bosqich eskirib, kontentsiz qaytsa bo\'sh holat ko\'rsatiladi', async () => {
+  mockTopic(() => false)
+  server.use(
+    http.get('/api/steps/101', () =>
+      HttpResponse.json(stepContent({ has_content: false, status: null, materials: [] })),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: i18n.t('player.complete') })).not.toBeInTheDocument()
 })

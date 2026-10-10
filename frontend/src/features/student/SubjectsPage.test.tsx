@@ -1,5 +1,6 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
+import { studentKeys } from '@/api/student'
 import { i18n } from '@/i18n'
 import { subjectCards } from '@/test/fixtures'
 import { renderRoute, studentUser } from '@/test/render'
@@ -50,4 +51,26 @@ test('fanlar ro\'yxati xato bo\'lsa qayta urinish tugmasi bilan xato holat ko\'r
   renderRoute(<SubjectsPage />, { path: '/app', user: studentUser })
   expect(await screen.findByText(i18n.t('errors.INTERNAL_ERROR'))).toBeInTheDocument()
   expect(screen.getByRole('button', { name: i18n.t('common.retry') })).toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi (3-tur): ma'lumot-birinchi — fon qayta so'rovi xatosi kontentni yopmaydi ---
+
+test('fanlar keshda bo\'lsa, fon qayta so\'rovi 500 bo\'lganda ham ro\'yxat ko\'rinishda qoladi', async () => {
+  server.use(
+    http.get('/api/subjects', () => HttpResponse.json(subjectCards)),
+    http.get('/api/me/continue', () => HttpResponse.json(null)),
+  )
+  const { queryClient } = renderRoute(<SubjectsPage />, { path: '/app', user: studentUser })
+  expect(await screen.findByRole('link', { name: /Metodika asoslari/ })).toBeInTheDocument()
+
+  // "Tugatdim" ['subjects']ni invalidatsiya qiladi; keyingi qayta so'rov serverda 500 bilan tugaydi.
+  server.use(
+    http.get('/api/subjects', () => HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 })),
+  )
+  await queryClient.invalidateQueries({ queryKey: studentKeys.subjects })
+
+  await waitFor(() => expect(queryClient.isFetching({ queryKey: studentKeys.subjects })).toBe(0))
+  // Avval yuklangan ro'yxat ko'rinishda qoladi — "Nimadir xato ketdi" chiqmaydi.
+  expect(screen.getByRole('link', { name: /Metodika asoslari/ })).toBeInTheDocument()
+  expect(screen.queryByText(i18n.t('common.errorTitle'))).not.toBeInTheDocument()
 })

@@ -27,7 +27,9 @@ export function SubjectPage() {
       </Link>
       {subject.isPending ? (
         <PageSpinner />
-      ) : subject.isError ? (
+      ) : !subject.data ? (
+        // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+        // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
         <ErrorState
           error={subject.error}
           onRetry={canRetry(subject.error) ? () => void subject.refetch() : undefined}

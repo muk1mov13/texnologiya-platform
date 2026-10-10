@@ -77,12 +77,12 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             ←
           </Button>
-          <span
-            className="text-sm font-semibold"
-            aria-live="polite"
-            aria-label={t('player.pageOfLabel', { page, total: numPages })}
-          >
-            {t('player.pageOf', { page, total: numPages })}
+          {/* `aria-label` oddiy `<span>`ga nom berolmaydi, va live region matn o'zgarishini
+              e'lon qiladi (labelni emas) — shuning uchun ko'rinadigan qisqa matn `aria-hidden`
+              bilan yashirilib, ekran o'quvchi uchun to'liq matn alohida `sr-only` span'da beriladi. */}
+          <span aria-live="polite" className="text-sm font-semibold">
+            <span aria-hidden="true">{t('player.pageOf', { page, total: numPages })}</span>
+            <span className="sr-only">{t('player.pageOfLabel', { page, total: numPages })}</span>
           </span>
           <Button
             variant="secondary"

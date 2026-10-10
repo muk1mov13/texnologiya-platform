@@ -3500,10 +3500,16 @@ import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
+import { RouteError } from './RouteError'
 
+// Har bir yuqori darajadagi marshrutga (ochiq layout, ichki ilova layout'i, 404 fallback)
+// alohida `errorElement` biriktirilgan — shunda ULARNING ICHIDAGI render xatosi (yoki lazy
+// chunk yuklanmasa, masalan `StepContent`dagi `import('./PdfViewer')`) butun ilovani
+// qulatmaydi, faqat o'sha bo'limni lokalizatsiya qilingan xato sahifasiga almashtiradi.
 export const routes: RouteObject[] = [
   {
     element: <PublicLayout />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'pending', element: <PendingPage /> },
@@ -3518,6 +3524,7 @@ export const routes: RouteObject[] = [
   },
   {
     element: <RequireAuth />,
+    errorElement: <RouteError />,
     children: [
       {
         element: <AppLayout />,
@@ -3545,13 +3552,17 @@ export const routes: RouteObject[] = [
       },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
+  { path: '*', element: <NotFoundPage />, errorElement: <RouteError /> },
 ]
 
 export function createAppRouter() {
   return createBrowserRouter(routes)
 }
 ```
+
+> **Code-review tuzatishi (3-tur, Task 10'dan keyin):** `frontend/src/app/RouteError.tsx` qo'shildi
+> va yuqoridagi uch marshrutga (`PublicLayout`, `RequireAuth`/`AppLayout`, `*` 404 fallback)
+> `errorElement` biriktirildi — tafsilotlar Task 10'dagi "Code-review tuzatishi (3-tur)" bandida.
 
 - [ ] **Step 8: `frontend/src/main.tsx` (to'liq yangi ko'rinishi) va `App.tsx`ni o'chirish**
 
@@ -4574,6 +4585,11 @@ Expected: FAIL — `steps.test.ts` `./steps`ni topmaydi, sahifa testlari stub tu
 
 - [ ] **Step 6: `frontend/src/features/student/SubjectsPage.tsx`**
 
+> **Code-review tuzatishi (3-tur, Task 10'dan keyin):** `SubjectList` endi ma'lumot-birinchi —
+> xato holati `isError` emas, `!subjects.data` bo'yicha tekshiriladi (`canRetry` bilan birga),
+> shunda "Tugatdim"dan keyingi `['subjects']` invalidatsiyasi fon qayta so'rovida 500 bilan
+> tugasa ham, keshdagi ro'yxat ko'rinishda qoladi. Tafsilotlar Task 10'dagi 3-tur bandida.
+
 > **Code-review tuzatishi:** oq matn `brand-500` fonida WCAG AA kontrastini ta'minlamaydi
 > (~2.5:1), shuning uchun `ContinueCard` foni `brand-700`/`hover:brand-900`ga, ikkinchi darajali
 > matn `brand-100`dan `brand-50`ga o'zgartirildi. Havolalarga `Button`dagiga o'xshash
@@ -4583,6 +4599,7 @@ Expected: FAIL — `steps.test.ts` `./steps`ni topmaydi, sahifa testlari stub tu
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
+import { canRetry } from '@/api/errors'
 import { useContinue, useSubjects } from '@/api/student'
 import type { ContinueTarget, SubjectCard } from '@/api/types'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -4642,7 +4659,12 @@ function SubjectList() {
   const { t } = useTranslation()
   const subjects = useSubjects()
   if (subjects.isPending) return <PageSpinner />
-  if (subjects.isError) return <ErrorState error={subjects.error} onRetry={() => void subjects.refetch()} />
+  // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+  // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi. Masalan, "Tugatdim"
+  // ['subjects']ni invalidatsiya qiladi; keyingi qayta so'rov 500 bo'lsa ham ro'yxat ko'rinishda qoladi.
+  if (!subjects.data) {
+    return <ErrorState error={subjects.error} onRetry={canRetry(subjects.error) ? () => void subjects.refetch() : undefined} />
+  }
   if (subjects.data.length === 0) {
     return <EmptyState icon="📚" title={t('student.noSubjects')} text={t('student.noSubjectsText')} />
   }
@@ -4692,6 +4714,10 @@ function SubjectTile({ subject }: { subject: SubjectCard }) {
 > `canRetry(error)` yordamchisiga ko'chirildi — xuddi shu mantiq `PlayerPage`, `StepContent` va
 > `PdfViewer`da (Task 10) ham ishlatiladi, shuning uchun bitta joyda saqlanadi.
 
+> **Code-review tuzatishi (3-tur, Task 10'dan keyin):** `SubjectPage` allaqachon `canRetry`
+> ishlatardi, lekin tartib hali `isError`dan boshlanardi — endi `!subject.data` (ma'lumot-birinchi)
+> bo'yicha tekshiriladi, xuddi `SubjectsPage`dagi kabi.
+
 ```tsx
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
@@ -4722,7 +4748,9 @@ export function SubjectPage() {
       </Link>
       {subject.isPending ? (
         <PageSpinner />
-      ) : subject.isError ? (
+      ) : !subject.data ? (
+        // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+        // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
         <ErrorState
           error={subject.error}
           onRetry={canRetry(subject.error) ? () => void subject.refetch() : undefined}
@@ -4806,8 +4834,10 @@ git commit -m "feat(frontend): student subjects list and topic path"
 
 **Files:**
 - Create: `frontend/src/features/student/PdfViewer.tsx`, `frontend/src/features/student/StepContent.tsx`
+- Create (3-tur, code-review): `frontend/src/app/RouteError.tsx`
 - Modify (stub → to'liq): `frontend/src/features/student/PlayerPage.tsx`
 - Test: `frontend/src/features/student/PlayerPage.test.tsx`, `frontend/src/features/student/PdfViewer.test.tsx`
+- Test (3-tur): `frontend/src/app/RouteError.test.tsx`
 
 **Qoidalar (spec, "Bosqichni tugatish qoidalari"):**
 - Bosqichlar qulflanmaydi: talaba istalgan bosqichni ochishi mumkin.
@@ -5211,12 +5241,12 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             ←
           </Button>
-          <span
-            className="text-sm font-semibold"
-            aria-live="polite"
-            aria-label={t('player.pageOfLabel', { page, total: numPages })}
-          >
-            {t('player.pageOf', { page, total: numPages })}
+          {/* `aria-label` oddiy `<span>`ga nom berolmaydi, va live region matn o'zgarishini
+              e'lon qiladi (labelni emas) — shuning uchun ko'rinadigan qisqa matn `aria-hidden`
+              bilan yashirilib, ekran o'quvchi uchun to'liq matn alohida `sr-only` span'da beriladi. */}
+          <span aria-live="polite" className="text-sm font-semibold">
+            <span aria-hidden="true">{t('player.pageOf', { page, total: numPages })}</span>
+            <span className="sr-only">{t('player.pageOfLabel', { page, total: numPages })}</span>
           </span>
           <Button
             variant="secondary"
@@ -5334,22 +5364,29 @@ interface StepContentViewProps {
 
 export function StepContentView({ topicId, step, nextKind }: StepContentViewProps) {
   const { t } = useTranslation()
-  const content = useStep(step.id)
+  // Mavzu ro'yxati bosqichni kontentsiz deb bilsa, so'rov yuborilmaydi: GET /api/steps/{id}
+  // bo'sh bosqich uchun ham StepProgress(in_progress) qatorini yaratadi (backend progress.py
+  // _get_or_create_progress) — 2-bosqichda bu qatorlar bosqich "boshlangan" deb noto'g'ri
+  // o'qilishi mumkin edi.
+  const content = useStep(step.has_content ? step.id : undefined)
   const complete = useCompleteStep(topicId)
 
-  if (content.isPending) return <PageSpinner />
-  // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
-  // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
-  if (!content.data) {
-    return (
-      <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
-    )
+  if (step.has_content) {
+    if (content.isPending) return <PageSpinner />
+    // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
+    // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+    if (!content.data) {
+      return (
+        <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
+      )
+    }
   }
 
   const data = content.data
-  // Bosqich kontentiga ENDI yuklangan ma'lumot (`data.has_content`) asosida qaraladi — mavzu
-  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor bo'ldi).
-  if (!data.has_content) {
+  // Bosqich kontenti ENDI yuklangan ma'lumot (`data.has_content`) asosida aniqlanadi — mavzu
+  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor
+  // bo'ldi, yoki aksincha o'chirilgan — bu holda `data` yuklangan, ammo `has_content` yolg'on).
+  if (!data || !data.has_content) {
     return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
   }
 
@@ -5507,13 +5544,18 @@ export function PlayerPage() {
       return
     }
     headingRef.current?.scrollIntoView({ block: 'start' })
-    headingRef.current?.focus()
+    // `preventScroll`: scroll yuqorida ALLAQACHON `scrollIntoView` bilan bajarildi (u
+    // `scroll-mt-*`ni hisobga oladi) — fokus o'zi yana scroll qilsa, brauzer header ostini
+    // nishonlab, sarlavhani sticky header orqasiga olib ketishi mumkin edi.
+    headingRef.current?.focus({ preventScroll: true })
   }, [previewCurrentId])
 
   // PdfViewer chunk'ini mavzu/bosqich JSON bilan bir vaqtda oldindan yuklaydi — aks holda
-  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi.
+  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi. Xato (`.catch`) shu yerda yutiladi —
+  // aks holda tarmoqsiz/eskirgan hash holatida ishlanmagan rad etish (unhandled rejection)
+  // bo'lardi. Haqiqiy xato `StepContent`dagi Suspense `import()`i orqali `RouteError`ga chiqadi.
   useEffect(() => {
-    void import('./PdfViewer')
+    void import('./PdfViewer').catch(() => {})
   }, [])
 
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
@@ -5562,7 +5604,11 @@ export function PlayerPage() {
             ref={headingRef}
             id="step-title"
             tabIndex={-1}
-            className={cx('mb-4 text-xl font-bold outline-none', FOCUS_RING)}
+            // `scroll-mt-28`: AppLayout'ning `sticky top-0` header'i ostida qolmasin (mobil'da
+            // nav ikkinchi qatorga tushishi mumkin, shuning uchun zaxira bilan). `outline-none`
+            // qoldirilgan, `FOCUS_RING` esa YO'Q — bu dastur fokusi (skript orqali), klaviatura
+            // foydalanuvchisi emas, shuning uchun fokus halqasi ko'rsatilmasligi kerak.
+            className="mb-4 scroll-mt-28 text-xl font-bold outline-none"
           >
             <span aria-hidden="true">{STEP_ICONS[current.kind]} </span>
             {t(`steps.${current.kind}`)}
@@ -5642,6 +5688,52 @@ alohida chunk (~632 kB / 191 kB gzip).
 ```bash
 cd .. && git add frontend docs CHANGELOG.md
 git commit -m "fix(frontend): lesson player review fixes (lazy pdf, refetch errors, focus, canRetry)"
+```
+
+- [ ] **Step 9: Code-review tuzatishi (3-tur) va commit**
+
+> **Code-review tuzatishi (3-tur):** sifat tekshiruvi (approve, minor bandlar) yana oltita
+> band talab qildi — 1) `PlayerPage`dagi sarlavha (`h2#step-title`) endi `scroll-mt-28` klassiga
+> ega — AppLayout'ning `sticky top-0` header'i ostida qolmasin (mobil'da nav ikkinchi qatorga
+> tushadi, shuning uchun zaxira bilan); fokus effekti `scrollIntoView({block:'start'})`dan keyin
+> `focus({preventScroll:true})` chaqiradi, aks holda ikkinchi scroll sarlavhani yana header
+> orqasiga olib ketishi mumkin edi. 2) Shu sarlavhadan `FOCUS_RING` olib tashlandi — Tailwind
+> v4'da `outline-none` va `FOCUS_RING` (`focus-visible:outline-*`) bir-biriga zid: `outline-none`
+> `--tw-outline-style: none`ni o'rnatadi va fokus halqasi hech qachon ko'rinmaydi; dastur fokusi
+> (skript orqali, klaviatura emas) uchun halqa SHART emas, shuning uchun `outline-none` qoldirilib
+> `FOCUS_RING` olib tashlandi. 3) `PdfViewer`dagi sahifa hisoblagichi (`aria-label` oddiy
+> `<span>`da) endi ikki qism: ko'rinadigan matn `aria-hidden="true"`, to'liq matn (`player.pageOfLabel`)
+> alohida `sr-only` span'da — live region (`aria-live="polite"`) matn o'zgarishini e'lon qiladi,
+> labelni emas; oddiy elementlar umuman nom (accessible name) olmaydi. 4) `router.tsx`ga uchta
+> yuqori darajadagi marshrutga (`PublicLayout`, `RequireAuth`/`AppLayout`, `*` 404 fallback)
+> `errorElement={<RouteError />}` qo'shildi (`frontend/src/app/RouteError.tsx`, yangi) — render
+> xatosi yoki lazy chunk yuklanmasa (masalan, `StepContent`dagi `import('./PdfViewer')` Suspense
+> orqali, tarmoqsiz yoki eskirgan build hash'ida) butun ilova emas, faqat marshrut bo'limi
+> lokalizatsiya qilingan xato sahifasiga ("Sahifani qayta yuklash" tugmasi, `window.location.reload()`)
+> almashadi; `PlayerPage`dagi oldindan yuklash endi `import('./PdfViewer').catch(() => {})` —
+> muvaffaqiyatsiz oldindan yuklash ishlanmagan rad etish bo'lib qolmaydi, haqiqiy xato Suspense
+> orqali `RouteError`ga chiqadi. Yangi i18n kalitlari: `routeError.title/text/reload` (uz/ru).
+> 5) `StepContentView` endi gibrid `has_content` filtridan foydalanadi: `useStep(step.has_content
+> ? step.id : undefined)` — mavzu ro'yxati bosqichni kontentsiz deb bilsa, GET /api/steps/{id}
+> umuman so'ralmaydi (backend `progress.py`dagi `_get_or_create_progress` bo'sh bosqich uchun ham
+> `StepProgress(in_progress)` qatorini yaratardi — 2-bosqichda bu "boshlangan" deb noto'g'ri
+> o'qilishi mumkin edi); bo'sh/`"Tugatdim"` holati endi YUKLANGAN `data.has_content`ga qaraydi
+> (eskirgan holat: mavzu kontentli deb bilgan bosqich qaytganda bo'sh bo'lsa, bo'sh holat
+> ko'rsatiladi va tugma yo'qoladi). Endi keraksiz `/api/steps/100` mocklari `PlayerPage.test.tsx`dan
+> olib tashlandi. 6) `SubjectsPage`/`SubjectPage` ro'yxat sahifalari ma'lumot-birinchi bo'ldi:
+> xato holati `isError` emas, `!data` bo'yicha (umumiy `canRetry` bilan) — "Tugatdim"dan keyingi
+> `['subjects']` invalidatsiyasi fon qayta so'rovida 500 bilan tugasa ham, keshdagi ro'yxat
+> ko'rinishda qoladi. Yangi testlar: `RouteError.test.tsx` (marshrut xatosi + qayta yuklash),
+> `PlayerPage.test.tsx`ga eskirgan `has_content` va "birinchi yuklanishda fokus yo'q" testlari,
+> `SubjectsPage.test.tsx`ga kesh+muvaffaqiyatsiz-refetch testi, `PdfViewer.test.tsx`ga `sr-only`
+> matn tekshiruvi.
+
+Run: `npm test && npm run lint && npm run typecheck && npm run build`, so'ng 3× to'liq to'plam tsikli.
+Expected: PASS, lint/typecheck xatosiz, build muvaffaqiyatli.
+
+```bash
+cd .. && git add frontend docs CHANGELOG.md
+git commit -m "fix(frontend): player polish, route error boundary, data-first list pages"
 ```
 
 ---

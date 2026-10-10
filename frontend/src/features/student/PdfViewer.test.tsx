@@ -50,6 +50,8 @@ test('sahifalar o\'rtasida o\'tish, chegaralarda tugmalar o\'chiriladi', async (
 
   expect(await screen.findByTestId('document')).toBeInTheDocument()
   expect(screen.getByText('1 / 3')).toBeInTheDocument()
+  // Ekran o'quvchi uchun to'liq matn alohida `sr-only` span'da — live region shu matnni e'lon qiladi.
+  expect(screen.getByText(i18n.t('player.pageOfLabel', { page: 1, total: 3 }))).toBeInTheDocument()
   expect(screen.getByRole('button', { name: i18n.t('player.prevPage') })).toBeDisabled()
   expect(screen.getByRole('button', { name: i18n.t('player.nextPage') })).toBeEnabled()
 

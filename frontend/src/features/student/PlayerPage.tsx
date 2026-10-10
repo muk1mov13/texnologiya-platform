@@ -37,13 +37,18 @@ export function PlayerPage() {
       return
     }
     headingRef.current?.scrollIntoView({ block: 'start' })
-    headingRef.current?.focus()
+    // `preventScroll`: scroll yuqorida ALLAQACHON `scrollIntoView` bilan bajarildi (u
+    // `scroll-mt-*`ni hisobga oladi) — fokus o'zi yana scroll qilsa, brauzer header ostini
+    // nishonlab, sarlavhani sticky header orqasiga olib ketishi mumkin edi.
+    headingRef.current?.focus({ preventScroll: true })
   }, [previewCurrentId])
 
   // PdfViewer chunk'ini mavzu/bosqich JSON bilan bir vaqtda oldindan yuklaydi — aks holda
-  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi.
+  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi. Xato (`.catch`) shu yerda yutiladi —
+  // aks holda tarmoqsiz/eskirgan hash holatida ishlanmagan rad etish (unhandled rejection)
+  // bo'lardi. Haqiqiy xato `StepContent`dagi Suspense `import()`i orqali `RouteError`ga chiqadi.
   useEffect(() => {
-    void import('./PdfViewer')
+    void import('./PdfViewer').catch(() => {})
   }, [])
 
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
@@ -92,7 +97,11 @@ export function PlayerPage() {
             ref={headingRef}
             id="step-title"
             tabIndex={-1}
-            className={cx('mb-4 text-xl font-bold outline-none', FOCUS_RING)}
+            // `scroll-mt-28`: AppLayout'ning `sticky top-0` header'i ostida qolmasin (mobil'da
+            // nav ikkinchi qatorga tushishi mumkin, shuning uchun zaxira bilan). `outline-none`
+            // qoldirilgan, `FOCUS_RING` esa YO'Q — bu dastur fokusi (skript orqali), klaviatura
+            // foydalanuvchisi emas, shuning uchun fokus halqasi ko'rsatilmasligi kerak.
+            className="mb-4 scroll-mt-28 text-xl font-bold outline-none"
           >
             <span aria-hidden="true">{STEP_ICONS[current.kind]} </span>
             {t(`steps.${current.kind}`)}

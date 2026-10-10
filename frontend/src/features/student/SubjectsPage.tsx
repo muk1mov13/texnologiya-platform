@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
+import { canRetry } from '@/api/errors'
 import { useContinue, useSubjects } from '@/api/student'
 import type { ContinueTarget, SubjectCard } from '@/api/types'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -60,7 +61,12 @@ function SubjectList() {
   const { t } = useTranslation()
   const subjects = useSubjects()
   if (subjects.isPending) return <PageSpinner />
-  if (subjects.isError) return <ErrorState error={subjects.error} onRetry={() => void subjects.refetch()} />
+  // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+  // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi. Masalan, "Tugatdim"
+  // ['subjects']ni invalidatsiya qiladi; keyingi qayta so'rov 500 bo'lsa ham ro'yxat ko'rinishda qoladi.
+  if (!subjects.data) {
+    return <ErrorState error={subjects.error} onRetry={canRetry(subjects.error) ? () => void subjects.refetch() : undefined} />
+  }
   if (subjects.data.length === 0) {
     return <EmptyState icon="📚" title={t('student.noSubjects')} text={t('student.noSubjectsText')} />
   }

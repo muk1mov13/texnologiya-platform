@@ -27,22 +27,29 @@ interface StepContentViewProps {
 
 export function StepContentView({ topicId, step, nextKind }: StepContentViewProps) {
   const { t } = useTranslation()
-  const content = useStep(step.id)
+  // Mavzu ro'yxati bosqichni kontentsiz deb bilsa, so'rov yuborilmaydi: GET /api/steps/{id}
+  // bo'sh bosqich uchun ham StepProgress(in_progress) qatorini yaratadi (backend progress.py
+  // _get_or_create_progress) — 2-bosqichda bu qatorlar bosqich "boshlangan" deb noto'g'ri
+  // o'qilishi mumkin edi.
+  const content = useStep(step.has_content ? step.id : undefined)
   const complete = useCompleteStep(topicId)
 
-  if (content.isPending) return <PageSpinner />
-  // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
-  // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
-  if (!content.data) {
-    return (
-      <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
-    )
+  if (step.has_content) {
+    if (content.isPending) return <PageSpinner />
+    // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
+    // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+    if (!content.data) {
+      return (
+        <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
+      )
+    }
   }
 
   const data = content.data
   // Bosqich kontenti ENDI yuklangan ma'lumot (`data.has_content`) asosida aniqlanadi — mavzu
-  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor bo'ldi).
-  if (!data.has_content) {
+  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor
+  // bo'ldi, yoki aksincha o'chirilgan — bu holda `data` yuklangan, ammo `has_content` yolg'on).
+  if (!data || !data.has_content) {
     return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
   }
 

@@ -15,10 +15,16 @@ import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
+import { RouteError } from './RouteError'
 
+// Har bir yuqori darajadagi marshrutga (ochiq layout, ichki ilova layout'i, 404 fallback)
+// alohida `errorElement` biriktirilgan — shunda ULARNING ICHIDAGI render xatosi (yoki lazy
+// chunk yuklanmasa, masalan `StepContent`dagi `import('./PdfViewer')`) butun ilovani
+// qulatmaydi, faqat o'sha bo'limni lokalizatsiya qilingan xato sahifasiga almashtiradi.
 export const routes: RouteObject[] = [
   {
     element: <PublicLayout />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'pending', element: <PendingPage /> },
@@ -33,6 +39,7 @@ export const routes: RouteObject[] = [
   },
   {
     element: <RequireAuth />,
+    errorElement: <RouteError />,
     children: [
       {
         element: <AppLayout />,
@@ -60,7 +67,7 @@ export const routes: RouteObject[] = [
       },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
+  { path: '*', element: <NotFoundPage />, errorElement: <RouteError /> },
 ]
 
 export function createAppRouter() {
