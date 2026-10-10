@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
+A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the phase roadmap (phases 0–4, status, next step) is `docs/superpowers/roadmap.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
 
 Code comments, docstrings, user-facing error messages and docs are written in **Uzbek (Latin script)**. Keep new ones in Uzbek to match.
 
