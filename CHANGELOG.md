@@ -6,6 +6,23 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 16 — Admin: fanlar (yaratish, tahrirlash, nashr, o'qituvchi biriktirish, o'chirish)
+- `frontend/src/features/admin/AdminSubjectsPage.tsx` (stub o'rniga to'liq sahifa):
+  - fanlar ro'yxati: slug, biriktirilgan o'qituvchilar, "nashr qilingan" yoki "qoralama" belgisi;
+  - bitta tugma bilan nashr qilish yoki nashrdan olish, tasdiq bilan o'chirish.
+  - Rejadan farqi: yuklanish va xato holati `QueryState` orqali.
+- `SubjectFormModal.tsx`:
+  - fan yaratish va tahrirlash formasi (nomi, slug, tavsif, tartib raqami, nashr);
+  - bo'sh slug `null` bo'lib yuboriladi va backend uni nomdan yaratadi;
+  - server xatosi (masalan, `SLUG_TAKEN`) modal ichida ko'rsatiladi.
+- `TeachersModal.tsx`: faol o'qituvchilar ro'yxatidan belgilab biriktirish (`PUT .../teachers`).
+- `schemas.ts`: fan formasining zod sxemasi.
+- `AdminSubjectsPage.test.tsx`: 5 ta test.
+- **Tekshiruv:**
+  - to'liq suite 33/33 fayl va 178/178 test;
+  - ESLint va `tsc` xatosiz;
+  - backend bilan qo'lda tekshiruv (fan yaratish, o'qituvchi biriktirish, o'qituvchi `/teach` da fanni ko'rishi) hali qilinmagan.
+
 ### `660fb12` — Task 15: Admin: API hook'lari va foydalanuvchilar sahifasi
 - Yangi `frontend/src/api/admin.ts`:
   - foydalanuvchilar: ro'yxat (holat filtri, qidiruv), rol yoki holatni o'zgartirish, vaqtinchalik parol;
