@@ -4687,11 +4687,15 @@ function SubjectTile({ subject }: { subject: SubjectCard }) {
 > Qayta urinish endi faqat 5xx/tarmoq xatosida ko'rsatiladi (`ApiError.status < 500`da yo'q),
 > "← Barcha fanlar" havolasi endi har doim (yuklanish/xato holatida ham) ko'rinadi, Badge ichidagi
 > ✓ `aria-hidden`ga o'raldi, havolalarga `FOCUS_RING` qo'shildi.
+>
+> **Code-review tuzatishi (Task 10):** mahalliy `canRetry` o'zgaruvchisi `@/api/errors`dagi umumiy
+> `canRetry(error)` yordamchisiga ko'chirildi — xuddi shu mantiq `PlayerPage`, `StepContent` va
+> `PdfViewer`da (Task 10) ham ishlatiladi, shuning uchun bitta joyda saqlanadi.
 
 ```tsx
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
-import { ApiError } from '@/api/client'
+import { canRetry } from '@/api/errors'
 import { useSubject } from '@/api/student'
 import type { SubjectDetail } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
@@ -4710,9 +4714,6 @@ export function SubjectPage() {
   const { t } = useTranslation()
   const { slug = '' } = useParams()
   const subject = useSubject(slug)
-  // 4xx (masalan, "fan topilmadi") qayta urinish bilan tuzatilmaydi — faqat 5xx/tarmoq
-  // xatosida "Qayta urinish" tugmasi ko'rsatiladi.
-  const canRetry = !(subject.error instanceof ApiError) || subject.error.status >= 500
 
   return (
     <div className="flex flex-col gap-6">
@@ -4722,7 +4723,10 @@ export function SubjectPage() {
       {subject.isPending ? (
         <PageSpinner />
       ) : subject.isError ? (
-        <ErrorState error={subject.error} onRetry={canRetry ? () => void subject.refetch() : undefined} />
+        <ErrorState
+          error={subject.error}
+          onRetry={canRetry(subject.error) ? () => void subject.refetch() : undefined}
+        />
       ) : (
         <SubjectBody subject={subject.data} />
       )}
@@ -4803,7 +4807,7 @@ git commit -m "feat(frontend): student subjects list and topic path"
 **Files:**
 - Create: `frontend/src/features/student/PdfViewer.tsx`, `frontend/src/features/student/StepContent.tsx`
 - Modify (stub → to'liq): `frontend/src/features/student/PlayerPage.tsx`
-- Test: `frontend/src/features/student/PlayerPage.test.tsx`
+- Test: `frontend/src/features/student/PlayerPage.test.tsx`, `frontend/src/features/student/PdfViewer.test.tsx`
 
 **Qoidalar (spec, "Bosqichni tugatish qoidalari"):**
 - Bosqichlar qulflanmaydi: talaba istalgan bosqichni ochishi mumkin.
@@ -4811,7 +4815,7 @@ git commit -m "feat(frontend): student subjects list and topic path"
 - `review`, `practice` va `task` bosqichlari 1B'da doim kontentsiz (ular 2-bosqichda qo'shiladi).
 - Manzilda `kind` bo'lmasa (`/app/topics/10`), birinchi kontentli bosqichga yo'naltiriladi.
 
-PDF faylni olish uchun Bearer token kerak, shuning uchun `PdfViewer` faylni `apiBuffer` orqali `ArrayBuffer` qilib oladi va react-pdf'ga `{ data }` sifatida beradi. pdf.js buferni "detach" qiladi, shu sababli keshdagi buferning nusxasi uzatiladi. Unit testlarda `PdfViewer` mock qilinadi, PDF'ning haqiqiy chizilishi E2E testda tekshiriladi.
+PDF faylni olish uchun Bearer token kerak, shuning uchun `PdfViewer` faylni `apiBuffer` orqali `ArrayBuffer` qilib oladi va react-pdf'ga `{ data }` sifatida beradi. react-pdf (`Document.js`, `parameters.data`) ArrayBuffer/TypedArray bo'lsa, pdf.js'ga uzatishdan oldin o'zi nusxa oladi (`.slice(0)`) — shuning uchun keshdagi bufer bu yerda qayta nusxalanmaydi. Unit testlarda `PdfViewer` mock qilinadi (`PlayerPage.test.tsx`da) yoki faqat `react-pdf` mock qilinib haqiqiy komponent sinaladi (`PdfViewer.test.tsx`da); PDF'ning haqiqiy chizilishi E2E testda tekshiriladi.
 
 > **Code-review tuzatishi:** birinchi implementatsiyadan keyingi review quyidagilarni talab qildi —
 > 1) "Tugatdim" toast'i `StepContent`dagi chaqiruvga xos `onSuccess`dan `useCompleteStep`
@@ -4827,6 +4831,41 @@ PDF faylni olish uchun Bearer token kerak, shuning uchun `PdfViewer` faylni `api
 > matn/belgi bilan yetarli kontrastda qolsin. Pastdagi kod shu tuzatilgan holat; qo'shimcha
 > testlar (bir nechta material, bosqich kontentini olishda xato, noma'lum `kind`, kontentli
 > bosqichi yo'q mavzu) Step 1'ga qo'shilgan.
+
+> **Code-review tuzatishi (2-tur):** sifat tekshiruvi yana sakkiz band talab qildi —
+> 1) `PdfViewer` (react-pdf + pdf.js, ~1 MB) `StepContent.tsx`da `React.lazy` + `Suspense` orqali
+> alohida chunk'ga ajratildi; asosiy JS 1200 kB (368 kB gzip) → 568 kB (178 kB gzip)ga tushdi,
+> `PdfViewer` o'z chunk'iga (632 kB / 191 kB gzip) ko'chdi. `PlayerPage` mount bo'lishi bilan
+> `void import('./PdfViewer')` orqali shu chunk'ni oldindan yuklaydi — JSON → chunk → PDF
+> ketma-ket (waterfall) bo'lmasin. `vi.mock('./PdfViewer', ...)` dinamik `import()`ni ham
+> qamrab oladi (tekshirildi). 2) TanStack Query v5'da fon qayta so'rovi muvaffaqiyatsiz bo'lsa
+> `isError: true` bo'ladi, lekin eski `data` saqlanib qoladi — `PlayerPage`, `StepContent` va
+> `PdfViewer` endi xato holatini FAQAT `data` umuman yo'q bo'lsagina ko'rsatadi (`!topic.data` /
+> `!content.data` / `!file`), aks holda "Tugatdim"dan keyingi muvaffaqiyatsiz refetch ochiq
+> darsni "Nimadir xato ketdi"ga aylantirib yubormaydi. 3) Umumiy `canRetry(error)` yordamchisi
+> `@/api/errors`ga qo'shildi (4xx → `false`, 5xx/tarmoq xatosi → `true`) va `SubjectPage`
+> (Task 9), `PlayerPage`, `StepContent`, `PdfViewer`dagi bir xil mahalliy mantiq shu bilan
+> almashtirildi. 4) Bosqich almashganda (masalan, "Keyingi bosqich") fokus `<body>`da
+> qolib ketmasligi uchun `PlayerPage`da sarlavha (`h2#step-title`, `tabIndex={-1}`) effekt
+> orqali scroll+fokus qilinadi — FAQAT bosqich ID'si o'zgarganda, birinchi mount'da emas
+> (`hasFocusedOnceRef`). jsdom `scrollIntoView`/`ResizeObserver`ni amalga oshirmaydi, shuning
+> uchun `test/setup.ts`ga minimal stub qo'shildi (ScrollRestoration ilova darajasida bu
+> bosqichda QO'SHILMADI). 5) `StepLink`da xira/oddiy ranglar endi o'zaro istisno qiladi
+> (`text-slate-500`, avval `400` edi), orqaga havola va `StepLink`ga `FOCUS_RING` qo'shildi.
+> 6) `PdfViewer`dagi ortiqcha `.slice(0)` olib tashlandi (react-pdf `Document.js`da
+> `parameters.data`ni o'zi nusxalaydi — `node_modules/react-pdf/dist/Document.js:94-101`da
+> tekshirildi); `externalLinkTarget="_blank"`, `externalLinkRel="noopener noreferrer"`,
+> `onItemClick` (ichki havolalar), xato xabariga `role="alert"`, sahifa hisoblagichiga
+> `aria-label` (`player.pageOfLabel`, ikki tilda) qo'shildi. 7) `StepContentView` endi HAR
+> bir bosqich uchun (kontentli yoki yo'q) kontentni so'raydi va "Tugatdim"/bo'sh holatni
+> ENDI yuklangan `data.has_content`ga qarab ko'rsatadi — mavzu ro'yxatidagi `step.has_content`
+> eskirgan bo'lishi mumkin (masalan, material endigina tayyor bo'ldi). 8) Yangi testlar:
+> `PdfViewer.test.tsx` (`react-pdf` mock qilinib sahifalar o'rtasida o'tish, chegara holatlari,
+> 404'da qayta urinishsiz xato), refetch-xato-kontentni-yopmaydi, 404/5xx `canRetry`, fokus
+> "Keyingi bosqich"dan keyin, "Keyingi bosqich" bo'sh bosqichlarni o'tkazib yuborishi va
+> oxirgi bosqichda yo'qligi. **Eslatma:** keyingi tasklar (12–16, o'qituvchi/admin sahifalari)
+> ham katta kutubxonalarga tayansa, asosiy chunk yana o'ssa, ularni marshrut darajasida
+> (`React.lazy` router'da) alohida yuklashni ko'rib chiqish kerak.
 
 - [ ] **Step 1: Muvaffaqiyatsiz testni yozish**
 
@@ -4855,6 +4894,14 @@ function mockTopic(glossaryCompleted: () => boolean) {
       topic.steps[5].status = glossaryCompleted() ? 'completed' : null
       return HttpResponse.json(topic)
     }),
+    // StepContentView endi HAR bir bosqich uchun (kontentli yoki yo'q) GET /api/steps/{id}'ni
+    // chaqiradi — backend bu so'rovni har doim qo'llab-quvvatlaydi (`data.has_content` asosida
+    // UI tanlanadi, mavzu ro'yxatidagi eskirgan `has_content`ga emas).
+    http.get('/api/steps/100', () =>
+      HttpResponse.json(
+        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
+      ),
+    ),
     http.get('/api/steps/101', () => HttpResponse.json(stepContent())),
     http.get('/api/steps/105', () =>
       HttpResponse.json(
@@ -4982,10 +5029,98 @@ test('kontentli bosqich bo\'lmagan mavzuda birinchi bosqich ko\'rsatiladi', asyn
         }),
       ),
     ),
+    http.get('/api/steps/100', () =>
+      HttpResponse.json(
+        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
+      ),
+    ),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
   expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: new RegExp(i18n.t('steps.review')) })).toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 2: fon qayta so'rovi xatosi ochiq kontentni yopmaydi ---
+
+test('bosqichni tugatgandan keyin fon qayta so\'rovi 500 bo\'lsa ham kontent ko\'rinishda qoladi', async () => {
+  mockTopic(() => false)
+  server.use(
+    http.post('/api/steps/105/complete', () =>
+      HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
+  expect(await screen.findByText('Mehnat faoliyati turi')).toBeInTheDocument()
+
+  // "Tugatdim"dan keyingi invalidatsiya qayta so'rovlari serverda 500 bilan tugaydi.
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+    http.get('/api/steps/105', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+  )
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('player.complete') }))
+  expect(await screen.findByText(i18n.t('player.completedToast'))).toBeInTheDocument()
+
+  // Avval yuklangan kontent ko'rinishda qoladi — "Nimadir xato ketdi" chiqmaydi.
+  expect(screen.getByText('Mehnat faoliyati turi')).toBeInTheDocument()
+  expect(screen.queryByText(i18n.t('common.errorTitle'))).not.toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 3: umumiy canRetry ---
+
+test('mavzu topilmasa (404) qayta urinish tugmasi ko\'rsatilmaydi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'TOPIC_NOT_FOUND', message: 'x', details: {} }, { status: 404 }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('errors.TOPIC_NOT_FOUND'))).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: i18n.t('common.retry') })).not.toBeInTheDocument()
+})
+
+test('mavzuni olishda server xatosi (5xx) bo\'lsa qayta urinish tugmasi ko\'rsatiladi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('errors.INTERNAL_ERROR'))).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: i18n.t('common.retry') })).toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 4: bosqich almashganda fokus va scroll ---
+
+test('"Keyingi bosqich" bosilganda fokus yangi bosqich sarlavhasiga o\'tadi', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  const next = await screen.findByRole('link', { name: new RegExp(i18n.t('player.next')) })
+  await userEvent.click(next)
+  await waitFor(() =>
+    expect(screen.getByRole('heading', { name: i18n.t('steps.glossary') })).toHaveFocus(),
+  )
+})
+
+// --- Code-review tuzatishi 8: "Keyingi bosqich" bo'sh bosqichlarni o'tkazib yuboradi ---
+
+test('"Keyingi bosqich" kontentsiz bosqichlarni o\'tkazib yuboradi', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  const next = await screen.findByRole('link', { name: new RegExp(i18n.t('player.next')) })
+  // lecture(101)dan keyingi kontentli bosqich glossary(105) — presentation/practice/task
+  // (kontentsiz) o'tkazib yuboriladi.
+  expect(next).toHaveAttribute('href', '/app/topics/10/glossary')
+})
+
+test('oxirgi kontentli bosqichda "Keyingi bosqich" havolasi yo\'q', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
+  await screen.findByText('Mehnat faoliyati turi')
+  expect(screen.queryByRole('link', { name: new RegExp(i18n.t('player.next')) })).not.toBeInTheDocument()
 })
 ```
 
@@ -5002,6 +5137,7 @@ import { useTranslation } from 'react-i18next'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
+import { canRetry } from '@/api/errors'
 import { useMaterialPdf } from '@/api/student'
 import { Button } from '@/components/ui/Button'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -5026,21 +5162,35 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
     return () => observer.disconnect()
   }, [])
 
-  // pdf.js uzatilgan buferni "detach" qiladi — keshdagi bufer buzilmasligi uchun nusxa beriladi.
-  const file = useMemo(() => (pdf.data ? { data: new Uint8Array(pdf.data.slice(0)) } : null), [pdf.data])
+  // react-pdf (Document.js, parameters.data) ArrayBuffer/TypedArray'ni pdf.js'ga uzatishdan
+  // oldin o'zi nusxalaydi (`.slice(0)`) — keshdagi bufer shu sababli bu yerda qayta nusxalanmaydi.
+  const file = useMemo(() => (pdf.data ? { data: pdf.data } : null), [pdf.data])
 
   return (
     <figure className="flex flex-col gap-3">
       <figcaption className="font-semibold">{title}</figcaption>
       <div ref={containerRef} className="min-h-40 overflow-hidden rounded-xl border-2 border-slate-100 bg-slate-100">
-        {pdf.isError ? (
-          <ErrorState error={pdf.error} onRetry={() => void pdf.refetch()} />
-        ) : file ? (
+        {!file ? (
+          // Fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham, avval yuklangan fayl (`file`) bo'lsa,
+          // u ko'rsatilishda davom etadi — xato holati faqat ma'lumot umuman yo'q bo'lsa chiqadi.
+          pdf.isError ? (
+            <ErrorState error={pdf.error} onRetry={canRetry(pdf.error) ? () => void pdf.refetch() : undefined} />
+          ) : (
+            <PageSpinner />
+          )
+        ) : (
           <Document
             file={file}
             suspense={false}
             loading={<PageSpinner />}
-            error={<p className="p-6 text-center text-red-700">{t('player.pdfError')}</p>}
+            error={
+              <p role="alert" className="p-6 text-center text-red-700">
+                {t('player.pdfError')}
+              </p>
+            }
+            externalLinkTarget="_blank"
+            externalLinkRel="noopener noreferrer"
+            onItemClick={({ pageNumber }) => setPage(pageNumber)}
             onLoadSuccess={({ numPages: total }) => {
               setNumPages(total)
               setPage(1)
@@ -5048,8 +5198,6 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             <Page pageNumber={page} width={width} loading={<PageSpinner />} />
           </Document>
-        ) : (
-          <PageSpinner />
         )}
       </div>
       {numPages > 1 && (
@@ -5063,7 +5211,11 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             ←
           </Button>
-          <span className="text-sm font-semibold" aria-live="polite">
+          <span
+            className="text-sm font-semibold"
+            aria-live="polite"
+            aria-label={t('player.pageOfLabel', { page, total: numPages })}
+          >
             {t('player.pageOf', { page, total: numPages })}
           </span>
           <Button
@@ -5082,12 +5234,81 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
 }
 ```
 
+`frontend/src/features/student/PdfViewer.test.tsx` (yangi — `react-pdf`ning o'zi mock qilinadi, haqiqiy `PdfViewer` sinaladi):
+
+```tsx
+import { QueryClientProvider } from '@tanstack/react-query'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw/http'
+import { useEffect, type ReactNode } from 'react'
+import { setAccessToken } from '@/api/client'
+import { createQueryClient } from '@/api/queryClient'
+import { i18n } from '@/i18n'
+import { server } from '@/test/server'
+import { PdfViewer } from './PdfViewer'
+
+vi.mock('react-pdf', () => ({
+  pdfjs: { GlobalWorkerOptions: {} },
+  Document: ({
+    children,
+    onLoadSuccess,
+  }: {
+    children?: ReactNode
+    onLoadSuccess?: (info: { numPages: number }) => void
+  }) => {
+    // Faqat mount bo'lganda bir marta chaqiriladi (haqiqiy PDF yuklanganda shunday ishlaydi).
+    useEffect(() => {
+      onLoadSuccess?.({ numPages: 3 })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+    return <div data-testid="document">{children}</div>
+  },
+  Page: ({ pageNumber }: { pageNumber: number }) => <div data-testid="page">{pageNumber}</div>,
+}))
+
+function renderViewer(url = '/api/materials/500/file') {
+  setAccessToken('test-token')
+  const queryClient = createQueryClient()
+  queryClient.setDefaultOptions({ queries: { retry: false, retryDelay: 0 } })
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <PdfViewer url={url} title="Kirish ma'ruzasi" />
+    </QueryClientProvider>,
+  )
+}
+
+test('sahifalar o\'rtasida o\'tish, chegaralarda tugmalar o\'chiriladi', async () => {
+  server.use(http.get('/api/materials/500/file', () => new HttpResponse(new Uint8Array([1, 2, 3]).buffer)))
+  renderViewer()
+  expect(await screen.findByTestId('document')).toBeInTheDocument()
+  expect(screen.getByText('1 / 3')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: i18n.t('player.prevPage') })).toBeDisabled()
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('player.nextPage') }))
+  expect(screen.getByText('2 / 3')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('player.nextPage') }))
+  expect(screen.getByRole('button', { name: i18n.t('player.nextPage') })).toBeDisabled()
+})
+
+test('faylni olishda 404 bo\'lsa qayta urinish tugmasisiz xato ko\'rsatiladi', async () => {
+  server.use(
+    http.get('/api/materials/404/file', () =>
+      HttpResponse.json({ code: 'MATERIAL_NOT_FOUND', message: 'x', details: {} }, { status: 404 }),
+    ),
+  )
+  renderViewer('/api/materials/404/file')
+  expect(await screen.findByText(i18n.t('errors.MATERIAL_NOT_FOUND'))).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: i18n.t('common.retry') })).not.toBeInTheDocument()
+})
+```
+
 - [ ] **Step 4: `frontend/src/features/student/StepContent.tsx`**
 
 ```tsx
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { canRetry } from '@/api/errors'
 import { useCompleteStep, useStep } from '@/api/student'
 import type { GlossaryTerm, LiteratureItem, MaterialView, StepBrief, StepKind } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
@@ -5098,7 +5319,12 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
-import { PdfViewer } from './PdfViewer'
+
+// PdfViewer (react-pdf + pdf.js) alohida chunk'ga ajratiladi — asosiy bundle faqat lecture/
+// presentation bosqichida kerak bo'lgan ~1 MB'lik kodni yuklamaydi. `PlayerPage` bu chunk'ni
+// mount bo'lishi bilan oldindan yuklaydi (`import('./PdfViewer')`), shuning uchun odatda
+// Suspense fallback faqat bir lahzaga ko'rinadi.
+const PdfViewer = lazy(() => import('./PdfViewer').then((module) => ({ default: module.PdfViewer })))
 
 interface StepContentViewProps {
   topicId: number
@@ -5108,16 +5334,25 @@ interface StepContentViewProps {
 
 export function StepContentView({ topicId, step, nextKind }: StepContentViewProps) {
   const { t } = useTranslation()
-  const content = useStep(step.has_content ? step.id : undefined)
+  const content = useStep(step.id)
   const complete = useCompleteStep(topicId)
 
-  if (!step.has_content) {
-    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
-  }
   if (content.isPending) return <PageSpinner />
-  if (content.isError) return <ErrorState error={content.error} onRetry={() => void content.refetch()} />
+  // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
+  // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+  if (!content.data) {
+    return (
+      <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
+    )
+  }
 
   const data = content.data
+  // Bosqich kontentiga ENDI yuklangan ma'lumot (`data.has_content`) asosida qaraladi — mavzu
+  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor bo'ldi).
+  if (!data.has_content) {
+    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
@@ -5180,7 +5415,9 @@ function FileMaterials({ materials }: { materials: MaterialView[] }) {
           })}
         </div>
       )}
-      <PdfViewer key={selected.id} url={selected.file_url} title={selected.title} />
+      <Suspense fallback={<PageSpinner />}>
+        <PdfViewer key={selected.id} url={selected.file_url} title={selected.title} />
+      </Suspense>
     </div>
   )
 }
@@ -5231,8 +5468,10 @@ function LiteratureList({ items }: { items: LiteratureItem[] }) {
 - [ ] **Step 5: `frontend/src/features/student/PlayerPage.tsx`**
 
 ```tsx
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useParams } from 'react-router'
+import { canRetry } from '@/api/errors'
 import { useTopic } from '@/api/student'
 import type { StepBrief } from '@/api/types'
 import { Card } from '@/components/ui/Card'
@@ -5240,7 +5479,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { isStepKind, STEP_ICONS } from '@/lib/steps'
 import { StepContentView } from './StepContent'
 
@@ -5250,9 +5489,40 @@ export function PlayerPage() {
   const topicId = Number(params.topicId)
   const topic = useTopic(topicId)
 
+  // Fokus/scroll effekti uchun joriy bosqich ID'si — ma'lumot hali yuklanmagan bo'lsa undefined.
+  // Hook'lar har renderda bir xil tartibda chaqirilishi kerak, shuning uchun bu pastdagi
+  // "early return"lardan OLDIN hisoblanadi.
+  const previewSteps = topic.data?.steps
+  const previewCurrentId =
+    previewSteps && isStepKind(params.kind) ? previewSteps.find((step) => step.kind === params.kind)?.id : undefined
+
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const hasFocusedOnceRef = useRef(false)
+  useEffect(() => {
+    if (previewCurrentId === undefined) return
+    if (!hasFocusedOnceRef.current) {
+      // Sahifaga birinchi kelishda (yoki yangilashda) fokus o'g'irlanmasin — faqat bosqich
+      // ALMASHGANDA (masalan, "Keyingi bosqich") sarlavhaga o'tadi.
+      hasFocusedOnceRef.current = true
+      return
+    }
+    headingRef.current?.scrollIntoView({ block: 'start' })
+    headingRef.current?.focus()
+  }, [previewCurrentId])
+
+  // PdfViewer chunk'ini mavzu/bosqich JSON bilan bir vaqtda oldindan yuklaydi — aks holda
+  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi.
+  useEffect(() => {
+    void import('./PdfViewer')
+  }, [])
+
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
   if (topic.isPending) return <PageSpinner />
-  if (topic.isError) return <ErrorState error={topic.error} onRetry={() => void topic.refetch()} />
+  // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+  // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+  if (!topic.data) {
+    return <ErrorState error={topic.error} onRetry={canRetry(topic.error) ? () => void topic.refetch() : undefined} />
+  }
 
   const { steps } = topic.data
   if (!isStepKind(params.kind)) {
@@ -5267,7 +5537,7 @@ export function PlayerPage() {
     <div className="flex flex-col gap-4">
       <Link
         to={`/app/subjects/${topic.data.subject.slug}`}
-        className="text-sm font-semibold text-brand-700 hover:underline"
+        className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}
       >
         ← {topic.data.subject.title}
       </Link>
@@ -5288,7 +5558,12 @@ export function PlayerPage() {
           </Card>
         </aside>
         <section aria-labelledby="step-title" className="min-w-0">
-          <h2 id="step-title" className="mb-4 text-xl font-bold">
+          <h2
+            ref={headingRef}
+            id="step-title"
+            tabIndex={-1}
+            className={cx('mb-4 text-xl font-bold outline-none', FOCUS_RING)}
+          >
             <span aria-hidden="true">{STEP_ICONS[current.kind]} </span>
             {t(`steps.${current.kind}`)}
           </h2>
@@ -5308,8 +5583,13 @@ function StepLink({ topicId, step, active }: { topicId: number; step: StepBrief;
       aria-current={active ? 'step' : undefined}
       className={cx(
         'flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm whitespace-nowrap',
-        active ? 'bg-brand-100 font-bold text-slate-900' : 'text-slate-700 hover:bg-slate-100',
-        !step.has_content && !active && 'text-slate-400',
+        FOCUS_RING,
+        // Uch holat o'zaro bir-birini istisno qiladi: faol / oddiy / kontentsiz (xira).
+        active
+          ? 'bg-brand-100 font-bold text-slate-900'
+          : step.has_content
+            ? 'text-slate-700 hover:bg-slate-100'
+            : 'text-slate-500 hover:bg-slate-100',
       )}
     >
       <span
@@ -5346,6 +5626,22 @@ CHANGELOG qatori: `- Dars pleyeri: 7 bosqich paneli, himoyalangan PDF ko'ruvchi,
 ```bash
 cd .. && git add frontend CHANGELOG.md
 git commit -m "feat(frontend): lesson player with pdf viewer and step completion"
+```
+
+- [ ] **Step 8: 2-tur code-review tuzatish va commit**
+
+Yuqoridagi "Code-review tuzatishi (2-tur)" bandida sanalgan 8 band (lazy `PdfViewer` + oldindan yuklash,
+fon qayta so'rovi xatosi kontentni yopmasligi, umumiy `canRetry`, bosqich almashganda fokus/scroll,
+`StepLink` rang/`FOCUS_RING`, `PdfViewer` tozalash, `data.has_content` asosida gating,
+`PdfViewer.test.tsx`) shu commit'da amalga oshiriladi.
+
+Run: `npm test && npm run lint && npm run typecheck && npm run build`, so'ng 3× to'liq to'plam tsikli.
+Expected: PASS; build hajmi: asosiy JS ~1200 kB (368 kB gzip) → ~569 kB (178 kB gzip), `PdfViewer`
+alohida chunk (~632 kB / 191 kB gzip).
+
+```bash
+cd .. && git add frontend docs CHANGELOG.md
+git commit -m "fix(frontend): lesson player review fixes (lazy pdf, refetch errors, focus, canRetry)"
 ```
 
 ---

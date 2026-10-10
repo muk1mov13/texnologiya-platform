@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
-import { ApiError } from '@/api/client'
+import { canRetry } from '@/api/errors'
 import { useSubject } from '@/api/student'
 import type { SubjectDetail } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
@@ -19,9 +19,6 @@ export function SubjectPage() {
   const { t } = useTranslation()
   const { slug = '' } = useParams()
   const subject = useSubject(slug)
-  // 4xx (masalan, "fan topilmadi") qayta urinish bilan tuzatilmaydi — faqat 5xx/tarmoq
-  // xatosida "Qayta urinish" tugmasi ko'rsatiladi.
-  const canRetry = !(subject.error instanceof ApiError) || subject.error.status >= 500
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,7 +28,10 @@ export function SubjectPage() {
       {subject.isPending ? (
         <PageSpinner />
       ) : subject.isError ? (
-        <ErrorState error={subject.error} onRetry={canRetry ? () => void subject.refetch() : undefined} />
+        <ErrorState
+          error={subject.error}
+          onRetry={canRetry(subject.error) ? () => void subject.refetch() : undefined}
+        />
       ) : (
         <SubjectBody subject={subject.data} />
       )}

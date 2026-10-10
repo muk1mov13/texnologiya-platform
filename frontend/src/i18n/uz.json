@@ -172,7 +172,8 @@
     "pdfError": "PDF faylni ochib bo'lmadi",
     "prevPage": "Oldingi sahifa",
     "nextPage": "Keyingi sahifa",
-    "pageOf": "{{page}} / {{total}}"
+    "pageOf": "{{page}} / {{total}}",
+    "pageOfLabel": "Sahifa {{page}} / {{total}}"
   },
   "profile": {
     "title": "Profil",

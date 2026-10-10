@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { canRetry } from '@/api/errors'
 import { useCompleteStep, useStep } from '@/api/student'
 import type { GlossaryTerm, LiteratureItem, MaterialView, StepBrief, StepKind } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
@@ -11,7 +12,12 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
-import { PdfViewer } from './PdfViewer'
+
+// PdfViewer (react-pdf + pdf.js) alohida chunk'ga ajratiladi — asosiy bundle faqat lecture/
+// presentation bosqichida kerak bo'lgan ~1 MB'lik kodni yuklamaydi. `PlayerPage` bu chunk'ni
+// mount bo'lishi bilan oldindan yuklaydi (`import('./PdfViewer')`), shuning uchun odatda
+// Suspense fallback faqat bir lahzaga ko'rinadi.
+const PdfViewer = lazy(() => import('./PdfViewer').then((module) => ({ default: module.PdfViewer })))
 
 interface StepContentViewProps {
   topicId: number
@@ -21,16 +27,25 @@ interface StepContentViewProps {
 
 export function StepContentView({ topicId, step, nextKind }: StepContentViewProps) {
   const { t } = useTranslation()
-  const content = useStep(step.has_content ? step.id : undefined)
+  const content = useStep(step.id)
   const complete = useCompleteStep(topicId)
 
-  if (!step.has_content) {
-    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
-  }
   if (content.isPending) return <PageSpinner />
-  if (content.isError) return <ErrorState error={content.error} onRetry={() => void content.refetch()} />
+  // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
+  // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+  if (!content.data) {
+    return (
+      <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
+    )
+  }
 
   const data = content.data
+  // Bosqich kontenti ENDI yuklangan ma'lumot (`data.has_content`) asosida aniqlanadi — mavzu
+  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor bo'ldi).
+  if (!data.has_content) {
+    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
@@ -91,7 +106,9 @@ function FileMaterials({ materials }: { materials: MaterialView[] }) {
           })}
         </div>
       )}
-      <PdfViewer key={selected.id} url={selected.file_url} title={selected.title} />
+      <Suspense fallback={<PageSpinner />}>
+        <PdfViewer key={selected.id} url={selected.file_url} title={selected.title} />
+      </Suspense>
     </div>
   )
 }

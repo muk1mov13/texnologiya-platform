@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useParams } from 'react-router'
+import { canRetry } from '@/api/errors'
 import { useTopic } from '@/api/student'
 import type { StepBrief } from '@/api/types'
 import { Card } from '@/components/ui/Card'
@@ -7,7 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { isStepKind, STEP_ICONS } from '@/lib/steps'
 import { StepContentView } from './StepContent'
 
@@ -17,9 +19,40 @@ export function PlayerPage() {
   const topicId = Number(params.topicId)
   const topic = useTopic(topicId)
 
+  // Fokus/scroll effekti uchun joriy bosqich ID'si — ma'lumot hali yuklanmagan bo'lsa undefined.
+  // Hook'lar har renderda bir xil tartibda chaqirilishi kerak, shuning uchun bu pastdagi
+  // "early return"lardan OLDIN hisoblanadi.
+  const previewSteps = topic.data?.steps
+  const previewCurrentId =
+    previewSteps && isStepKind(params.kind) ? previewSteps.find((step) => step.kind === params.kind)?.id : undefined
+
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const hasFocusedOnceRef = useRef(false)
+  useEffect(() => {
+    if (previewCurrentId === undefined) return
+    if (!hasFocusedOnceRef.current) {
+      // Sahifaga birinchi kelishda (yoki yangilashda) fokus o'g'irlanmasin — faqat bosqich
+      // ALMASHGANDA (masalan, "Keyingi bosqich") sarlavhaga o'tadi.
+      hasFocusedOnceRef.current = true
+      return
+    }
+    headingRef.current?.scrollIntoView({ block: 'start' })
+    headingRef.current?.focus()
+  }, [previewCurrentId])
+
+  // PdfViewer chunk'ini mavzu/bosqich JSON bilan bir vaqtda oldindan yuklaydi — aks holda
+  // JSON -> chunk -> PDF ketma-ket (waterfall) yuklanardi.
+  useEffect(() => {
+    void import('./PdfViewer')
+  }, [])
+
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
   if (topic.isPending) return <PageSpinner />
-  if (topic.isError) return <ErrorState error={topic.error} onRetry={() => void topic.refetch()} />
+  // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
+  // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
+  if (!topic.data) {
+    return <ErrorState error={topic.error} onRetry={canRetry(topic.error) ? () => void topic.refetch() : undefined} />
+  }
 
   const { steps } = topic.data
   if (!isStepKind(params.kind)) {
@@ -34,7 +67,7 @@ export function PlayerPage() {
     <div className="flex flex-col gap-4">
       <Link
         to={`/app/subjects/${topic.data.subject.slug}`}
-        className="text-sm font-semibold text-brand-700 hover:underline"
+        className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}
       >
         ← {topic.data.subject.title}
       </Link>
@@ -55,7 +88,12 @@ export function PlayerPage() {
           </Card>
         </aside>
         <section aria-labelledby="step-title" className="min-w-0">
-          <h2 id="step-title" className="mb-4 text-xl font-bold">
+          <h2
+            ref={headingRef}
+            id="step-title"
+            tabIndex={-1}
+            className={cx('mb-4 text-xl font-bold outline-none', FOCUS_RING)}
+          >
             <span aria-hidden="true">{STEP_ICONS[current.kind]} </span>
             {t(`steps.${current.kind}`)}
           </h2>
@@ -75,8 +113,13 @@ function StepLink({ topicId, step, active }: { topicId: number; step: StepBrief;
       aria-current={active ? 'step' : undefined}
       className={cx(
         'flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm whitespace-nowrap',
-        active ? 'bg-brand-100 font-bold text-slate-900' : 'text-slate-700 hover:bg-slate-100',
-        !step.has_content && !active && 'text-slate-400',
+        FOCUS_RING,
+        // Uch holat o'zaro bir-birini istisno qiladi: faol / oddiy / kontentsiz (xira).
+        active
+          ? 'bg-brand-100 font-bold text-slate-900'
+          : step.has_content
+            ? 'text-slate-700 hover:bg-slate-100'
+            : 'text-slate-500 hover:bg-slate-100',
       )}
     >
       <span

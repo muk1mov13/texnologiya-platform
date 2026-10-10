@@ -172,7 +172,8 @@
     "pdfError": "Не удалось открыть PDF",
     "prevPage": "Предыдущая страница",
     "nextPage": "Следующая страница",
-    "pageOf": "{{page}} / {{total}}"
+    "pageOf": "{{page}} / {{total}}",
+    "pageOfLabel": "Страница {{page}} из {{total}}"
   },
   "profile": {
     "title": "Профиль",

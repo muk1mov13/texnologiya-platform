@@ -6,6 +6,19 @@ import { clearToasts } from '@/components/ui/toast-store'
 import { setLanguage } from '@/i18n'
 import { server } from './server'
 
+// jsdom `ResizeObserver` va `Element.scrollIntoView`ni amalga oshirmaydi — PdfViewer va
+// PlayerPage'dagi fokus/o'lcham effektlari test muhitida xato bermasligi uchun minimal stub.
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
+if (typeof Element.prototype.scrollIntoView !== 'function') {
+  Element.prototype.scrollIntoView = () => {}
+}
+
 beforeAll(() => {
   server.listen({ onUnhandledFrame: 'error' })
 })

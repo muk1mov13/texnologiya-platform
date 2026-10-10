@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
+import { canRetry } from '@/api/errors'
 import { useMaterialPdf } from '@/api/student'
 import { Button } from '@/components/ui/Button'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -27,21 +28,35 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
     return () => observer.disconnect()
   }, [])
 
-  // pdf.js uzatilgan buferni "detach" qiladi — keshdagi bufer buzilmasligi uchun nusxa beriladi.
-  const file = useMemo(() => (pdf.data ? { data: new Uint8Array(pdf.data.slice(0)) } : null), [pdf.data])
+  // react-pdf (Document.js, parameters.data) ArrayBuffer/TypedArray'ni pdf.js'ga uzatishdan
+  // oldin o'zi nusxalaydi (`.slice(0)`) — keshdagi bufer shu sababli bu yerda qayta nusxalanmaydi.
+  const file = useMemo(() => (pdf.data ? { data: pdf.data } : null), [pdf.data])
 
   return (
     <figure className="flex flex-col gap-3">
       <figcaption className="font-semibold">{title}</figcaption>
       <div ref={containerRef} className="min-h-40 overflow-hidden rounded-xl border-2 border-slate-100 bg-slate-100">
-        {pdf.isError ? (
-          <ErrorState error={pdf.error} onRetry={() => void pdf.refetch()} />
-        ) : file ? (
+        {!file ? (
+          // Fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham, avval yuklangan fayl (`file`) bo'lsa,
+          // u ko'rsatilishda davom etadi — xato holati faqat ma'lumot umuman yo'q bo'lsa chiqadi.
+          pdf.isError ? (
+            <ErrorState error={pdf.error} onRetry={canRetry(pdf.error) ? () => void pdf.refetch() : undefined} />
+          ) : (
+            <PageSpinner />
+          )
+        ) : (
           <Document
             file={file}
             suspense={false}
             loading={<PageSpinner />}
-            error={<p className="p-6 text-center text-red-700">{t('player.pdfError')}</p>}
+            error={
+              <p role="alert" className="p-6 text-center text-red-700">
+                {t('player.pdfError')}
+              </p>
+            }
+            externalLinkTarget="_blank"
+            externalLinkRel="noopener noreferrer"
+            onItemClick={({ pageNumber }) => setPage(pageNumber)}
             onLoadSuccess={({ numPages: total }) => {
               setNumPages(total)
               setPage(1)
@@ -49,8 +64,6 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             <Page pageNumber={page} width={width} loading={<PageSpinner />} />
           </Document>
-        ) : (
-          <PageSpinner />
         )}
       </div>
       {numPages > 1 && (
@@ -64,7 +77,11 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
           >
             ←
           </Button>
-          <span className="text-sm font-semibold" aria-live="polite">
+          <span
+            className="text-sm font-semibold"
+            aria-live="polite"
+            aria-label={t('player.pageOfLabel', { page, total: numPages })}
+          >
             {t('player.pageOf', { page, total: numPages })}
           </span>
           <Button

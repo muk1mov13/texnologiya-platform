@@ -20,6 +20,14 @@ function mockTopic(glossaryCompleted: () => boolean) {
       topic.steps[5].status = glossaryCompleted() ? 'completed' : null
       return HttpResponse.json(topic)
     }),
+    // StepContentView endi HAR bir bosqich uchun (kontentli yoki yo'q) GET /api/steps/{id}'ni
+    // chaqiradi — backend bu so'rovni har doim qo'llab-quvvatlaydi (`data.has_content` asosida
+    // UI tanlanadi, mavzu ro'yxatidagi eskirgan `has_content`ga emas).
+    http.get('/api/steps/100', () =>
+      HttpResponse.json(
+        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
+      ),
+    ),
     http.get('/api/steps/101', () => HttpResponse.json(stepContent())),
     http.get('/api/steps/105', () =>
       HttpResponse.json(
@@ -147,8 +155,96 @@ test('kontentli bosqich bo\'lmagan mavzuda birinchi bosqich ko\'rsatiladi', asyn
         }),
       ),
     ),
+    http.get('/api/steps/100', () =>
+      HttpResponse.json(
+        stepContent({ id: 100, kind: 'review', order: 1, has_content: false, status: null, materials: [] }),
+      ),
+    ),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
   expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: new RegExp(i18n.t('steps.review')) })).toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 2: fon qayta so'rovi xatosi ochiq kontentni yopmaydi ---
+
+test('bosqichni tugatgandan keyin fon qayta so\'rovi 500 bo\'lsa ham kontent ko\'rinishda qoladi', async () => {
+  mockTopic(() => false)
+  server.use(
+    http.post('/api/steps/105/complete', () =>
+      HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
+  expect(await screen.findByText('Mehnat faoliyati turi')).toBeInTheDocument()
+
+  // "Tugatdim"dan keyingi invalidatsiya qayta so'rovlari serverda 500 bilan tugaydi.
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+    http.get('/api/steps/105', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+  )
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('player.complete') }))
+  expect(await screen.findByText(i18n.t('player.completedToast'))).toBeInTheDocument()
+
+  // Avval yuklangan kontent ko'rinishda qoladi — "Nimadir xato ketdi" chiqmaydi.
+  expect(screen.getByText('Mehnat faoliyati turi')).toBeInTheDocument()
+  expect(screen.queryByText(i18n.t('common.errorTitle'))).not.toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 3: umumiy canRetry ---
+
+test('mavzu topilmasa (404) qayta urinish tugmasi ko\'rsatilmaydi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'TOPIC_NOT_FOUND', message: 'x', details: {} }, { status: 404 }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('errors.TOPIC_NOT_FOUND'))).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: i18n.t('common.retry') })).not.toBeInTheDocument()
+})
+
+test('mavzuni olishda server xatosi (5xx) bo\'lsa qayta urinish tugmasi ko\'rsatiladi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json({ code: 'INTERNAL_ERROR', message: 'x', details: {} }, { status: 500 }),
+    ),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('errors.INTERNAL_ERROR'))).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: i18n.t('common.retry') })).toBeInTheDocument()
+})
+
+// --- Code-review tuzatishi 4: bosqich almashganda fokus va scroll ---
+
+test('"Keyingi bosqich" bosilganda fokus yangi bosqich sarlavhasiga o\'tadi', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  const next = await screen.findByRole('link', { name: new RegExp(i18n.t('player.next')) })
+  await userEvent.click(next)
+  await waitFor(() =>
+    expect(screen.getByRole('heading', { name: i18n.t('steps.glossary') })).toHaveFocus(),
+  )
+})
+
+// --- Code-review tuzatishi 8: "Keyingi bosqich" bo'sh bosqichlarni o'tkazib yuboradi ---
+
+test('"Keyingi bosqich" kontentsiz bosqichlarni o\'tkazib yuboradi', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  const next = await screen.findByRole('link', { name: new RegExp(i18n.t('player.next')) })
+  // lecture(101)dan keyingi kontentli bosqich glossary(105) — presentation/practice/task
+  // (kontentsiz) o'tkazib yuboriladi.
+  expect(next).toHaveAttribute('href', '/app/topics/10/glossary')
+})
+
+test('oxirgi kontentli bosqichda "Keyingi bosqich" havolasi yo\'q', async () => {
+  mockTopic(() => false)
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
+  await screen.findByText('Mehnat faoliyati turi')
+  expect(screen.queryByRole('link', { name: new RegExp(i18n.t('player.next')) })).not.toBeInTheDocument()
 })

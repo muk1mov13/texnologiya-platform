@@ -17,3 +17,11 @@ export function errorText(error: unknown): string {
   }
   return i18n.t('errors.NETWORK')
 }
+
+/**
+ * Qayta urinish tugmasi ko'rsatilsinmi: 4xx (mijoz xatosi, masalan "topilmadi" yoki
+ * validatsiya) qayta urinish bilan tuzatilmaydi — faqat 5xx yoki tarmoq xatosida ko'rsatiladi.
+ */
+export function canRetry(error: unknown): boolean {
+  return !(error instanceof ApiError) || error.status >= 500
+}

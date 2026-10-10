@@ -36,7 +36,7 @@ export function useTopic(topicId: number) {
   })
 }
 
-/** `stepId` undefined bo'lsa so'rov yuborilmaydi (kontenti yo'q bosqich). */
+/** `stepId` undefined bo'lsa so'rov yuborilmaydi. */
 export function useStep(stepId: number | undefined) {
   return useQuery({
     queryKey: studentKeys.step(stepId ?? 0),
