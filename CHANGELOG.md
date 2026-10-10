@@ -59,6 +59,27 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - Task 12 testlari 21/21;
   - ESLint, `tsc` va `npm run build` xatosiz (`PdfViewer` chunk'i 632 kB ekani haqida ogohlantirish bor — u ataylab lazy yuklanadi).
 
+### "Sayoz/zaif yechimlar" bo'limi qayta baholandi
+- Har bir band kodning hozirgi holati bilan qayta tekshirildi:
+  - **A.** `PlayerPage` bo'sh `steps` yoki topilmagan `kind` da yiqiladi — tuzatiladi.
+  - **B.** Talaba keshi: Task 12 da qisman tuzatilgan. `['steps']` va material mutatsiyalari qoldi — tuzatiladi.
+  - **C.** `LanguageSwitch` xatoda tilni qaytarmaydi — tuzatiladi.
+  - **D.** `TeachHomePage` dagi `as`-cast va `eslint-disable` — tuzatiladi, kod tozaligi uchun.
+  - **E.** Takrorlangan logout — oshirib baholangan: bir xil kod 3 emas, 2 joyda, `auth.ts` dagisi ataylab boshqacha. O'zgartirilmaydi.
+  - **F.** "Ma'lumot → spinner → xato" bloki 5 joyda takrorlangan — Task 13 dan boshlab umumiy `QueryState` yordamchisi bilan.
+  - **G.** Javoblar runtime'da tekshirilmaydi (`as T`) — Task 18 da `openapi-typescript` bilan tiplar generatsiyasi va CI'da drift tekshiruvi.
+- Tartib: A → B → C → D, har biri alohida commit.
+
+### A-band: `PlayerPage` chegaraviy holatlarda yiqilmaydi
+- `frontend/src/features/student/PlayerPage.tsx`:
+  - mavzuda bosqich umuman bo'lmasa, xato sahifasi o'rniga "material yo'q" bo'sh holati ko'rsatiladi;
+  - manzildagi bosqich turi to'g'ri, lekin shu mavzuda bo'lmasa, birinchi kontentli bosqichga yo'naltiriladi (ilgari `current.id` da xato berardi).
+- `PlayerPage.test.tsx`: shu ikki holat uchun testlar.
+- **Tekshiruv:**
+  - to'liq suite 27/27 fayl va 147/147 test;
+  - ESLint va `tsc` xatosiz.
+  - Eslatma: birinchi to'liq ishga tushirishda deyarli barcha fayllar o'zgarishga aloqasi bo'lmagan holda ochilish bosqichida yiqildi. Bitta fayl alohida, keyin to'liq suite qayta ishga tushirilganda xatosiz o'tdi. Ehtimol sabab yana kam xotira (bo'sh RAM ~0.8 GB); aniq sababi ushlanmadi.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.

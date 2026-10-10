@@ -156,6 +156,34 @@ test('kontentli bosqich bo\'lmagan mavzuda birinchi bosqich ko\'rsatiladi', asyn
   expect(screen.getByRole('heading', { name: new RegExp(i18n.t('steps.review')) })).toBeInTheDocument()
 })
 
+test('manzildagi bosqich turi mavzuda bo\'lmasa birinchi kontentli bosqichga yo\'naltiriladi', async () => {
+  server.use(
+    http.get('/api/topics/10', () =>
+      HttpResponse.json(
+        topicDetail({
+          steps: [
+            { id: 100, kind: 'review', order: 1, has_content: false, status: null },
+            { id: 105, kind: 'glossary', order: 2, has_content: true, status: null },
+          ],
+        }),
+      ),
+    ),
+    http.get('/api/steps/105', () =>
+      HttpResponse.json(stepContent({ id: 105, kind: 'glossary', order: 2, status: null, materials: [] })),
+    ),
+  )
+  // `lecture` to'g'ri bosqich turi, lekin bu mavzuda yo'q.
+  const { router } = renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/lecture', user: studentUser })
+  await waitFor(() => expect(router.state.location.pathname).toBe('/app/topics/10/glossary'))
+})
+
+test('mavzuda bosqich umuman bo\'lmasa sahifa yiqilmaydi, bo\'sh holat ko\'rsatiladi', async () => {
+  server.use(http.get('/api/topics/10', () => HttpResponse.json(topicDetail({ steps: [] }))))
+  const { router } = renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10', user: studentUser })
+  expect(await screen.findByText(i18n.t('player.noContent'))).toBeInTheDocument()
+  expect(router.state.location.pathname).toBe('/app/topics/10')
+})
+
 // --- Code-review tuzatishi 2: fon qayta so'rovi xatosi ochiq kontentni yopmaydi ---
 
 test('bosqichni tugatgandan keyin fon qayta so\'rovi 500 bo\'lsa ham kontent ko\'rinishda qoladi', async () => {

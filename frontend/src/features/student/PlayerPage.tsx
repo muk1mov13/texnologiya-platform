@@ -60,11 +60,16 @@ export function PlayerPage() {
   }
 
   const { steps } = topic.data
-  if (!isStepKind(params.kind)) {
+  // Backend har mavzuga 7 bosqich kafolatlaydi, ammo kafolat buzilsa sahifa yiqilmasin.
+  if (steps.length === 0) {
+    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+  }
+  const index = isStepKind(params.kind) ? steps.findIndex((step) => step.kind === params.kind) : -1
+  if (index === -1) {
+    // Bosqich turi ko'rsatilmagan, noma'lum yoki shu mavzuda yo'q — birinchi kontentli bosqichga.
     const first = steps.find((step) => step.has_content) ?? steps[0]
     return <Navigate to={`/app/topics/${topicId}/${first.kind}`} replace />
   }
-  const index = steps.findIndex((step) => step.kind === params.kind)
   const current = steps[index]
   const next = steps.slice(index + 1).find((step) => step.has_content)
 
