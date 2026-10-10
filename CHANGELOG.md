@@ -6,6 +6,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 15 — Admin: API hook'lari va foydalanuvchilar sahifasi
+- Yangi `frontend/src/api/admin.ts`:
+  - foydalanuvchilar: ro'yxat (holat filtri, qidiruv), rol yoki holatni o'zgartirish, vaqtinchalik parol;
+  - fanlar (Task 16 uchun): ro'yxat, yaratish, tahrirlash, o'chirish, o'qituvchi biriktirish; faol o'qituvchilar ro'yxati.
+- `frontend/src/features/admin/AdminUsersPage.tsx` (stub o'rniga to'liq sahifa):
+  - sukut bo'yicha "tasdiq kutayotganlar" filtri bilan ochiladi; holat tablari va ism yoki email bo'yicha qidiruv;
+  - tasdiqlash, bloklash, blokdan chiqarish va rol tanlash;
+  - vaqtinchalik parol modal oynada faqat bir marta ko'rsatiladi;
+  - adminning o'z qatorida "(siz)" belgisi bor, rol tanlovi o'chirilgan, amal tugmalari yo'q.
+  - Rejadan farqi: yuklanish va xato holati `QueryState` orqali; rol tanlovida `as Role` o'rniga `isRole` tekshiruvi.
+- `AdminUsersPage.test.tsx`: 5 ta test.
+- **Tekshiruv:**
+  - to'liq suite 32/32 fayl va 173/173 test;
+  - ESLint va `tsc` xatosiz.
+
 ### `318512e` — Task 14: Mavzu muharriri: glossariy va adabiyotlar
 - `frontend/src/features/teach/GlossaryTab.tsx` va `LiteratureTab.tsx`:
   - yozuvlar ro'yxati;
