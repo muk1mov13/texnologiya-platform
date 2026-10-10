@@ -25,6 +25,24 @@ const routes = [
   { path: '/teach/topics/:topicId', element: <p>muharrir</p> },
 ]
 
+/** 3 mavzuli fan — fokus testlarida chegara bo'lmagan (o'rtadagi) surishlarni tekshirish uchun. */
+function threeTopicSubjects(ids: number[]): TeachSubject[] {
+  const byId: Record<number, { title: string; is_published: boolean }> = {
+    10: { title: 'Birinchi mavzu', is_published: true },
+    11: { title: 'Ikkinchi mavzu', is_published: false },
+    12: { title: 'Uchinchi mavzu', is_published: false },
+  }
+  return [
+    {
+      id: 1,
+      title: "Kasb ta'limi metodikasi",
+      slug: 'kasb',
+      is_published: true,
+      topics: ids.map((id, index) => ({ id, order: index + 1, ...byId[id] })),
+    },
+  ]
+}
+
 test("mavzular tartib va holat bilan ko'rsatiladi", async () => {
   server.use(http.get('/api/teach/subjects', () => HttpResponse.json(subjects)))
   renderRoutes(routes, { url: '/teach', user: teacherUser })
@@ -59,23 +77,32 @@ test("birinchi elementning ↑ va oxirgisining ↓ tugmasi o'chirilgan", async (
 })
 
 test('tartiblash xato qaytarsa, holat tiklanadi va xabar chiqadi', async () => {
+  let getCalls = 0
   server.use(
-    http.get('/api/teach/subjects', () => HttpResponse.json(subjects)),
+    http.get('/api/teach/subjects', () => {
+      getCalls += 1
+      return HttpResponse.json(subjects)
+    }),
     http.put('/api/teach/subjects/1/topics/order', () =>
-      HttpResponse.json({ code: 'INVALID_ORDER', message: "Mavzular ro'yxati fan mavzulariga mos emas", details: {} }, { status: 400 }),
+      HttpResponse.json(
+        { code: 'INVALID_ORDER', message: "Mavzular ro'yxati fan mavzulariga mos emas", details: {} },
+        { status: 400 },
+      ),
     ),
   )
   renderRoutes(routes, { url: '/teach', user: teacherUser })
   const downButton = await screen.findByRole('button', {
     name: i18n.t('teach.moveDown', { title: 'Birinchi mavzu' }),
   })
+  await waitFor(() => expect(getCalls).toBe(1))
   await userEvent.click(downButton)
-  // Server GET /api/teach/subjects dan hamon eski tartibni qaytaradi (o'zgarish yo'q),
-  // shuning uchun invalidatsiyadan keyin ro'yxat avvalgi holatiga qaytadi.
-  await waitFor(() => {
-    const names = screen.getAllByRole('link').map((el) => el.textContent)
-    expect(names).toEqual(['Birinchi mavzu', 'Ikkinchi mavzu'])
-  })
+  // Xato xabari aniq kod bo'yicha ko'rsatiladi (umumiy toast).
+  expect(await screen.findByText(i18n.t('errors.INVALID_ORDER'))).toBeInTheDocument()
+  // `onSettled` ro'yxatni qayta so'ragani (refetch haqiqatan sodir bo'lgani) tasdiqlanadi —
+  // server hamon eski tartibni qaytaradi, shuning uchun ro'yxat o'zgarmaydi.
+  await waitFor(() => expect(getCalls).toBeGreaterThanOrEqual(2))
+  const names = screen.getAllByRole('link').map((el) => el.textContent)
+  expect(names).toEqual(['Birinchi mavzu', 'Ikkinchi mavzu'])
 })
 
 test("yangi mavzu yaratilgach muharrirga o'tiladi", async () => {
@@ -138,7 +165,7 @@ test("o'chirish tasdiqlangach DELETE yuboriladi", async () => {
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
 })
 
-test("o'chirish server xato qaytarsa, dialog ochiq qoladi va xabar chiqadi", async () => {
+test("o'chirish server xato qaytarsa, dialog ochiq qoladi va tugmalar qayta yoqiladi", async () => {
   server.use(
     http.get('/api/teach/subjects', () => HttpResponse.json(subjects)),
     http.delete('/api/teach/topics/11', () =>
@@ -151,7 +178,59 @@ test("o'chirish server xato qaytarsa, dialog ochiq qoladi va xabar chiqadi", asy
   )
   const dialog = screen.getByRole('dialog')
   await userEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.delete') }))
-  await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+  expect(await screen.findByText(i18n.t('errors.INTERNAL_ERROR'))).toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toBeInTheDocument()
+  // Mutation tugagach "Bekor qilish"/"O'chirish" qayta yoqiladi — foydalanuvchi qayta urinishi
+  // yoki bekor qilishi mumkin.
+  expect(within(dialog).getByRole('button', { name: i18n.t('common.cancel') })).not.toBeDisabled()
+  expect(within(dialog).getByRole('button', { name: i18n.t('common.delete') })).not.toBeDisabled()
+})
+
+test("mavzuni yuqoriga surish — chegaraga yetgach fokus o'zining pastga tugmasiga o'tadi", async () => {
+  let currentIds = [10, 11, 12]
+  server.use(
+    http.get('/api/teach/subjects', () => HttpResponse.json(threeTopicSubjects(currentIds))),
+    http.put('/api/teach/subjects/1/topics/order', async ({ request }) => {
+      const body = (await request.json()) as { topic_ids: number[] }
+      currentIds = body.topic_ids
+      return HttpResponse.json([])
+    }),
+  )
+  renderRoutes(routes, { url: '/teach', user: teacherUser })
+  const upButton = await screen.findByRole('button', { name: i18n.t('teach.moveUp', { title: 'Ikkinchi mavzu' }) })
+  upButton.focus()
+  await userEvent.keyboard('{Enter}')
+  await waitFor(() => {
+    const downButton = screen.getByRole('button', { name: i18n.t('teach.moveDown', { title: 'Ikkinchi mavzu' }) })
+    expect(document.activeElement).toBe(downButton)
+  })
+  // Harakatlangan mavzu endi birinchi o'rinda — uning ↑ tugmasi chegara bo'yicha o'chirilgan,
+  // shuning uchun fokus ↓ tugmasiga o'tgan va u haqiqatan bosilishi mumkin.
+  expect(document.activeElement).not.toBeDisabled()
+})
+
+test("mavzuni pastga surish — fokus o'zining pastga tugmasida qoladi", async () => {
+  let currentIds = [10, 11, 12]
+  server.use(
+    http.get('/api/teach/subjects', () => HttpResponse.json(threeTopicSubjects(currentIds))),
+    http.put('/api/teach/subjects/1/topics/order', async ({ request }) => {
+      const body = (await request.json()) as { topic_ids: number[] }
+      currentIds = body.topic_ids
+      return HttpResponse.json([])
+    }),
+  )
+  renderRoutes(routes, { url: '/teach', user: teacherUser })
+  const downButton = await screen.findByRole('button', {
+    name: i18n.t('teach.moveDown', { title: 'Birinchi mavzu' }),
+  })
+  downButton.focus()
+  await userEvent.keyboard('{Enter}')
+  await waitFor(() => {
+    const target = screen.getByRole('button', { name: i18n.t('teach.moveDown', { title: 'Birinchi mavzu' }) })
+    expect(document.activeElement).toBe(target)
+  })
+  // Harakatlangan mavzu endi o'rtada (2-o'rinda, 3 tadan) — ↓ tugmasi hamon bosilishi mumkin.
+  expect(document.activeElement).not.toBeDisabled()
 })
 
 test("biriktirilgan fan bo'lmasa tushuntirish ko'rsatiladi", async () => {

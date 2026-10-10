@@ -16,7 +16,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - Kritik muammolar:
   1. Frontend testlari beqaror edi (worker'lar yiqilib qolardi) — **shu yozuvda tuzatildi**.
   2. `REFRESH_ROTATED` holatida backend cookie'ni o'chiradi, frontend esa 401'ni "sessiya yo'qoldi" deb hisoblaydi. Natijada parallel tab yoki uzilgan sahifa yangilanishi baribir tizimdan chiqarib yuboradi (`backend/app/auth/router.py`, `frontend/src/api/client.ts`). Qayta ko'rib chiqildi va ma'lum cheklov sifatida hujjatlandi, tuzatish keyinga qoldirildi (pastga qarang).
-  3. Task 12 review tuzatishlari hali commit qilinmagan.
+  3. Task 12 review tuzatishlari hali commit qilinmagan edi — **tuzatildi** (pastga qarang).
 - Zaif joylar (navbatda turibdi):
   - `PlayerPage` bo'sh `steps` yoki topilmagan `kind` holatida yiqiladi.
   - O'qituvchi o'zgarishlaridan keyin talabaning `['steps']` keshi yangilanmaydi (`api/teach.ts`).
@@ -42,6 +42,22 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - Parallel tablar poygasini frontend Web Locks navbati (`client.ts`, `withAuthLock`) allaqachon yopib qo'ygan.
   - Muammo faqat Web Locks yo'q eski brauzerlarda (masalan, Safari 15.4 dan eski) qoladi va faqat shu brauzerdagi sessiyaga ta'sir qiladi.
 - **Qaror:** kod o'zgartirilmadi. Spec'ning 6-bo'limiga (Xavfsizlik → Tokenlar) cookie o'chirish sababi, "Ma'lum cheklov" va kelajakdagi yechim yozildi. Yechim: `REFRESH_ROTATED` da cookie o'chirilmaydi, frontend bir marta qayta urinadi, bo'lmasa `/api/auth/logout` orqali eski cookie'ni tozalaydi.
+
+### 3-kritik muammo: Task 12 review tuzatishlari commit qilindi
+- `frontend/src/api/teach.ts`:
+  - o'qituvchi mavzu yaratsa, tahrirlasa, tartiblasa yoki o'chirsa, glossariy yoki adabiyotni o'zgartirsa, talabaning `['subjects']` va `['topics']` keshlari ham yangilanadi;
+  - o'chirilgan mavzuning muharrir keshi tozalanadi;
+  - so'rov xato bilan tugasa, material holatini so'rab turish (polling) to'xtaydi;
+  - yangi mavzu yaratilgach muharrirga o'tish `invalidateQueries`ni kutmaydi.
+- `frontend/src/features/teach/TeachHomePage.tsx`:
+  - tartiblash xato bilan tugasa, fokus surilgan tugmaga qaytadi;
+  - so'rov paytida tugmalar `disabled` emas, `aria-disabled` bo'ladi, shunda fokus yo'qolmaydi;
+  - mavzu havolasida fokus halqasi bor, tartib raqami kontrasti oshirildi.
+- Testlar: `api/teach.test.ts` o'rniga kengaytirilgan `api/teach.test.tsx`, `TeachHomePage.test.tsx`ga xato, fokus va o'chirish ssenariylari qo'shildi.
+- **Tekshiruv:**
+  - to'liq suite 27/27 fayl va 145/145 test (ikki marta);
+  - Task 12 testlari 21/21;
+  - ESLint, `tsc` va `npm run build` xatosiz (`PdfViewer` chunk'i 632 kB ekani haqida ogohlantirish bor — u ataylab lazy yuklanadi).
 
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 

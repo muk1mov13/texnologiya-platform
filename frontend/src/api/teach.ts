@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { apiFetch } from './client'
+import { studentKeys } from './student'
 import type {
   GlossaryIn,
   GlossaryTerm,
@@ -16,6 +17,18 @@ import type {
 export const teachKeys = {
   subjects: ['teach', 'subjects'] as const,
   topic: (id: number) => ['teach', 'topics', id] as const,
+}
+
+// Talaba tomoni keshlari prefiks bo'yicha: `studentKeys.subjects` === ['subjects'] (shuning
+// o'zi fan tafsiloti `studentKeys.subject(slug)` === ['subjects', slug] uchun ham prefiks
+// bo'ladi). `studentKeys` mavzular uchun umumiy prefiks bermaydi — faqat `topic(id)` va
+// `step(id)` bor — shuning uchun bu yerda adabiy prefiks qo'lda yoziladi.
+const STUDENT_TOPICS_PREFIX = ['topics'] as const
+
+/** O'qituvchi tomonidagi o'zgarish talaba ko'radigan ro'yxat/mavzularga ham ta'sir qiladi. */
+function invalidateStudentCaches(queryClient: QueryClient): void {
+  void queryClient.invalidateQueries({ queryKey: studentKeys.subjects })
+  void queryClient.invalidateQueries({ queryKey: STUDENT_TOPICS_PREFIX })
 }
 
 const POLL_MS = 2000
@@ -37,7 +50,10 @@ export function useEditorTopic(topicId: number) {
     queryKey: teachKeys.topic(topicId),
     queryFn: ({ signal }) => apiFetch<TopicEditor>(`/api/teach/topics/${topicId}`, { signal }),
     enabled: Number.isInteger(topicId) && topicId > 0,
-    refetchInterval: (query) => (hasProcessing(query.state.data) ? POLL_MS : false),
+    // So'rov xato bilan tugasa, keyingi muvaffaqiyatli urinishgacha cheksiz pollinguchun sabab
+    // yo'q — faqat status 'error' bo'lmaganda va hali `processing` material bo'lsa so'raladi.
+    refetchInterval: (query) =>
+      query.state.status === 'error' ? false : hasProcessing(query.state.data) ? POLL_MS : false,
   })
 }
 
@@ -47,8 +63,11 @@ export function useCreateTopic(subjectId: number) {
     mutationFn: (data: TopicCreate) =>
       apiFetch<TopicEditor>(`/api/teach/subjects/${subjectId}/topics`, { method: 'POST', json: data }),
     onSuccess: (topic) => {
+      // Muharrir keshi darhol to'ldiriladi — `invalidateQueries`ni kutmasdan (fire-and-forget),
+      // aks holda chaqiruvchi tomondagi navigatsiya (masalan, yangi muharrirga o'tish) kechikadi.
       queryClient.setQueryData(teachKeys.topic(topic.id), topic)
-      return queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      void queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      invalidateStudentCaches(queryClient)
     },
   })
 }
@@ -61,7 +80,10 @@ export function useReorderTopics(subjectId: number) {
         method: 'PUT',
         json: { topic_ids: topicIds },
       }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: teachKeys.subjects }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      invalidateStudentCaches(queryClient)
+    },
   })
 }
 
@@ -72,7 +94,8 @@ export function useUpdateTopic(topicId: number) {
       apiFetch<TopicEditor>(`/api/teach/topics/${topicId}`, { method: 'PATCH', json: data }),
     onSuccess: (topic) => {
       queryClient.setQueryData(teachKeys.topic(topic.id), topic)
-      return queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      void queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      invalidateStudentCaches(queryClient)
     },
   })
 }
@@ -81,7 +104,13 @@ export function useDeleteTopic() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (topicId: number) => apiFetch<void>(`/api/teach/topics/${topicId}`, { method: 'DELETE' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teachKeys.subjects }),
+    onSuccess: (_data, topicId) => {
+      // O'chirilgan mavzu muharriri keshda qolib ketmasin — keyinroq shu ID bilan yangi
+      // mavzu yaratilsa, eski ma'lumot ko'rsatilib qolishi mumkin edi.
+      queryClient.removeQueries({ queryKey: teachKeys.topic(topicId) })
+      void queryClient.invalidateQueries({ queryKey: teachKeys.subjects })
+      invalidateStudentCaches(queryClient)
+    },
   })
 }
 
@@ -127,7 +156,12 @@ export function useRetryMaterial(topicId: number) {
 function useTopicItemMutations<TIn, TOut>(topicId: number, resource: 'glossary' | 'literature') {
   const queryClient = useQueryClient()
   const base = `/api/teach/topics/${topicId}/${resource}`
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) })
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) })
+    // Glossariy/adabiyot talaba ko'radigan mavzu kontentining qismi — talaba keshi ham
+    // yangilanishi kerak.
+    invalidateStudentCaches(queryClient)
+  }
   const add = useMutation({
     mutationFn: (data: TIn) => apiFetch<TOut>(base, { method: 'POST', json: data }),
     onSuccess: invalidate,
