@@ -6,6 +6,23 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 18 — CI, hujjatlar, API tiplari mosligi va yakuniy tekshiruv
+- `.github/workflows/ci.yml`: `backend` job'i o'zgarmadi, ikkita yangi job qo'shildi:
+  - `frontend`: lint, typecheck, Vitest, build;
+  - `e2e` (`backend` va `frontend` dan keyin): API tiplari drift tekshiruvi, so'ng Playwright; yiqilsa hisobot artefakt sifatida saqlanadi.
+- G-band (`openapi-typescript`) — tanlangan variant: generatsiya + moslik tekshiruvi, mavjud kod o'zgarmaydi:
+  - `frontend/scripts/gen-api-types.mjs` (`npm run gen:api`): sxema server ishga tushirilmasdan `create_app().openapi()` dan olinadi va `src/api/schema.gen.ts` ga yoziladi; `defaultNonNullable: false` — so'rovlarda sukut qiymatli maydon ixtiyoriy;
+  - `src/api/types.contract.ts`: qo'lda yozilgan `types.ts` dagi 34 ta tip generatsiya qilingan sxema bilan tip darajasida solishtiriladi (javoblar: backend qiymati frontend tipiga sig'adi; so'rovlar: aksincha; maydon nomlari to'liq bir xil). Tekshiruv sinab ko'rildi: `types.ts` vaqtincha buzilganda (`token_type` tipi, `teacher_ids` olib tashlandi) `tsc` ikkalasini ham ushladi;
+  - CI `gen:api` ni qayta ishga tushirib, `schema.gen.ts` commit qilingan nusxadan farq qilmasligini tekshiradi;
+  - `openapi-typescript` 7.13.0 peer sifatida TypeScript `^5` so'raydi; `package.json` dagi `overrides` bilan loyihadagi TS 6.0.3 berildi (`--force` va `--legacy-peer-deps` ishlatilmadi).
+- `frontend/README.md`: ishga tushirish, tekshiruvlar, E2E, tiplar mosligi, tuzilma.
+- `CLAUDE.md`: loyiha holati yangilandi; frontend buyruqlari, uchta CI job'i va yangi "Architecture (frontend)" bo'limi (auth, guard'lar, `QueryState`, xatolar, API tiplari, i18n, testlar).
+- **Yakuniy tekshiruv:**
+  - frontend: ESLint, `tsc`, 33/33 fayl va 178/178 test, build, E2E 1 passed;
+  - backend: 149 test, `ruff format --check`, `ruff check`, `mypy` — hammasi o'tdi;
+  - rejadagi "1B'da backend o'zgarmagan" sharti eskirgan: branch'da backend'ga 3 ta ataylab qilingan auth tuzatishi kirgan (`5713b46`, `4d7b3b5`, `4dbbaa6` — refresh grace window va cookie tozalash), ular CHANGELOG va `CLAUDE.md` da hujjatlangan;
+  - spec'dagi qo'lda tekshiruv (PPTX → PDF LibreOffice bilan, uz/ru interfeys, 375px'da gorizontal scroll yo'qligi, o'qituvchi biriktirish oqimi) hali qilinmagan.
+
 ### `348ae58` — Task 17: Playwright E2E: to'liq o'quv oqimi
 - `frontend/e2e/learning-flow.spec.ts` — bitta stsenariy:
   1. admin fan yaratadi, mavzu qo'shadi, PDF yuklaydi va nashr qiladi;

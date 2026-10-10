@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the current phase plan is `docs/superpowers/plans/2026-10-09-phase-1a-backend.md`. Only Phase 1A (backend) exists so far. The `frontend/` (React + Vite) and `deploy/` (Docker Compose, nginx, arq worker) directories described in the spec haven't been created yet.
+A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
 
 Code comments, docstrings, user-facing error messages and docs are written in **Uzbek (Latin script)**. Keep new ones in Uzbek to match.
 
@@ -31,7 +31,19 @@ uv run mypy app
 uv run alembic revision --autogenerate -m "description"   # new migration
 ```
 
-CI (`.github/workflows/ci.yml`) runs ruff format, ruff check, mypy, pytest on SQLite, then on PostgreSQL 16 runs `alembic upgrade head`, `alembic check` (migration drift) and pytest again. To test against Postgres locally, set `TEST_DATABASE_URL=postgresql+asyncpg://...`.
+Frontend commands run from `frontend/` (Node >=22.22.2):
+
+```bash
+npm install
+npm run dev                               # http://localhost:5173, proxies /api → localhost:8000
+npm test                                  # Vitest + RTL + MSW
+npx vitest run src/api/client.test.ts -t "refresh"   # single test
+npm run lint && npm run typecheck && npm run build
+npm run e2e                               # Playwright; starts its own backend on :8001 with a fresh SQLite DB
+npm run gen:api                           # regenerate src/api/schema.gen.ts from the backend OpenAPI (needs uv)
+```
+
+CI (`.github/workflows/ci.yml`) has three jobs. `backend` runs ruff format, ruff check, mypy, pytest on SQLite, then on PostgreSQL 16 runs `alembic upgrade head`, `alembic check` (migration drift) and pytest again. `frontend` runs lint, typecheck, Vitest and build. `e2e` (after both) checks that `npm run gen:api` leaves `schema.gen.ts` unchanged, then runs Playwright. To test against Postgres locally, set `TEST_DATABASE_URL=postgresql+asyncpg://...`.
 
 Local development needs no Docker, PostgreSQL or Redis. PPT/DOC → PDF conversion needs LibreOffice (`SOFFICE_PATH` in `.env`). Without it, those materials go to `failed` with `LIBREOFFICE_NOT_FOUND`, while PDF uploads still work.
 
@@ -61,6 +73,17 @@ Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (uniqu
 **Auth.** Access tokens are short-lived JWTs sent as Bearer tokens. Refresh tokens are rotated and stored hashed in `refresh_sessions`; they travel in an httpOnly cookie scoped to `/api/auth`. Reusing a revoked refresh token revokes all of the user's sessions (`REFRESH_REUSED`), except within `REFRESH_REUSE_GRACE_SECONDS` (default 30 s) of its revocation, where only that request gets 401 `REFRESH_ROTATED` (concurrent tabs, interrupted reload). New registrations start as `pending` until an admin approves them. Settings refuse to load in prod with the default `JWT_SECRET` or with `COOKIE_SECURE=false`.
 
 **Tests.** `tests/conftest.py` provides the `settings`, `app` (runs drop_all/create_all, then drains jobs on teardown), `client` (httpx ASGI) and `db` fixtures. `tests/factories.py` has `make_user`, `auth_headers`, `make_subject`, `make_topic`, `step_of`, `make_pdf_bytes`, `add_ready_pdf` and `build_course`. pytest-asyncio runs in `auto` mode, so test functions don't need decorators. Ruff uses line length 100 with rules E/F/I/B/UP/ASYNC. mypy uses the pydantic plugin with `check_untyped_defs`.
+
+## Architecture (frontend)
+
+- **Auth:** the access token lives only in memory (`src/api/client.ts`). The refresh token is the backend's httpOnly cookie. On load, `SessionGate` restores the session via `POST /api/auth/refresh`. On a 401 with `INVALID_TOKEN`/`NOT_AUTHENTICATED`, the client does one single-flight refresh (serialised across tabs with Web Locks) and retries the request once. The current user is the TanStack Query `['session']` entry (`User | null`).
+- **Routing:** route guards live in `src/app/guards.tsx`. `RequireAuth roles=[...]` sends pending users to `/pending` and users with the wrong role to `homePathFor(user)`. `RedirectIfAuthed` covers `/login` and `/register`.
+- **Data states:** pages render queries through `QueryState` (`src/components/ui/QueryState.tsx`): data first, then spinner, then `ErrorState` (retry only for 5xx/network errors).
+- **Errors:** every API error is an `ApiError` carrying the backend `code`. User-facing text comes from `errors.<CODE>` in i18n via `errorText()`. Mutations show a global error toast unless `meta: { silent: true }` is set; silent mutations render a `FormError` inline instead.
+- **API types:** `src/api/types.ts` is hand-written and used by the code. `src/api/types.contract.ts` checks it against the generated `schema.gen.ts` at type level, so after a backend schema change run `npm run gen:api` and fix whatever `typecheck` reports. Never edit `schema.gen.ts` by hand.
+- **i18n:** never hard-code UI text. Add every key to both `src/i18n/uz.json` and `ru.json`; `i18n.test.ts` enforces this.
+- **Lint rule:** files exporting components must not export anything else (react-refresh). Put zod schemas in `schemas.ts` and helpers in `.ts` files.
+- **Tests:** `src/test/render.tsx` (`renderRoute`/`renderRoutes` with a memory router, session user and Toaster) and `src/test/fixtures.ts`. Mock HTTP with `server.use(http.get(...))` from `msw/http`; an unhandled request fails the test. `PdfViewer` is mocked in unit tests; real PDF rendering is covered by E2E. Vitest runs with `maxWorkers: 2` (more workers exhaust RAM on the dev machine).
 
 ## Execution Constraints (Token & Subagent Control)
 
