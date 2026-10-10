@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Ish tartibi cheklovlari hujjatlashtirildi
+### `88e447f` — Ish tartibi cheklovlari hujjatlashtirildi
 - `CLAUDE.md`: yangi "Execution Constraints" bo'limi:
   - subagent ishlatilmaydi;
   - bir vaqtda faqat bitta task bajariladi, tugagach tasdiq kutiladi;
