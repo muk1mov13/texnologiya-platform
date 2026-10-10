@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { useCreateTopic, useDeleteTopic, useReorderTopics, useTeachSubjects } from '@/api/teach'
@@ -72,9 +72,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
 
   /** Haqiqatan bosilishi mumkin bo'lgan tugma: chegarada (birinchi ↑/oxirgi ↓) emas va navbatda turmagan. */
   function isUsable(el: HTMLElement | null): el is HTMLButtonElement {
-    if (!el) return false
-    const button = el as HTMLButtonElement
-    return !button.disabled && button.getAttribute('aria-disabled') !== 'true'
+    return el instanceof HTMLButtonElement && !el.disabled && el.getAttribute('aria-disabled') !== 'true'
   }
 
   function focusMoved(topicId: number, direction: 'up' | 'down') {
@@ -105,15 +103,18 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
     })
   }
 
-  useEffect(() => {
+  // Effect faqat `topics` o'zgarganda (yangi tartib kelganda) ishlaydi; fokus mantig'i
+  // `useEffectEvent` ichida, shuning uchun har render'da yangi `focusMoved` effektni qayta ishga tushirmaydi.
+  const restorePendingFocus = useEffectEvent(() => {
     const pending = pendingFocusRef.current
     if (!pending) return
     pendingFocusRef.current = null
     if (!topics.some((t) => t.id === pending.topicId)) return
     focusMoved(pending.topicId, pending.direction)
-    // `focusMoved` har render'da qayta yaratiladi, ammo faqat parametrlariga bog'liq —
-    // dep sifatida qo'shish ortiqcha effektni qayta ishga tushirmaydi (DOM id orqali ishlaydi).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  })
+
+  useEffect(() => {
+    restorePendingFocus()
   }, [topics])
 
   function onCreate(event: FormEvent) {

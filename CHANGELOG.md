@@ -104,6 +104,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 27/27 fayl va 148/148 test;
   - ESLint va `tsc` xatosiz.
 
+### D-band: `TeachHomePage` dan `as`-cast va `eslint-disable` olib tashlandi
+- `frontend/src/features/teach/TeachHomePage.tsx`:
+  - `isUsable`: `el as HTMLButtonElement` o'rniga `el instanceof HTMLButtonElement` tekshiruvi;
+  - fokusni qaytarish effekti: mantiq `useEffectEvent` ichiga ko'chirildi, effekt faqat `topics` o'zgarganda ishlaydi, `eslint-disable-next-line react-hooks/exhaustive-deps` kerak bo'lmay qoldi (eslint-plugin-react-hooks 7.1.1).
+- Xatti-harakat o'zgarmadi: mavjud fokus testlari o'zgarishsiz o'tdi.
+- **Tekshiruv:**
+  - to'liq suite 27/27 fayl va 148/148 test;
+  - ESLint va `tsc` xatosiz.
+- Shu bilan "Sayoz/zaif yechimlar" bo'limidagi A–D bandlar yopildi. E o'zgartirilmaydi, F (Task 13 da `QueryState`) va G (Task 18 da `openapi-typescript`) keyinga qoldirildi.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.
