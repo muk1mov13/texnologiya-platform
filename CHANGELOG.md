@@ -6,6 +6,24 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 13 — Mavzu muharriri: mavzu ma'lumotlari, 7 bosqich tablari, material yuklash
+- `frontend/src/features/teach/TopicEditorPage.tsx` (stub o'rniga to'liq sahifa):
+  - mavzu ma'lumotlari formasi, 7 bosqich tablari;
+  - tanlangan tab manzilda `?tab=` sifatida saqlanadi;
+  - `review`, `practice` va `task` tablarida "keyingi yangilanishda" bo'sh holati;
+  - rejadan farqi: yuklanish va xato holati umumiy `QueryState` orqali; noto'g'ri mavzu ID'sida (`/teach/topics/abc`) spinner to'xtamay aylanmaydi, "topilmadi" holati chiqadi.
+- `TopicDetailsForm.tsx`: nomi, qisqacha mazmuni va "nashr qilingan" belgisi (`PATCH`).
+- `MaterialsTab.tsx`:
+  - `lecture` va `presentation` tablarida fayl yuklash;
+  - material holati (qayta ishlanmoqda, tayyor · N bet, xato va uning sababi);
+  - qayta urinish va tasdiq bilan o'chirish.
+- `schemas.ts`: mavzu, glossariy va adabiyot formalarining zod sxemalari (glossariy va adabiyot Task 14 da ulanadi).
+- `TopicEditorPage.test.tsx`: 6 ta test.
+- **Tekshiruv:**
+  - to'liq suite 29/29 fayl va 161/161 test;
+  - ESLint va `tsc` xatosiz;
+  - backend bilan qo'lda tekshiruv (PDF/PPTX yuklash) hali qilinmagan.
+
 ### `88e447f` — Ish tartibi cheklovlari hujjatlashtirildi
 - `CLAUDE.md`: yangi "Execution Constraints" bo'limi:
   - subagent ishlatilmaydi;
