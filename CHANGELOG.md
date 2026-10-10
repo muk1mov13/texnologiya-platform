@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Task 16 — Admin: fanlar (yaratish, tahrirlash, nashr, o'qituvchi biriktirish, o'chirish)
+### `b8848d0` — Task 16: Admin: fanlar (yaratish, tahrirlash, nashr, o'qituvchi biriktirish, o'chirish)
 - `frontend/src/features/admin/AdminSubjectsPage.tsx` (stub o'rniga to'liq sahifa):
   - fanlar ro'yxati: slug, biriktirilgan o'qituvchilar, "nashr qilingan" yoki "qoralama" belgisi;
   - bitta tugma bilan nashr qilish yoki nashrdan olish, tasdiq bilan o'chirish.
