@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Request, Response
+from fastapi.responses import JSONResponse
 
 from app.auth import service
 from app.auth.deps import CurrentUser
@@ -15,7 +16,7 @@ from app.auth.schemas import (
 )
 from app.core.config import Settings
 from app.core.deps import AppSettings, DbSession, LoginLimiter
-from app.core.errors import AppError
+from app.core.errors import AppError, error_body
 
 router = APIRouter(tags=["auth"])
 
@@ -82,12 +83,28 @@ async def refresh(
     db: DbSession,
     settings: AppSettings,
     refresh_token: Annotated[str | None, Cookie()] = None,
-) -> TokenOut:
+) -> TokenOut | JSONResponse:
+    # Muvaffaqiyatsiz refresh cookie'ni o'chiradi: aks holda uzilgan sahifa
+    # yangilanishidan keyin brauzer rotatsiya qilingan eski tokenni qayta-qayta
+    # yuboradi va imtiyoz oynasi o'tgach barcha sessiyalar yopiladi. Cookie
+    # umuman kelmagan bo'lsa (NO_REFRESH_TOKEN) o'chiriladigan narsa yo'q —
+    # bu holatda o'chirish buyrug'i yangi login qo'ygan cookie bilan poyga
+    # holatiga kirib, uni bekor qilib qo'yishi mumkin.
     if not refresh_token:
-        raise AppError(401, "NO_REFRESH_TOKEN", "Sessiya topilmadi")
-    user, access, raw = await service.rotate_refresh(
-        db, refresh_token, settings, request.headers.get("user-agent")
-    )
+        failed = JSONResponse(
+            error_body("NO_REFRESH_TOKEN", "Sessiya topilmadi", {}), status_code=401
+        )
+        return failed
+    try:
+        user, access, raw = await service.rotate_refresh(
+            db, refresh_token, settings, request.headers.get("user-agent")
+        )
+    except AppError as exc:
+        failed = JSONResponse(
+            error_body(exc.code, exc.message, exc.details), status_code=exc.status_code
+        )
+        clear_refresh_cookie(failed, settings)
+        return failed
     set_refresh_cookie(response, raw, settings)
     return TokenOut(access_token=access, user=UserOut.model_validate(user))
 

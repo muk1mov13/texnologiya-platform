@@ -1,0 +1,182 @@
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router'
+import { pushToast } from '@/components/ui/toast-store'
+import { i18n, LANGUAGES, setLanguage } from '@/i18n'
+import { apiFetch, logoutRequest, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
+import type { LoginIn, MeUpdateIn, PasswordChangeIn, RegisterIn, TokenOut, User } from './types'
+
+export const sessionKey = ['session'] as const
+
+const removeNonSessionQueries = (queryClient: QueryClient): void =>
+  queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== sessionKey[0] })
+
+/**
+ * Sessiyani zo'rlab yopadi: token/generation tozalanadi, kutilayotgan so'rovlar bekor qilinadi
+ * (avval cancel, keyin null — aks holda QueryClient bekor qilingan so'rovni eski holatga
+ * "revert" qilib, foydalanuvchini qayta tiklab qo'yishi mumkin), so'ng boshqa barcha kesh o'chadi.
+ */
+function endSession(queryClient: QueryClient): void {
+  resetSession()
+  void queryClient.cancelQueries()
+  queryClient.setQueryData(sessionKey, null)
+  removeNonSessionQueries(queryClient)
+}
+
+/** Client refresh/sessiya yo'qolishi haqida xabar berganda keshni yangilaydi. */
+export function installAuthHandlers(queryClient: QueryClient): void {
+  setAuthHandlers({
+    onRefreshed: (session) => {
+      const cached = queryClient.getQueryData<User | null>(sessionKey)
+      if (cached && cached.id !== session.user.id) {
+        // Boshqa foydalanuvchi sessiyasi — avvalgisining keshi yangisiga aralashmasligi uchun tozalanadi.
+        removeNonSessionQueries(queryClient)
+      }
+      queryClient.setQueryData(sessionKey, session.user)
+      setLanguage(session.user.locale)
+    },
+    onLost: () => endSession(queryClient),
+  })
+}
+
+async function restoreSession(): Promise<User | null> {
+  const session = await refreshSession()
+  if (session) setLanguage(session.user.locale)
+  return session?.user ?? null
+}
+
+export function useSession() {
+  return useQuery({
+    queryKey: sessionKey,
+    queryFn: restoreSession,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: 1,
+  })
+}
+
+export function useCurrentUser(): User | null {
+  return useSession().data ?? null
+}
+
+function startSession(queryClient: QueryClient, session: TokenOut): void {
+  // Generation'ni ham yangilaymiz: eski (boshqa foydalanuvchiga tegishli bo'lishi mumkin bo'lgan)
+  // kechikkan refresh natijasi ushbu yangi sessiyaga aralashmasligi kerak.
+  resetSession()
+  setAccessToken(session.access_token)
+  queryClient.setQueryData(sessionKey, session.user)
+  setLanguage(session.user.locale)
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: LoginIn) =>
+      apiFetch<TokenOut>('/api/auth/login', { method: 'POST', json: data, auth: false }),
+    onSuccess: (session) => startSession(queryClient, session),
+    meta: { silent: true },
+  })
+}
+
+export function useRegister() {
+  return useMutation({
+    mutationFn: (data: RegisterIn) =>
+      apiFetch<User>('/api/auth/register', { method: 'POST', json: data, auth: false }),
+    meta: { silent: true },
+  })
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    // logoutRequest refresh bilan bitta navbatda turadi (client.ts), shuning uchun bu yerda
+    // qo'shimcha kutish kerak emas.
+    mutationFn: () => logoutRequest(),
+    onSuccess: () => endSession(queryClient),
+    // meta.silent yo'q: tarmoq xatosida sessiya saqlanadi va umumiy toast orqali qayta urinish mumkin bo'ladi.
+  })
+}
+
+/**
+ * "Chiqish" tugmalari uchun: logout muvaffaqiyatli bo'lsa `/login` ga o'tiladi.
+ * - Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
+ * - `flushSync`: sessiya tozalanishi (setQueryData) React'ning navigatsiya tranzitsiyasidan
+ *   OLDIN qo'llanilishi mumkin — aks holda `RequireAuth` hali eski manzilda qayta render
+ *   bo'lib, o'zining `state: {from}` li Navigate'i bilan shu toza navigatsiyani bosib qo'yardi.
+ */
+export function useLogoutAndRedirect() {
+  const logout = useLogout()
+  const navigate = useNavigate()
+  return {
+    logout: () =>
+      logout.mutate(undefined, {
+        onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+      }),
+    isPending: logout.isPending,
+  }
+}
+
+/**
+ * `silent`: xato forma ichida (`FormError`) ko'rsatiladigan chaqiruvlar uchun — aks holda
+ * umumiy toast bilan ikki marta ko'rsatilardi. `LanguageSwitch` uchun esa toast kerak,
+ * shuning uchun bu yerda standart `false` — faqat kerak joyda `silent: true` beriladi.
+ */
+export function useUpdateMe(options: { silent?: boolean } = {}) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: MeUpdateIn) => apiFetch<User>('/api/me', { method: 'PATCH', json: data }),
+    // Til darhol almashadi, server saqlamasa avvalgisiga qaytadi. Bu hook darajasida qilinadi:
+    // `mutate(..., { onError })` callback'i faqat kuzatuvchi hali o'sha mutatsiyaga bog'liq
+    // bo'lsa chaqiriladi va til almashganda bu kafolat yo'qolishi mumkin (useChangePassword'ga qarang).
+    onMutate: (variables) => {
+      if (variables.locale === undefined) return { previousLocale: undefined }
+      const previousLocale = LANGUAGES.find((lang) => lang === i18n.language)
+      setLanguage(variables.locale)
+      return { previousLocale }
+    },
+    onError: (_error, variables, context) => {
+      // Shu orada foydalanuvchi yana boshqa tilni tanlagan bo'lsa, uning tanlovi bosib qo'yilmaydi.
+      if (context?.previousLocale && variables.locale === i18n.language) {
+        setLanguage(context.previousLocale)
+      }
+    },
+    onSuccess: (user, variables) => {
+      queryClient.setQueryData(sessionKey, user)
+      // Faqat so'rovda `locale` yuborilgan bo'lsa almashtiramiz — aks holda ism saqlanishi
+      // (javob kelguncha) parallel ravishda almashtirilgan tilni orqaga qaytarib qo'yardi.
+      if (variables.locale !== undefined) setLanguage(user.locale)
+    },
+    meta: { silent: options.silent },
+  })
+}
+
+/**
+ * Backend parol almashganda barcha sessiyalarni bekor qiladi, shuning uchun lokal sessiya ham yopiladi.
+ * Toast va navigatsiya shu yerda — hook darajasida — amalga oshiriladi: `mutate()`ga
+ * komponent darajasida berilgan `onSuccess` faqat kuzatuvchi hali mavjud bo'lsa chaqiriladi
+ * (TanStack Query, `MutationObserver#notify`), sessiya yopilib `ProfilePage` unmount
+ * bo'lgandan keyin esa bu kafolat yo'qoladi. Shu sabab navigatsiya PasswordForm'ning
+ * `mutate(..., { onSuccess })`iga emas, shu yerga yozilgan — xuddi logout kabi, lekin
+ * poyga xavfisiz bo'lishi uchun komponent tashqarisida.
+ */
+export function useChangePassword() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  return useMutation({
+    mutationFn: (data: PasswordChangeIn) =>
+      apiFetch<void>('/api/me/password', { method: 'POST', json: data }),
+    onSuccess: async () => {
+      // Backend parolni almashtirgach refresh cookie'ni ham bekor qiladi, ammo brauzerdagi
+      // cookie'ni tozalash uchun logout so'rovi yuboriladi — xatosi e'tiborsiz qoladi.
+      await logoutRequest().catch(() => {})
+      endSession(queryClient)
+      pushToast('success', i18n.t('profile.passwordChanged'))
+      // Qaytish manzilisiz (AppLayout logoutidagi kabi) — aks holda keyingi kirgan
+      // foydalanuvchi oldingisining sahifasiga tushib qolardi. `flushSync`: sessiya
+      // tozalanishi `RequireAuth`ning navigatsiya tranzitsiyasidan OLDIN qo'llanilishi
+      // mumkin, aks holda u hali eski manzilda qayta render bo'lib, o'ziga xos
+      // `state: {from}` bilan Navigate qaytarib, shu toza navigatsiyani bosib qo'yardi.
+      void navigate('/login', { replace: true, flushSync: true })
+    },
+    meta: { silent: true },
+  })
+}

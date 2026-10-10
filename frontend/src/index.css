@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "@fontsource-variable/onest";
+
+@theme {
+  --font-sans: "Onest Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-900: #134e4a;
+
+  --shadow-press: 0 3px 0 var(--color-brand-900);
+  --shadow-press-slate: 0 3px 0 var(--color-slate-300);
+  --shadow-press-danger: 0 3px 0 var(--color-red-700);
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 font-sans text-slate-900 antialiased;
+  }
+}

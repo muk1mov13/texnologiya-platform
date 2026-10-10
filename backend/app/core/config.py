@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEV_JWT_SECRET = "dev-only-secret-change-me-in-production-0000"
@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     jwt_secret: str = DEV_JWT_SECRET
     access_token_minutes: int = 15
     refresh_token_days: int = 30
+    refresh_reuse_grace_seconds: int = Field(default=30, ge=0)
     cookie_secure: bool = False
     cors_origins: list[str] = ["http://localhost:5173"]
     media_root: str = "./media"

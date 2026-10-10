@@ -9,3 +9,8 @@ media/
 .ruff_cache/
 .mypy_cache/
 resource/
+dist/
+.vitest/
+frontend/playwright-report/
+frontend/test-results/
+frontend/e2e/.data/

@@ -1,7 +1,5 @@
 # 1A-bosqich: Backend asosi — implementatsiya rejasi
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Spec'dagi 1-bosqich backend qismini qurish: auth (ro'yxatdan o'tish, tasdiqlash, JWT + refresh), fan → mavzu → 7 bosqich, materiallar (PPT → PDF), glossariy, adabiyotlar, talaba progressi. Barchasi testlar bilan qoplanadi.
 
 **Architecture:** FastAPI modulli monolit (`app/core`, `app/auth`, `app/learning`). SQLAlchemy 2 async, lokal muhitda SQLite, CI'da PostgreSQL. Fon ishlari `JobRunner` interfeysi orqali yuboriladi, lokal muhitda ular `InlineJobRunner` bilan shu jarayonning o'zida bajariladi. Docker ishlatilmaydi.
