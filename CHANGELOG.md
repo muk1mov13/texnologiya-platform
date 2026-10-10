@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Task 14 — Mavzu muharriri: glossariy va adabiyotlar
+### `318512e` — Task 14: Mavzu muharriri: glossariy va adabiyotlar
 - `frontend/src/features/teach/GlossaryTab.tsx` va `LiteratureTab.tsx`:
   - yozuvlar ro'yxati;
   - har bir qator joyida formaga aylanib tahrirlanadi, o'chirish tasdiq oynasi bilan;
