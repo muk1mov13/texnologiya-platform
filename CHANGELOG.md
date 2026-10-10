@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 14 — Mavzu muharriri: glossariy va adabiyotlar
+- `frontend/src/features/teach/GlossaryTab.tsx` va `LiteratureTab.tsx`:
+  - yozuvlar ro'yxati;
+  - har bir qator joyida formaga aylanib tahrirlanadi, o'chirish tasdiq oynasi bilan;
+  - pastda yangi yozuv qo'shish formasi, muvaffaqiyatdan keyin forma tozalanadi;
+  - adabiyotda bo'sh yil va havola `null` bo'lib, yil esa son bo'lib yuboriladi; yil (1900–2100) va havola (`http(s)://`) tekshiriladi.
+- `TopicEditorPage.tsx`: `glossary` va `literature` tablari shu komponentlarga ulandi.
+- Testlar: `GlossaryTab.test.tsx` (4 ta), `LiteratureTab.test.tsx` (3 ta).
+- **Tekshiruv:**
+  - to'liq suite 31/31 fayl va 168/168 test;
+  - ESLint va `tsc` xatosiz.
+
 ### `5c639f7` — Task 13: Mavzu muharriri: mavzu ma'lumotlari, 7 bosqich tablari, material yuklash
 - `frontend/src/features/teach/TopicEditorPage.tsx` (stub o'rniga to'liq sahifa):
   - mavzu ma'lumotlari formasi, 7 bosqich tablari;

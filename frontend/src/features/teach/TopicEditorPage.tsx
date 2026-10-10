@@ -7,6 +7,8 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
+import { GlossaryTab } from './GlossaryTab'
+import { LiteratureTab } from './LiteratureTab'
 import { MaterialsTab } from './MaterialsTab'
 import { TopicDetailsForm } from './TopicDetailsForm'
 
@@ -57,6 +59,10 @@ export function TopicEditorPage() {
                 <TabPanel id={tab}>
                   {FILE_KINDS.has(tab) && step ? (
                     <MaterialsTab topicId={data.id} step={step} />
+                  ) : tab === 'glossary' ? (
+                    <GlossaryTab topicId={data.id} items={data.glossary} />
+                  ) : tab === 'literature' ? (
+                    <LiteratureTab topicId={data.id} items={data.literature} />
                   ) : (
                     <EmptyState icon="🛠️" title={t('teach.comingSoon')} text={t('teach.comingSoonText')} />
                   )}
