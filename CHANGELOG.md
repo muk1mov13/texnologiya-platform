@@ -114,6 +114,24 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - ESLint va `tsc` xatosiz.
 - Shu bilan "Sayoz/zaif yechimlar" bo'limidagi A–D bandlar yopildi. E o'zgartirilmaydi, F (Task 13 da `QueryState`) va G (Task 18 da `openapi-typescript`) keyinga qoldirildi.
 
+### Qayta ko'rib chiqish: E va F bandlar bo'yicha qaror o'zgardi
+- Foydalanuvchi auditning qolgan qismlarini qayta yubordi va quyidagilarni tanladi:
+  - **E:** takrorlangan logout faqat 2 joyda birlashtiriladi;
+  - **F:** `QueryState` hozir yoziladi va 5 ta sahifa unga ko'chiriladi.
+- Qolgan ishlar tartibi:
+  1. `useLogoutAndRedirect`;
+  2. `QueryState`;
+  3. chegara holat testlari (`REFRESH_ROTATED`, "Tugatdim" ni ikki marta bosish).
+
+### 1-qadam: `useLogoutAndRedirect` — takrorlangan logout birlashtirildi
+- `frontend/src/api/auth.ts`: yangi `useLogoutAndRedirect()` hook'i (`useLogout` + `useNavigate`). U `{ logout, isPending }` qaytaradi va muvaffaqiyatda `/login` ga qaytish manzilisiz, `flushSync` bilan o'tadi. Bu tartibning sababi endi bitta joyda yozilgan.
+- `AppLayout.tsx` va `PendingPage.tsx` shu hook'ga o'tdi, ikki joydagi takror kod va izoh olib tashlandi.
+- `useChangePassword` o'zgarmadi: unda navigatsiya ataylab hook darajasida (sahifa unmount bo'lgandan keyin ham ishlashi kerak).
+- **Tekshiruv:**
+  - mavjud logout testlari o'zgarishsiz o'tdi;
+  - to'liq suite 27/27 fayl va 148/148 test;
+  - ESLint va `tsc` xatosiz.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.

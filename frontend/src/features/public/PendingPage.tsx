@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useNavigate } from 'react-router'
-import { useCurrentUser, useLogout, useSession } from '@/api/auth'
+import { useCurrentUser, useLogoutAndRedirect, useSession } from '@/api/auth'
 import type { User } from '@/api/types'
 import { homePathFor } from '@/app/paths'
 import { Button } from '@/components/ui/Button'
@@ -12,7 +12,7 @@ import { cx } from '@/lib/cx'
 export function PendingPage() {
   const { t } = useTranslation()
   const user = useCurrentUser()
-  const logout = useLogout()
+  const logout = useLogoutAndRedirect()
   const session = useSession()
   const navigate = useNavigate()
 
@@ -64,16 +64,7 @@ export function PendingPage() {
           >
             {t('pending.check')}
           </Button>
-          {/* AppLayout'dagi chiqish bilan bir xil: qaytish manzilisiz, flushSync bilan /login'ga o'tiladi. */}
-          <Button
-            variant="secondary"
-            loading={logout.isPending}
-            onClick={() =>
-              logout.mutate(undefined, {
-                onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
-              })
-            }
-          >
+          <Button variant="secondary" loading={logout.isPending} onClick={logout.logout}>
             {t('nav.logout')}
           </Button>
         </div>

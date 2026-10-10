@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router'
-import { useCurrentUser, useLogout } from '@/api/auth'
+import { Link, NavLink, Outlet } from 'react-router'
+import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Button } from '@/components/ui/Button'
 import { cx } from '@/lib/cx'
 import { homePathFor, navLinksFor } from '../paths'
@@ -15,8 +15,7 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
 export function AppLayout() {
   const { t } = useTranslation()
   const user = useCurrentUser()
-  const logout = useLogout()
-  const navigate = useNavigate()
+  const logout = useLogoutAndRedirect()
   if (!user) return null
 
   return (
@@ -47,16 +46,7 @@ export function AppLayout() {
               variant="ghost"
               size="sm"
               loading={logout.isPending}
-              // Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
-              // `flushSync`: sessiya tozalanishi (setQueryData) React'ning navigatsiya
-              // tranzitsiyasidan OLDIN qo'llanilishi mumkin — aks holda `RequireAuth` hali
-              // eski `/app` manzilida qayta render bo'lib, `state: {from: '/app'}` bilan
-              // o'ziga xos Navigate qaytarib, shu toza navigatsiyani bosib qo'yishi mumkin edi.
-              onClick={() =>
-                logout.mutate(undefined, {
-                  onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
-                })
-              }
+              onClick={logout.logout}
             >
               {t('nav.logout')}
             </Button>

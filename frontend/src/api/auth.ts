@@ -97,6 +97,25 @@ export function useLogout() {
 }
 
 /**
+ * "Chiqish" tugmalari uchun: logout muvaffaqiyatli bo'lsa `/login` ga o'tiladi.
+ * - Qaytish manzilisiz: keyingi kirgan foydalanuvchi oldingisining sahifasiga tushmasin.
+ * - `flushSync`: sessiya tozalanishi (setQueryData) React'ning navigatsiya tranzitsiyasidan
+ *   OLDIN qo'llanilishi mumkin — aks holda `RequireAuth` hali eski manzilda qayta render
+ *   bo'lib, o'zining `state: {from}` li Navigate'i bilan shu toza navigatsiyani bosib qo'yardi.
+ */
+export function useLogoutAndRedirect() {
+  const logout = useLogout()
+  const navigate = useNavigate()
+  return {
+    logout: () =>
+      logout.mutate(undefined, {
+        onSuccess: () => void navigate('/login', { replace: true, flushSync: true }),
+      }),
+    isPending: logout.isPending,
+  }
+}
+
+/**
  * `silent`: xato forma ichida (`FormError`) ko'rsatiladigan chaqiruvlar uchun — aks holda
  * umumiy toast bilan ikki marta ko'rsatilardi. `LanguageSwitch` uchun esa toast kerak,
  * shuning uchun bu yerda standart `false` — faqat kerak joyda `silent: true` beriladi.
