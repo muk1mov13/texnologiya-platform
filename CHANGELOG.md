@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Task 18 — CI, hujjatlar, API tiplari mosligi va yakuniy tekshiruv
+### `6d4a974` — Task 18: CI, hujjatlar, API tiplari mosligi va yakuniy tekshiruv
 - `.github/workflows/ci.yml`: `backend` job'i o'zgarmadi, ikkita yangi job qo'shildi:
   - `frontend`: lint, typecheck, Vitest, build;
   - `e2e` (`backend` va `frontend` dan keyin): API tiplari drift tekshiruvi, so'ng Playwright; yiqilsa hisobot artefakt sifatida saqlanadi.
