@@ -6,6 +6,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Task 17 — Playwright E2E: to'liq o'quv oqimi
+- `frontend/e2e/learning-flow.spec.ts` — bitta stsenariy:
+  1. admin fan yaratadi, mavzu qo'shadi, PDF yuklaydi va nashr qiladi;
+  2. talaba ro'yxatdan o'tadi va `/pending` ga tushadi;
+  3. admin talabani tasdiqlaydi;
+  4. talaba kirib mavzuni ochadi, PDF ko'rsatiladi, "Tugatdim" bosiladi;
+  5. `/app` da progress 1/1 bo'ladi.
+- `frontend/e2e/start-backend.mjs`: E2E uchun toza backend. 8001 portda; `e2e/.data/` dagi yangi SQLite, migratsiyalar, admin va `pymupdf` bilan namuna PDF yaratiladi, so'ng uvicorn ishga tushadi.
+- `frontend/playwright.config.ts`: backend va `vite preview` (4174 port, `/api` → 8001) webServer sifatida; bitta worker, Chromium.
+- `frontend/e2e/i18n.ts`: testlar matnlarni `uz.json` dan oladi.
+- Shu test Task 13 va Task 16 da qolgan qo'lda tekshiruvning asosiy qismini (PDF yuklash → "Tayyor", fan yaratish va nashr) haqiqiy backend bilan qamradi. PPTX konvertatsiyasi va o'qituvchi biriktirish E2E'da tekshirilmaydi.
+- **Tekshiruv:**
+  - `npx playwright install chromium`, so'ng `npm run e2e`: 1 passed (~26 s);
+  - ESLint va `tsc` xatosiz (E2E fayllari `tsconfig.node.json` ga kiradi).
+
 ### `b8848d0` — Task 16: Admin: fanlar (yaratish, tahrirlash, nashr, o'qituvchi biriktirish, o'chirish)
 - `frontend/src/features/admin/AdminSubjectsPage.tsx` (stub o'rniga to'liq sahifa):
   - fanlar ro'yxati: slug, biriktirilgan o'qituvchilar, "nashr qilingan" yoki "qoralama" belgisi;
