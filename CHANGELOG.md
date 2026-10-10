@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Task 17 — Playwright E2E: to'liq o'quv oqimi
+### `348ae58` — Task 17: Playwright E2E: to'liq o'quv oqimi
 - `frontend/e2e/learning-flow.spec.ts` — bitta stsenariy:
   1. admin fan yaratadi, mavzu qo'shadi, PDF yuklaydi va nashr qiladi;
   2. talaba ro'yxatdan o'tadi va `/pending` ga tushadi;
