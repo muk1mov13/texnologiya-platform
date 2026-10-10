@@ -150,6 +150,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 28/28 fayl va 153/153 test;
   - ESLint, `tsc` va `npm run build` xatosiz.
 
+### 3-qadam: chegara holatlar testlari (faqat testlar, kod o'zgarmadi)
+- `frontend/src/api/client.test.ts`: refresh 401 `REFRESH_ROTATED` qaytarsa, sessiya yopiladi (`onLost`, token `null`) va refresh qayta urinilmaydi. Bu spec'dagi "ma'lum cheklov"ni test bilan qayd etadi: xatti-harakat o'zgarsa, test buni ko'rsatadi.
+- `frontend/src/features/student/PlayerPage.test.tsx`: "Tugatdim" so'rovi kutilayotganda tugma o'chiq va qayta bosish ikkinchi `POST /api/steps/{id}/complete` yubormaydi.
+  - Cheklov: test ikkinchi bosishdan oldin tugma o'chishini kutadi, ya'ni odatdagi qayta bosishni tekshiradi. React qayta render qilishga ulgurmasdan bir lahzada sodir bo'ladigan ikki marta bosish alohida tekshirilmagan.
+- Ikkala test ham birinchi urinishda o'tdi — yangi xato topilmadi.
+- **Ochiq savol — `/api/me/progress`:** backend endpoint'i tayyor va spec'da (1-bosqich API ro'yxati) bor. Lekin 1B rejasida uni ishlatadigan sahifa yo'q (`SubjectProgress` tipi ham ishlatilmaydi). Profil yoki bosh sahifada progress xulosasi kerakmi, yoki endpoint 2-bosqichga qoldiriladimi — qaror kerak.
+- **Tekshiruv:**
+  - to'liq suite 28/28 fayl va 155/155 test;
+  - ESLint va `tsc` xatosiz.
+- Shu bilan audit hisobotidagi zaif joylar va test bo'shliqlari bo'yicha rejadagi barcha qadamlar yopildi.
+  - Qolganlari reja bo'yicha keyingi task'larda: stub sahifalar va ishlatilmagan tiplar — Task 13–16; frontend CI va `openapi-typescript` — Task 18.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.

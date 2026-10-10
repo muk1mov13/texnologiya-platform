@@ -72,6 +72,32 @@ test('glossariy bosqichini "Tugatdim" bilan yakunlash', async () => {
   )
 })
 
+test('"Tugatdim" so\'rov kutilayotganda qayta bosilsa ikkinchi so\'rov yuborilmaydi', async () => {
+  let completed = false
+  let posts = 0
+  let release: () => void = () => {}
+  const held = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  mockTopic(() => completed)
+  server.use(
+    http.post('/api/steps/105/complete', async () => {
+      posts += 1
+      await held
+      completed = true
+      return HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' })
+    }),
+  )
+  renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
+  const button = await screen.findByRole('button', { name: i18n.t('player.complete') })
+  await userEvent.click(button)
+  await waitFor(() => expect(button).toBeDisabled())
+  await userEvent.click(button)
+  release()
+  expect(await screen.findByText(i18n.t('player.completedToast'))).toBeInTheDocument()
+  expect(posts).toBe(1)
+})
+
 test('kontentsiz bosqich "material yo\'q" holatini ko\'rsatadi', async () => {
   mockTopic(() => false)
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/review', user: studentUser })

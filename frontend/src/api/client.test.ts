@@ -116,6 +116,25 @@ test('refresh muvaffaqiyatsiz bo\'lsa onLost chaqiriladi va asl xato tashlanadi'
   expect(getAccessToken()).toBeNull()
 })
 
+// Spec 6-bo'lim, "Ma'lum cheklov": REFRESH_ROTATED boshqa 401'lar kabi sessiya yo'qolgani
+// sifatida qabul qilinadi (qayta urinish yo'q). Bu xatti-harakat o'zgarsa, test buni ko'rsatadi.
+test("refresh REFRESH_ROTATED qaytarsa sessiya yopiladi va refresh qayta urinilmaydi", async () => {
+  setAccessToken('old')
+  const onLost = vi.fn()
+  const refresh = vi.fn(() =>
+    HttpResponse.json(
+      { code: 'REFRESH_ROTATED', message: 'Sessiya yangilangan, qayta kiring', details: {} },
+      { status: 401 },
+    ),
+  )
+  setAuthHandlers({ onRefreshed: vi.fn(), onLost })
+  server.use(http.post('/api/auth/refresh', refresh), http.get('/api/subjects', invalidToken))
+  await expect(apiFetch('/api/subjects')).rejects.toMatchObject({ code: 'INVALID_TOKEN' })
+  expect(refresh).toHaveBeenCalledOnce()
+  expect(onLost).toHaveBeenCalledOnce()
+  expect(getAccessToken()).toBeNull()
+})
+
 test('auth: false so\'rovlarda refresh qilinmaydi', async () => {
   const refresh = vi.fn(() => HttpResponse.json(session))
   server.use(
