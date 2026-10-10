@@ -132,7 +132,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 27/27 fayl va 148/148 test;
   - ESLint va `tsc` xatosiz.
 
-### 2-qadam: `QueryState` — "ma'lumot → spinner → xato" takrori birlashtirildi
+### `63be210` — 2-qadam: `QueryState` — "ma'lumot → spinner → xato" takrori birlashtirildi
 - Yangi `frontend/src/components/ui/QueryState.tsx`:
   - ma'lumot bor bo'lsa (fon qayta so'rovi xato bersa ham) uni chizadi;
   - yuklanayotganda `PageSpinner`;
