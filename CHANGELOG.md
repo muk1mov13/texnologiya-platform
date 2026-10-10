@@ -6,6 +6,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### 1B GitHub'ga joylandi — PR #2
+- `feat/phase-1b-frontend` branch'i push qilindi va `main` ga PR ochildi: https://github.com/muk1mov13/texnologiya-platform/pull/2 ("Phase 1B: frontend").
+- Merge CI'dagi `backend`, `frontend` va `e2e` job'lari yashil bo'lgach, foydalanuvchi tasdig'i bilan qilinadi; so'ng merge commit shu yerga yoziladi.
+
 ### `6d4a974` — Task 18: CI, hujjatlar, API tiplari mosligi va yakuniy tekshiruv
 - `.github/workflows/ci.yml`: `backend` job'i o'zgarmadi, ikkita yangi job qo'shildi:
   - `frontend`: lint, typecheck, Vitest, build;
