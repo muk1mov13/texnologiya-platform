@@ -70,7 +70,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - **G.** Javoblar runtime'da tekshirilmaydi (`as T`) — Task 18 da `openapi-typescript` bilan tiplar generatsiyasi va CI'da drift tekshiruvi.
 - Tartib: A → B → C → D, har biri alohida commit.
 
-### A-band: `PlayerPage` chegaraviy holatlarda yiqilmaydi
+### `e6bcdf2` — A-band: `PlayerPage` chegaraviy holatlarda yiqilmaydi
 - `frontend/src/features/student/PlayerPage.tsx`:
   - mavzuda bosqich umuman bo'lmasa, xato sahifasi o'rniga "material yo'q" bo'sh holati ko'rsatiladi;
   - manzildagi bosqich turi to'g'ri, lekin shu mavzuda bo'lmasa, birinchi kontentli bosqichga yo'naltiriladi (ilgari `current.id` da xato berardi).
