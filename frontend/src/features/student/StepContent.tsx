@@ -1,14 +1,13 @@
 import { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { canRetry } from '@/api/errors'
 import { useCompleteStep, useStep } from '@/api/student'
 import type { GlossaryTerm, LiteratureItem, MaterialView, StepBrief, StepKind } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ErrorState } from '@/components/ui/ErrorState'
+import { QueryState } from '@/components/ui/QueryState'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
@@ -34,47 +33,43 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
   const content = useStep(step.has_content ? step.id : undefined)
   const complete = useCompleteStep(topicId)
 
-  if (step.has_content) {
-    if (content.isPending) return <PageSpinner />
-    // Ma'lumot mavjud bo'lsa (hatto fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan
-    // render qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
-    if (!content.data) {
-      return (
-        <ErrorState error={content.error} onRetry={canRetry(content.error) ? () => void content.refetch() : undefined} />
-      )
-    }
-  }
-
-  const data = content.data
-  // Bosqich kontenti ENDI yuklangan ma'lumot (`data.has_content`) asosida aniqlanadi — mavzu
-  // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina tayyor
-  // bo'ldi, yoki aksincha o'chirilgan — bu holda `data` yuklangan, ammo `has_content` yolg'on).
-  if (!data || !data.has_content) {
-    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
-  }
+  const empty = <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+  // Kontentsiz bosqichda so'rov o'chiq (abadiy `isPending`) — QueryState'ga yuborilmaydi.
+  if (!step.has_content) return empty
 
   return (
-    <div className="flex flex-col gap-6">
-      {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
-      {data.kind === 'glossary' && <GlossaryList items={data.glossary} />}
-      {data.kind === 'literature' && <LiteratureList items={data.literature} />}
-      {SELF_COMPLETE_KINDS.has(data.kind) && (
-        <div className="flex flex-wrap items-center gap-3 border-t-2 border-slate-100 pt-4">
-          {data.status === 'completed' ? (
-            <Badge tone="green">✓ {t('player.completed')}</Badge>
-          ) : (
-            <Button loading={complete.isPending} onClick={() => complete.mutate(step.id)}>
-              {t('player.complete')}
-            </Button>
-          )}
-          {nextKind && (
-            <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
-              {t('player.next')} →
-            </Link>
-          )}
-        </div>
-      )}
-    </div>
+    <QueryState query={content}>
+      {(data) =>
+        // Bosqich kontenti ENDI yuklangan ma'lumot (`data.has_content`) asosida aniqlanadi — mavzu
+        // ro'yxatidagi `step.has_content` eskirgan bo'lishi mumkin (masalan, material endigina
+        // o'chirilgan — bu holda `data` yuklangan, ammo `has_content` yolg'on).
+        !data.has_content ? (
+          empty
+        ) : (
+          <div className="flex flex-col gap-6">
+            {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
+            {data.kind === 'glossary' && <GlossaryList items={data.glossary} />}
+            {data.kind === 'literature' && <LiteratureList items={data.literature} />}
+            {SELF_COMPLETE_KINDS.has(data.kind) && (
+              <div className="flex flex-wrap items-center gap-3 border-t-2 border-slate-100 pt-4">
+                {data.status === 'completed' ? (
+                  <Badge tone="green">✓ {t('player.completed')}</Badge>
+                ) : (
+                  <Button loading={complete.isPending} onClick={() => complete.mutate(step.id)}>
+                    {t('player.complete')}
+                  </Button>
+                )}
+                {nextKind && (
+                  <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
+                    {t('player.next')} →
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      }
+    </QueryState>
   )
 }
 

@@ -1,14 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useParams } from 'react-router'
-import { canRetry } from '@/api/errors'
 import { useTopic } from '@/api/student'
-import type { StepBrief } from '@/api/types'
+import type { StepBrief, TopicDetail } from '@/api/types'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
-import { PageSpinner } from '@/components/ui/Spinner'
+import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { isStepKind, STEP_ICONS } from '@/lib/steps'
 import { StepContentView } from './StepContent'
@@ -51,20 +49,30 @@ export function PlayerPage() {
     void import('./PdfViewer').catch(() => {})
   }, [])
 
+  // Noto'g'ri ID'da so'rov o'chiq (abadiy `isPending`), shuning uchun QueryState'dan oldin ajratiladi.
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
-  if (topic.isPending) return <PageSpinner />
-  // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
-  // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
-  if (!topic.data) {
-    return <ErrorState error={topic.error} onRetry={canRetry(topic.error) ? () => void topic.refetch() : undefined} />
-  }
+  return (
+    <QueryState query={topic}>
+      {(data) => <PlayerBody topicId={topicId} kind={params.kind} topic={data} headingRef={headingRef} />}
+    </QueryState>
+  )
+}
 
-  const { steps } = topic.data
+interface PlayerBodyProps {
+  topicId: number
+  kind: string | undefined
+  topic: TopicDetail
+  headingRef: RefObject<HTMLHeadingElement | null>
+}
+
+function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
+  const { t } = useTranslation()
+  const { steps } = topic
   // Backend har mavzuga 7 bosqich kafolatlaydi, ammo kafolat buzilsa sahifa yiqilmasin.
   if (steps.length === 0) {
     return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
   }
-  const index = isStepKind(params.kind) ? steps.findIndex((step) => step.kind === params.kind) : -1
+  const index = isStepKind(kind) ? steps.findIndex((step) => step.kind === kind) : -1
   if (index === -1) {
     // Bosqich turi ko'rsatilmagan, noma'lum yoki shu mavzuda yo'q — birinchi kontentli bosqichga.
     const first = steps.find((step) => step.has_content) ?? steps[0]
@@ -76,17 +84,17 @@ export function PlayerPage() {
   return (
     <div className="flex flex-col gap-4">
       <Link
-        to={`/app/subjects/${topic.data.subject.slug}`}
+        to={`/app/subjects/${topic.subject.slug}`}
         className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}
       >
-        ← {topic.data.subject.title}
+        ← {topic.subject.title}
       </Link>
       <div className="grid gap-6 md:grid-cols-[260px_1fr]">
         <aside className="md:sticky md:top-20 md:self-start">
           <Card className="flex flex-col gap-4 p-4">
             <div className="flex items-center gap-3">
-              <ProgressRing completed={topic.data.progress.completed} total={topic.data.progress.total} size={48} />
-              <h1 className="font-bold leading-tight">{topic.data.title}</h1>
+              <ProgressRing completed={topic.progress.completed} total={topic.progress.total} size={48} />
+              <h1 className="font-bold leading-tight">{topic.title}</h1>
             </div>
             <ol aria-label={t('player.steps')} className="flex gap-2 overflow-x-auto pb-1 md:flex-col md:overflow-visible">
               {steps.map((step) => (

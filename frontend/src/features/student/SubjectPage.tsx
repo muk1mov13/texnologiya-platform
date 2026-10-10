@@ -1,13 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
-import { canRetry } from '@/api/errors'
 import { useSubject } from '@/api/student'
 import type { SubjectDetail } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressRing } from '@/components/ui/ProgressRing'
-import { PageSpinner } from '@/components/ui/Spinner'
+import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
 
 // Katta ekranda (md: va undan yuqori) mavzular chap-o'ng siljib, yo'l (path) shaklini hosil qiladi.
@@ -25,18 +23,7 @@ export function SubjectPage() {
       <Link to="/app" className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}>
         ← {t('student.allSubjects')}
       </Link>
-      {subject.isPending ? (
-        <PageSpinner />
-      ) : !subject.data ? (
-        // Ma'lumot mavjud bo'lsa (fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham) undan render
-        // qilinadi — xato holati faqat ma'lumot umuman yo'q bo'lsa ko'rsatiladi.
-        <ErrorState
-          error={subject.error}
-          onRetry={canRetry(subject.error) ? () => void subject.refetch() : undefined}
-        />
-      ) : (
-        <SubjectBody subject={subject.data} />
-      )}
+      <QueryState query={subject}>{(data) => <SubjectBody subject={data} />}</QueryState>
     </div>
   )
 }

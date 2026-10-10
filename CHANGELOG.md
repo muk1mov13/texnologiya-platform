@@ -132,6 +132,24 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 27/27 fayl va 148/148 test;
   - ESLint va `tsc` xatosiz.
 
+### 2-qadam: `QueryState` — "ma'lumot → spinner → xato" takrori birlashtirildi
+- Yangi `frontend/src/components/ui/QueryState.tsx`:
+  - ma'lumot bor bo'lsa (fon qayta so'rovi xato bersa ham) uni chizadi;
+  - yuklanayotganda `PageSpinner`;
+  - aks holda `ErrorState`, qayta urinish tugmasi faqat `canRetry` rost bo'lsa (5xx yoki tarmoq xatosi).
+  - O'chiq (`enabled: false`) so'rov abadiy `isPending` bo'lgani uchun bunday holat chaqiruvchida oldindan ajratiladi.
+- Ko'chirilgan joylar:
+  - `SubjectsPage` (`SubjectList`), `SubjectPage`, `TeachHomePage`;
+  - `PlayerPage`: tana yangi `PlayerBody` komponentiga chiqdi, hook'lar tartibi o'zgarmadi;
+  - `StepContent`: kontentsiz bosqich `QueryState` dan oldin ajratiladi.
+  - Har biridagi takrorlangan izoh va importlar olib tashlandi.
+- `PdfViewer` ko'chirilmadi: spinner va xato konteyner ichida, shakli boshqa.
+- `QueryState.test.tsx`: 5 ta test — spinner, ma'lumot, 4xx (tugmasiz), 5xx (tugma so'rovni qayta yuboradi), ma'lumot bor paytda fon so'rovi xatosi.
+- **Tekshiruv:**
+  - sahifalarning mavjud testlari o'zgarishsiz o'tdi;
+  - to'liq suite 28/28 fayl va 153/153 test;
+  - ESLint, `tsc` va `npm run build` xatosiz.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.

@@ -7,42 +7,28 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
-import { PageSpinner } from '@/components/ui/Spinner'
-import { canRetry } from '@/api/errors'
+import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
 
 export function TeachHomePage() {
   const { t } = useTranslation()
   const subjects = useTeachSubjects()
 
-  // (a) Xato bo'lsa ham, oldin yuklangan ma'lumot bo'lsa o'shani ko'rsatamiz — fon
-  // yangilanishi muvaffaqiyatsiz bo'lsa, allaqachon ko'rsatilgan ro'yxat yo'qolmaydi.
-  if (subjects.data === undefined) {
-    if (subjects.isPending) return <PageSpinner />
-    if (subjects.isError) {
-      return (
-        <ErrorState
-          error={subjects.error}
-          onRetry={canRetry(subjects.error) ? () => void subjects.refetch() : undefined}
-        />
-      )
-    }
-  }
-
-  const data = subjects.data ?? []
-
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
-      {data.length === 0 ? (
-        <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
-      ) : (
-        data.map((subject) => <SubjectTopics key={subject.id} subject={subject} />)
+    <QueryState query={subjects}>
+      {(data) => (
+        <div className="flex flex-col gap-6">
+          <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
+          {data.length === 0 ? (
+            <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
+          ) : (
+            data.map((subject) => <SubjectTopics key={subject.id} subject={subject} />)
+          )}
+        </div>
       )}
-    </div>
+    </QueryState>
   )
 }
 
