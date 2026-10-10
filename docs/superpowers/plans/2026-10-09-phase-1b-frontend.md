@@ -6452,6 +6452,8 @@ test('biriktirilgan fan bo\'lmasa tushuntirish ko\'rsatiladi', async () => {
 })
 ```
 
+**Code-review tuzatishi (ro'yobga chiqarishda qo'shilgan testlar, lesson f):** yuqoridagi test to'plami rejadagi 5 testdan iborat edi; ro'yobga chiqarishda shu fayl 11 testga kengaytirildi — birinchi elementning ↑ va oxirgisining ↓ tugmasi o'chirilganini tekshirish, tartiblash `INVALID_ORDER`/5xx bilan muvaffaqiyatsiz bo'lsa ro'yxat avvalgi tartibga tiklanishini tekshirish (serverga qayta `GET` so'rovi eski tartibni qaytaradi, shuning uchun invalidatsiyadan keyin ro'yxat o'zgarmaydi), mavzu yaratishda server validatsiya xatosi global toast orqali ko'rsatilishi (xato kodi `errors.ts` orqali tarjima qilingan umumiy matnga o'giriladi, server xabariga emas) va mavzuni o'chirishda server xatosi kelsa dialog ochiq qolishi. Haqiqiy fayl: `frontend/src/features/teach/TeachHomePage.test.tsx`.
+
 - [ ] **Step 3: Testlar yiqilishini tekshirish**
 
 Run: `npm test -- src/api/teach src/features/teach`
@@ -6460,7 +6462,7 @@ Expected: FAIL.
 - [ ] **Step 4: `frontend/src/features/teach/TeachHomePage.tsx`**
 
 ```tsx
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { useCreateTopic, useDeleteTopic, useReorderTopics, useTeachSubjects } from '@/api/teach'
@@ -6473,21 +6475,35 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { PageSpinner } from '@/components/ui/Spinner'
+import { canRetry } from '@/api/errors'
 
 export function TeachHomePage() {
   const { t } = useTranslation()
   const subjects = useTeachSubjects()
 
-  if (subjects.isPending) return <PageSpinner />
-  if (subjects.isError) return <ErrorState error={subjects.error} onRetry={() => void subjects.refetch()} />
+  // (a) Xato bo'lsa ham, oldin yuklangan ma'lumot bo'lsa o'shani ko'rsatamiz — fon
+  // yangilanishi muvaffaqiyatsiz bo'lsa, allaqachon ko'rsatilgan ro'yxat yo'qolmaydi.
+  if (subjects.data === undefined) {
+    if (subjects.isPending) return <PageSpinner />
+    if (subjects.isError) {
+      return (
+        <ErrorState
+          error={subjects.error}
+          onRetry={canRetry(subjects.error) ? () => void subjects.refetch() : undefined}
+        />
+      )
+    }
+  }
+
+  const data = subjects.data ?? []
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
-      {subjects.data.length === 0 ? (
+      {data.length === 0 ? (
         <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
       ) : (
-        subjects.data.map((subject) => <SubjectTopics key={subject.id} subject={subject} />)
+        data.map((subject) => <SubjectTopics key={subject.id} subject={subject} />)
       )}
     </div>
   )
@@ -6508,13 +6524,38 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
   const [toDelete, setToDelete] = useState<TeachTopicBrief | null>(null)
   const inputId = `new-topic-${subject.id}`
   const topics = subject.topics
+  // (d) Suriladigan mavzuning tugmasiga fokusni saqlab qolish uchun: so'rov tugab, ro'yxat
+  // yangi tartibda qayta chiqgach, shu mavzuning tugmasiga fokus qaytariladi (klaviatura
+  // foydalanuvchilari uchun). Buferlangan qiymat ro'yxat o'zgarganda quyidagi effectda ishlatiladi.
+  const pendingFocusRef = useRef<{ topicId: number; direction: 'up' | 'down' } | null>(null)
+
+  function moveButtonId(topicId: number, direction: 'up' | 'down') {
+    return `teach-move-${direction}-${topicId}`
+  }
 
   function move(index: number, delta: -1 | 1) {
-    const ids = topics.map((topic) => topic.id)
+    if (reorder.isPending) return
+    const direction: 'up' | 'down' = delta === -1 ? 'up' : 'down'
+    const topic = topics[index]
+    const ids = topics.map((t) => t.id)
     const target = index + delta
     ;[ids[index], ids[target]] = [ids[target], ids[index]]
+    pendingFocusRef.current = { topicId: topic.id, direction }
     reorder.mutate(ids)
   }
+
+  useEffect(() => {
+    const pending = pendingFocusRef.current
+    if (!pending) return
+    const { topicId, direction } = pending
+    if (!topics.some((t) => t.id === topicId)) return
+    const other: 'up' | 'down' = direction === 'up' ? 'down' : 'up'
+    const button =
+      document.getElementById(moveButtonId(topicId, direction)) ??
+      document.getElementById(moveButtonId(topicId, other))
+    button?.focus()
+    pendingFocusRef.current = null
+  }, [topics])
 
   function onCreate(event: FormEvent) {
     event.preventDefault()
@@ -6549,6 +6590,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
               </Link>
               <PublishedBadge published={topic.is_published} />
               <Button
+                id={moveButtonId(topic.id, 'up')}
                 variant="ghost"
                 size="sm"
                 aria-label={t('teach.moveUp', { title: topic.title })}
@@ -6558,6 +6600,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
                 ↑
               </Button>
               <Button
+                id={moveButtonId(topic.id, 'down')}
                 variant="ghost"
                 size="sm"
                 aria-label={t('teach.moveDown', { title: topic.title })}
@@ -6608,6 +6651,8 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
   )
 }
 ```
+
+**Code-review tuzatishi (lesson a, d):** rejadagi kod `subjects.isPending`/`subjects.isError` bo'yicha to'g'ridan-to'g'ri qaytib ketardi — fon refetch xato qaytarsa, allaqachon ko'rsatilgan ro'yxat yo'qolib, uning o'rniga butunlay `ErrorState` chiqib ketardi. Ro'yobga chiqarishda `subjects.data === undefined` bo'lgandagina spinner/xato holatiga o'tiladi, aks holda eski ma'lumot ko'rsatiladi; qayta urinish tugmasi faqat `canRetry(error)` rost bo'lsa beriladi. Tartiblash uchun `pendingFocusRef` + `useEffect` qo'shildi: so'rov tugab ro'yxat yangi tartibda qayta render bo'lgach, suriladigan mavzuning tugmasiga (yo'q bo'lib qolgan bo'lsa, qarama-qarshi tugmaga) fokus qaytariladi — har bir tugmaga `id={moveButtonId(topic.id, direction)}` qo'shildi. `move()` ichida `reorder.isPending` bo'lsa so'rov yuborilmaydi (tez-tez bosishdan himoya; tugmalar ham `disabled` bilan bloklanadi). Haqiqiy fayl: `frontend/src/features/teach/TeachHomePage.tsx`.
 
 - [ ] **Step 5: Testlar o'tishini tekshirish**
 
