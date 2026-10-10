@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import { pushToast } from '@/components/ui/toast-store'
-import { i18n, setLanguage } from '@/i18n'
+import { i18n, LANGUAGES, setLanguage } from '@/i18n'
 import { apiFetch, logoutRequest, refreshSession, resetSession, setAccessToken, setAuthHandlers } from './client'
 import type { LoginIn, MeUpdateIn, PasswordChangeIn, RegisterIn, TokenOut, User } from './types'
 
@@ -105,6 +105,21 @@ export function useUpdateMe(options: { silent?: boolean } = {}) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: MeUpdateIn) => apiFetch<User>('/api/me', { method: 'PATCH', json: data }),
+    // Til darhol almashadi, server saqlamasa avvalgisiga qaytadi. Bu hook darajasida qilinadi:
+    // `mutate(..., { onError })` callback'i faqat kuzatuvchi hali o'sha mutatsiyaga bog'liq
+    // bo'lsa chaqiriladi va til almashganda bu kafolat yo'qolishi mumkin (useChangePassword'ga qarang).
+    onMutate: (variables) => {
+      if (variables.locale === undefined) return { previousLocale: undefined }
+      const previousLocale = LANGUAGES.find((lang) => lang === i18n.language)
+      setLanguage(variables.locale)
+      return { previousLocale }
+    },
+    onError: (_error, variables, context) => {
+      // Shu orada foydalanuvchi yana boshqa tilni tanlagan bo'lsa, uning tanlovi bosib qo'yilmaydi.
+      if (context?.previousLocale && variables.locale === i18n.language) {
+        setLanguage(context.previousLocale)
+      }
+    },
     onSuccess: (user, variables) => {
       queryClient.setQueryData(sessionKey, user)
       // Faqat so'rovda `locale` yuborilgan bo'lsa almashtiramiz — aks holda ism saqlanishi

@@ -13,8 +13,9 @@ export function LanguageSwitch() {
 
   function choose(lang: Locale) {
     if (lang === i18n.language) return
-    setLanguage(lang)
+    // Kirgan foydalanuvchida tilni `useUpdateMe` o'zi almashtiradi va server saqlamasa qaytaradi.
     if (user) updateMe.mutate({ locale: lang })
+    else setLanguage(lang)
   }
 
   return (

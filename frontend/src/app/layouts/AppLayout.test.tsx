@@ -2,6 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw/http'
 import type { RouteObject } from 'react-router'
+import { getToasts } from '@/components/ui/toast-store'
 import { i18n } from '@/i18n'
 import { adminUser, renderRoutes, studentUser, teacherUser } from '@/test/render'
 import { server } from '@/test/server'
@@ -51,4 +52,17 @@ test('til almashtirilganda PATCH /me yuboriladi', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Русский' }))
   await waitFor(() => expect(body).toEqual({ locale: 'ru' }))
   expect(i18n.language).toBe('ru')
+})
+
+test('til saqlanmasa (server xatosi) interfeys avvalgi tilga qaytadi va xabar chiqadi', async () => {
+  server.use(
+    http.patch('/api/me', () =>
+      HttpResponse.json({ code: 'HTTP_500', message: 'Server xatosi', details: {} }, { status: 500 }),
+    ),
+  )
+  renderRoutes(routes, { url: '/app', user: studentUser })
+  await userEvent.click(screen.getByRole('button', { name: 'Русский' }))
+  await waitFor(() => expect(i18n.language).toBe('uz'))
+  expect(document.documentElement.lang).toBe('uz')
+  expect(getToasts()).toHaveLength(1)
 })

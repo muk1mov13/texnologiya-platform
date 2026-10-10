@@ -90,6 +90,20 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 27/27 fayl va 147/147 test;
   - ESLint va `tsc` xatosiz.
 
+### C-band: til saqlanmasa interfeys avvalgi tilga qaytadi
+- **Muammo:** til almashtirilganda `PATCH /api/me` xato bersa, ekran yangi tilda qolardi, serverda esa eski til saqlanardi. Keyingi kirishda til "o'zidan" o'zgarib qolardi.
+- **Birinchi urinish ishlamadi:** qaytarish `LanguageSwitch` dagi `mutate(..., { onError })` ga qo'yilgan edi. Yangi test ikki marta yiqildi (til `ru` bo'lib qoldi), CLAUDE.md qoidasi bo'yicha ish to'xtatilib hisobot berildi. Sabab: komponent darajasidagi callback chaqirilmadi (TanStack Query uni faqat kuzatuvchi hali o'sha mutatsiyaga bog'liq bo'lsa chaqiradi). `useChangePassword` dagi kabi holat.
+- **Yechim:** `frontend/src/api/auth.ts` → `useUpdateMe`:
+  - `onMutate`: so'rovda `locale` bo'lsa, avvalgi til eslab qolinadi va yangi til darhol o'rnatiladi;
+  - `onError`: til hali o'sha bo'lsa (foydalanuvchi shu orada boshqa tilni tanlamagan bo'lsa), avvalgisiga qaytariladi.
+  - `ProfilePage` `locale` yubormaydi, unga ta'sir yo'q.
+- `frontend/src/app/layouts/LanguageSwitch.tsx`: kirgan foydalanuvchida tilni hook almashtiradi, mehmonda avvalgidek `setLanguage`.
+- `AppLayout.test.tsx`: server 500 qaytarsa, til `uz` ga, `<html lang>` ham `uz` ga qaytadi va xato toast chiqadi.
+- Kichik eslatma: xato toast'i til qaytarilishidan oldin chiqadi, shuning uchun uning matni yangi tanlangan tilda bo'ladi.
+- **Tekshiruv:**
+  - to'liq suite 27/27 fayl va 148/148 test;
+  - ESLint va `tsc` xatosiz.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.
