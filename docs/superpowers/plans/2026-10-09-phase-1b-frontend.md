@@ -3024,34 +3024,59 @@ export function useLogout() {
   })
 }
 
-export function useUpdateMe() {
+/**
+ * `silent`: xato forma ichida (`FormError`) ko'rsatiladigan chaqiruvlar uchun — aks holda
+ * umumiy toast bilan ikki marta ko'rsatilardi. `LanguageSwitch` uchun esa toast kerak,
+ * shuning uchun bu yerda standart `false` — faqat kerak joyda `silent: true` beriladi.
+ */
+export function useUpdateMe(options: { silent?: boolean } = {}) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: MeUpdateIn) => apiFetch<User>('/api/me', { method: 'PATCH', json: data }),
-    onSuccess: (user) => {
+    onSuccess: (user, variables) => {
       queryClient.setQueryData(sessionKey, user)
-      setLanguage(user.locale)
+      // Faqat so'rovda `locale` yuborilgan bo'lsa almashtiramiz — aks holda ism saqlanishi
+      // (javob kelguncha) parallel ravishda almashtirilgan tilni orqaga qaytarib qo'yardi.
+      if (variables.locale !== undefined) setLanguage(user.locale)
     },
+    meta: { silent: options.silent },
   })
 }
 
 /**
  * Backend parol almashganda barcha sessiyalarni bekor qiladi, shuning uchun lokal sessiya ham yopiladi.
- * Toast shu yerda chiqariladi: sessiya yopilgach profil sahifasi unmount bo'ladi.
+ * Toast va navigatsiya shu yerda — hook darajasida — amalga oshiriladi: `mutate()`ga
+ * komponent darajasida berilgan `onSuccess` faqat kuzatuvchi hali mavjud bo'lsa chaqiriladi
+ * (TanStack Query, `MutationObserver#notify`), sessiya yopilib `ProfilePage` unmount
+ * bo'lgandan keyin esa bu kafolat yo'qoladi. Shu sabab navigatsiya PasswordForm'ning
+ * `mutate(..., { onSuccess })`iga emas, shu yerga yozilgan — xuddi logout kabi, lekin
+ * poyga xavfisiz bo'lishi uchun komponent tashqarisida.
  */
 export function useChangePassword() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   return useMutation({
     mutationFn: (data: PasswordChangeIn) =>
       apiFetch<void>('/api/me/password', { method: 'POST', json: data }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Backend parolni almashtirgach refresh cookie'ni ham bekor qiladi, ammo brauzerdagi
+      // cookie'ni tozalash uchun logout so'rovi yuboriladi — xatosi e'tiborsiz qoladi.
+      await logoutRequest().catch(() => {})
       endSession(queryClient)
       pushToast('success', i18n.t('profile.passwordChanged'))
+      // Qaytish manzilisiz (AppLayout logoutidagi kabi) — aks holda keyingi kirgan
+      // foydalanuvchi oldingisining sahifasiga tushib qolardi. `flushSync`: sessiya
+      // tozalanishi `RequireAuth`ning navigatsiya tranzitsiyasidan OLDIN qo'llanilishi
+      // mumkin, aks holda u hali eski manzilda qayta render bo'lib, o'ziga xos
+      // `state: {from}` bilan Navigate qaytarib, shu toza navigatsiyani bosib qo'yardi.
+      void navigate('/login', { replace: true, flushSync: true })
     },
     meta: { silent: true },
   })
 }
 ```
+
+**Code-review tuzatishi (Task 11 review paytida topildi):** yuqoridagi `useUpdateMe`/`useChangePassword` kodi Task 11 review'idan keyingi yakuniy `frontend/src/api/auth.ts` holatiga mos keltirildi — `useUpdateMe`ga `silent` opsiyasi qo'shildi (profil formasi xato ikki marta ko'rsatilmasligi uchun), `setLanguage` endi faqat so'rovda `locale` bo'lsa chaqiriladi (poyga holati), `useChangePassword` navigatsiyani o'z ichida (`useNavigate` + `flushSync`) amalga oshiradi.
 
 - [ ] **Step 5: `frontend/src/app/paths.ts`**
 
@@ -5745,7 +5770,7 @@ git commit -m "fix(frontend): player polish, route error boundary, data-first li
 - Modify (stub → to'liq): `frontend/src/features/profile/ProfilePage.tsx`
 - Test: `frontend/src/features/profile/ProfilePage.test.tsx`
 
-Parol almashtirilganda backend barcha sessiyalarni bekor qiladi. Shuning uchun `useChangePassword` muvaffaqiyatli tugagach lokal sessiya yopiladi va `RequireAuth` foydalanuvchini `/login`ga yuboradi. Bu haqda toast orqali xabar beriladi.
+Parol almashtirilganda backend barcha sessiyalarni bekor qiladi. Shuning uchun `useChangePassword` muvaffaqiyatli tugagach lokal sessiya yopiladi va `/login`ga navigatsiya qiladi (hook o'zi, `useNavigate` + `flushSync` bilan — `RequireAuth`ning tabiiy qaytish-manzilli redirektiga tayanilmaydi). Bu haqda toast orqali xabar beriladi.
 
 - [ ] **Step 1: `frontend/src/features/profile/schemas.ts`**
 
@@ -5806,7 +5831,56 @@ test('ism yangilanadi va toast chiqadi', async () => {
   await userEvent.type(name, 'Dilnoza Aliyeva')
   await userEvent.click(screen.getByRole('button', { name: i18n.t('common.save') }))
   expect(await screen.findByText(i18n.t('profile.saved'))).toBeInTheDocument()
+  // `toEqual` aniq teng bo'lishni talab qiladi — shuning uchun `locale` kiritilmagani ham tasdiqlanadi.
   expect(body).toEqual({ full_name: 'Dilnoza Aliyeva', phone: null })
+  expect(body).not.toHaveProperty('locale')
+})
+
+test("profil saqlash xatosi faqat bir marta ko'rsatiladi", async () => {
+  server.use(
+    http.patch('/api/me', () =>
+      HttpResponse.json({ code: 'VALIDATION_ERROR', message: 'x', details: {} }, { status: 422 }),
+    ),
+  )
+  renderRoutes(routes, { url: '/app/profile', user: studentUser })
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('common.save') }))
+  // `useUpdateMe({ silent: true })` + forma ichidagi `FormError`: umumiy toast chiqmasligi
+  // kerak, shuning uchun matn aynan bir marta ko'rinadi.
+  const matches = await screen.findAllByText(i18n.t('errors.VALIDATION_ERROR'))
+  expect(matches).toHaveLength(1)
+})
+
+test('telefon tozalansa phone: null yuboriladi', async () => {
+  const user = { ...studentUser, phone: '+998901234567' }
+  let body: unknown = null
+  server.use(
+    http.patch('/api/me', async ({ request }) => {
+      body = await request.json()
+      return HttpResponse.json(user)
+    }),
+  )
+  renderRoutes(routes, { url: '/app/profile', user })
+  const phone = screen.getByLabelText(i18n.t('auth.phone'))
+  await userEvent.clear(phone)
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('common.save') }))
+  await waitFor(() => expect(body).toEqual({ full_name: user.full_name, phone: null }))
+})
+
+test("ism 2 belgidan kam bo'lsa xato ko'rsatiladi va so'rov yuborilmaydi", async () => {
+  let called = false
+  server.use(
+    http.patch('/api/me', () => {
+      called = true
+      return HttpResponse.json(studentUser)
+    }),
+  )
+  renderRoutes(routes, { url: '/app/profile', user: studentUser })
+  const name = screen.getByLabelText(i18n.t('auth.fullName'))
+  await userEvent.clear(name)
+  await userEvent.type(name, 'A')
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('common.save') }))
+  expect(await screen.findByText(i18n.t('validation.nameMin'))).toBeInTheDocument()
+  expect(called).toBe(false)
 })
 
 async function submitPassword(current: string) {
@@ -5816,7 +5890,41 @@ async function submitPassword(current: string) {
   await userEvent.click(screen.getByRole('button', { name: i18n.t('profile.changePassword') }))
 }
 
-test('joriy parol noto\'g\'ri bo\'lsa xato ko\'rsatiladi', async () => {
+test("parol tasdiqlash mos kelmasa xato ko'rsatiladi va so'rov yuborilmaydi", async () => {
+  let called = false
+  server.use(
+    http.post('/api/me/password', () => {
+      called = true
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
+  renderRoutes(routes, { url: '/app/profile', user: studentUser })
+  await userEvent.type(screen.getByLabelText(i18n.t('profile.currentPassword')), 'eski-parol-123')
+  await userEvent.type(screen.getByLabelText(i18n.t('profile.newPassword')), 'yangi-parol-123')
+  await userEvent.type(screen.getByLabelText(i18n.t('auth.passwordConfirm')), 'boshqa-parol-123')
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('profile.changePassword') }))
+  expect(await screen.findByText(i18n.t('validation.passwordMismatch'))).toBeInTheDocument()
+  expect(called).toBe(false)
+})
+
+test("yangi parol 8 belgidan kam bo'lsa xato ko'rsatiladi va so'rov yuborilmaydi", async () => {
+  let called = false
+  server.use(
+    http.post('/api/me/password', () => {
+      called = true
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
+  renderRoutes(routes, { url: '/app/profile', user: studentUser })
+  await userEvent.type(screen.getByLabelText(i18n.t('profile.currentPassword')), 'eski-parol-123')
+  await userEvent.type(screen.getByLabelText(i18n.t('profile.newPassword')), 'qisqa')
+  await userEvent.type(screen.getByLabelText(i18n.t('auth.passwordConfirm')), 'qisqa')
+  await userEvent.click(screen.getByRole('button', { name: i18n.t('profile.changePassword') }))
+  expect(await screen.findByText(i18n.t('validation.passwordMin'))).toBeInTheDocument()
+  expect(called).toBe(false)
+})
+
+test("joriy parol noto'g'ri bo'lsa xato ko'rsatiladi", async () => {
   server.use(
     http.post('/api/me/password', () =>
       HttpResponse.json({ code: 'WRONG_PASSWORD', message: 'x', details: {} }, { status: 400 }),
@@ -5827,7 +5935,7 @@ test('joriy parol noto\'g\'ri bo\'lsa xato ko\'rsatiladi', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent(i18n.t('errors.WRONG_PASSWORD'))
 })
 
-test('parol almashgach sessiya yopiladi va /login ga o\'tiladi', async () => {
+test("parol almashgach sessiya yopiladi va /login ga o'tiladi", async () => {
   server.use(http.post('/api/me/password', () => new HttpResponse(null, { status: 204 })))
   const { router } = renderRoutes(routes, { url: '/app/profile', user: studentUser })
   await submitPassword('eski-parol-123')
@@ -5839,6 +5947,8 @@ test('parol almashgach sessiya yopiladi va /login ga o\'tiladi', async () => {
 ```
 
 **Code-review tuzatishi:** oxirgi testga `router.state.location.state` ni `null` bo'lishini tekshiruvchi qator qo'shildi — logout oqimidagi xavfning xuddi shunisi (qaytish manzili keyingi foydalanuvchiga tushib qolishi) parol almashtirishda ham bor.
+
+**Code-review tuzatishi (ikkinchi tur):** quyidagi testlar qo'shildi — profil saqlash xatosi bir marta ko'rsatilishi (xato ikki marta chiqish muammosi), telefonni tozalash `phone: null` yuborishi (mavjud telefonli foydalanuvchi bilan), ism/parol validatsiyasi so'rov yubormasligi (ism 2 belgidan kam, parol 8 belgidan kam, tasdiqlash mos kelmasligi) va `locale` profil so'rovida hech qachon yuborilmasligi (birinchi testga qo'shilgan tekshiruv).
 
 - [ ] **Step 3: Test yiqilishini tekshirish**
 
@@ -5886,10 +5996,13 @@ export function ProfilePage() {
 
 function ProfileForm({ user }: { user: User }) {
   const { t } = useTranslation()
-  const updateMe = useUpdateMe()
+  // `silent: true`: xato shu yerda `FormError` orqali ko'rsatiladi — umumiy toast bilan
+  // ikki marta chiqmasligi uchun.
+  const updateMe = useUpdateMe({ silent: true })
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
@@ -5902,12 +6015,22 @@ function ProfileForm({ user }: { user: User }) {
       <form
         noValidate
         className="flex flex-col gap-4"
-        onSubmit={handleSubmit((values) =>
-          updateMe.mutate(
-            { full_name: values.full_name, phone: values.phone || null },
-            { onSuccess: () => pushToast('success', t('profile.saved')) },
-          ),
-        )}
+        onSubmit={(event) => {
+          // Har bir yuborishda eski server xatosi tozalanadi — validatsiya o'tmasa ham.
+          updateMe.reset()
+          void handleSubmit((values) =>
+            updateMe.mutate(
+              { full_name: values.full_name, phone: values.phone || null },
+              {
+                onSuccess: (updatedUser) => {
+                  pushToast('success', t('profile.saved'))
+                  // Server qaytargan (kesilgan/tozalangan) qiymatlar bilan formani yangilaymiz.
+                  reset({ full_name: updatedUser.full_name, phone: updatedUser.phone ?? '' })
+                },
+              },
+            ),
+          )(event)
+        }}
       >
         {updateMe.error && <FormError error={updateMe.error} />}
         <Field id="full_name" label={t('auth.fullName')} error={errors.full_name?.message}>
@@ -5941,9 +6064,13 @@ function PasswordForm() {
       <form
         noValidate
         className="flex flex-col gap-4"
-        onSubmit={handleSubmit((values) =>
-          changePassword.mutate({ current_password: values.current_password, new_password: values.new_password }),
-        )}
+        onSubmit={(event) => {
+          // Har bir yuborishda eski server xatosi tozalanadi — validatsiya o'tmasa ham.
+          changePassword.reset()
+          void handleSubmit((values) =>
+            changePassword.mutate({ current_password: values.current_password, new_password: values.new_password }),
+          )(event)
+        }}
       >
         {changePassword.error && <FormError error={changePassword.error} />}
         <Field id="current_password" label={t('profile.currentPassword')} error={errors.current_password?.message}>
@@ -5995,6 +6122,13 @@ Parol almashgani haqidagi toast `useChangePassword` hook'ining o'zida chiqarilad
 - `ProfileForm`ga `{updateMe.error && <FormError error={updateMe.error} />}` qo'shildi — server tomonidagi xato (masalan tarmoq yoki 5xx) ko'rsatilmay qolmasligi uchun (`LoginPage`/`RegisterPage` bilan bir xil naqsh).
 - `/login`ga navigatsiya **komponentda emas**, `useChangePassword`ning o'zida (`frontend/src/api/auth.ts`) amalga oshiriladi: TanStack Query'da `mutate(vars, { onSuccess })`ga berilgan callback faqat kuzatuvchi (komponent) hali ulangan bo'lsagina chaqiriladi (`MutationObserver#notify`, `this.hasListeners()` tekshiruvi — `node_modules/@tanstack/query-core/build/modern/mutationObserver.js`). Parol almashgach sessiya shu hook ichida yopiladi va `ProfilePage` (`if (!user) return null`) unmount bo'ladi, shuning uchun `PasswordForm`ning `mutate(..., { onSuccess })`iga navigatsiyani qo'yish poyga holatida ishlamay qolishi mumkin edi. Shu sabab `useChangePassword` o'zi `useNavigate()`dan foydalanib, `endSession` va toast'dan keyin `navigate('/login', { replace: true, flushSync: true })` chaqiradi — xuddi `AppLayout`dagi logout kabi, qaytish manzilisiz.
 - Shu o'zgarish `frontend/src/api/auth.test.tsx`dagi `makeWrapper`ni ham `MemoryRouter` bilan o'rab qo'yishni talab qildi (`useChangePassword` endi Router konteksti talab qiladi).
+
+**Code-review tuzatishi (ikkinchi tur):**
+- **Xato ikki marta ko'rsatilishi:** `useUpdateMe`ga ilgari `meta.silent` berilmagandi, shuning uchun umumiy `MutationCache.onError` toast chiqarardi VA `ProfileForm`dagi `FormError` bir xil matnni qaytardi. Endi `useUpdateMe(options: { silent?: boolean })` — `LanguageSwitch` standart (toast kerak) bilan chaqiradi, `ProfileForm` esa `{ silent: true }` beradi.
+- **Til poygasi:** `useUpdateMe`ning `onSuccess`i endi `setLanguage(user.locale)`ni faqat so'rov o'zgaruvchilarida (`variables`) `locale` bo'lsa chaqiradi — aks holda ism saqlash javobi parallel ravishda almashtirilgan tilni orqaga qaytarib qo'yardi.
+- **Forma qiymatlari saqlangach yangilanadi:** `ProfileForm`ning muvaffaqiyatli `onSuccess`i `reset({ full_name, phone })`ni server qaytargan (tozalangan/kesilgan) qiymatlar bilan chaqiradi.
+- **Eski xatolar tozalanadi:** har ikki forma ham `<form onSubmit>`da avval `updateMe.reset()` / `changePassword.reset()`ni chaqiradi, so'ng `handleSubmit(...)`ni ishga tushiradi — shunda client validatsiyasi o'tmagan qayta urinishda ham eski server xatosi ko'rinib qolmaydi.
+- `useChangePassword`da navigatsiya endi `void navigate(...)` — `AppLayout`dagi logout bilan bir xil uslub.
 
 - [ ] **Step 5: Testlar o'tishini tekshirish**
 

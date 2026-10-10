@@ -96,14 +96,22 @@ export function useLogout() {
   })
 }
 
-export function useUpdateMe() {
+/**
+ * `silent`: xato forma ichida (`FormError`) ko'rsatiladigan chaqiruvlar uchun — aks holda
+ * umumiy toast bilan ikki marta ko'rsatilardi. `LanguageSwitch` uchun esa toast kerak,
+ * shuning uchun bu yerda standart `false` — faqat kerak joyda `silent: true` beriladi.
+ */
+export function useUpdateMe(options: { silent?: boolean } = {}) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: MeUpdateIn) => apiFetch<User>('/api/me', { method: 'PATCH', json: data }),
-    onSuccess: (user) => {
+    onSuccess: (user, variables) => {
       queryClient.setQueryData(sessionKey, user)
-      setLanguage(user.locale)
+      // Faqat so'rovda `locale` yuborilgan bo'lsa almashtiramiz — aks holda ism saqlanishi
+      // (javob kelguncha) parallel ravishda almashtirilgan tilni orqaga qaytarib qo'yardi.
+      if (variables.locale !== undefined) setLanguage(user.locale)
     },
+    meta: { silent: options.silent },
   })
 }
 
@@ -133,7 +141,7 @@ export function useChangePassword() {
       // tozalanishi `RequireAuth`ning navigatsiya tranzitsiyasidan OLDIN qo'llanilishi
       // mumkin, aks holda u hali eski manzilda qayta render bo'lib, o'ziga xos
       // `state: {from}` bilan Navigate qaytarib, shu toza navigatsiyani bosib qo'yardi.
-      navigate('/login', { replace: true, flushSync: true })
+      void navigate('/login', { replace: true, flushSync: true })
     },
     meta: { silent: true },
   })

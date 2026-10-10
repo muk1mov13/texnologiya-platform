@@ -36,10 +36,13 @@ export function ProfilePage() {
 
 function ProfileForm({ user }: { user: User }) {
   const { t } = useTranslation()
-  const updateMe = useUpdateMe()
+  // `silent: true`: xato shu yerda `FormError` orqali ko'rsatiladi — umumiy toast bilan
+  // ikki marta chiqmasligi uchun.
+  const updateMe = useUpdateMe({ silent: true })
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
@@ -52,12 +55,22 @@ function ProfileForm({ user }: { user: User }) {
       <form
         noValidate
         className="flex flex-col gap-4"
-        onSubmit={handleSubmit((values) =>
-          updateMe.mutate(
-            { full_name: values.full_name, phone: values.phone || null },
-            { onSuccess: () => pushToast('success', t('profile.saved')) },
-          ),
-        )}
+        onSubmit={(event) => {
+          // Har bir yuborishda eski server xatosi tozalanadi — validatsiya o'tmasa ham.
+          updateMe.reset()
+          void handleSubmit((values) =>
+            updateMe.mutate(
+              { full_name: values.full_name, phone: values.phone || null },
+              {
+                onSuccess: (updatedUser) => {
+                  pushToast('success', t('profile.saved'))
+                  // Server qaytargan (kesilgan/tozalangan) qiymatlar bilan formani yangilaymiz.
+                  reset({ full_name: updatedUser.full_name, phone: updatedUser.phone ?? '' })
+                },
+              },
+            ),
+          )(event)
+        }}
       >
         {updateMe.error && <FormError error={updateMe.error} />}
         <Field id="full_name" label={t('auth.fullName')} error={errors.full_name?.message}>
@@ -96,9 +109,13 @@ function PasswordForm() {
       <form
         noValidate
         className="flex flex-col gap-4"
-        onSubmit={handleSubmit((values) =>
-          changePassword.mutate({ current_password: values.current_password, new_password: values.new_password }),
-        )}
+        onSubmit={(event) => {
+          // Har bir yuborishda eski server xatosi tozalanadi — validatsiya o'tmasa ham.
+          changePassword.reset()
+          void handleSubmit((values) =>
+            changePassword.mutate({ current_password: values.current_password, new_password: values.new_password }),
+          )(event)
+        }}
       >
         {changePassword.error && <FormError error={changePassword.error} />}
         <Field id="current_password" label={t('profile.currentPassword')} error={errors.current_password?.message}>
