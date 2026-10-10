@@ -123,7 +123,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   2. `QueryState`;
   3. chegara holat testlari (`REFRESH_ROTATED`, "Tugatdim" ni ikki marta bosish).
 
-### 1-qadam: `useLogoutAndRedirect` — takrorlangan logout birlashtirildi
+### `b341ad4` — 1-qadam: `useLogoutAndRedirect` — takrorlangan logout birlashtirildi
 - `frontend/src/api/auth.ts`: yangi `useLogoutAndRedirect()` hook'i (`useLogout` + `useNavigate`). U `{ logout, isPending }` qaytaradi va muvaffaqiyatda `/login` ga qaytish manzilisiz, `flushSync` bilan o'tadi. Bu tartibning sababi endi bitta joyda yozilgan.
 - `AppLayout.tsx` va `PendingPage.tsx` shu hook'ga o'tdi, ikki joydagi takror kod va izoh olib tashlandi.
 - `useChangePassword` o'zgarmadi: unda navigatsiya ataylab hook darajasida (sahifa unmount bo'lgandan keyin ham ishlashi kerak).
