@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
+### Ish tartibi cheklovlari hujjatlashtirildi
+- `CLAUDE.md`: yangi "Execution Constraints" bo'limi:
+  - subagent ishlatilmaydi;
+  - bir vaqtda faqat bitta task bajariladi, tugagach tasdiq kutiladi;
+  - test ikki marta yiqilsa, ish to'xtatilib hisobot beriladi.
+  - Shuningdek, ro'yxatlardan oldin bo'sh qatorlar qo'shildi (markdown formati).
+- `docs/superpowers/plans/2026-10-09-phase-1a-backend.md` va `2026-10-09-phase-1b-frontend.md`: "subagent-driven-development" ko'rsatmasi olib tashlandi, yangi cheklovlarga mos.
+
 ### Texnik audit (faqat o'qish rejimida)
 - Frontend (1–12 task'lar) mustaqil tekshirildi: tiplar, backend bilan moslik, arxitektura, testlar sifati, ishlatilmayotgan kod.
 - Topilgan yaxshi tomonlar:

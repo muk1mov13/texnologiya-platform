@@ -40,11 +40,13 @@ Local development needs no Docker, PostgreSQL or Redis. PPT/DOC → PDF conversi
 **App factory and state.** `app/main.py:create_app(settings)` builds everything and stores it on `app.state`: engine, sessionmaker, `Storage`, the job runner and the login rate limiter. Nothing is a module-level global. Routes reach these through the `Annotated` dependency aliases in `app/core/deps.py` (`DbSession`, `AppSettings`, `AppStorage`, `Jobs`, `LoginLimiter`). Auth aliases live in `app/auth/deps.py`: `CurrentUser`, `ActiveUser` (rejects pending users), `StaffUser` (teacher or admin) and `AdminUser`. Tests build the app with their own `Settings`, so any new shared resource should follow the same pattern.
 
 **Dev/prod swappable pieces.** The code is written so local and production setups differ only in configuration:
+
 - The DB is SQLite (aiosqlite) locally and PostgreSQL in CI and prod. All code must work on both. Use `BigIntPK`, `UTCDateTime` (rejects naive datetimes) and `str_enum()` (enums stored as VARCHAR) from `app/core/types.py`, never the raw SQLAlchemy types. `make_engine` turns on `PRAGMA foreign_keys=ON` for SQLite.
 - Background jobs go through the `JobRunner` protocol (`app/core/jobs.py`). Register a job with the `@job("name")` decorator; it is called as `func(ctx: JobContext, **kwargs)`. Locally `InlineJobRunner` runs jobs as in-process asyncio tasks. Prod will use an arq worker with the same `enqueue()` signature. Because inline jobs aren't persisted, the startup lifespan marks any `processing` materials as `failed`/`INTERRUPTED`.
 - Rate limiting uses `InMemoryRateLimiter` for now; Redis comes later.
 
 **Modules.** `app/auth/` and `app/learning/` each have `models.py`, `schemas.py` and routers. Routers are kept thin: they check permissions, call module functions and return. In `learning`, the logic is split by area instead of living in one `service.py`:
+
 - `editing.py`: subject and topic CRUD, slugify, and the permission checks `ensure_can_edit_subject` / `ensure_can_edit_step` (teachers may only edit subjects they're assigned to via `subject_teachers`; admins may edit any).
 - `materials.py` and `convert.py`: the upload pipeline. Files are saved through `Storage` (UUID names, path-escape guard, size limit) and then checked against magic bytes. A PDF is marked `ready` right away. Other formats are enqueued as the `convert_material` job (LibreOffice → PyMuPDF page count, up to 3 attempts). The job uses short-lived DB sessions and re-checks the status before writing the result, so concurrent deletes are safe.
 - `topic_items.py`: glossary and literature items.
@@ -59,3 +61,10 @@ Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (uniqu
 **Auth.** Access tokens are short-lived JWTs sent as Bearer tokens. Refresh tokens are rotated and stored hashed in `refresh_sessions`; they travel in an httpOnly cookie scoped to `/api/auth`. Reusing a revoked refresh token revokes all of the user's sessions (`REFRESH_REUSED`), except within `REFRESH_REUSE_GRACE_SECONDS` (default 30 s) of its revocation, where only that request gets 401 `REFRESH_ROTATED` (concurrent tabs, interrupted reload). New registrations start as `pending` until an admin approves them. Settings refuse to load in prod with the default `JWT_SECRET` or with `COOKIE_SECURE=false`.
 
 **Tests.** `tests/conftest.py` provides the `settings`, `app` (runs drop_all/create_all, then drains jobs on teardown), `client` (httpx ASGI) and `db` fixtures. `tests/factories.py` has `make_user`, `auth_headers`, `make_subject`, `make_topic`, `step_of`, `make_pdf_bytes`, `add_ready_pdf` and `build_course`. pytest-asyncio runs in `auto` mode, so test functions don't need decorators. Ruff uses line length 100 with rules E/F/I/B/UP/ASYNC. mypy uses the pydantic plugin with `check_untyped_defs`.
+
+## Execution Constraints (Token & Subagent Control)
+
+- DO NOT spawn background subagents or use subagent-driven workflows.
+- Execute only ONE task at a time as requested by the user.
+- Stop immediately after finishing the single task and await user approval before touching anything else.
+- Do not run continuous or looping test-fix cycles. If a test fails twice, stop and report the error.

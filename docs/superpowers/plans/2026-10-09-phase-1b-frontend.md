@@ -1,7 +1,5 @@
 # 1B-bosqich: Frontend — implementatsiya rejasi
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** 1-bosqichni yakunlaydigan React frontend'ni qurish:
 - "Yorqin ilova" dizayn tizimi, uz/ru interfeys;
 - ochiq sahifalar (bosh sahifa skeleti, kirish, ro'yxatdan o'tish, tasdiq kutish);
