@@ -24,11 +24,14 @@ export const teachKeys = {
 // bo'ladi). `studentKeys` mavzular uchun umumiy prefiks bermaydi — faqat `topic(id)` va
 // `step(id)` bor — shuning uchun bu yerda adabiy prefiks qo'lda yoziladi.
 const STUDENT_TOPICS_PREFIX = ['topics'] as const
+// Bosqich kontenti (materiallar, glossariy, adabiyotlar) `studentKeys.step(id)` keshida turadi.
+const STUDENT_STEPS_PREFIX = ['steps'] as const
 
-/** O'qituvchi tomonidagi o'zgarish talaba ko'radigan ro'yxat/mavzularga ham ta'sir qiladi. */
+/** O'qituvchi tomonidagi o'zgarish talaba ko'radigan ro'yxat, mavzu va bosqichlarga ham ta'sir qiladi. */
 function invalidateStudentCaches(queryClient: QueryClient): void {
   void queryClient.invalidateQueries({ queryKey: studentKeys.subjects })
   void queryClient.invalidateQueries({ queryKey: STUDENT_TOPICS_PREFIX })
+  void queryClient.invalidateQueries({ queryKey: STUDENT_STEPS_PREFIX })
 }
 
 const POLL_MS = 2000
@@ -129,7 +132,11 @@ export function useUploadMaterial(topicId: number) {
       body.append('file', file)
       return apiFetch<Material>(`/api/teach/steps/${stepId}/materials`, { method: 'POST', body })
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) }),
+    onSuccess: () => {
+      // Material talaba ko'radigan bosqich kontenti va progressiga (has_content) ta'sir qiladi.
+      invalidateStudentCaches(queryClient)
+      return queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) })
+    },
     meta: { silent: true },
   })
 }
@@ -139,7 +146,11 @@ export function useDeleteMaterial(topicId: number) {
   return useMutation({
     mutationFn: (materialId: number) =>
       apiFetch<void>(`/api/teach/materials/${materialId}`, { method: 'DELETE' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) }),
+    onSuccess: () => {
+      // Material talaba ko'radigan bosqich kontenti va progressiga (has_content) ta'sir qiladi.
+      invalidateStudentCaches(queryClient)
+      return queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) })
+    },
   })
 }
 
@@ -148,7 +159,11 @@ export function useRetryMaterial(topicId: number) {
   return useMutation({
     mutationFn: (materialId: number) =>
       apiFetch<Material>(`/api/teach/materials/${materialId}/retry`, { method: 'POST' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) }),
+    onSuccess: () => {
+      // Material talaba ko'radigan bosqich kontenti va progressiga (has_content) ta'sir qiladi.
+      invalidateStudentCaches(queryClient)
+      return queryClient.invalidateQueries({ queryKey: teachKeys.topic(topicId) })
+    },
   })
 }
 

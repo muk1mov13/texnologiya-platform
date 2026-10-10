@@ -195,9 +195,10 @@ test("useUploadMaterial: multipart maydonlari yuboriladi, xato bo'lsa toast chiq
   }
 })
 
-test('useRetryMaterial va useDeleteMaterial: muharrir mavzusi invalidatsiya qilinadi', async () => {
+test('useRetryMaterial va useDeleteMaterial: muharrir mavzusi va talaba bosqichi invalidatsiya qilinadi', async () => {
   const queryClient = createQueryClient()
   queryClient.setQueryData(teachKeys.topic(1), topicWith(['failed']))
+  queryClient.setQueryData(studentKeys.step(10), {})
   const retried: Material = {
     id: 1,
     step_id: 10,
@@ -215,17 +216,21 @@ test('useRetryMaterial va useDeleteMaterial: muharrir mavzusi invalidatsiya qili
   retry.current.mutate(1)
   await waitFor(() => expect(retry.current.isSuccess).toBe(true))
   expect(queryClient.getQueryState(teachKeys.topic(1))?.isInvalidated).toBe(true)
+  expect(queryClient.getQueryState(studentKeys.step(10))?.isInvalidated).toBe(true)
 
   queryClient.setQueryData(teachKeys.topic(1), topicWith(['ready']))
+  queryClient.setQueryData(studentKeys.step(10), {})
   const { result: remove } = renderHook(() => useDeleteMaterial(1), { wrapper: makeWrapper(queryClient) })
   remove.current.mutate(2)
   await waitFor(() => expect(remove.current.isSuccess).toBe(true))
   expect(queryClient.getQueryState(teachKeys.topic(1))?.isInvalidated).toBe(true)
+  expect(queryClient.getQueryState(studentKeys.step(10))?.isInvalidated).toBe(true)
 })
 
 test("useGlossaryMutations: to'g'ri manzil/metodlar bilan ishlaydi va mavzuni invalidatsiya qiladi", async () => {
   const queryClient = createQueryClient()
   queryClient.setQueryData(teachKeys.topic(1), topicWith(['ready']))
+  queryClient.setQueryData(studentKeys.step(16), {})
   const term: GlossaryTerm = { id: 5, term: 'A', definition: 'B', order: 1 }
   let addPath = ''
   let updatePath = ''
@@ -253,6 +258,8 @@ test("useGlossaryMutations: to'g'ri manzil/metodlar bilan ishlaydi va mavzuni in
   await waitFor(() => expect(result.current.add.isSuccess).toBe(true))
   expect(addPath).toBe('/api/teach/topics/1/glossary')
   expect(queryClient.getQueryState(teachKeys.topic(1))?.isInvalidated).toBe(true)
+  // Talaba glossariy bosqichini `['steps', id]` keshidan ko'radi — u ham yangilanishi kerak.
+  expect(queryClient.getQueryState(studentKeys.step(16))?.isInvalidated).toBe(true)
 
   result.current.update.mutate({ id: 5, data: { definition: 'C' } })
   await waitFor(() => expect(result.current.update.isSuccess).toBe(true))
