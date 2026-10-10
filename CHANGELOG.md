@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
-### Roadmap repoga ko'chirildi (`feat/phase-2-assessment` branch'i)
+### `125b8f5` — Roadmap repoga ko'chirildi (`feat/phase-2-assessment` branch'i)
 - 2-bosqich uchun `feat/phase-2-assessment` branch'i lokal `main` dan ochildi; `main` faqat PR orqali o'zgargani uchun PR #2 merge qaydi (`263c327`) ham shu branch bilan kiradi.
 - Yangi `docs/superpowers/roadmap.md`: 2026-10-09 da tasdiqlangan, shu paytgacha faqat lokal (`~/.claude/plans/`) turgan yo'l xaritasi. Ko'chirishda yangilandi:
   - "Kontekst": 1A (PR #1, `59def80`) va 1B (PR #2, `0cc93d6`) `main` da, CI uch job bilan yashil;
