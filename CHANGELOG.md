@@ -104,7 +104,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - to'liq suite 27/27 fayl va 148/148 test;
   - ESLint va `tsc` xatosiz.
 
-### D-band: `TeachHomePage` dan `as`-cast va `eslint-disable` olib tashlandi
+### `1114f70` — D-band: `TeachHomePage` dan `as`-cast va `eslint-disable` olib tashlandi
 - `frontend/src/features/teach/TeachHomePage.tsx`:
   - `isUsable`: `el as HTMLButtonElement` o'rniga `el instanceof HTMLButtonElement` tekshiruvi;
   - fokusni qaytarish effekti: mantiq `useEffectEvent` ichiga ko'chirildi, effekt faqat `topics` o'zgarganda ishlaydi, `eslint-disable-next-line react-hooks/exhaustive-deps` kerak bo'lmay qoldi (eslint-plugin-react-hooks 7.1.1).
