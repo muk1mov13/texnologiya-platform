@@ -20,5 +20,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    // Har bir worker o'z jsdom muhitini yaratadi. Sukut bo'yicha workerlar soni yadrolar
+    // soniga teng (8 ta) va kam xotirali mashinada ular RAM'ni to'ldirib, jarayonni
+    // 0xC0000409/134 kodi bilan yiqitardi. 2 ta worker bilan suite ~40 soniyada barqaror tugaydi.
+    maxWorkers: 2,
   },
 })

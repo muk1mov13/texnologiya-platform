@@ -19,8 +19,16 @@ if (typeof Element.prototype.scrollIntoView !== 'function') {
   Element.prototype.scrollIntoView = () => {}
 }
 
+// `onUnhandledFrame: 'error'` faqat konsolga yozadi, so'rov esa tarmoq xatosi bilan tugaydi.
+// Ilova tarmoq xatosini muloyim ko'rsatgani uchun test baribir o'tib ketardi. Shu sabab
+// handler'siz so'rovlar yig'iladi va `afterEach`da test aniq xato bilan yiqiladi.
+const unhandledRequests: string[] = []
+
 beforeAll(() => {
   server.listen({ onUnhandledFrame: 'error' })
+  server.events.on('request:unhandled', ({ request }) => {
+    unhandledRequests.push(`${request.method} ${request.url}`)
+  })
 })
 
 beforeEach(() => {
@@ -34,6 +42,10 @@ afterEach(() => {
   clearToasts()
   setAccessToken(null)
   resetAuthHandlers()
+  const unhandled = unhandledRequests.splice(0)
+  if (unhandled.length > 0) {
+    throw new Error(`MSW handler'i yo'q so'rov(lar): ${unhandled.join(', ')}`)
+  }
 })
 
 afterAll(() => {

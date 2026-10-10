@@ -131,10 +131,19 @@ test("joriy parol noto'g'ri bo'lsa xato ko'rsatiladi", async () => {
 })
 
 test("parol almashgach sessiya yopiladi va /login ga o'tiladi", async () => {
-  server.use(http.post('/api/me/password', () => new HttpResponse(null, { status: 204 })))
+  const logout = vi.fn()
+  server.use(
+    http.post('/api/me/password', () => new HttpResponse(null, { status: 204 })),
+    // Brauzerdagi refresh cookie'ni tozalash uchun logout so'rovi yuboriladi (auth.ts).
+    http.post('/api/auth/logout', () => {
+      logout()
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
   const { router } = renderRoutes(routes, { url: '/app/profile', user: studentUser })
   await submitPassword('eski-parol-123')
   await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+  expect(logout).toHaveBeenCalledOnce()
   expect(screen.getByText(i18n.t('profile.passwordChanged'))).toBeInTheDocument()
   // Logout bilan bir xil sabab: qaytish manzilisiz — aks holda keyingi kirgan foydalanuvchi
   // oldingisining sahifasiga tushib qolardi (AppLayout logout testiga qarang).

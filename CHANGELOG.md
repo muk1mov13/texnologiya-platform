@@ -4,6 +4,38 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
+
+### Texnik audit (faqat o'qish rejimida)
+- Frontend (1–12 task'lar) mustaqil tekshirildi: tiplar, backend bilan moslik, arxitektura, testlar sifati, ishlatilmayotgan kod.
+- Topilgan yaxshi tomonlar:
+  - `any` va `@ts-ignore` yo'q.
+  - `api/types.ts` backend sxemalariga maydonma-maydon mos, endpoint yo'llari ham mos.
+  - Backend'ning barcha xato kodlari uz/ru lug'atida bor.
+  - ESLint va tsc toza.
+- Kritik muammolar:
+  1. Frontend testlari beqaror edi (worker'lar yiqilib qolardi) — **shu yozuvda tuzatildi**.
+  2. `REFRESH_ROTATED` holatida backend cookie'ni o'chiradi, frontend esa 401'ni "sessiya yo'qoldi" deb hisoblaydi. Natijada parallel tab yoki uzilgan sahifa yangilanishi baribir tizimdan chiqarib yuboradi (`backend/app/auth/router.py`, `frontend/src/api/client.ts`). Hali tuzatilmagan.
+  3. Task 12 review tuzatishlari hali commit qilinmagan.
+- Zaif joylar (navbatda turibdi):
+  - `PlayerPage` bo'sh `steps` yoki topilmagan `kind` holatida yiqiladi.
+  - O'qituvchi o'zgarishlaridan keyin talabaning `['steps']` keshi yangilanmaydi (`api/teach.ts`).
+  - Logout va yo'naltirish mantig'i 3 joyda takrorlangan.
+  - Har sahifada "avval ma'lumot, keyin spinner yoki xato" bloki qo'lda yozilgan.
+  - `LanguageSwitch` xato bo'lsa tilni orqaga qaytarmaydi.
+  - Javoblar runtime'da tekshirilmaydi (`as T`).
+- Tuzatish tartibi: testlar barqarorligi → Task 12 commit → `PlayerPage` → `teach.ts` keshlari → `REFRESH_ROTATED` → refaktor → OpenAPI'dan tiplar va frontend CI.
+
+### 1-kritik muammo tuzatildi: frontend testlari beqarorligi
+- **Belgi:** `vitest run` har safar boshqa fayllarda `Worker exited unexpectedly` (kod `0xC0000409` / `134`) bilan yiqilardi. Ishga tushgan testlar o'tardi, lekin buyruq xato bilan tugardi.
+- **Sabab:** Vitest sukut bo'yicha yadrolar soniga teng (8 ta) worker ochadi. Har biri o'z jsdom muhitini yaratadi. Bo'sh xotira ~0.6 GB bo'lgan mashinada ular RAM'ni to'ldirib yuborardi. `--maxWorkers=2` bilan yiqilish yo'qolgani sababni tasdiqladi.
+- `frontend/vite.config.ts`: `test.maxWorkers: 2`.
+- `frontend/src/test/setup.ts`: MSW handler'i yo'q so'rovlar endi yig'iladi va `afterEach`da testni aniq xabar bilan yiqitadi. Ilgari `onUnhandledFrame: 'error'` faqat konsolga yozardi, test esa o'tib ketardi. Himoya vaqtinchalik test bilan tekshirildi (test yiqildi, fayl o'chirildi).
+- Shu himoya yashirin muammoni topdi: "parol almashgach sessiya yopiladi" testi mock'siz `POST /api/auth/logout` yuborardi. Xatoni `.catch` yutgani uchun test shu paytgacha o'tib kelgan. `ProfilePage.test.tsx`ga handler qo'shildi va logout so'rovi yuborilgani ham tekshiriladi.
+- **Natija:**
+  - ketma-ket 2 marta 27/27 fayl va 145/145 test o'tdi (ilgari 1–3 fayl ishga tushmasdan yiqilardi), har biri ~37 s;
+  - ESLint va `tsc` (app + node) xatosiz.
+
 ## 2026-10-09 — 1B-bosqich (frontend) boshlandi
 
 - `feat/phase-1b-frontend` branch'i yaratildi.
