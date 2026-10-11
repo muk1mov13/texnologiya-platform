@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i
 
-### 2-bosqich mini-spec'i
+### `3880fb3` — 2-bosqich mini-spec'i
 - Yangi `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md` (baholash va gamifikatsiya). Brainstorming'da hal qilingan qarorlar:
   - reja 2A (backend) va 2B (frontend) ga bo'linadi;
   - `review`/`practice` bosqichida bir nechta faoliyat bo'lishi mumkin, bosqich hammasi yakunlanganda tugaydi;
