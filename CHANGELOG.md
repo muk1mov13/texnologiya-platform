@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 2 — XP berish, seriya va nishonlar
+### `cc875f6` — 2A Task 2: XP berish, seriya va nishonlar
 - `app/gamification/service.py`:
   - `award()` XP hodisasini savepoint ichida yozadi. Unique to'qnashuvda hech narsa o'zgarmaydi, shuning uchun XP ikki marta berilmaydi.
   - Seriya Toshkent kuni bo'yicha yangilanadi (doimiy UTC+5, `tzdata` kerak emas). 0 XP'lik hodisa seriyaga ta'sir qilmaydi.
