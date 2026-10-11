@@ -4,7 +4,27 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
-## 2026-10-11 — 2-bosqich mini-spec'i
+## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
+
+### 2A (backend) implementatsiya rejasi
+- Yangi `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`: 12 ta task (0–11), TDD bilan:
+  - gamifikatsiya modellari va `award()`;
+  - krossvord algoritmi;
+  - baholash modellari;
+  - o'qituvchi faoliyat muharriri;
+  - talaba bosqich ko'rinishi;
+  - urinishlar;
+  - vazifalar;
+  - tekshirish navbati;
+  - bosh sahifa, natijalar va statistika;
+  - API tiplari.
+- Mini-spec'ga 6 ta aniqlik kiritildi:
+  - format xatolari `VALIDATION_ERROR` bilan qaytadi;
+  - yangi `GET /teach/steps/{id}/task`;
+  - bosh sahifada `continue` → `continue_step`;
+  - uzilgan seriya 0 deb ko'rsatiladi;
+  - biriktirilmagan o'qituvchiga javob 404 bilan qaytadi;
+  - XP testi takroriy chaqiruv orqali tekshiriladi.
 
 ### `3880fb3` — 2-bosqich mini-spec'i
 - Yangi `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md` (baholash va gamifikatsiya). Brainstorming'da hal qilingan qarorlar:

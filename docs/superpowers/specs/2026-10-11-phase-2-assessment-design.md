@@ -136,6 +136,8 @@ Faoliyat yoki vazifa o'chirilsa, uning urinishlari va javoblari ham o'chadi (CAS
    - `longest = max(longest, current)`.
 
    0 XP'lik hodisa (`task_graded` ball 0 bo'lganda) qator sifatida yoziladi, lekin seriyaga ta'sir qilmaydi.
+
+   Seriya ko'rsatilganda: `last_active_date` kechadan eski bo'lsa, `current` 0 deb ko'rsatiladi (bazadagi qiymat keyingi faol kunda 1 dan boshlanadi), `longest` saqlanadi.
 3. Nishon shartlari tekshiriladi. Yangi berilganlari `user_badges`ga yoziladi (unique, savepoint bilan).
 4. `Rewards(xp, new_badges)` qaytadi.
 
@@ -206,6 +208,7 @@ Mavjud uslub saqlanadi: o'qituvchi uchun `/api/teach/...` (`StaffUser`), talaba 
 | `PATCH /teach/activities/{id}` | `{is_published}` |
 | `DELETE /teach/activities/{id}` | O'chirish |
 | `PUT /teach/steps/{step_id}/activities/order` | `{ids: [...]}` — tartiblash |
+| `GET /teach/steps/{step_id}/task` | Bosqich vazifasi yoki `null` (muharrir uchun) |
 | `PUT /teach/steps/{step_id}/task` | Vazifani yaratish yoki tahrirlash. Faqat `task` bosqichida, aks holda 400 `TASK_WRONG_STEP` |
 | `DELETE /teach/tasks/{id}` | Vazifani javoblari va ularning fayllari bilan o'chirish |
 | `GET /teach/submissions?status=&subject_id=` | Tekshirish navbati, faqat tahrirlash huquqi bor fanlar bo'yicha. Sukut bo'yicha `status=submitted`, eng eskisi birinchi |
@@ -230,7 +233,7 @@ Faoliyatda 1–50 ta element bo'ladi (krossvordda 3–20). Buzilsa → 422 `ACTI
 | `POST /activities/{id}/attempts` | `{answers}` → `{attempt_id, score, max_score, result, rewards, step}` |
 | `PUT /tasks/{id}/submission` | multipart: `text?`, `file?` → `{submission, rewards, step}` |
 | `GET /submissions/{id}/file` | O'z javob fayli |
-| `GET /me/dashboard` | `{xp_total, streak: {current, longest, active_today}, badges: [{code, icon, title_uz, title_ru, description_uz, description_ru, awarded_at \| null}], continue}` |
+| `GET /me/dashboard` | `{xp_total, streak: {current, longest, active_today}, badges: [{code, icon, title_uz, title_ru, description_uz, description_ru, awarded_at \| null}], continue_step}` (`continue` Python'da kalit so'z bo'lgani uchun `continue_step`) |
 | `GET /me/results` | Fanlar va mavzular bo'yicha: faoliyatlar (eng yaxshi foiz, urinishlar soni, oxirgi urinish `attempt_id` va sanasi) va vazifa javoblari (holat, ball, izoh, `is_late`) |
 | `GET /me/attempts/{id}` | Bitta urinishning to'liq tahlili (`result`) |
 
@@ -273,6 +276,8 @@ Barcha matnlar `uz.json` va `ru.json` ga qo'shiladi, yangi xato kodlari `errors.
 | `ACTIVITY_INVALID_ITEMS`, `CROSSWORD_INVALID_WORD`, `CROSSWORD_UNPLACEABLE`, `ATTEMPT_INVALID_ANSWERS`, `SUBMISSION_EMPTY`, `SUBMISSION_FIELD_NOT_ALLOWED`, `SCORE_OUT_OF_RANGE` | 422 |
 | `SUBMISSION_GRADED`, `SUBMISSION_NOT_SUBMITTED` | 409 |
 
+Faoliyat va element formati Pydantic bilan tekshiriladi, shuning uchun bunday xatolar 422 `VALIDATION_ERROR` bilan qaytadi: variantlar soni, bo'sh matn, element soni va krossvordda 3–20 so'z. `ACTIVITY_INVALID_ITEMS` faqat semantik xatolar uchun ishlatiladi: takrorlangan so'z, katak uzunligi, faoliyat turini o'zgartirishga urinish.
+
 Fayl xatolari uchun mavjud `UNSUPPORTED_FILE_TYPE` va `FILE_TOO_LARGE` ishlatiladi. Nashr qilinmagan faoliyat, mavzu yoki fan talabaga 404 bilan qaytadi, shuning uchun uning borligi oshkor bo'lmaydi.
 
 ### Ruxsatlar
@@ -281,7 +286,7 @@ Fayl xatolari uchun mavjud `UNSUPPORTED_FILE_TYPE` va `FILE_TOO_LARGE` ishlatila
 
 ### Backend testlari (2A)
 - **To'g'ri javob chiqib ketmasligi:** `GET /steps/{id}` javobida `correct_index`, `answer`, `cells`, `word` va `word_id` kalitlari yo'qligi rekursiv tekshiriladi.
-- **XP ikki marta berilmasligi:** bir xil `award` ikki marta chaqirilganda va ikkita parallel urinish yuborilganda `activity_completed` qatori bitta bo'ladi.
+- **XP ikki marta berilmasligi:** bir xil `award` ikki marta chaqirilganda va qayta urinishlarda `activity_completed` qatori bitta bo'ladi. Ikkinchi chaqiruv parallel so'rov bilan bir xil savepoint shoxidan o'tadi; SQLite'da parallel yozish testlari beqaror bo'lgani uchun ular yozilmaydi.
 - **Seriya:** Toshkent kun chegarasi (UTC 18:59 va 19:00), kecha → +1, kun o'tkazib yuborilsa → 1, bir kunda ikki hodisa → o'zgarmaydi, 0 XP hodisa → o'zgarmaydi.
 - **Nishonlar:** har biri shart chegarasida beriladi va ikkinchi marta berilmaydi; `sync_badges` idempotent.
 - **Krossvord:** deterministiklik, kesishmalar mosligi, yon tomondan tegmaslik, Oʻ/Gʻ bitta katak, noto'g'ri belgi, joylashmaydigan so'z, raqamlash.
