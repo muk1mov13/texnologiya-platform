@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.models_registry  # noqa: F401  (barcha jadvallarni Base.metadata'ga ro'yxatdan o'tkazadi)
 from app.core.config import Settings
 from app.core.db import Base
+from app.gamification.service import sync_badges
 from app.main import create_app
 
 TEST_SECRET = "test-secret-" + "x" * 32
@@ -35,6 +36,8 @@ async def app(settings: Settings) -> AsyncIterator[FastAPI]:
     async with application.state.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+    async with application.state.sessionmaker() as session:
+        await sync_badges(session)
     yield application
     jobs = getattr(application.state, "jobs", None)
     if jobs is not None:

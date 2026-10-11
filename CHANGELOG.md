@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 1 — gamifikatsiya modellari va nishonlar
+- Yangi `app/gamification/` moduli:
+  - `models.py` — `xp_events` ((user, reason, ref_type, ref_id) unique), `streaks`, `badges`, `user_badges`;
+  - `rules.py` — `XpReason`, XP qiymatlari, yarmi yuqoriga yaxlitlash (`round_half_up`), 10 ta nishon ta'rifi (`BADGES`);
+  - `service.py` — `sync_badges()`: nishonlarni bazaga idempotent yozadi.
+- `sync_badges` ilova lifespan'ida va testlardagi `app` fixture'ida chaqiriladi.
+- Migratsiya `c82b084aa586_gamification_tables`.
+- Testlar: `tests/test_gamification.py` (XP yaxlitlash, sinxronizatsiya idempotentligi). Jami 152 test yashil.
+
 ### `0e631a6` — 2A (backend) implementatsiya rejasi
 - Yangi `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`: 12 ta task (0–11), TDD bilan:
   - gamifikatsiya modellari va `award()`;
