@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 1 — gamifikatsiya modellari va nishonlar
+### `9e9666c` — 2A Task 1: gamifikatsiya modellari va nishonlar
 - Yangi `app/gamification/` moduli:
   - `models.py` — `xp_events` ((user, reason, ref_type, ref_id) unique), `streaks`, `badges`, `user_badges`;
   - `rules.py` — `XpReason`, XP qiymatlari, yarmi yuqoriga yaxlitlash (`round_half_up`), 10 ta nishon ta'rifi (`BADGES`);
