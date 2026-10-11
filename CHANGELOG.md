@@ -4,7 +4,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
-## 2026-10-11 — Kichik tozalash
+## 2026-10-11 — 2-bosqich mini-spec'i
+
+### 2-bosqich mini-spec'i
+- Yangi `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md` (baholash va gamifikatsiya). Brainstorming'da hal qilingan qarorlar:
+  - reja 2A (backend) va 2B (frontend) ga bo'linadi;
+  - `review`/`practice` bosqichida bir nechta faoliyat bo'lishi mumkin, bosqich hammasi yakunlanganda tugaydi;
+  - urinishdan keyin to'liq tahlil ko'rsatiladi;
+  - har talabada vazifaga bitta javob, o'qituvchi uni qaytara oladi;
+  - muddat o'tsa javob "kechikkan" belgisi bilan qabul qilinadi.
+- Gamifikatsiya: XP jadvali kodda, seriya Toshkent kuni bo'yicha, 10 ta nishon.
+- Krossvord uchun deterministik ochko'z algoritm tanlandi.
+- Asosiy spec'dagi modellarga soddalashtirishlar kiritildi, API, frontend sahifalari, xato kodlari va testlar ro'yxati yozildi.
+
+### `feat/phase-2-assessment` GitHub'ga push qilindi
+- Branch `origin/feat/phase-2-assessment` ga upstream bilan push qilindi (`b467a71` gacha). PR hali ochilmagan.
 
 ### `b5c3925` — `.gitignore`: Playwright MCP papkasi
 - `.gitignore`ga `.playwright-mcp/` qo'shildi: Playwright MCP vositasi yaratadigan vaqtinchalik fayllar repoga tushmaydi.
