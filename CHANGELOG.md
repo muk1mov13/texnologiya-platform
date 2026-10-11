@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A (backend) implementatsiya rejasi
+### `0e631a6` — 2A (backend) implementatsiya rejasi
 - Yangi `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`: 12 ta task (0–11), TDD bilan:
   - gamifikatsiya modellari va `award()`;
   - krossvord algoritmi;

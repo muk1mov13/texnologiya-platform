@@ -281,7 +281,7 @@ Faoliyat va element formati Pydantic bilan tekshiriladi, shuning uchun bunday xa
 Fayl xatolari uchun mavjud `UNSUPPORTED_FILE_TYPE` va `FILE_TOO_LARGE` ishlatiladi. Nashr qilinmagan faoliyat, mavzu yoki fan talabaga 404 bilan qaytadi, shuning uchun uning borligi oshkor bo'lmaydi.
 
 ### Ruxsatlar
-- O'qituvchi faoliyat, vazifa, javob va statistika bilan faqat tahrirlash huquqi bor fanlarda ishlaydi (`subject_teachers`). Admin barcha fanlarda ishlay oladi.
+- O'qituvchi faoliyat, vazifa, javob va statistika bilan faqat tahrirlash huquqi bor fanlarda ishlaydi (`subject_teachers`). Admin barcha fanlarda ishlay oladi. Biriktirilmagan fandagi javob so'ralsa, o'qituvchi 403 emas, 404 `SUBMISSION_NOT_FOUND` oladi, shunda javobning borligi bilinmaydi. Faoliyat, vazifa va statistika uchun mavjud `NOT_SUBJECT_TEACHER` (403) qoladi.
 - Talaba faqat o'z urinishlari, javoblari va fayllarini ko'radi. Boshqa talabaniki so'ralsa 404 qaytadi.
 
 ### Backend testlari (2A)
