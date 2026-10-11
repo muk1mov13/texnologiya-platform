@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-11 — Kichik tozalash
+
+### `b5c3925` — `.gitignore`: Playwright MCP papkasi
+- `.gitignore`ga `.playwright-mcp/` qo'shildi: Playwright MCP vositasi yaratadigan vaqtinchalik fayllar repoga tushmaydi.
+
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
 
 ### `125b8f5` — Roadmap repoga ko'chirildi (`feat/phase-2-assessment` branch'i)
