@@ -4,11 +4,27 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-11 — Kichik tozalash
+
+### `b5c3925` — `.gitignore`: Playwright MCP papkasi
+- `.gitignore`ga `.playwright-mcp/` qo'shildi: Playwright MCP vositasi yaratadigan vaqtinchalik fayllar repoga tushmaydi.
+
 ## 2026-10-10 — Texnik audit va frontend testlarini barqarorlashtirish
+
+### `125b8f5` — Roadmap repoga ko'chirildi (`feat/phase-2-assessment` branch'i)
+- 2-bosqich uchun `feat/phase-2-assessment` branch'i lokal `main` dan ochildi; `main` faqat PR orqali o'zgargani uchun PR #2 merge qaydi (`263c327`) ham shu branch bilan kiradi.
+- Yangi `docs/superpowers/roadmap.md`: 2026-10-09 da tasdiqlangan, shu paytgacha faqat lokal (`~/.claude/plans/`) turgan yo'l xaritasi. Ko'chirishda yangilandi:
+  - "Kontekst": 1A (PR #1, `59def80`) va 1B (PR #2, `0cc93d6`) `main` da, CI uch job bilan yashil;
+  - ish tartibi: subagent o'rniga task ketma-task, har task'dan keyin tasdiq;
+  - 0-qadam va 1B "bajarildi" deb belgilandi, 1B'ning CI bandi haqiqatga moslandi, qo'lda tekshirilmagan bandlar ro'yxati qo'shildi;
+  - "Keyingi aniq qadam": 2-bosqich mini-spec'i.
+  - 2–4-bosqich bo'limlari o'zgarishsiz.
+- `CLAUDE.md`: "Project" bandiga roadmap havolasi qo'shildi.
 
 ### 1B GitHub'ga joylandi — PR #2
 - `feat/phase-1b-frontend` branch'i push qilindi va `main` ga PR ochildi: https://github.com/muk1mov13/texnologiya-platform/pull/2 ("Phase 1B: frontend").
-- Merge CI'dagi `backend`, `frontend` va `e2e` job'lari yashil bo'lgach, foydalanuvchi tasdig'i bilan qilinadi; so'ng merge commit shu yerga yoziladi.
+- CI birinchi urinishda yashil o'tdi: `backend` (1m42s), `frontend` (1m18s), `e2e` (59s, API tiplari drift tekshiruvi va Playwright bilan).
+- **`0cc93d6`:** PR #2 foydalanuvchi tasdig'i bilan `main` ga merge commit bilan birlashtirildi. `feat/phase-1b-frontend` branch'i GitHub'da o'chirildi. 1-bosqich (1A backend + 1B frontend) yopildi.
 
 ### `6d4a974` — Task 18: CI, hujjatlar, API tiplari mosligi va yakuniy tekshiruv
 - `.github/workflows/ci.yml`: `backend` job'i o'zgarmadi, ikkita yangi job qo'shildi:
