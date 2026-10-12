@@ -20,7 +20,7 @@ from app.core.errors import AppError
 from app.core.types import utcnow
 from app.gamification import rules
 from app.gamification.rules import XpReason
-from app.gamification.service import Rewards, award, rewards_out
+from app.gamification.service import Rewards, rewards_out
 from app.learning import progress
 from app.learning.models import ProgressStatus, Step, Topic
 from app.learning.student_schemas import StepBrief
@@ -136,7 +136,7 @@ async def refresh_activity_step(
     row.updated_at = now
     rewards = Rewards()
     if row.status != ProgressStatus.completed and published and all(a in best for a in published):
-        rewards = await progress.mark_step_completed(db, row, topic.id, now)
+        rewards = await progress.mark_step_completed(db, user, row, topic.id, now)
     brief = StepBrief(
         id=step.id,
         kind=step.kind,
@@ -166,9 +166,9 @@ async def submit_attempt(
     )
     db.add(attempt)
     await db.flush()
-    rewards = await award(
+    rewards = await progress.reward(
         db,
-        user.id,
+        user,
         XpReason.activity_completed,
         ref_type="activity",
         ref_id=activity.id,
@@ -176,9 +176,9 @@ async def submit_attempt(
         now=now,
     )
     if score == max_score:
-        rewards += await award(
+        rewards += await progress.reward(
             db,
-            user.id,
+            user,
             XpReason.activity_perfect,
             ref_type="activity",
             ref_id=activity.id,

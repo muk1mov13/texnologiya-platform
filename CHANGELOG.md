@@ -6,6 +6,23 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### Audit 8-band — kichik tuzatishlar (7-band esa keyinga qoldirildi)
+- **Foydalanuvchi qarorlari:**
+  - yangi testlar (audit 7-band) loyiha yakunlangandan keyin yoziladi;
+  - hozircha testlar umuman ishga tushirilmaydi, faqat statik tekshiruvlar (ruff, mypy, `tsc`) qoladi;
+  - XP, seriya va nishonlar faqat talabalarga beriladi.
+- XP faqat talabalarga:
+  - yangi `learning.progress.reward(db, user, ...)` talaba bo'lmasa bo'sh mukofot qaytaradi;
+  - "Tugatdim", urinish, vazifa yuborish, mavzu mukofoti va baholash shu orqali o'tadi (baholashda javob muallifining roli olinadi);
+  - `mark_step_completed` va `topic_completion_rewards` endi `user` qabul qiladi;
+  - `gamification` boshqa modullarni import qilmaydi.
+- `GradeIn.score`: sun'iy ±1 000 000 chegarasi olib tashlandi, oraliq servisda tekshiriladi (`SCORE_OUT_OF_RANGE`).
+- `GET /api/teach/submissions` ga `limit` (1–200, sukut 50) va `offset` qo'shildi. Javob shakli o'zgarmadi.
+- `PUT /api/teach/steps/{id}/task`: maksimal ballni baholangan javoblardagi eng katta baldan pastga tushirib bo'lmaydi — yangi 409 `MAX_SCORE_BELOW_GRADED` (`details.max_graded_score`).
+- Mini-spec yangilandi: xato kodlari jadvali, 5-bo'lim (kimga XP beriladi, seriya qarori) va 7-bo'lim (navbat parametrlari, vazifa cheklovi).
+- `frontend/src/api/schema.gen.ts` qayta generatsiya qilindi.
+- Tekshiruv: ruff, mypy va `tsc` toza. Testlar foydalanuvchi qaroriga ko'ra lokal ishga tushirilmadi. Ular push'dan keyin CI'da avtomatik ishlaydi.
+
 ### `5c0c393` — Audit 6-band: takrorlangan bloklar umumiy funksiyalarga ajratildi (xatti-harakat o'zgarmadi)
 - `Storage.delete_quietly(paths)` diskdan o'chirish va xatoni logga yozishni bir joyga to'pladi. Avval bu sikl 5 joyda takrorlangan edi: `learning/teach_router.py`, `admin_router.py`, `materials.py`, `assessment/teach_router.py`, `tasks.py`.
 - `progress.mark_step_completed(db, row, topic_id, now)` bosqichni tugatish va mavzu mukofotini bir joyga to'pladi. Avval 3 joyda edi: `complete_step`, `attempts.refresh_activity_step`, `tasks.submit`.

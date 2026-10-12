@@ -137,6 +137,11 @@ Faoliyat yoki vazifa o'chirilsa, uning urinishlari va javoblari ham o'chadi (CAS
 
    0 XP'lik hodisa (`task_graded` ball 0 bo'lganda) qator sifatida yoziladi, lekin seriyaga ta'sir qilmaydi.
 
+   XP, seriya va nishonlar faqat talaba rolidagi foydalanuvchilarga beriladi. O'qituvchi yoki
+   admin kursni ko'rib chiqayotganda progress saqlanadi, lekin mukofot berilmaydi
+   (`learning.progress.reward`). O'qituvchi baho qo'yganda talabaning seriyasi oshadi
+   (foydalanuvchi qarori, 2026-10-12).
+
    Seriya ko'rsatilganda: `last_active_date` kechadan eski bo'lsa, `current` 0 deb ko'rsatiladi (bazadagi qiymat keyingi faol kunda 1 dan boshlanadi), `longest` saqlanadi.
 3. Nishon shartlari tekshiriladi. Yangi berilganlari `user_badges`ga yoziladi (unique, savepoint bilan).
 4. `Rewards(xp, new_badges)` qaytadi.
@@ -209,9 +214,9 @@ Mavjud uslub saqlanadi: o'qituvchi uchun `/api/teach/...` (`StaffUser`), talaba 
 | `DELETE /teach/activities/{id}` | O'chirish |
 | `PUT /teach/steps/{step_id}/activities/order` | `{ids: [...]}` — tartiblash |
 | `GET /teach/steps/{step_id}/task` | Bosqich vazifasi yoki `null` (muharrir uchun) |
-| `PUT /teach/steps/{step_id}/task` | Vazifani yaratish yoki tahrirlash. Faqat `task` bosqichida, aks holda 400 `TASK_WRONG_STEP` |
+| `PUT /teach/steps/{step_id}/task` | Vazifani yaratish yoki tahrirlash. Faqat `task` bosqichida, aks holda 400 `TASK_WRONG_STEP`. Maksimal ballni baholangan javoblardagi eng katta baldan pastga tushirib bo'lmaydi: 409 `MAX_SCORE_BELOW_GRADED` |
 | `DELETE /teach/tasks/{id}` | Vazifani javoblari va ularning fayllari bilan o'chirish |
-| `GET /teach/submissions?status=&subject_id=` | Tekshirish navbati, faqat tahrirlash huquqi bor fanlar bo'yicha. Sukut bo'yicha `status=submitted`, eng eskisi birinchi |
+| `GET /teach/submissions?status=&subject_id=&limit=&offset=` | Tekshirish navbati, faqat tahrirlash huquqi bor fanlar bo'yicha. Sukut bo'yicha `status=submitted`, eng eskisi birinchi, `limit` 1–200 (sukut 50) |
 | `GET /teach/submissions/{id}` | Javob tafsiloti: talaba ismi, fan/mavzu, vazifa, matn, fayl nomi, `is_late` |
 | `GET /teach/submissions/{id}/file` | Javob fayli |
 | `POST /teach/submissions/{id}/grade` | `{score, feedback?}` → `graded`. Ball oraliqdan tashqarida bo'lsa → 422 `SCORE_OUT_OF_RANGE` |
@@ -274,7 +279,7 @@ Barcha matnlar `uz.json` va `ru.json` ga qo'shiladi, yangi xato kodlari `errors.
 | `ACTIVITY_NOT_FOUND`, `TASK_NOT_FOUND`, `SUBMISSION_NOT_FOUND`, `ATTEMPT_NOT_FOUND` | 404 |
 | `ACTIVITY_WRONG_STEP`, `TASK_WRONG_STEP` | 400 |
 | `ACTIVITY_INVALID_ITEMS`, `CROSSWORD_INVALID_WORD`, `CROSSWORD_UNPLACEABLE`, `ATTEMPT_INVALID_ANSWERS`, `SUBMISSION_EMPTY`, `SUBMISSION_FIELD_NOT_ALLOWED`, `SCORE_OUT_OF_RANGE` | 422 |
-| `SUBMISSION_GRADED`, `SUBMISSION_NOT_SUBMITTED` | 409 |
+| `SUBMISSION_GRADED`, `SUBMISSION_NOT_SUBMITTED`, `MAX_SCORE_BELOW_GRADED` | 409 |
 
 Faoliyat va element formati Pydantic bilan tekshiriladi, shuning uchun bunday xatolar 422 `VALIDATION_ERROR` bilan qaytadi: variantlar soni, bo'sh matn, element soni va krossvordda 3–20 so'z. `ACTIVITY_INVALID_ITEMS` faqat semantik xatolar uchun ishlatiladi: takrorlangan so'z, katak uzunligi, faoliyat turini o'zgartirishga urinish.
 

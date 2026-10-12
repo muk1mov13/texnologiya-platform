@@ -3308,6 +3308,8 @@ export interface operations {
             query?: {
                 status?: components["schemas"]["SubmissionStatus"];
                 subject_id?: number | null;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;

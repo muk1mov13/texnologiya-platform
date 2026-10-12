@@ -9,10 +9,10 @@ from app.core.errors import AppError
 from app.core.types import utcnow
 from app.gamification import rules
 from app.gamification.rules import XpReason
-from app.gamification.service import award
+from app.learning import progress
 from app.learning.models import Step, Subject, Topic, subject_teachers
 
-QUEUE_LIMIT = 200
+QUEUE_LIMIT = 200  # bitta sahifadagi eng ko'p javoblar soni
 
 ReviewRow = tuple[Submission, Task, Topic, Subject, str]
 
@@ -74,12 +74,18 @@ def _detail(row: ReviewRow) -> SubmissionDetailOut:
 
 
 async def list_queue(
-    db: AsyncSession, user: User, status: SubmissionStatus, subject_id: int | None
+    db: AsyncSession,
+    user: User,
+    status: SubmissionStatus,
+    subject_id: int | None,
+    *,
+    limit: int,
+    offset: int,
 ) -> list[SubmissionQueueItem]:
     stmt = _base_query(user).where(Submission.status == status)
     if subject_id is not None:
         stmt = stmt.where(Subject.id == subject_id)
-    stmt = stmt.order_by(Submission.submitted_at, Submission.id).limit(QUEUE_LIMIT)
+    stmt = stmt.order_by(Submission.submitted_at, Submission.id).limit(limit).offset(offset)
     return [_queue_item(_as_review_row(row)) for row in await db.execute(stmt)]
 
 
@@ -123,15 +129,17 @@ async def grade(
     submission.feedback = (data.feedback or "").strip() or None
     submission.graded_by = user.id
     submission.graded_at = now
-    await award(
-        db,
-        submission.user_id,
-        XpReason.task_graded,
-        ref_type="submission",
-        ref_id=submission.id,
-        amount=rules.graded_xp(data.score, task.max_score),
-        now=now,
-    )
+    author = await db.get(User, submission.user_id)
+    if author is not None:
+        await progress.reward(
+            db,
+            author,
+            XpReason.task_graded,
+            ref_type="submission",
+            ref_id=submission.id,
+            amount=rules.graded_xp(data.score, task.max_score),
+            now=now,
+        )
     await db.commit()
     return _detail(row)
 

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.assessment import views
 from app.assessment.models import ACTIVITY_STEP_KINDS
-from app.auth.models import User
+from app.auth.models import Role, User
 from app.core.errors import AppError
 from app.core.types import utcnow
 from app.gamification import rules
@@ -188,20 +188,39 @@ async def get_or_create_progress(db: AsyncSession, user_id: int, step_id: int) -
     return row
 
 
+async def reward(
+    db: AsyncSession,
+    user: User,
+    reason: XpReason,
+    *,
+    ref_type: str,
+    ref_id: int,
+    amount: int,
+    now: datetime,
+) -> Rewards:
+    """XP faqat talabalarga beriladi: o'qituvchi yoki admin kursni ko'rib chiqayotganda
+    progress saqlanadi, lekin XP, seriya va nishon berilmaydi."""
+    if user.role != Role.student:
+        return Rewards()
+    return await award(
+        db, user.id, reason, ref_type=ref_type, ref_id=ref_id, amount=amount, now=now
+    )
+
+
 async def topic_completion_rewards(
-    db: AsyncSession, user_id: int, topic_id: int, now: datetime
+    db: AsyncSession, user: User, topic_id: int, now: datetime
 ) -> Rewards:
     """Mavzuning kontenti bor barcha bosqichlari tugagan bo'lsa, `topic_completed`
     XP'sini beradi."""
     await db.flush()
     infos = (await load_step_infos(db, [topic_id]))[topic_id]
-    status = await load_progress(db, user_id, [info.id for info in infos])
+    status = await load_progress(db, user.id, [info.id for info in infos])
     done, total = count_progress(infos, status)
     if total == 0 or done < total:
         return Rewards()
-    return await award(
+    return await reward(
         db,
-        user_id,
+        user,
         XpReason.topic_completed,
         ref_type="topic",
         ref_id=topic_id,
@@ -211,14 +230,14 @@ async def topic_completion_rewards(
 
 
 async def mark_step_completed(
-    db: AsyncSession, row: StepProgress, topic_id: int, now: datetime
+    db: AsyncSession, user: User, row: StepProgress, topic_id: int, now: datetime
 ) -> Rewards:
     """Bosqichni tugatilgan deb belgilaydi; mavzu to'liq tugagan bo'lsa uning XP'sini beradi."""
     if row.status != ProgressStatus.completed:
         row.status = ProgressStatus.completed
         row.completed_at = now
     row.updated_at = now
-    return await topic_completion_rewards(db, row.user_id, topic_id, now)
+    return await topic_completion_rewards(db, user, topic_id, now)
 
 
 async def visible_topic_or(db: AsyncSession, user: User, topic_id: int, error: AppError) -> Topic:
@@ -300,16 +319,16 @@ async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepCompl
 
     now = utcnow()
     row = await get_or_create_progress(db, user.id, step.id)
-    rewards = await award(
+    rewards = await reward(
         db,
-        user.id,
+        user,
         XpReason.step_completed,
         ref_type="step",
         ref_id=step.id,
         amount=rules.STEP_COMPLETED_XP,
         now=now,
     )
-    rewards += await mark_step_completed(db, row, topic.id, now)
+    rewards += await mark_step_completed(db, user, row, topic.id, now)
     await db.commit()
     return StepCompleteOut(
         id=step.id,

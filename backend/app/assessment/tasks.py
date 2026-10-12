@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi import UploadFile
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +16,7 @@ from app.core.storage import Storage
 from app.core.types import utcnow
 from app.gamification import rules
 from app.gamification.rules import XpReason
-from app.gamification.service import award, rewards_out
+from app.gamification.service import rewards_out
 from app.learning import editing, progress
 from app.learning.models import ProgressStatus, Step, StepKind, Topic
 from app.learning.student_schemas import StepBrief
@@ -64,6 +64,18 @@ async def upsert_task(db: AsyncSession, step: Step, data: TaskIn) -> Task:
             task = await get_step_task(db, step.id)
             if task is None:
                 raise
+    top_score = await db.scalar(
+        select(func.max(Submission.score)).where(
+            Submission.task_id == task.id, Submission.status == SubmissionStatus.graded
+        )
+    )
+    if top_score is not None and data.max_score < top_score:
+        raise AppError(
+            409,
+            "MAX_SCORE_BELOW_GRADED",
+            "Maksimal ball baholangan javoblardagi baldan kam bo'lishi mumkin emas",
+            {"max_graded_score": top_score},
+        )
     task.title = data.title
     task.description = data.description
     task.type = data.type
@@ -207,9 +219,9 @@ async def submit(
             submission.file = new_file
             submission.original_name = original_name
         await db.flush()
-        rewards = await award(
+        rewards = await progress.reward(
             db,
-            user.id,
+            user,
             XpReason.task_submitted,
             ref_type="task",
             ref_id=task.id,
@@ -217,7 +229,7 @@ async def submit(
             now=now,
         )
         row = await progress.get_or_create_progress(db, user.id, step.id)
-        rewards += await progress.mark_step_completed(db, row, topic.id, now)
+        rewards += await progress.mark_step_completed(db, user, row, topic.id, now)
         await db.commit()
     except BaseException:
         storage.delete(new_file)

@@ -27,8 +27,10 @@ async def list_submissions(
     db: DbSession,
     status: SubmissionStatus = SubmissionStatus.submitted,
     subject_id: Annotated[int | None, Query(ge=1, le=DB_ID_MAX)] = None,
+    limit: Annotated[int, Query(ge=1, le=review.QUEUE_LIMIT)] = 50,
+    offset: Annotated[int, Query(ge=0, le=DB_ID_MAX)] = 0,
 ) -> list[SubmissionQueueItem]:
-    return await review.list_queue(db, user, status, subject_id)
+    return await review.list_queue(db, user, status, subject_id, limit=limit, offset=offset)
 
 
 @router.get("/submissions/{submission_id}", response_model=SubmissionDetailOut)

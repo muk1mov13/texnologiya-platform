@@ -194,7 +194,7 @@ class SubmissionDetailOut(SubmissionQueueItem):
 
 class GradeIn(BaseModel):
     # Oraliq (0..max_score) servisda tekshiriladi: SCORE_OUT_OF_RANGE.
-    score: int = Field(ge=-1_000_000, le=1_000_000)
+    score: int
     feedback: str | None = Field(default=None, max_length=5000)
 
 
