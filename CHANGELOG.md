@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 4 — baholash modellari va umumiy fayl yordamchilari
+### `d229654` — 2A Task 4: baholash modellari va umumiy fayl yordamchilari
 - Yangi `app/assessment/models.py`:
   - jadvallar `activities` (krossvordda `layout` JSON), `quiz_questions`, `yesno_items`, `crossword_words`, `attempts` (`result` — har element bo'yicha natija nusxasi), `tasks` (`step_id` unique) va `submissions` ((task, user) unique, `submitted_at`);
   - enum'lar `ActivityType`, `TaskType`, `SubmissionStatus`;
