@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
 
-from app.assessment.models import ActivityType, TaskType
+from app.assessment.models import ActivityType, SubmissionStatus, TaskType
 from app.assessment.view_schemas import LayoutWord, SubmissionView
 from app.core.types import DbId, trimmed_str
 from app.gamification.schemas import RewardsOut
@@ -164,3 +164,43 @@ class SubmitOut(BaseModel):
     submission: SubmissionView
     rewards: RewardsOut
     step: StepBrief
+
+
+class SubmissionQueueItem(BaseModel):
+    id: int
+    status: SubmissionStatus
+    student_name: str
+    subject_id: int
+    subject_title: str
+    topic_id: int
+    topic_title: str
+    task_id: int
+    task_title: str
+    submitted_at: datetime
+    is_late: bool
+
+
+class SubmissionDetailOut(SubmissionQueueItem):
+    task_description: str
+    rubric: str | None
+    max_score: int
+    text: str | None
+    original_name: str | None
+    file_url: str | None
+    score: int | None
+    feedback: str | None
+    graded_at: datetime | None
+
+
+class GradeIn(BaseModel):
+    # Oraliq (0..max_score) servisda tekshiriladi: SCORE_OUT_OF_RANGE.
+    score: int = Field(ge=-1_000_000, le=1_000_000)
+    feedback: str | None = Field(default=None, max_length=5000)
+
+
+class ReturnIn(BaseModel):
+    feedback: trimmed_str(max_length=5000)  # type: ignore[valid-type]
+
+
+class TeachSummaryOut(BaseModel):
+    pending_submissions: int

@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 9 — tekshirish navbati, baholash va qaytarish
+- Yangi endpoint'lar (`/api/teach`, o'qituvchi faqat biriktirilgan fanlar bo'yicha, admin hammasi bo'yicha):
+  - `GET /submissions?status=&subject_id=` — navbat, sukut bo'yicha `submitted`, eng eskisi birinchi, ko'pi bilan 200 ta;
+  - `GET /submissions/{id}` va `/file`;
+  - `POST /submissions/{id}/grade` — `graded`. Ball 0..max oralig'idan tashqarida bo'lsa `SCORE_OUT_OF_RANGE`. Talabaga `task_graded` XP beriladi (30 × ball/max);
+  - `POST /submissions/{id}/return` — `returned`, izoh majburiy;
+  - `GET /summary` — `pending_submissions`.
+- Baholash va qaytarish faqat `submitted` holatidan mumkin, aks holda `SUBMISSION_NOT_SUBMITTED` (409). Biriktirilmagan o'qituvchi javobni so'rasa 404 oladi.
+- SQLAlchemy 2.1 da `Row.tuple()` eskirgan, shuning uchun qatorlar to'g'ridan-to'g'ri ochiladi. `Select`/`Row` annotatsiyalari yangi generik ko'rinishda (`Select[A, B, ...]`) yozildi.
+- Yangi fayllar: `assessment/review.py`, `assessment/review_router.py`.
+- Testlar: `tests/test_review.py` (4 ta). Jami 208 test yashil.
+
 ### `55d7667` — 2A Task 8: vazifalar va javob yuborish
 - O'qituvchi (`/api/teach`):
   - `GET` va `PUT /steps/{id}/task` — bosqichda bitta vazifa, faqat `task` bosqichida (`TASK_WRONG_STEP`);
