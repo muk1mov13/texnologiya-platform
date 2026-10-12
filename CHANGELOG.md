@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### Audit 3-band — `sync_badges` parallel ishga tushishga chidamli
+### `84e219b` — Audit 3-band: `sync_badges` parallel ishga tushishga chidamli
 - `gamification/service.py`:
   - `sync_badges()` yangi nishonni savepoint ichida qo'shadi. Boshqa server jarayoni uni shu orada qo'shgan bo'lsa (`badges.code` unique to'qnashuvi), nishon qayta o'qiladi va yangilanadi, jarayon qulamaydi.
   - `_existing_badges()` va `_apply_rule()` ajratildi.
