@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B Task 5 — krossvord pleyeri
+### `9480c38` — 2B Task 5: krossvord pleyeri
 - Yangi `features/student/assessment/crossword.ts` — sof yordamchilar: `cellKey`, `wordCells`, `cellOwners`, `answersFromCells`, `normalizeCellInput` (Oʻ / Gʻ bitta katak, apostrof turlari birlashtiriladi), `mayTakeApostrophe`.
 - Yangi `CrosswordPlayer.tsx`:
   - katakli to'r: ustunlar `minmax(0, 2.5rem)`, shuning uchun 375px kenglikda gorizontal scroll yo'q; so'z boshida raqam, faol so'z ajratib ko'rsatiladi;
