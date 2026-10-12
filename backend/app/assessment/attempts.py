@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.assessment import crossword
@@ -14,7 +14,7 @@ from app.assessment.models import (
     YesNoItem,
 )
 from app.assessment.schemas import AttemptIn, AttemptOut, ResultItem
-from app.assessment.views import ATTEMPT_PERCENT
+from app.assessment.views import attempt_stats
 from app.auth.models import User
 from app.core.errors import AppError
 from app.core.types import utcnow
@@ -47,10 +47,7 @@ async def get_attemptable_activity(
     step = await db.get(Step, activity.step_id)
     if step is None:
         raise _not_found()
-    try:
-        topic, _subject = await progress.get_visible_topic(db, user, step.topic_id)
-    except AppError:
-        raise _not_found() from None
+    topic = await progress.visible_topic_or(db, user, step.topic_id, _not_found())
     return activity, step, topic
 
 
@@ -132,22 +129,14 @@ async def refresh_activity_step(
             select(Activity.id).where(Activity.step_id == step.id, Activity.is_published.is_(True))
         )
     )
-    best: dict[int, float] = {
-        row.activity_id: float(row.best)
-        for row in await db.execute(
-            select(Attempt.activity_id, func.max(ATTEMPT_PERCENT).label("best"))
-            .where(Attempt.user_id == user.id, Attempt.activity_id.in_(published))
-            .group_by(Attempt.activity_id)
-        )
-    }
+    stats = await attempt_stats(db, user.id, published)
+    best = {activity_id: percent for activity_id, (percent, _count) in stats.items()}
     row = await progress.get_or_create_progress(db, user.id, step.id)
     row.best_score = round(sum(best.values()) / len(best), 2) if best else None
     row.updated_at = now
     rewards = Rewards()
     if row.status != ProgressStatus.completed and published and all(a in best for a in published):
-        row.status = ProgressStatus.completed
-        row.completed_at = now
-        rewards = await progress.topic_completion_rewards(db, user.id, topic.id, now)
+        rewards = await progress.mark_step_completed(db, row, topic.id, now)
     brief = StepBrief(
         id=step.id,
         kind=step.kind,

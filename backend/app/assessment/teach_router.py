@@ -1,4 +1,3 @@
-import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Response
@@ -16,8 +15,6 @@ from app.assessment.schemas import (
 from app.auth.deps import StaffUser
 from app.core.deps import AppStorage, DbSession
 from app.core.types import DbIdPath
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/teach", tags=["teach"])
 
@@ -92,9 +89,5 @@ async def delete_task(
     task_id: DbIdPath, user: StaffUser, db: DbSession, storage: AppStorage
 ) -> Response:
     task = await tasks.ensure_can_edit_task(db, user, task_id)
-    for path in await tasks.delete_task(db, task):
-        try:
-            storage.delete(path)
-        except OSError:
-            logger.warning("Faylni o'chirib bo'lmadi: %s", path)
+    storage.delete_quietly(await tasks.delete_task(db, task))
     return Response(status_code=204)

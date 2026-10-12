@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### Audit 6-band — takrorlangan bloklar umumiy funksiyalarga ajratildi (xatti-harakat o'zgarmadi)
+- `Storage.delete_quietly(paths)` diskdan o'chirish va xatoni logga yozishni bir joyga to'pladi. Avval bu sikl 5 joyda takrorlangan edi: `learning/teach_router.py`, `admin_router.py`, `materials.py`, `assessment/teach_router.py`, `tasks.py`.
+- `progress.mark_step_completed(db, row, topic_id, now)` bosqichni tugatish va mavzu mukofotini bir joyga to'pladi. Avval 3 joyda edi: `complete_step`, `attempts.refresh_activity_step`, `tasks.submit`.
+- `progress.visible_topic_or(db, user, topic_id, error)` — "mavzu ko'rinmasa ichki obyekt uchun 404" bloki. Avval `attempts.py` va `tasks.py` da takrorlangan edi.
+- `attempts.refresh_activity_step` endi o'z so'rovi o'rniga `views.attempt_stats()` ni ishlatadi. `reports.py` dagi ikkita foiz so'rovi boshqa shakldagi natija qaytaradi (oxirgi urinish, talabalar bo'yicha guruhlash), shuning uchun ataylab qoldirildi.
+- 4 ta modulda keraksiz bo'lib qolgan `logger` olib tashlandi.
+- Test: `test_delete_quietly_skips_missing_and_logs_os_errors`. Jami 219 test yashil.
+
 ### `818d7e2` — Audit 5-band: `award()` faqat takroriy hodisani yutadi
 - `gamification/service.py`:
   - `IntegrityError` dan keyin hodisa bazada haqiqatan bormi, tekshiriladi (`_event_exists`). Bor bo'lsa, bu takror va 0 XP qaytadi. Yo'q bo'lsa, masalan mavjud bo'lmagan foydalanuvchi (FK xatosi), xato ko'tariladi.

@@ -210,6 +210,27 @@ async def topic_completion_rewards(
     )
 
 
+async def mark_step_completed(
+    db: AsyncSession, row: StepProgress, topic_id: int, now: datetime
+) -> Rewards:
+    """Bosqichni tugatilgan deb belgilaydi; mavzu to'liq tugagan bo'lsa uning XP'sini beradi."""
+    if row.status != ProgressStatus.completed:
+        row.status = ProgressStatus.completed
+        row.completed_at = now
+    row.updated_at = now
+    return await topic_completion_rewards(db, row.user_id, topic_id, now)
+
+
+async def visible_topic_or(db: AsyncSession, user: User, topic_id: int, error: AppError) -> Topic:
+    """`get_visible_topic`, lekin ko'rinmasa berilgan xato ko'tariladi: ichki obyektning
+    (faoliyat, vazifa) borligi oshkor qilinmaydi."""
+    try:
+        topic, _subject = await get_visible_topic(db, user, topic_id)
+    except AppError:
+        raise error from None
+    return topic
+
+
 async def step_content(db: AsyncSession, user: User, step_id: int) -> StepContentOut:
     step = await editing.get_step(db, step_id)
     topic, _ = await get_visible_topic(db, user, step.topic_id)
@@ -279,10 +300,6 @@ async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepCompl
 
     now = utcnow()
     row = await get_or_create_progress(db, user.id, step.id)
-    if row.status != ProgressStatus.completed:
-        row.status = ProgressStatus.completed
-        row.completed_at = now
-    row.updated_at = now
     rewards = await award(
         db,
         user.id,
@@ -292,7 +309,7 @@ async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepCompl
         amount=rules.STEP_COMPLETED_XP,
         now=now,
     )
-    rewards += await topic_completion_rewards(db, user.id, topic.id, now)
+    rewards += await mark_step_completed(db, row, topic.id, now)
     await db.commit()
     return StepCompleteOut(
         id=step.id,

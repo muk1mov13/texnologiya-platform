@@ -70,3 +70,26 @@ def test_import_file_and_delete(tmp_path: Path) -> None:
     storage.delete(rel)
     assert not storage.path(rel).exists()
     storage.delete(None)
+
+
+def test_delete_quietly_skips_missing_and_logs_os_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    storage = Storage(tmp_path)
+    kept = storage.import_file(_write(tmp_path / "a.pdf"), "materials", ".pdf")
+    removed = storage.import_file(_write(tmp_path / "b.pdf"), "materials", ".pdf")
+
+    storage.delete_quietly([removed, None, "materials/yoq.pdf"])
+    assert not storage.path(removed).exists()
+
+    def locked(_self: Path, missing_ok: bool = False) -> None:
+        raise PermissionError("band")
+
+    monkeypatch.setattr(Path, "unlink", locked)
+    storage.delete_quietly([kept])  # xato ko'tarilmaydi, faqat log yoziladi
+    assert "materials/" in caplog.text
+
+
+def _write(path: Path) -> Path:
+    path.write_bytes(b"%PDF-1.4")
+    return path

@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -21,8 +20,6 @@ from app.gamification.service import award, rewards_out
 from app.learning import editing, progress
 from app.learning.models import ProgressStatus, Step, StepKind, Topic
 from app.learning.student_schemas import StepBrief
-
-logger = logging.getLogger(__name__)
 
 ALLOWED_SUBMISSION_EXT = frozenset(
     {".pdf", ".doc", ".docx", ".ppt", ".pptx", ".jpg", ".jpeg", ".png"}
@@ -124,10 +121,7 @@ async def get_submittable_task(
     step = await db.get(Step, task.step_id)
     if step is None:
         raise _task_not_found()
-    try:
-        topic, _subject = await progress.get_visible_topic(db, user, step.topic_id)
-    except AppError:
-        raise _task_not_found() from None
+    topic = await progress.visible_topic_or(db, user, step.topic_id, _task_not_found())
     return task, step, topic
 
 
@@ -223,20 +217,12 @@ async def submit(
             now=now,
         )
         row = await progress.get_or_create_progress(db, user.id, step.id)
-        if row.status != ProgressStatus.completed:
-            row.status = ProgressStatus.completed
-            row.completed_at = now
-        row.updated_at = now
-        rewards += await progress.topic_completion_rewards(db, user.id, topic.id, now)
+        rewards += await progress.mark_step_completed(db, row, topic.id, now)
         await db.commit()
     except BaseException:
         storage.delete(new_file)
         raise
-    if old_file:
-        try:
-            storage.delete(old_file)
-        except OSError:
-            logger.warning("Eski javob faylini o'chirib bo'lmadi: %s", old_file)
+    storage.delete_quietly([old_file])
     return SubmitOut(
         submission=views.submission_view(submission, task),
         rewards=rewards_out(rewards),

@@ -1,10 +1,14 @@
+import logging
 import shutil
 import uuid
+from collections.abc import Iterable
 from pathlib import Path
 
 from fastapi import UploadFile
 
 from app.core.errors import AppError
+
+logger = logging.getLogger(__name__)
 
 CHUNK_SIZE = 1024 * 1024
 MAX_ORIGINAL_NAME_LENGTH = 255
@@ -82,3 +86,13 @@ class Storage:
     def delete(self, rel: str | None) -> None:
         if rel:
             self.path(rel).unlink(missing_ok=True)
+
+    def delete_quietly(self, rels: Iterable[str | None]) -> None:
+        """Fayllarni o'chiradi; o'chirib bo'lmaganini (qulflangan, ruxsatsiz) faqat logga
+        yozadi. Baza o'zgarishi allaqachon saqlangandan keyin chaqiriladi, shuning uchun
+        so'rov 500'ga aylantirilmaydi."""
+        for rel in rels:
+            try:
+                self.delete(rel)
+            except OSError:
+                logger.warning("Faylni o'chirib bo'lmadi: %s", rel)
