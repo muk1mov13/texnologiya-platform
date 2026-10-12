@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 9 — tekshirish navbati, baholash va qaytarish
+### `6ad0405` — 2A Task 9: tekshirish navbati, baholash va qaytarish
 - Yangi endpoint'lar (`/api/teach`, o'qituvchi faqat biriktirilgan fanlar bo'yicha, admin hammasi bo'yicha):
   - `GET /submissions?status=&subject_id=` — navbat, sukut bo'yicha `submitted`, eng eskisi birinchi, ko'pi bilan 200 ta;
   - `GET /submissions/{id}` va `/file`;
