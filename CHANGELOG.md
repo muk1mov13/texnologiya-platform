@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 6 — talaba bosqich ko'rinishi (javobsiz) va kontent hisobi
+### `2994808` — 2A Task 6: talaba bosqich ko'rinishi (javobsiz) va kontent hisobi
 - `learning/content.py`: `review`/`practice` bosqichi nashr qilingan faoliyati bo'lsa, `task` bosqichi vazifasi bo'lsa "kontentli" hisoblanadi va mavzu progressiga kiradi.
 - `GET /api/steps/{id}` javobiga yangi maydonlar qo'shildi:
   - `activities` — faqat nashr qilinganlar, to'g'ri javobsiz: test variantlari, ha/yo'q bayonotlari, krossvordda faqat koordinata, uzunlik va savol, hamda talabaning eng yaxshi foizi va urinishlar soni;
