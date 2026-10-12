@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B Task 3 — bosh sahifada XP, seriya va nishonlar
+### `6d12350` — 2B Task 3: bosh sahifada XP, seriya va nishonlar
 - Yangi `features/student/DashboardStats.tsx` (`useDashboard`):
   - uchta karta: seriya ("bugun o'qidingizmi" izohi bilan), XP (eng uzun seriya izohi bilan), olingan nishonlar soni;
   - 10 ta nishon to'ri: olinmagani xira va kulrang, nomi va ta'rifi tilga qarab;
