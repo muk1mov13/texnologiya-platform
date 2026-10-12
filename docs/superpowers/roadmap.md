@@ -4,13 +4,17 @@
 
 Bu fayl platformani oxirigacha qurish va ishga tushirish uchun bosqichma-bosqich yo'l xaritasi. U 2026-10-09 da tasdiqlangan va dastlab faqat lokal saqlangan edi; 2026-10-10 da repoga ko'chirildi.
 
-Hozirgi holat (2026-10-10):
+Hozirgi holat (2026-10-12):
 
 - **1-bosqich tugadi.**
   - 1A (backend) — PR #1, merge commit `59def80`.
   - 1B (frontend) — PR #2, merge commit `0cc93d6`.
   - CI uchta job bilan yashil: `backend`, `frontend`, `e2e`.
-- **Qolganlari yozilmagan:** baholash va gamifikatsiya (2), AI (3), kutubxona, CMS, ochiq sayt va deploy (4).
+- **2-bosqich jarayonda.**
+  - Mini-spec: `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`.
+  - 2A (backend) bajarildi: reja `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`, `feat/phase-2-assessment` branch'ida, hali PR ochilmagan.
+  - 2B (frontend) rejasi yozilmagan.
+- **Qolganlari yozilmagan:** AI (3), kutubxona, CMS, ochiq sayt va deploy (4).
 - **Lokal muhit:** `uv`, Python 3.12, Node 24, Playwright Chromium bor. LibreOffice va Docker o'rnatilmagan.
 
 Manba: `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`, 10-bo'lim. Yo'l xaritasi spec'dagi bosqichlar tartibiga amal qiladi va har bosqich uchun aniq qadamlar, bog'liqliklar hamda "tayyor" mezonini beradi. Bajarilgan ishlarning batafsil tarixi — `CHANGELOG.md`.
@@ -91,7 +95,7 @@ Backend'ga 1B davomida 3 ta ataylab qilingan auth tuzatishi kirdi (refresh grace
 
 ---
 
-## 2-bosqich: Baholash va gamifikatsiya
+## 2-bosqich: Baholash va gamifikatsiya — 🟡 2A (backend) bajarildi, 2B (frontend) navbatda
 
 **Mini-spec'da hal qilinadigan masalalar:**
 - XP qiymatlari konfiguratsiyasi;
@@ -226,4 +230,4 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 
 ## Keyingi aniq qadam
 
-2-bosqich mini-spec'i: XP qiymatlari, nishonlar ro'yxati, krossvord algoritmi va vazifa fayllari cheklovi hal qilinadi. So'ng `docs/superpowers/plans/` ichida 2-bosqichning implementatsiya rejasi yoziladi. Ish `feat/phase-2-assessment` branch'ida olib boriladi.
+2B (frontend) implementatsiya rejasi: mini-spec'ning 8-bo'limi asosida `docs/superpowers/plans/` ichida yoziladi. Unda bosh sahifa, o'ynash ekranlari, muharrirlar, tekshirish navbati, statistika va E2E baholash oqimi bo'ladi. 2A va 2B bitta branch'da bo'lsa, PR 2B dan keyin ochiladi; 2A ni alohida PR qilish ham mumkin, bu foydalanuvchi bilan hal qilinadi.

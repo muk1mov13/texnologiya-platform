@@ -136,6 +136,67 @@ export interface LiteratureItem {
   order: number
 }
 
+export type ActivityType = 'quiz' | 'yesno' | 'crossword'
+export type TaskType = 'text' | 'file' | 'both'
+export type SubmissionStatus = 'submitted' | 'graded' | 'returned'
+
+export interface StudentLayoutWord {
+  number: number
+  row: number
+  col: number
+  direction: 'across' | 'down'
+  length: number
+  clue: string
+}
+
+export interface StudentLayout {
+  rows: number
+  cols: number
+  words: StudentLayoutWord[]
+}
+
+export interface QuizItemView {
+  text: string
+  options: string[]
+}
+
+export interface YesNoItemView {
+  statement: string
+}
+
+export interface ActivityView {
+  id: number
+  type: ActivityType
+  title: string
+  items: (QuizItemView | YesNoItemView)[]
+  layout: StudentLayout | null
+  best_percent: number | null
+  attempts_count: number
+}
+
+export interface TaskView {
+  id: number
+  title: string
+  description: string
+  type: TaskType
+  max_score: number
+  rubric: string | null
+  deadline: string | null
+}
+
+export interface SubmissionView {
+  id: number
+  status: SubmissionStatus
+  text: string | null
+  original_name: string | null
+  file_url: string | null
+  score: number | null
+  feedback: string | null
+  submitted_at: string
+  graded_at: string | null
+  is_late: boolean
+}
+
 export interface StepContent {
   id: number
   topic_id: number
@@ -146,6 +207,9 @@ export interface StepContent {
   materials: MaterialView[]
   glossary: GlossaryTerm[]
   literature: LiteratureItem[]
+  activities: ActivityView[]
+  task: TaskView | null
+  submission: SubmissionView | null
 }
 
 export interface ContinueTarget {

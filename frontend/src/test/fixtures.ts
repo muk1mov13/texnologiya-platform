@@ -55,6 +55,9 @@ export function stepContent(overrides: Partial<StepContent> = {}): StepContent {
     materials: [{ id: 500, title: "Kirish ma'ruzasi", page_count: 3, file_url: '/api/materials/500/file' }],
     glossary: [],
     literature: [],
+    activities: [],
+    task: null,
+    submission: null,
     ...overrides,
   }
 }

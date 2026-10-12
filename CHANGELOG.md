@@ -6,6 +6,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 11 — API tiplari, hujjatlar va yakuniy tekshiruv (2A yopildi)
+- `frontend/src/api/schema.gen.ts` `npm run gen:api` bilan qayta generatsiya qilindi.
+- `types.ts` ga talaba ko'rinishi tiplari qo'shildi: `ActivityView`, `TaskView`, `SubmissionView`, `StudentLayout` va boshqalar. `StepContent` ga `activities`, `task`, `submission` qo'shildi, ular `types.contract.ts` da tekshiriladi. `test/fixtures.ts` yangilandi. UI o'zgarmadi.
+- `CLAUDE.md`: 2-bosqich holati, `app/assessment/` va `app/gamification/` arxitekturasi (import yo'nalishi, `award()` idempotentligi, `sync_badges`) va bosqichni tugatish qoidalari yozildi.
+- `docs/superpowers/roadmap.md`: "Hozirgi holat"da 2A bajarildi, "Keyingi aniq qadam" — 2B frontend rejasi.
+- Yakuniy tekshiruv:
+  - backend: ruff, mypy, 213 pytest;
+  - frontend: lint, typecheck, 178 Vitest, build;
+  - E2E: Playwright 1/1, yangi migratsiyalar bilan toza bazada.
+
 ### `d2a6c06` — 2A Task 10: bosh sahifa, natijalarim va o'qituvchi statistikasi
 - `GET /api/me/dashboard`: `xp_total`, `streak` (`current`, `longest`, `active_today`), 10 ta nishon (`awarded_at` yoki `null`) va `continue_step`. Seriya kechadan eski bo'lsa `current` 0 ko'rsatiladi. Yangi `gamification.service.profile()` va `DashboardOut`.
 - `GET /api/me/results`: fan va mavzu bo'yicha har faoliyatning eng yaxshi foizi, urinishlar soni va oxirgi urinishi, hamda vazifa javoblari (holat, ball, izoh, `is_late`).

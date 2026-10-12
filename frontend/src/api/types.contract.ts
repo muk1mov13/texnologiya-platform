@@ -43,6 +43,10 @@ export type ResponseContract = [
   Check<Receives<T.TeachTopicBrief, S['TeachTopicBrief']>>,
   Check<Receives<T.TeachSubject, S['TeachSubjectOut']>>,
   Check<Receives<T.SubjectAdmin, S['SubjectAdminOut']>>,
+  Check<Receives<T.ActivityView, S['ActivityView']>>,
+  Check<Receives<T.TaskView, S['TaskView']>>,
+  Check<Receives<T.SubmissionView, S['SubmissionView']>>,
+  Check<Receives<T.StudentLayout, S['StudentLayout']>>,
 ]
 
 export type RequestContract = [
