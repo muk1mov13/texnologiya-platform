@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B Task 2 — "Tugatdim" mukofotlari va toast animatsiyasi
+### `e2e3f98` — 2B Task 2: "Tugatdim" mukofotlari va toast animatsiyasi
 - `api/student.ts`:
   - `useCompleteStep` javobi `StepCompleteResult` (rewards bilan) deb tiplandi;
   - muvaffaqiyatda `announceRewards()` "+N XP" va yangi nishon toast'larini chiqaradi;
