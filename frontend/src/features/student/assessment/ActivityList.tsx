@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { AttemptResult } from './AttemptResult'
 import { ChoicePlayer } from './ChoicePlayer'
+import { CrosswordPlayer } from './CrosswordPlayer'
 
 const ICONS: Record<ActivityType, string> = { quiz: '📝', yesno: '✅', crossword: '🧩' }
 
@@ -92,7 +93,12 @@ export function ActivityList({ topicId, stepId, activities }: ActivityListProps)
           onBack={back}
         />
       ) : selected.type === 'crossword' ? (
-        <EmptyState icon="🧩" title={t('teach.comingSoon')} />
+        <CrosswordPlayer
+          key={`${selected.id}-${run}`}
+          activity={selected}
+          pending={submit.isPending}
+          onSubmit={onSubmit}
+        />
       ) : (
         <ChoicePlayer
           key={`${selected.id}-${run}`}

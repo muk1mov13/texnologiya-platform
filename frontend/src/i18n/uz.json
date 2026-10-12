@@ -333,5 +333,12 @@
     "yourAnswer": "Sizning javobingiz",
     "correctAnswer": "To'g'ri javob",
     "noAnswer": "javob berilmagan"
+  },
+  "crossword": {
+    "across": "Gorizontal",
+    "down": "Vertikal",
+    "cellLabel": "{{number}}-so'z, {{direction}}, {{k}}-harf",
+    "letters": "{{count}} harf",
+    "hint": "Katakni bosing va harf yozing. Kesishgan katakni qayta bossangiz, yo'nalish almashadi."
   }
 }

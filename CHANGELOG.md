@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B Task 5 — krossvord pleyeri
+- Yangi `features/student/assessment/crossword.ts` — sof yordamchilar: `cellKey`, `wordCells`, `cellOwners`, `answersFromCells`, `normalizeCellInput` (Oʻ / Gʻ bitta katak, apostrof turlari birlashtiriladi), `mayTakeApostrophe`.
+- Yangi `CrosswordPlayer.tsx`:
+  - katakli to'r: ustunlar `minmax(0, 2.5rem)`, shuning uchun 375px kenglikda gorizontal scroll yo'q; so'z boshida raqam, faol so'z ajratib ko'rsatiladi;
+  - harf yozilgach fokus keyingi katakka o'tadi. "O"/"G" dan keyin apostrof kutiladi, boshqa harf yozilsa u keyingi katakka o'tadi. Bo'sh katakda Backspace oldingisiga qaytadi;
+  - kesishgan katakni qayta bosish yo'nalishni almashtiradi;
+  - "Gorizontal" va "Vertikal" savollar ro'yxati, bosilsa o'sha so'z faollashadi;
+  - har katakda `aria-label` (so'z raqami, yo'nalish, harf o'rni).
+- `ActivityList`: krossvord uchun "Tez orada" o'rniga pleyer ulandi.
+- i18n: yangi `crossword.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `1768bc9` — 2B Task 4: pleyerda test va ha/yo'q faoliyatlari, natija ekrani
 - Yangi `features/student/assessment/`:
   - `ActivityList`: faoliyat kartalari (tur, urinishlar soni, eng yaxshi foiz, "Boshlash" / "Qayta urinish"), yechish va natija o'rtasida o'tish;
