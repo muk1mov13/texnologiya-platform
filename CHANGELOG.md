@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 8 — vazifalar va javob yuborish
+### `55d7667` — 2A Task 8: vazifalar va javob yuborish
 - O'qituvchi (`/api/teach`):
   - `GET` va `PUT /steps/{id}/task` — bosqichda bitta vazifa, faqat `task` bosqichida (`TASK_WRONG_STEP`);
   - `DELETE /tasks/{id}` — javoblar va ularning fayllari bilan.
