@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.assessment.router import router as assessment_router
 from app.assessment.teach_router import router as assessment_teach_router
 from app.auth.admin_router import router as admin_users_router
 from app.auth.router import router as auth_router
@@ -27,3 +28,4 @@ api_router.include_router(teach_items_router)
 api_router.include_router(assessment_teach_router)
 api_router.include_router(learning_router)
 api_router.include_router(progress_router)
+api_router.include_router(assessment_router)

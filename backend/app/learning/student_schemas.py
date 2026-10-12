@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 from app.assessment.view_schemas import ActivityView, SubmissionView, TaskView
+from app.gamification.schemas import RewardsOut
 from app.learning.models import ProgressStatus, StepKind
 from app.learning.schemas import GlossaryOut, LiteratureOut
 
@@ -49,6 +50,10 @@ class StepBrief(BaseModel):
     order: int
     has_content: bool
     status: ProgressStatus | None
+
+
+class StepCompleteOut(StepBrief):
+    rewards: RewardsOut
 
 
 class TopicDetailOut(BaseModel):

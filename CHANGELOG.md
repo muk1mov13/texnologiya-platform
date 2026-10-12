@@ -6,6 +6,22 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 7 — urinishlar, bosqichni tugatish va XP
+- Yangi `POST /api/activities/{id}/attempts`:
+  - javoblar serverda tekshiriladi, natijada ball va to'liq tahlil qaytadi (to'g'ri javob va izoh bilan); natija urinish ichiga nusxa qilib saqlanadi;
+  - noto'g'ri formatdagi javoblar `ATTEMPT_INVALID_ANSWERS` oladi;
+  - nashr qilinmagan yoki yashirin mavzudagi faoliyat `ACTIVITY_NOT_FOUND` (404) oladi;
+  - krossvord javoblari normallashtirib solishtiriladi.
+- Bosqich nashr qilingan har bir faoliyatga urinish bo'lganda tugaydi. `best_score` — eng yaxshi foizlar o'rtachasi.
+- XP:
+  - `activity_completed` (10–20) va `activity_perfect` (+10) har faoliyat uchun bir marta beriladi;
+  - "Tugatdim" uchun `step_completed` (10);
+  - mavzuning barcha kontentli bosqichlari tugaganda `topic_completed` (50).
+- `POST /api/steps/{id}/complete` javobi `StepCompleteOut` bo'ldi (`rewards` qo'shildi, eski maydonlar saqlangan).
+- `progress._get_or_create_progress` nomi `get_or_create_progress` ga o'zgardi va yangi `topic_completion_rewards()` qo'shildi.
+- Yangi fayllar: `assessment/attempts.py`, `assessment/router.py`.
+- Testlar: `tests/test_attempts.py` (7 ta). Jami 196 test yashil.
+
 ### `2994808` — 2A Task 6: talaba bosqich ko'rinishi (javobsiz) va kontent hisobi
 - `learning/content.py`: `review`/`practice` bosqichi nashr qilingan faoliyati bo'lsa, `task` bosqichi vazifasi bo'lsa "kontentli" hisoblanadi va mavzu progressiga kiradi.
 - `GET /api/steps/{id}` javobiga yangi maydonlar qo'shildi:

@@ -1,10 +1,12 @@
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from app.assessment.models import ActivityType
 from app.assessment.view_schemas import LayoutWord
 from app.core.types import DbId, trimmed_str
+from app.gamification.schemas import RewardsOut
+from app.learning.student_schemas import StepBrief
 
 
 class QuizItemIn(BaseModel):
@@ -104,3 +106,32 @@ class ActivityTeachOut(BaseModel):
     is_published: bool
     items: list[QuizItemOut | YesNoItemOut | CrosswordItemOut]
     layout: TeachLayout | None
+
+
+AnswerText = Annotated[str, StringConstraints(max_length=100)]
+
+
+class AttemptIn(BaseModel):
+    """Javoblar talabaga yuborilgan elementlar tartibida: test — 0..3, ha/yo'q — bool,
+    krossvord — so'z satri; javobsiz element — null."""
+
+    answers: list[int | bool | AnswerText | None] = Field(max_length=50)
+
+
+class ResultItem(BaseModel):
+    prompt: str
+    options: list[str] | None = None
+    given: int | bool | str | None
+    correct: int | bool | str
+    is_correct: bool
+    explanation: str | None = None
+
+
+class AttemptOut(BaseModel):
+    attempt_id: int
+    activity_id: int
+    score: int
+    max_score: int
+    result: list[ResultItem]
+    rewards: RewardsOut
+    step: StepBrief
