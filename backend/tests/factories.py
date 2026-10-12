@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import pymupdf
 from httpx import AsyncClient
@@ -149,3 +150,69 @@ async def build_course(client: AsyncClient, db: AsyncSession, settings: Settings
         student_headers=auth_headers(student, settings),
         material_ids=material_ids,
     )
+
+
+CROSSWORD_WORDS = [
+    ("ABCDEFGHI", "Alifbo boshi"),
+    ("PAQ", "Birinchi so'z"),
+    ("RCS", "Ikkinchi so'z"),
+    ("TEU", "Uchinchi so'z"),
+]
+
+
+def quiz_payload(title: str = "Takrorlash testi", count: int = 2) -> dict[str, Any]:
+    """`count` ta savol; i-savolning to'g'ri javobi `i % 4`."""
+    return {
+        "type": "quiz",
+        "title": title,
+        "items": [
+            {
+                "text": f"{i + 1}-savol",
+                "options": ["A", "B", "C", "D"],
+                "correct_index": i % 4,
+                "explanation": f"{i + 1}-izoh",
+            }
+            for i in range(count)
+        ],
+    }
+
+
+def yesno_payload(title: str = "Ha yoki yo'q") -> dict[str, Any]:
+    return {
+        "type": "yesno",
+        "title": title,
+        "items": [
+            {"statement": "Yer dumaloq", "answer": True},
+            {"statement": "Quyosh sovuq", "answer": False, "explanation": "Issiq"},
+        ],
+    }
+
+
+def crossword_payload(title: str = "Krossvord") -> dict[str, Any]:
+    return {
+        "type": "crossword",
+        "title": title,
+        "items": [{"word": word, "clue": clue} for word, clue in CROSSWORD_WORDS],
+    }
+
+
+async def add_activity(
+    client: AsyncClient,
+    headers: dict[str, str],
+    step_id: int,
+    payload: dict[str, Any],
+    *,
+    publish: bool = True,
+) -> dict[str, Any]:
+    response = await client.post(
+        f"/api/teach/steps/{step_id}/activities", headers=headers, json=payload
+    )
+    assert response.status_code == 201, response.text
+    body: dict[str, Any] = response.json()
+    if publish:
+        published = await client.patch(
+            f"/api/teach/activities/{body['id']}", headers=headers, json={"is_published": True}
+        )
+        assert published.status_code == 200, published.text
+        body = published.json()
+    return body

@@ -6,6 +6,19 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 5 — o'qituvchi uchun faoliyatlar API
+- Yangi endpoint'lar (`/api/teach`, faqat fanga biriktirilgan o'qituvchi yoki admin):
+  - `GET` va `POST /steps/{id}/activities`;
+  - `PUT /steps/{id}/activities/order`;
+  - `PUT`, `PATCH` (nashr qilish) va `DELETE /activities/{id}`.
+- Faoliyat butunligicha saqlanadi: elementlar to'liq almashtiriladi, krossvord to'ri serverda qayta quriladi. So'rov tanasi `type` bo'yicha discriminator bilan tekshiriladi (test / ha-yo'q / krossvord).
+- Faoliyat faqat `review` yoki `practice` bosqichiga qo'shiladi (`ACTIVITY_WRONG_STEP`). Krossvord xatolari:
+  - `CROSSWORD_INVALID_WORD`;
+  - `CROSSWORD_UNPLACEABLE` (joylashmagan so'zlar bilan);
+  - `ACTIVITY_INVALID_ITEMS` (takrorlangan so'z, uzunlik, turni o'zgartirish).
+- Yangi fayllar: `assessment/schemas.py`, `view_schemas.py`, `items.py`, `activities.py`, `teach_router.py`. `tests/factories.py` ga faoliyat yordamchilari qo'shildi.
+- Testlar: `tests/test_teach_activities.py` (8 ta). Jami 186 test yashil.
+
 ### `d229654` — 2A Task 4: baholash modellari va umumiy fayl yordamchilari
 - Yangi `app/assessment/models.py`:
   - jadvallar `activities` (krossvordda `layout` JSON), `quiz_questions`, `yesno_items`, `crossword_words`, `attempts` (`result` — har element bo'yicha natija nusxasi), `tasks` (`step_id` unique) va `submissions` ((task, user) unique, `submitted_at`);
