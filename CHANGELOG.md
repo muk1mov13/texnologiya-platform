@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B (frontend) implementatsiya rejasi
+### `f123da4` — 2B (frontend) implementatsiya rejasi
 - Yangi `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md`: 13 ta task (0–12):
   - API tiplari va hook'lar;
   - mukofot toast'lari;
