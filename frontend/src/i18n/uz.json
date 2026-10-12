@@ -83,6 +83,22 @@
     "INVALID_PDF": "PDF fayl buzilgan, shifrlangan yoki bo'sh",
     "MATERIAL_PROCESSING": "Material hali qayta ishlanmoqda. Tugashini kuting",
     "MATERIAL_NOT_FAILED": "Faqat xato bilan tugagan materialni qayta ishlash mumkin",
+    "ACTIVITY_NOT_FOUND": "Faoliyat topilmadi",
+    "TASK_NOT_FOUND": "Vazifa topilmadi",
+    "SUBMISSION_NOT_FOUND": "Javob topilmadi",
+    "ATTEMPT_NOT_FOUND": "Urinish topilmadi",
+    "ACTIVITY_WRONG_STEP": "Faoliyat faqat takrorlash yoki amaliyot bosqichiga qo'shiladi",
+    "TASK_WRONG_STEP": "Vazifa faqat vazifa bosqichiga qo'shiladi",
+    "ACTIVITY_INVALID_ITEMS": "Faoliyat elementlari noto'g'ri to'ldirilgan",
+    "CROSSWORD_INVALID_WORD": "So'zda faqat harflar bo'lishi mumkin",
+    "CROSSWORD_UNPLACEABLE": "Ba'zi so'zlarni krossvordga joylab bo'lmadi",
+    "ATTEMPT_INVALID_ANSWERS": "Javoblar faoliyat savollariga mos emas",
+    "SUBMISSION_EMPTY": "Javob bo'sh",
+    "SUBMISSION_FIELD_NOT_ALLOWED": "Bu vazifa uchun bunday javob turi qabul qilinmaydi",
+    "SCORE_OUT_OF_RANGE": "Ball 0 va maksimal ball oralig'ida bo'lishi kerak",
+    "SUBMISSION_GRADED": "Baholangan javobni o'zgartirib bo'lmaydi",
+    "SUBMISSION_NOT_SUBMITTED": "Faqat tekshiruvdagi javob bilan ishlash mumkin",
+    "MAX_SCORE_BELOW_GRADED": "Maksimal ball baholangan javoblardagi baldan kam bo'lishi mumkin emas",
     "UNKNOWN": "Kutilmagan xato yuz berdi"
   },
   "materialErrors": {
@@ -277,5 +293,9 @@
       "deleteTitle": "Fanni o'chirish",
       "deleteText": "«{{title}}» fani barcha mavzu va materiallari bilan o'chiriladi. Bu amalni qaytarib bo'lmaydi."
     }
+  },
+  "rewards": {
+    "xp": "+{{xp}} XP",
+    "badge": "{{icon}} Yangi nishon: {{title}}"
   }
 }

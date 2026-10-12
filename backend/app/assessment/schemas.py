@@ -121,11 +121,11 @@ class AttemptIn(BaseModel):
 
 class ResultItem(BaseModel):
     prompt: str
-    options: list[str] | None = None
+    options: list[str] | None
     given: int | bool | str | None
     correct: int | bool | str
     is_correct: bool
-    explanation: str | None = None
+    explanation: str | None
 
 
 class AttemptOut(BaseModel):

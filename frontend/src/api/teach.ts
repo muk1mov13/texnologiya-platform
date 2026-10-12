@@ -28,7 +28,7 @@ const STUDENT_TOPICS_PREFIX = ['topics'] as const
 const STUDENT_STEPS_PREFIX = ['steps'] as const
 
 /** O'qituvchi tomonidagi o'zgarish talaba ko'radigan ro'yxat, mavzu va bosqichlarga ham ta'sir qiladi. */
-function invalidateStudentCaches(queryClient: QueryClient): void {
+export function invalidateStudentCaches(queryClient: QueryClient): void {
   void queryClient.invalidateQueries({ queryKey: studentKeys.subjects })
   void queryClient.invalidateQueries({ queryKey: STUDENT_TOPICS_PREFIX })
   void queryClient.invalidateQueries({ queryKey: STUDENT_STEPS_PREFIX })

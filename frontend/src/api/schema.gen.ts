@@ -1294,13 +1294,13 @@ export interface components {
             /** Correct */
             correct: number | boolean | string;
             /** Explanation */
-            explanation?: string | null;
+            explanation: string | null;
             /** Given */
             given: number | boolean | string | null;
             /** Is Correct */
             is_correct: boolean;
             /** Options */
-            options?: string[] | null;
+            options: string[] | null;
             /** Prompt */
             prompt: string;
         };
@@ -1311,16 +1311,10 @@ export interface components {
         };
         /** RewardsOut */
         RewardsOut: {
-            /**
-             * New Badges
-             * @default []
-             */
-            new_badges?: components["schemas"]["BadgeBrief"][];
-            /**
-             * Xp
-             * @default 0
-             */
-            xp?: number;
+            /** New Badges */
+            new_badges: components["schemas"]["BadgeBrief"][];
+            /** Xp */
+            xp: number;
         };
         /**
          * Role

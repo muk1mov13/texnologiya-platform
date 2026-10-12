@@ -13,8 +13,8 @@ class BadgeBrief(BaseModel):
 
 
 class RewardsOut(BaseModel):
-    xp: int = 0
-    new_badges: list[BadgeBrief] = []
+    xp: int
+    new_badges: list[BadgeBrief]
 
 
 class BadgeOut(BadgeBrief):

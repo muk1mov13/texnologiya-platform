@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B Task 1 — API tiplari, hook'lar va xato matnlari
+- `frontend/src/api/types.ts`: 2A'ning barcha javob va so'rov tiplari qo'shildi (mukofotlar, urinish, vazifa javobi, bosh sahifa, natijalar, o'qituvchi faoliyatlari, vazifa, navbat, statistika). `types.contract.ts` da 23 ta javob va 8 ta so'rov tekshiruvi qo'shildi.
+- Yangi `api/assessment.ts` (talaba): `useSubmitAttempt`, `useSubmitTask`, `useDashboard`, `useResults`, `useAttemptDetail`.
+- Yangi `api/teachAssessment.ts` (o'qituvchi): faoliyatlar CRUD, nashr qilish va tartiblash; vazifa; navbat, baholash va qaytarish; summary va statistika. `api/teach.ts` dagi `invalidateStudentCaches` eksport qilindi.
+- Yangi `lib/rewards.ts` (`announceRewards`) va `rewards.*` i18n kalitlari. Ular rejada Task 2 da edi, `assessment.ts` build'dan o'tishi uchun shu task'ga ko'chirildi.
+- `errors` i18n'ga 2A'ning 16 ta xato kodi qo'shildi (uz/ru).
+- Backend: `RewardsOut` va `ResultItem` dagi sukut qiymatlari olib tashlandi. Ular doim to'liq qaytariladi, lekin sukut qiymat tufayli OpenAPI'da ixtiyoriy chiqib, ichma-ich kontrakt tekshiruvini buzayotgan edi. `schema.gen.ts` qayta generatsiya qilindi.
+- Tekshiruv: lint, typecheck, build, ruff va mypy. Testlar foydalanuvchi qaroriga ko'ra lokal ishga tushirilmadi.
+
 ### `f123da4` — 2B (frontend) implementatsiya rejasi
 - Yangi `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md`: 13 ta task (0–12):
   - API tiplari va hook'lar;
