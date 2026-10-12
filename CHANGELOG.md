@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 4 — baholash modellari va umumiy fayl yordamchilari
+- Yangi `app/assessment/models.py`:
+  - jadvallar `activities` (krossvordda `layout` JSON), `quiz_questions`, `yesno_items`, `crossword_words`, `attempts` (`result` — har element bo'yicha natija nusxasi), `tasks` (`step_id` unique) va `submissions` ((task, user) unique, `submitted_at`);
+  - enum'lar `ActivityType`, `TaskType`, `SubmissionStatus`;
+  - `ACTIVITY_STEP_KINDS` (review, practice).
+- Yangi `app/core/files.py`:
+  - `signature_matches()` — magic bytes tekshiruvi `learning/materials.py` dan ko'chirildi, jpg/jpeg/png imzolari qo'shildi;
+  - `file_response()` — himoyalangan faylni beradi (prod'da X-Accel-Redirect).
+- `Settings.max_submission_mb = 20`. `.env.example` ga qo'shilmadi, chunki u yerda `MAX_MATERIAL_MB` ham yo'q va sukut qiymatlari koddan olinadi.
+- Migratsiya `19d9e2025f03_assessment_tables`: 7 jadval va indekslar. Generatsiyadan keyin `ruff format` bilan formatlandi.
+- Testlar: `tests/test_files.py` (6 holat). Jami 178 test yashil.
+
 ### `33f878b` — 2A Task 3: krossvord algoritmi
 - Yangi `app/assessment/crossword.py` (sof funksiyalar, baza bilan ishlamaydi):
   - `normalize_word()` so'zni katta harfli kataklarga bo'ladi. Oʻ va Gʻ bitta katak, apostrof turlari (`'`, `ʻ`, `ʼ`, `’`, `‘`, `` ` ``) birlashtiriladi, harf bo'lmagan belgi bo'lsa xato beradi.
