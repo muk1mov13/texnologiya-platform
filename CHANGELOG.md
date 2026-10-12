@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### `33f878b` — 2A Task 3: krossvord algoritmi
+- Yangi `app/assessment/crossword.py` (sof funksiyalar, baza bilan ishlamaydi):
+  - `normalize_word()` so'zni katta harfli kataklarga bo'ladi. Oʻ va Gʻ bitta katak, apostrof turlari (`'`, `ʻ`, `ʼ`, `’`, `‘`, `` ` ``) birlashtiriladi, harf bo'lmagan belgi bo'lsa xato beradi.
+  - `build_layout()` deterministik "ochko'z" algoritm. Uzun so'z birinchi joylashadi, tanlash tartibi: ko'p kesishma, kichik maydon, koordinata. Yon tomondan tegish taqiqlanadi. Joylashmagan so'zlar `UnplaceableError` bilan qaytadi. Raqamlash `(row, col)` bo'yicha.
+  - `layout_to_json()` va `word_matches()`.
+- Testlar: `tests/test_crossword.py` (13 ta). Ular aniq to'r koordinatalarini, to'rning to'g'riligini (ortiqcha harf qatori yo'qligi), deterministiklikni, joylashmaydigan so'zni va javobni normallashtirishni tekshiradi. Jami 172 test yashil.
+- CHANGELOG yozuvi hook tufayli kod commit'iga tushmay qoldi va alohida commit qilindi.
+
 ### `cc875f6` — 2A Task 2: XP berish, seriya va nishonlar
 - `app/gamification/service.py`:
   - `award()` XP hodisasini savepoint ichida yozadi. Unique to'qnashuvda hech narsa o'zgarmaydi, shuning uchun XP ikki marta berilmaydi.
