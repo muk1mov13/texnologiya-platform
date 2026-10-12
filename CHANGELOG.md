@@ -6,6 +6,23 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B (frontend) implementatsiya rejasi
+- Yangi `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md`: 13 ta task (0–12):
+  - API tiplari va hook'lar;
+  - mukofot toast'lari;
+  - bosh sahifada XP, seriya va nishonlar;
+  - test va ha/yo'q pleyeri, krossvord pleyeri;
+  - vazifa bosqichi;
+  - natijalarim;
+  - o'qituvchi muharrirlari va vazifa formasi;
+  - tekshirish navbati va statistika;
+  - hujjatlar.
+- Foydalanuvchi qarorlari:
+  - testlar yozilmaydi va lokal ishga tushirilmaydi, faqat lint, typecheck va build;
+  - CI'da buzilgan mavjud testlarning mock'lari minimal yangilanadi;
+  - E2E baholash oqimi loyiha oxiriga qoldi.
+- Spec 8-bo'limidan soddalashtirish: `/app` alohida bosh sahifaga ko'chirilmaydi, mavjud sahifa XP, seriya va nishonlar bilan to'ldiriladi.
+
 ### `1c6f5bd` — Audit 8-band: kichik tuzatishlar (7-band esa keyinga qoldirildi)
 - **Foydalanuvchi qarorlari:**
   - yangi testlar (audit 7-band) loyiha yakunlangandan keyin yoziladi;
