@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B Task 1 — API tiplari, hook'lar va xato matnlari
+### `0c80037` — 2B Task 1: API tiplari, hook'lar va xato matnlari
 - `frontend/src/api/types.ts`: 2A'ning barcha javob va so'rov tiplari qo'shildi (mukofotlar, urinish, vazifa javobi, bosh sahifa, natijalar, o'qituvchi faoliyatlari, vazifa, navbat, statistika). `types.contract.ts` da 23 ta javob va 8 ta so'rov tekshiruvi qo'shildi.
 - Yangi `api/assessment.ts` (talaba): `useSubmitAttempt`, `useSubmitTask`, `useDashboard`, `useResults`, `useAttemptDetail`.
 - Yangi `api/teachAssessment.ts` (o'qituvchi): faoliyatlar CRUD, nashr qilish va tartiblash; vazifa; navbat, baholash va qaytarish; summary va statistika. `api/teach.ts` dagi `invalidateStudentCaches` eksport qilindi.
