@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B Task 2 — "Tugatdim" mukofotlari va toast animatsiyasi
+- `api/student.ts`:
+  - `useCompleteStep` javobi `StepCompleteResult` (rewards bilan) deb tiplandi;
+  - muvaffaqiyatda `announceRewards()` "+N XP" va yangi nishon toast'larini chiqaradi;
+  - `['me']` prefiksi invalidatsiya qilinadi (davom ettirish, bosh sahifa, natijalar). `assessmentKeys` import qilinmadi, chunki import tsikl hosil qilardi.
+- `components/ui/Toast.tsx` va `index.css`: toast'lar `toast-pop` animatsiyasi bilan chiqadi, faqat `motion-safe`, ya'ni harakatni kamaytirish sozlamasida animatsiyasiz.
+- Mavjud testlar: `PlayerPage.test.tsx` va `api/student.test.tsx` dagi 5 ta "Tugatdim" mock'iga `rewards` maydoni qo'shildi (kelishilgan minimal mock yangilash, yangi test yo'q).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `0c80037` — 2B Task 1: API tiplari, hook'lar va xato matnlari
 - `frontend/src/api/types.ts`: 2A'ning barcha javob va so'rov tiplari qo'shildi (mukofotlar, urinish, vazifa javobi, bosh sahifa, natijalar, o'qituvchi faoliyatlari, vazifa, navbat, statistika). `types.contract.ts` da 23 ta javob va 8 ta so'rov tekshiruvi qo'shildi.
 - Yangi `api/assessment.ts` (talaba): `useSubmitAttempt`, `useSubmitTask`, `useDashboard`, `useResults`, `useAttemptDetail`.

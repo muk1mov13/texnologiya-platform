@@ -2,7 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { pushToast } from '@/components/ui/toast-store'
 import { i18n } from '@/i18n'
 import { apiBuffer, apiFetch } from './client'
-import type { ContinueTarget, StepBrief, StepContent, SubjectCard, SubjectDetail, TopicDetail } from './types'
+import { announceRewards } from '@/lib/rewards'
+import type { ContinueTarget, StepCompleteResult, StepContent, SubjectCard, SubjectDetail, TopicDetail } from './types'
 
 export const studentKeys = {
   subjects: ['subjects'] as const,
@@ -59,7 +60,7 @@ export function useContinue() {
 export function useCompleteStep(topicId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (stepId: number) => apiFetch<StepBrief>(`/api/steps/${stepId}/complete`, { method: 'POST' }),
+    mutationFn: (stepId: number) => apiFetch<StepCompleteResult>(`/api/steps/${stepId}/complete`, { method: 'POST' }),
     onSuccess: (step) => {
       // Natija darhol keshga yoziladi: refetch muvaffaqiyatsiz bo'lsa ham (masalan, tarmoq
       // uzilsa), "Tugatdim" tugmasi server allaqachon yakunlagan bosqichni qayta ko'rsatmaydi.
@@ -82,6 +83,7 @@ export function useCompleteStep(topicId: number) {
       // (masalan, "Tugatdim" ketidan tezda "Keyingi →" bosilsa), chaqiruvga xos onSuccess
       // callback'i o'tkazib yuborilishi mumkin, ammo hook darajasidagi bu handler har doim ishlaydi.
       pushToast('success', i18n.t('player.completedToast'))
+      announceRewards(step.rewards)
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: studentKeys.topic(topicId) }),
         queryClient.invalidateQueries({ queryKey: studentKeys.step(step.id) }),
@@ -89,7 +91,10 @@ export function useCompleteStep(topicId: number) {
         // shuning uchun bu bitta chaqiruv ro'yxatni (studentKeys.subjects) HAM fan tafsilotini
         // (studentKeys.subject(slug) === ['subjects', slug]) invalidatsiya qiladi.
         queryClient.invalidateQueries({ queryKey: studentKeys.subjects }),
-        queryClient.invalidateQueries({ queryKey: studentKeys.continue }),
+        // ['me'] prefiksi "davom ettirish"ni, XP/seriya/nishonlarni (`/api/me/dashboard`) va
+        // natijalarni qamraydi. `assessmentKeys` import qilinmaydi: `assessment.ts` o'zi shu
+        // modulga tayanadi, import tsikl hosil qilardi.
+        queryClient.invalidateQueries({ queryKey: ['me'] }),
       ])
     },
   })

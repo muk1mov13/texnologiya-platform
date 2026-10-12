@@ -18,7 +18,12 @@ export function Toaster() {
         <div
           key={toast.id}
           role={toast.kind === 'error' ? 'alert' : 'status'}
-          className={cx('flex w-full max-w-sm items-start gap-3 rounded-xl border-2 px-4 py-3 shadow-lg', KIND_CLASSES[toast.kind])}
+          className={cx(
+            'flex w-full max-w-sm items-start gap-3 rounded-xl border-2 px-4 py-3 shadow-lg',
+            // Mukofot va xabarlar "pop" bilan chiqadi; harakatni kamaytirish sozlamasida animatsiyasiz.
+            'motion-safe:animate-[toast-pop_0.25s_ease-out]',
+            KIND_CLASSES[toast.kind],
+          )}
         >
           <p className="flex-1 text-sm font-medium">{toast.text}</p>
           <button
