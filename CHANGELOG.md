@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### 2B Task 4 — pleyerda test va ha/yo'q faoliyatlari, natija ekrani
+### `1768bc9` — 2B Task 4: pleyerda test va ha/yo'q faoliyatlari, natija ekrani
 - Yangi `features/student/assessment/`:
   - `ActivityList`: faoliyat kartalari (tur, urinishlar soni, eng yaxshi foiz, "Boshlash" / "Qayta urinish"), yechish va natija o'rtasida o'tish;
   - `ChoicePlayer`: test savollari bitta-bitta (radio variantlar, oldingi/keyingi), ha/yo'q bayonotlari ro'yxati (`aria-pressed` tugmalar); javobsiz savol bo'lsa tasdiqlash oynasi chiqadi;
