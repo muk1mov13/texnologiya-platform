@@ -3,9 +3,10 @@ from fastapi.responses import FileResponse
 
 from app.auth.deps import ActiveUser
 from app.core.deps import AppSettings, AppStorage, DbSession
-from app.core.types import DbIdPath
+from app.core.types import DbIdPath, utcnow
+from app.gamification import service as gamification
 from app.learning import resume
-from app.learning.student_schemas import ContinueOut, SubjectProgressOut
+from app.learning.student_schemas import ContinueOut, DashboardOut, SubjectProgressOut
 
 router = APIRouter(tags=["learning"])
 
@@ -13,6 +14,14 @@ router = APIRouter(tags=["learning"])
 @router.get("/me/continue", response_model=ContinueOut | None)
 async def continue_learning(user: ActiveUser, db: DbSession) -> ContinueOut | None:
     return await resume.continue_target(db, user)
+
+
+@router.get("/me/dashboard", response_model=DashboardOut)
+async def dashboard(user: ActiveUser, db: DbSession) -> DashboardOut:
+    profile = await gamification.profile(db, user.id, utcnow())
+    return DashboardOut(
+        **profile.model_dump(), continue_step=await resume.continue_target(db, user)
+    )
 
 
 @router.get("/me/progress", response_model=list[SubjectProgressOut])

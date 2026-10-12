@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.types import utcnow
 from app.gamification.models import Badge, Streak, UserBadge, XpEvent
 from app.gamification.rules import BADGES, XpReason
-from app.gamification.schemas import BadgeBrief, RewardsOut
+from app.gamification.schemas import BadgeBrief, BadgeOut, ProfileOut, RewardsOut, StreakOut
 
 # O'zbekistonda 1992 yildan beri yozgi vaqt yo'q: doimiy UTC+5.
 TASHKENT = timezone(timedelta(hours=5), "Asia/Tashkent")
@@ -145,3 +145,42 @@ async def xp_total(db: AsyncSession, user_id: int) -> int:
         select(func.coalesce(func.sum(XpEvent.amount), 0)).where(XpEvent.user_id == user_id)
     )
     return int(total or 0)
+
+
+async def profile(db: AsyncSession, user_id: int, now: datetime) -> ProfileOut:
+    """XP, seriya va nishonlar. Seriya kechadan eski bo'lsa, `current` 0 deb ko'rsatiladi."""
+    today = local_date(now)
+    streak = await db.get(Streak, user_id)
+    current = longest = 0
+    active_today = False
+    if streak is not None:
+        longest = streak.longest
+        last = streak.last_active_date
+        if last is not None and last >= today - timedelta(days=1):
+            current = streak.current
+        active_today = last == today
+    owned = {
+        row.badge_id: row.awarded_at
+        for row in await db.execute(
+            select(UserBadge.badge_id, UserBadge.awarded_at).where(UserBadge.user_id == user_id)
+        )
+    }
+    by_code = {badge.code: badge for badge in await db.scalars(select(Badge))}
+    badges = [
+        BadgeOut(
+            code=badge.code,
+            icon=badge.icon,
+            title_uz=badge.title_uz,
+            title_ru=badge.title_ru,
+            description_uz=badge.description_uz,
+            description_ru=badge.description_ru,
+            awarded_at=owned.get(badge.id),
+        )
+        for rule in BADGES
+        if (badge := by_code.get(rule.code)) is not None
+    ]
+    return ProfileOut(
+        xp_total=await xp_total(db, user_id),
+        streak=StreakOut(current=current, longest=longest, active_today=active_today),
+        badges=badges,
+    )

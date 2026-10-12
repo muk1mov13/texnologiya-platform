@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 10 — bosh sahifa, natijalarim va o'qituvchi statistikasi
+- `GET /api/me/dashboard`: `xp_total`, `streak` (`current`, `longest`, `active_today`), 10 ta nishon (`awarded_at` yoki `null`) va `continue_step`. Seriya kechadan eski bo'lsa `current` 0 ko'rsatiladi. Yangi `gamification.service.profile()` va `DashboardOut`.
+- `GET /api/me/results`: fan va mavzu bo'yicha har faoliyatning eng yaxshi foizi, urinishlar soni va oxirgi urinishi, hamda vazifa javoblari (holat, ball, izoh, `is_late`).
+- `GET /api/me/attempts/{id}`: urinish tahlili, faqat egasiga (`ATTEMPT_NOT_FOUND`).
+- `GET /api/teach/stats?subject_id=`: mavzular bo'yicha boshlagan va tugatgan talabalar soni, o'rtacha eng yaxshi foiz va tekshirilmagan javoblar. Faqat talabalar hisobga olinadi. Biriktirilmagan o'qituvchi `NOT_SUBJECT_TEACHER` oladi.
+- Yangi `assessment/reports.py`.
+- Testlar: `tests/test_reports.py` (5 ta). Jami 213 test yashil.
+
 ### `6ad0405` — 2A Task 9: tekshirish navbati, baholash va qaytarish
 - Yangi endpoint'lar (`/api/teach`, o'qituvchi faqat biriktirilgan fanlar bo'yicha, admin hammasi bo'yicha):
   - `GET /submissions?status=&subject_id=` — navbat, sukut bo'yicha `submitted`, eng eskisi birinchi, ko'pi bilan 200 ta;

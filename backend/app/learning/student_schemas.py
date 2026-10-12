@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from app.assessment.view_schemas import ActivityView, SubmissionView, TaskView
-from app.gamification.schemas import RewardsOut
+from app.gamification.schemas import ProfileOut, RewardsOut
 from app.learning.models import ProgressStatus, StepKind
 from app.learning.schemas import GlossaryOut, LiteratureOut
 
@@ -95,6 +95,10 @@ class ContinueOut(BaseModel):
     topic_title: str
     step_id: int
     step_kind: StepKind
+
+
+class DashboardOut(ProfileOut):
+    continue_step: ContinueOut | None
 
 
 class SubjectProgressOut(BaseModel):

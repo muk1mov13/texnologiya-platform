@@ -204,3 +204,58 @@ class ReturnIn(BaseModel):
 
 class TeachSummaryOut(BaseModel):
     pending_submissions: int
+
+
+class AttemptDetailOut(BaseModel):
+    id: int
+    activity_id: int
+    activity_title: str
+    activity_type: ActivityType
+    score: int
+    max_score: int
+    result: list[ResultItem]
+    created_at: datetime
+
+
+class ActivityResultOut(BaseModel):
+    activity_id: int
+    title: str
+    type: ActivityType
+    best_percent: float
+    attempts_count: int
+    last_attempt_id: int
+    last_attempt_at: datetime
+
+
+class TaskResultOut(BaseModel):
+    task_id: int
+    title: str
+    status: SubmissionStatus
+    score: int | None
+    max_score: int
+    feedback: str | None
+    is_late: bool
+    submitted_at: datetime
+
+
+class TopicResultsOut(BaseModel):
+    topic_id: int
+    topic_title: str
+    activities: list[ActivityResultOut]
+    tasks: list[TaskResultOut]
+
+
+class SubjectResultsOut(BaseModel):
+    subject_id: int
+    subject_title: str
+    subject_slug: str
+    topics: list[TopicResultsOut]
+
+
+class TopicStatsOut(BaseModel):
+    topic_id: int
+    topic_title: str
+    started: int
+    completed: int
+    avg_best_percent: float | None
+    pending_submissions: int

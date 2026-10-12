@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Response
 
-from app.assessment import review
+from app.assessment import reports, review
 from app.assessment.models import SubmissionStatus
 from app.assessment.schemas import (
     GradeIn,
@@ -10,6 +10,7 @@ from app.assessment.schemas import (
     SubmissionDetailOut,
     SubmissionQueueItem,
     TeachSummaryOut,
+    TopicStatsOut,
 )
 from app.auth.deps import StaffUser
 from app.core.deps import AppSettings, AppStorage, DbSession
@@ -68,3 +69,10 @@ async def return_submission(
 @router.get("/summary", response_model=TeachSummaryOut)
 async def teach_summary(user: StaffUser, db: DbSession) -> TeachSummaryOut:
     return TeachSummaryOut(pending_submissions=await review.pending_count(db, user))
+
+
+@router.get("/stats", response_model=list[TopicStatsOut])
+async def teach_stats(
+    subject_id: Annotated[int, Query(ge=1, le=DB_ID_MAX)], user: StaffUser, db: DbSession
+) -> list[TopicStatsOut]:
+    return await reports.teach_stats(db, user, subject_id)
