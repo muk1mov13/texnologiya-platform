@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### Audit 3-band — `sync_badges` parallel ishga tushishga chidamli
+- `gamification/service.py`:
+  - `sync_badges()` yangi nishonni savepoint ichida qo'shadi. Boshqa server jarayoni uni shu orada qo'shgan bo'lsa (`badges.code` unique to'qnashuvi), nishon qayta o'qiladi va yangilanadi, jarayon qulamaydi.
+  - `_existing_badges()` va `_apply_rule()` ajratildi.
+- Migratsiya qilinmagan bazada ilova avvalgidek ochiq xato bilan to'xtaydi. Bu ataylab qoldirildi.
+- Test: `test_sync_badges_survives_concurrent_insert`. Jami 217 test yashil.
+
 ### `870c7bb` — Audit 2-band: parallel yaratishda 500 o'rniga davom etish
 - `assessment/tasks.py`:
   - `submit()` birinchi javobni savepoint ichida yaratadi. Agar parallel so'rov (masalan, tugma ikki marta bosilgan) uni allaqachon yaratgan bo'lsa, mavjud javob qayta o'qiladi va so'rov tahrir sifatida davom etadi; baholangan bo'lsa `SUBMISSION_GRADED` (409) qaytadi.

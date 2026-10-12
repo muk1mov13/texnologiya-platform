@@ -1,8 +1,11 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.gamification import service as gamification_service
 from app.gamification.models import Badge, Streak, XpEvent
 from app.gamification.rules import BADGES, XpReason, activity_xp, graded_xp, round_half_up
 from app.gamification.service import award, sync_badges, xp_total
@@ -151,3 +154,25 @@ async def test_topic_badges_follow_completed_topics(db: AsyncSession) -> None:
         )
         codes += [b.code for b in rewards.new_badges]
     assert codes == ["first_topic", "topics_5"]
+
+
+async def test_sync_badges_survives_concurrent_insert(
+    db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Bir nechta worker bir vaqtda ishga tushganda boshqa jarayon nishonlarni allaqachon
+    qo'shgan bo'ladi: unique to'qnashuv ishga tushishni buzmasligi kerak."""
+    badge = await db.scalar(select(Badge).where(Badge.code == "first_step"))
+    assert badge is not None
+    badge.title_uz = "Eski nom"
+    await db.commit()
+
+    async def nothing_seen(_db: AsyncSession) -> dict[str, Any]:
+        return {}
+
+    monkeypatch.setattr(gamification_service, "_existing_badges", nothing_seen)
+    await sync_badges(db)
+
+    badges = list(await db.scalars(select(Badge)))
+    assert len(badges) == 10
+    await db.refresh(badge)
+    assert badge.title_uz == "Birinchi qadam"

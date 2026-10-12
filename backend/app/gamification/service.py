@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.types import utcnow
 from app.gamification.models import Badge, Streak, UserBadge, XpEvent
-from app.gamification.rules import BADGES, XpReason
+from app.gamification.rules import BADGES, BadgeRule, XpReason
 from app.gamification.schemas import BadgeBrief, BadgeOut, ProfileOut, RewardsOut, StreakOut
 
 # O'zbekistonda 1992 yildan beri yozgi vaqt yo'q: doimiy UTC+5.
@@ -33,20 +33,38 @@ def local_date(moment: datetime) -> date:
     return moment.astimezone(TASHKENT).date()
 
 
+async def _existing_badges(db: AsyncSession) -> dict[str, Badge]:
+    return {badge.code: badge for badge in await db.scalars(select(Badge))}
+
+
+def _apply_rule(badge: Badge, rule: BadgeRule) -> None:
+    badge.icon = rule.icon
+    badge.title_uz = rule.title_uz
+    badge.title_ru = rule.title_ru
+    badge.description_uz = rule.description_uz
+    badge.description_ru = rule.description_ru
+
+
 async def sync_badges(db: AsyncSession) -> None:
     """Kodda ta'riflangan nishonlarni bazaga yozadi (qo'shadi yoki yangilaydi). Idempotent;
-    ro'yxatda yo'q nishonlar o'chirilmaydi."""
-    existing = {badge.code: badge for badge in await db.scalars(select(Badge))}
+    ro'yxatda yo'q nishonlar o'chirilmaydi. Bir nechta jarayon bir vaqtda ishga tushsa ham
+    xavfsiz: boshqa jarayon shu orada qo'shgan nishon qayta o'qilib yangilanadi."""
+    existing = await _existing_badges(db)
     for rule in BADGES:
         badge = existing.get(rule.code)
         if badge is None:
-            badge = Badge(code=rule.code)
-            db.add(badge)
-        badge.icon = rule.icon
-        badge.title_uz = rule.title_uz
-        badge.title_ru = rule.title_ru
-        badge.description_uz = rule.description_uz
-        badge.description_ru = rule.description_ru
+            candidate = Badge(code=rule.code)
+            _apply_rule(candidate, rule)
+            try:
+                async with db.begin_nested():
+                    db.add(candidate)
+                    await db.flush()
+                continue
+            except IntegrityError:
+                badge = await db.scalar(select(Badge).where(Badge.code == rule.code))
+                if badge is None:
+                    raise
+        _apply_rule(badge, rule)
     await db.commit()
 
 
