@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### Audit 6-band — takrorlangan bloklar umumiy funksiyalarga ajratildi (xatti-harakat o'zgarmadi)
+### `5c0c393` — Audit 6-band: takrorlangan bloklar umumiy funksiyalarga ajratildi (xatti-harakat o'zgarmadi)
 - `Storage.delete_quietly(paths)` diskdan o'chirish va xatoni logga yozishni bir joyga to'pladi. Avval bu sikl 5 joyda takrorlangan edi: `learning/teach_router.py`, `admin_router.py`, `materials.py`, `assessment/teach_router.py`, `tasks.py`.
 - `progress.mark_step_completed(db, row, topic_id, now)` bosqichni tugatish va mavzu mukofotini bir joyga to'pladi. Avval 3 joyda edi: `complete_step`, `attempts.refresh_activity_step`, `tasks.submit`.
 - `progress.visible_topic_or(db, user, topic_id, error)` — "mavzu ko'rinmasa ichki obyekt uchun 404" bloki. Avval `attempts.py` va `tasks.py` da takrorlangan edi.
