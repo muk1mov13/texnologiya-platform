@@ -8,6 +8,7 @@ import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { STEP_ICONS } from '@/lib/steps'
+import { DashboardStats } from './DashboardStats'
 
 export function SubjectsPage() {
   const { t } = useTranslation()
@@ -16,6 +17,8 @@ export function SubjectsPage() {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-bold sm:text-3xl">{t('student.hello', { name: user?.full_name ?? '' })}</h1>
+      {/* XP, seriya va nishonlar faqat talabalarga beriladi (o'qituvchi/admin ko'rib chiqishda olmaydi). */}
+      {user?.role === 'student' && <DashboardStats />}
       {next.data && <ContinueCard target={next.data} />}
       <section aria-labelledby="subjects-heading" className="flex flex-col gap-4">
         <h2 id="subjects-heading" className="text-lg font-bold">

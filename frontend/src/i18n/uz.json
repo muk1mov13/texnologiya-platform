@@ -297,5 +297,16 @@
   "rewards": {
     "xp": "+{{xp}} XP",
     "badge": "{{icon}} Yangi nishon: {{title}}"
+  },
+  "dashboard": {
+    "title": "Mening yutuqlarim",
+    "streak": "{{count}} kunlik seriya",
+    "streakToday": "Bugun ham o'qidingiz 👏",
+    "streakIdle": "Bugun hali o'qimadingiz",
+    "longest": "Eng uzun seriya: {{count}} kun",
+    "xp": "{{xp}} XP",
+    "badges": "{{owned}} / {{total}} nishon",
+    "badgeOwned": "olingan",
+    "badgeLocked": "hali olinmagan"
   }
 }

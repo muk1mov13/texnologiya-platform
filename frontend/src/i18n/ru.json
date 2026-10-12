@@ -297,5 +297,16 @@
   "rewards": {
     "xp": "+{{xp}} XP",
     "badge": "{{icon}} Новый значок: {{title}}"
+  },
+  "dashboard": {
+    "title": "Мои достижения",
+    "streak": "Серия: {{count}} дн.",
+    "streakToday": "Сегодня вы уже занимались 👏",
+    "streakIdle": "Сегодня вы ещё не занимались",
+    "longest": "Самая длинная серия: {{count}} дн.",
+    "xp": "{{xp}} XP",
+    "badges": "{{owned}} / {{total}} значков",
+    "badgeOwned": "получен",
+    "badgeLocked": "ещё не получен"
   }
 }

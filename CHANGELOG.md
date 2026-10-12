@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B Task 3 — bosh sahifada XP, seriya va nishonlar
+- Yangi `features/student/DashboardStats.tsx` (`useDashboard`):
+  - uchta karta: seriya ("bugun o'qidingizmi" izohi bilan), XP (eng uzun seriya izohi bilan), olingan nishonlar soni;
+  - 10 ta nishon to'ri: olinmagani xira va kulrang, nomi va ta'rifi tilga qarab;
+  - ma'lumot yuklanmasa blok ko'rinmaydi, fanlar ro'yxatiga ta'sir qilmaydi.
+- `SubjectsPage.tsx`: blok salomlashuvdan keyin, faqat talaba rolida ko'rsatiladi.
+- i18n: yangi `dashboard.*` bo'limi (uz/ru).
+- `test/server.ts`: `/api/me/dashboard` uchun standart bo'sh mock (kelishilgan minimal mock yangilash, yangi test yo'q).
+- Rejadan farq: menyudagi "Natijalarim" havolasi Task 7 ga ko'chirildi. Sahifa o'sha task'da yaratiladi, hozir qo'shilsa havola 404 ga olib borardi.
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `e2e3f98` — 2B Task 2: "Tugatdim" mukofotlari va toast animatsiyasi
 - `api/student.ts`:
   - `useCompleteStep` javobi `StepCompleteResult` (rewards bilan) deb tiplandi;
