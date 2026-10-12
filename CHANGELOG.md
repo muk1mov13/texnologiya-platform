@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### Audit 2-band — parallel yaratishda 500 o'rniga davom etish
+### `870c7bb` — Audit 2-band: parallel yaratishda 500 o'rniga davom etish
 - `assessment/tasks.py`:
   - `submit()` birinchi javobni savepoint ichida yaratadi. Agar parallel so'rov (masalan, tugma ikki marta bosilgan) uni allaqachon yaratgan bo'lsa, mavjud javob qayta o'qiladi va so'rov tahrir sifatida davom etadi; baholangan bo'lsa `SUBMISSION_GRADED` (409) qaytadi.
   - `upsert_task()` ham shu uslubda ishlaydi.
