@@ -1,17 +1,23 @@
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Response
 
-from app.assessment import activities
+from app.assessment import activities, tasks
+from app.assessment.models import Task
 from app.assessment.schemas import (
     ActivityIn,
     ActivityOrderIn,
     ActivityPublishIn,
     ActivityTeachOut,
+    TaskIn,
+    TaskOut,
 )
 from app.auth.deps import StaffUser
-from app.core.deps import DbSession
+from app.core.deps import AppStorage, DbSession
 from app.core.types import DbIdPath
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/teach", tags=["teach"])
 
@@ -66,4 +72,29 @@ async def publish_activity(
 async def delete_activity(activity_id: DbIdPath, user: StaffUser, db: DbSession) -> Response:
     activity = await activities.ensure_can_edit_activity(db, user, activity_id)
     await activities.delete_activity(db, activity)
+    return Response(status_code=204)
+
+
+@router.get("/steps/{step_id}/task", response_model=TaskOut | None)
+async def get_task(step_id: DbIdPath, user: StaffUser, db: DbSession) -> Task | None:
+    step = await tasks.task_step(db, user, step_id)
+    return await tasks.get_step_task(db, step.id)
+
+
+@router.put("/steps/{step_id}/task", response_model=TaskOut)
+async def upsert_task(step_id: DbIdPath, data: TaskIn, user: StaffUser, db: DbSession) -> Task:
+    step = await tasks.task_step(db, user, step_id)
+    return await tasks.upsert_task(db, step, data)
+
+
+@router.delete("/tasks/{task_id}", status_code=204)
+async def delete_task(
+    task_id: DbIdPath, user: StaffUser, db: DbSession, storage: AppStorage
+) -> Response:
+    task = await tasks.ensure_can_edit_task(db, user, task_id)
+    for path in await tasks.delete_task(db, task):
+        try:
+            storage.delete(path)
+        except OSError:
+            logger.warning("Faylni o'chirib bo'lmadi: %s", path)
     return Response(status_code=204)

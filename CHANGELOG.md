@@ -6,6 +6,20 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
+### 2A Task 8 — vazifalar va javob yuborish
+- O'qituvchi (`/api/teach`):
+  - `GET` va `PUT /steps/{id}/task` — bosqichda bitta vazifa, faqat `task` bosqichida (`TASK_WRONG_STEP`);
+  - `DELETE /tasks/{id}` — javoblar va ularning fayllari bilan.
+- Talaba:
+  - `PUT /api/tasks/{id}/submission` (multipart: matn va/yoki fayl). Turi bo'yicha qoidalar: `SUBMISSION_FIELD_NOT_ALLOWED`, `SUBMISSION_EMPTY`. Baholangan javob tahrirlansa `SUBMISSION_GRADED` (409).
+  - Javob yuborilganda bosqich tugaydi va birinchi marta `task_submitted` (20 XP) beriladi.
+  - Kechikish `is_late` bilan belgilanadi.
+  - `GET /api/submissions/{id}/file` — faqat javob egasiga.
+- Fayl: 20 MB gacha, pdf/doc/docx/ppt/pptx/jpg/png, magic bytes bilan tekshiriladi. Almashtirilgan eski fayl diskdan o'chiriladi.
+- `learning/editing.py`: fan yoki mavzu o'chirilganda javob fayllari ham diskdan o'chiriladi (`_submission_paths`).
+- Yangi `assessment/tasks.py`.
+- Testlar: `tests/test_tasks.py` (8 ta). Jami 204 test yashil.
+
 ### `79ff6b8` — 2A Task 7: urinishlar, bosqichni tugatish va XP
 - Yangi `POST /api/activities/{id}/attempts`:
   - javoblar serverda tekshiriladi, natijada ball va to'liq tahlil qaytadi (to'g'ri javob va izoh bilan); natija urinish ichiga nusxa qilib saqlanadi;

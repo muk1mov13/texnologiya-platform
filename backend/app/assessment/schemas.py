@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
 
-from app.assessment.models import ActivityType
-from app.assessment.view_schemas import LayoutWord
+from app.assessment.models import ActivityType, TaskType
+from app.assessment.view_schemas import LayoutWord, SubmissionView
 from app.core.types import DbId, trimmed_str
 from app.gamification.schemas import RewardsOut
 from app.learning.student_schemas import StepBrief
@@ -133,5 +134,33 @@ class AttemptOut(BaseModel):
     score: int
     max_score: int
     result: list[ResultItem]
+    rewards: RewardsOut
+    step: StepBrief
+
+
+class TaskIn(BaseModel):
+    title: trimmed_str(max_length=200)  # type: ignore[valid-type]
+    description: trimmed_str(max_length=10000)  # type: ignore[valid-type]
+    type: TaskType
+    max_score: int = Field(ge=1, le=100)
+    rubric: str | None = Field(default=None, max_length=5000)
+    deadline: AwareDatetime | None = None
+
+
+class TaskOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    step_id: int
+    title: str
+    description: str
+    type: TaskType
+    max_score: int
+    rubric: str | None
+    deadline: datetime | None
+
+
+class SubmitOut(BaseModel):
+    submission: SubmissionView
     rewards: RewardsOut
     step: StepBrief
