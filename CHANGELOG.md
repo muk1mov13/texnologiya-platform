@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 11 — API tiplari, hujjatlar va yakuniy tekshiruv (2A yopildi)
+### `7e615ae` — 2A Task 11: API tiplari, hujjatlar va yakuniy tekshiruv (2A yopildi)
 - `frontend/src/api/schema.gen.ts` `npm run gen:api` bilan qayta generatsiya qilindi.
 - `types.ts` ga talaba ko'rinishi tiplari qo'shildi: `ActivityView`, `TaskView`, `SubmissionView`, `StudentLayout` va boshqalar. `StepContent` ga `activities`, `task`, `submission` qo'shildi, ular `types.contract.ts` da tekshiriladi. `test/fixtures.ts` yangilandi. UI o'zgarmadi.
 - `CLAUDE.md`: 2-bosqich holati, `app/assessment/` va `app/gamification/` arxitekturasi (import yo'nalishi, `award()` idempotentligi, `sync_badges`) va bosqichni tugatish qoidalari yozildi.
