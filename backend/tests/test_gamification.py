@@ -3,6 +3,7 @@ from typing import Any
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.gamification import service as gamification_service
@@ -176,3 +177,18 @@ async def test_sync_badges_survives_concurrent_insert(
     assert len(badges) == 10
     await db.refresh(badge)
     assert badge.title_uz == "Birinchi qadam"
+
+
+async def test_award_does_not_hide_other_integrity_errors(db: AsyncSession) -> None:
+    """Faqat takroriy hodisa jim o'tadi; boshqa xato (mavjud bo'lmagan foydalanuvchi, FK)
+    yashirilmasligi kerak."""
+    with pytest.raises(IntegrityError):
+        await award(
+            db,
+            999_999,
+            XpReason.step_completed,
+            ref_type="step",
+            ref_id=1,
+            amount=10,
+            now=NOON,
+        )

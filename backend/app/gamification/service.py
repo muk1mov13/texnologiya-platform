@@ -94,6 +94,9 @@ async def award(
             db.add(event)
             await db.flush()
     except IntegrityError:
+        # Faqat takroriy hodisa jim o'tadi; boshqa xato (masalan FK) yashirilmaydi.
+        if not await _event_exists(db, user_id, reason, ref_type, ref_id):
+            raise
         return Rewards()
     if amount > 0:
         await _touch_streak(db, user_id, local_date(moment))
@@ -153,9 +156,33 @@ async def _award_badges(db: AsyncSession, user_id: int, moment: datetime) -> lis
                 db.add(UserBadge(user_id=user_id, badge_id=badge.id, awarded_at=moment))
                 await db.flush()
         except IntegrityError:
+            # Parallel so'rov nishonni shu orada bergan bo'lsa — o'tamiz; boshqa xato ko'tariladi.
+            if not await _badge_owned(db, user_id, badge.id):
+                raise
             continue
         new.append(badge)
     return new
+
+
+async def _event_exists(
+    db: AsyncSession, user_id: int, reason: XpReason, ref_type: str, ref_id: int
+) -> bool:
+    found = await db.scalar(
+        select(XpEvent.id).where(
+            XpEvent.user_id == user_id,
+            XpEvent.reason == reason.value,
+            XpEvent.ref_type == ref_type,
+            XpEvent.ref_id == ref_id,
+        )
+    )
+    return found is not None
+
+
+async def _badge_owned(db: AsyncSession, user_id: int, badge_id: int) -> bool:
+    found = await db.scalar(
+        select(UserBadge.id).where(UserBadge.user_id == user_id, UserBadge.badge_id == badge_id)
+    )
+    return found is not None
 
 
 async def xp_total(db: AsyncSession, user_id: int) -> int:
