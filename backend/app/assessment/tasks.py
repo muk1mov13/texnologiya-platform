@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.assessment import views
@@ -49,8 +50,23 @@ async def get_step_task(db: AsyncSession, step_id: int) -> Task | None:
 async def upsert_task(db: AsyncSession, step: Step, data: TaskIn) -> Task:
     task = await get_step_task(db, step.id)
     if task is None:
-        task = Task(step_id=step.id)
-        db.add(task)
+        candidate = Task(
+            step_id=step.id,
+            title=data.title,
+            description=data.description,
+            type=data.type,
+            max_score=data.max_score,
+        )
+        try:
+            async with db.begin_nested():
+                db.add(candidate)
+                await db.flush()
+            task = candidate
+        except IntegrityError:
+            # Parallel so'rov vazifani shu orada yaratgan: uni yangilaymiz (500 o'rniga).
+            task = await get_step_task(db, step.id)
+            if task is None:
+                raise
     task.title = data.title
     task.description = data.description
     task.type = data.type
@@ -86,6 +102,17 @@ async def delete_task(db: AsyncSession, task: Task) -> list[str]:
 
 
 # --- talaba ---------------------------------------------------------------------------------
+
+
+async def _find_submission(db: AsyncSession, task_id: int, user_id: int) -> Submission | None:
+    return await db.scalar(
+        select(Submission).where(Submission.task_id == task_id, Submission.user_id == user_id)
+    )
+
+
+def _ensure_editable(submission: Submission) -> None:
+    if submission.status == SubmissionStatus.graded:
+        raise AppError(409, "SUBMISSION_GRADED", "Baholangan javobni o'zgartirib bo'lmaydi")
 
 
 async def get_submittable_task(
@@ -136,11 +163,9 @@ async def submit(
     task, step, topic = await get_submittable_task(db, user, task_id)
     clean_text = (text or "").strip() or None
     has_file = upload is not None and bool(upload.filename)
-    submission = await db.scalar(
-        select(Submission).where(Submission.task_id == task.id, Submission.user_id == user.id)
-    )
-    if submission is not None and submission.status == SubmissionStatus.graded:
-        raise AppError(409, "SUBMISSION_GRADED", "Baholangan javobni o'zgartirib bo'lmaydi")
+    submission = await _find_submission(db, task.id, user.id)
+    if submission is not None:
+        _ensure_editable(submission)
     _check_fields(task, clean_text, has_file, existing_file=bool(submission and submission.file))
 
     new_file: str | None = None
@@ -162,13 +187,24 @@ async def submit(
     old_file: str | None = None
     try:
         if submission is None:
-            submission = Submission(
+            candidate = Submission(
                 task_id=task.id,
                 user_id=user.id,
                 status=SubmissionStatus.submitted,
                 submitted_at=now,
             )
-            db.add(submission)
+            try:
+                async with db.begin_nested():
+                    db.add(candidate)
+                    await db.flush()
+                submission = candidate
+            except IntegrityError:
+                # Parallel so'rov (masalan, tugma ikki marta bosilgan) javobni shu orada
+                # yaratgan: 500 o'rniga uni tahrir sifatida davom ettiramiz.
+                submission = await _find_submission(db, task.id, user.id)
+                if submission is None:
+                    raise
+                _ensure_editable(submission)
         submission.status = SubmissionStatus.submitted
         submission.submitted_at = now
         submission.text = clean_text

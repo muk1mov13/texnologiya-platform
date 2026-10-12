@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### Audit 2-band — parallel yaratishda 500 o'rniga davom etish
+- `assessment/tasks.py`:
+  - `submit()` birinchi javobni savepoint ichida yaratadi. Agar parallel so'rov (masalan, tugma ikki marta bosilgan) uni allaqachon yaratgan bo'lsa, mavjud javob qayta o'qiladi va so'rov tahrir sifatida davom etadi; baholangan bo'lsa `SUBMISSION_GRADED` (409) qaytadi.
+  - `upsert_task()` ham shu uslubda ishlaydi.
+  - Avval ikkala holat ham 500 qaytarardi (testda takrorlandi).
+- Yangi xato kodi kerak bo'lmadi. `_find_submission()` va `_ensure_editable()` ajratildi.
+- Testlar: `tests/test_tasks.py` ga 3 ta yangi test (parallel birinchi yuborish, baholangan javobga parallel yuborish, parallel vazifa yaratish). Jami 216 test yashil.
+- **Audit 4-band, foydalanuvchi qarori:** o'qituvchi baho qo'yganda talabaning seriyasi oshaveradi. Bu hozirgi xatti-harakat va spec 5-bo'limidagi "XP hodisasi bo'lgan kun faol" qoidasiga mos, kod o'zgarmadi.
+
 ### Texnik audit (faqat o'qish)
 - Kod o'zgartirilmadi.
 - Kritik xavflar:

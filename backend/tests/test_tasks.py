@@ -1,12 +1,14 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.assessment.models import Submission, SubmissionStatus
+from app.assessment import tasks as tasks_module
+from app.assessment.models import Submission, SubmissionStatus, Task
 from app.core.config import Settings
 from app.learning.models import StepKind, Topic
 from tests.factories import Course, auth_headers, build_course, make_pdf_bytes, make_user, step_of
@@ -226,3 +228,69 @@ async def test_deleting_task_or_topic_removes_submission_files(
     )
     assert removed.status_code == 204
     assert not storage.path(rel2).exists()
+
+
+def _miss_first_lookup(original: Any) -> Any:
+    """Birinchi chaqiruvda `None` qaytaradi: parallel so'rov qatorni hali ko'rmagan holat."""
+    calls = {"n": 0}
+
+    async def wrapper(*args: Any) -> Any:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return None
+        return await original(*args)
+
+    return wrapper
+
+
+async def test_concurrent_first_submission_becomes_edit(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Tugma ikki marta bosilganda ikkinchi so'rov qatorni ko'rmay yaratishga urinadi:
+    unique to'qnashuv 500 bermasligi, so'rov tahrir sifatida davom etishi kerak."""
+    course = await build_course(client, db, settings)
+    _, task = await _make_task(client, db, course, course.topic1, type="text")
+    url = f"/api/tasks/{task['id']}/submission"
+    first = await client.put(url, headers=course.student_headers, data={"text": "Birinchi"})
+    assert first.status_code == 200
+
+    monkeypatch.setattr(
+        tasks_module, "_find_submission", _miss_first_lookup(tasks_module._find_submission)
+    )
+    second = await client.put(url, headers=course.student_headers, data={"text": "Ikkinchi"})
+    assert second.status_code == 200, second.text
+    assert second.json()["submission"]["text"] == "Ikkinchi"
+    assert second.json()["rewards"]["xp"] == 0
+    assert await db.scalar(select(func.count()).select_from(Submission)) == 1
+
+
+async def test_concurrent_submission_respects_graded_status(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    course = await build_course(client, db, settings)
+    _, task = await _make_task(client, db, course, course.topic1, type="text")
+    url = f"/api/tasks/{task['id']}/submission"
+    await client.put(url, headers=course.student_headers, data={"text": "Javob"})
+    await db.execute(update(Submission).values(status=SubmissionStatus.graded, score=8))
+    await db.commit()
+
+    monkeypatch.setattr(
+        tasks_module, "_find_submission", _miss_first_lookup(tasks_module._find_submission)
+    )
+    response = await client.put(url, headers=course.student_headers, data={"text": "Yangi"})
+    assert response.status_code == 409
+    assert response.json()["code"] == "SUBMISSION_GRADED"
+
+
+async def test_concurrent_task_creation_becomes_update(
+    client: AsyncClient, db: AsyncSession, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    course = await build_course(client, db, settings)
+    _, task = await _make_task(client, db, course, course.topic1)
+
+    monkeypatch.setattr(
+        tasks_module, "get_step_task", _miss_first_lookup(tasks_module.get_step_task)
+    )
+    _, again = await _make_task(client, db, course, course.topic1, title="Yangi esse")
+    assert again["id"] == task["id"] and again["title"] == "Yangi esse"
+    assert await db.scalar(select(func.count()).select_from(Task)) == 1
