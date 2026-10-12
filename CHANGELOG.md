@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 5 — o'qituvchi uchun faoliyatlar API
+### `d420690` — 2A Task 5: o'qituvchi uchun faoliyatlar API
 - Yangi endpoint'lar (`/api/teach`, faqat fanga biriktirilgan o'qituvchi yoki admin):
   - `GET` va `POST /steps/{id}/activities`;
   - `PUT /steps/{id}/activities/order`;
