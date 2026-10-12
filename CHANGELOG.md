@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### `818d7e2` — Audit 5-band: `award()` faqat takroriy hodisani yutadi
+- `gamification/service.py`:
+  - `IntegrityError` dan keyin hodisa bazada haqiqatan bormi, tekshiriladi (`_event_exists`). Bor bo'lsa, bu takror va 0 XP qaytadi. Yo'q bo'lsa, masalan mavjud bo'lmagan foydalanuvchi (FK xatosi), xato ko'tariladi.
+  - Nishon berishda ham shunday (`_badge_owned`).
+  - SQLite unique xatosida constraint nomini bermaydi, shuning uchun xato matni o'rniga bazaning o'zi tekshiriladi: usul ikkala bazada bir xil ishlaydi.
+- Test: `test_award_does_not_hide_other_integrity_errors`. Avval xato jimgina yutilardi. Jami 218 test yashil.
+- CHANGELOG yozuvi hook tufayli kod commit'iga tushmay qoldi va alohida commit qilindi.
+
 ### `84e219b` — Audit 3-band: `sync_badges` parallel ishga tushishga chidamli
 - `gamification/service.py`:
   - `sync_badges()` yangi nishonni savepoint ichida qo'shadi. Boshqa server jarayoni uni shu orada qo'shgan bo'lsa (`badges.code` unique to'qnashuvi), nishon qayta o'qiladi va yangilanadi, jarayon qulamaydi.
