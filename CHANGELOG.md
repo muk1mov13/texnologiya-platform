@@ -4,6 +4,26 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
+
+### Texnik audit (faqat o'qish)
+- Kod o'zgartirilmadi.
+- Kritik xavflar:
+  - 2A Postgres'da tekshirilmagan edi (quyida yopildi);
+  - `sync_badges` bir nechta worker ishga tushganda to'qnashishi mumkin;
+  - vazifaga ikki marta yuborish 500 qaytaradi;
+  - o'qituvchi baho qo'yganda talaba seriyasi oshadi.
+- Zaif joylar: takrorlangan bloklar (bosqichni tugatish, fayl o'chirish, eng yaxshi foiz so'rovi), `award()` barcha `IntegrityError` larni yutadi, navbatda sahifalash yo'q, testi yo'q chegara holatlari.
+- 9 bandlik tuzatish rejasi tuzildi. 1-band (push va CI) bajarildi.
+
+### GitHub: PR #3 (avval qayd etilmagan) va draft PR #4
+- **PR #3** (`878e50d`, 2026-10-11, foydalanuvchi tomonidan) `feat/phase-2-assessment` dan `main` ga faqat 5 ta hujjat commit'ini qo'shgan: `263c327`, `125b8f5`, `7f3c56a`, `b5c3925`, `b467a71`. Bu yozuv kechikib qayd etildi.
+- 2A'ning 26 ta commit'i push qilindi (`b467a71..98f91f0`). CI faqat `main` push'ida va PR'da ishlagani uchun **draft PR #4** ochildi: https://github.com/muk1mov13/texnologiya-platform/pull/4 ("Phase 2A: assessment and gamification backend"). Merge qilinmagan.
+- CI run `38243313479` — uchala job yashil:
+  - `backend`: ruff, mypy, SQLite'da 213 test; PostgreSQL'da migratsiyalar, `alembic check` (drift yo'q) va 213 test;
+  - `frontend`;
+  - `e2e`.
+
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
 ### `7e615ae` — 2A Task 11: API tiplari, hujjatlar va yakuniy tekshiruv (2A yopildi)
