@@ -6,6 +6,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
+### 2B Task 4 — pleyerda test va ha/yo'q faoliyatlari, natija ekrani
+- Yangi `features/student/assessment/`:
+  - `ActivityList`: faoliyat kartalari (tur, urinishlar soni, eng yaxshi foiz, "Boshlash" / "Qayta urinish"), yechish va natija o'rtasida o'tish;
+  - `ChoicePlayer`: test savollari bitta-bitta (radio variantlar, oldingi/keyingi), ha/yo'q bayonotlari ro'yxati (`aria-pressed` tugmalar); javobsiz savol bo'lsa tasdiqlash oynasi chiqadi;
+  - `AttemptResult`: ball va foiz (`ProgressRing`), har element bo'yicha ✓/✗, talaba javobi, to'g'ri javob va izoh; Task 7 da ham ishlatiladi.
+- `StepContent.tsx`: `review`/`practice` bosqichlarida faoliyatlar ro'yxati va "Keyingi bosqich" havolasi. `lib/steps.ts` ga `ACTIVITY_KINDS` qo'shildi.
+- Krossvord tanlansa, hozircha "Tez orada" holati ko'rinadi (pleyer Task 5 da).
+- i18n: yangi `activity.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `6d12350` — 2B Task 3: bosh sahifada XP, seriya va nishonlar
 - Yangi `features/student/DashboardStats.tsx` (`useDashboard`):
   - uchta karta: seriya ("bugun o'qidingizmi" izohi bilan), XP (eng uzun seriya izohi bilan), olingan nishonlar soni;

@@ -18,6 +18,9 @@ export const SELF_COMPLETE_KINDS: ReadonlySet<StepKind> = new Set([
   'literature',
 ])
 
+/** Faoliyatlar (test, ha/yo'q, krossvord) orqali yakunlanadigan bosqichlar. */
+export const ACTIVITY_KINDS: ReadonlySet<StepKind> = new Set(['review', 'practice'])
+
 /** Fayl (PDF/PPT/DOC) yuklanadigan bosqichlar. */
 export const FILE_KINDS: ReadonlySet<StepKind> = new Set(['lecture', 'presentation'])
 

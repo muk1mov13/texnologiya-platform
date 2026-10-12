@@ -10,7 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
-import { FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
+import { ACTIVITY_KINDS, FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
+import { ActivityList } from './assessment/ActivityList'
 
 // PdfViewer (react-pdf + pdf.js) alohida chunk'ga ajratiladi — asosiy bundle faqat lecture/
 // presentation bosqichida kerak bo'lgan ~1 MB'lik kodni yuklamaydi. `PlayerPage` bu chunk'ni
@@ -50,6 +51,16 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
             {FILE_KINDS.has(data.kind) && <FileMaterials materials={data.materials} />}
             {data.kind === 'glossary' && <GlossaryList items={data.glossary} />}
             {data.kind === 'literature' && <LiteratureList items={data.literature} />}
+            {ACTIVITY_KINDS.has(data.kind) && (
+              <ActivityList topicId={topicId} stepId={data.id} activities={data.activities} />
+            )}
+            {ACTIVITY_KINDS.has(data.kind) && nextKind && (
+              <div className="border-t-2 border-slate-100 pt-4">
+                <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
+                  {t('player.next')} →
+                </Link>
+              </div>
+            )}
             {SELF_COMPLETE_KINDS.has(data.kind) && (
               <div className="flex flex-wrap items-center gap-3 border-t-2 border-slate-100 pt-4">
                 {data.status === 'completed' ? (

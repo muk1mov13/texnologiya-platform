@@ -308,5 +308,30 @@
     "badges": "{{owned}} / {{total}} nishon",
     "badgeOwned": "olingan",
     "badgeLocked": "hali olinmagan"
+  },
+  "activity": {
+    "quiz": "Test",
+    "yesno": "Ha yoki yo'q",
+    "crossword": "Krossvord",
+    "start": "Boshlash",
+    "retry": "Qayta urinish",
+    "notAttempted": "Hali yechilmagan",
+    "best": "Eng yaxshi: {{percent}}%",
+    "attempts": "{{count}} ta urinish",
+    "back": "Faoliyatlar",
+    "prev": "Oldingi",
+    "next": "Keyingi",
+    "finish": "Yakunlash",
+    "questionOf": "{{n}}-savol / {{total}}",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "unansweredTitle": "Javobsiz savollar bor",
+    "unansweredText": "{{count}} ta savol javobsiz qoldi. Yakunlaysizmi?",
+    "score": "{{score}} / {{max}}",
+    "correct": "To'g'ri",
+    "wrong": "Xato",
+    "yourAnswer": "Sizning javobingiz",
+    "correctAnswer": "To'g'ri javob",
+    "noAnswer": "javob berilmagan"
   }
 }

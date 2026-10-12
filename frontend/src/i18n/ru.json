@@ -308,5 +308,30 @@
     "badges": "{{owned}} / {{total}} значков",
     "badgeOwned": "получен",
     "badgeLocked": "ещё не получен"
+  },
+  "activity": {
+    "quiz": "Тест",
+    "yesno": "Да или нет",
+    "crossword": "Кроссворд",
+    "start": "Начать",
+    "retry": "Попробовать снова",
+    "notAttempted": "Ещё не решено",
+    "best": "Лучший результат: {{percent}}%",
+    "attempts": "Попыток: {{count}}",
+    "back": "Задания",
+    "prev": "Назад",
+    "next": "Далее",
+    "finish": "Завершить",
+    "questionOf": "Вопрос {{n}} из {{total}}",
+    "yes": "Да",
+    "no": "Нет",
+    "unansweredTitle": "Есть вопросы без ответа",
+    "unansweredText": "Без ответа осталось вопросов: {{count}}. Завершить?",
+    "score": "{{score}} / {{max}}",
+    "correct": "Верно",
+    "wrong": "Неверно",
+    "yourAnswer": "Ваш ответ",
+    "correctAnswer": "Правильный ответ",
+    "noAnswer": "нет ответа"
   }
 }
