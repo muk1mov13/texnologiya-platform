@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.assessment.models import ACTIVITY_STEP_KINDS, Activity, Task
 from app.learning.models import (
     FILE_STEP_KINDS,
     GlossaryTerm,
@@ -56,6 +57,14 @@ async def load_step_infos(db: AsyncSession, topic_ids: Sequence[int]) -> dict[in
             select(LiteratureItem.topic_id).where(LiteratureItem.topic_id.in_(topic_ids)).distinct()
         )
     )
+    activity_steps = set(
+        await db.scalars(
+            select(Activity.step_id)
+            .where(Activity.step_id.in_(step_ids), Activity.is_published.is_(True))
+            .distinct()
+        )
+    )
+    task_steps = set(await db.scalars(select(Task.step_id).where(Task.step_id.in_(step_ids))))
     for row in steps:
         kind = StepKind(row.kind)
         if kind in FILE_STEP_KINDS:
@@ -64,9 +73,10 @@ async def load_step_infos(db: AsyncSession, topic_ids: Sequence[int]) -> dict[in
             has_content = row.topic_id in glossary_topics
         elif kind == StepKind.literature:
             has_content = row.topic_id in literature_topics
-        else:
-            # review / practice / task: faoliyatlar va vazifalar 2-bosqichda qo'shiladi.
-            has_content = False
+        elif kind in ACTIVITY_STEP_KINDS:
+            has_content = row.id in activity_steps
+        else:  # StepKind.task
+            has_content = row.id in task_steps
         result[row.topic_id].append(StepInfo(row.id, row.topic_id, kind, row.order, has_content))
     return result
 

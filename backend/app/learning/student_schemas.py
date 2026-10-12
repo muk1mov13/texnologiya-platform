@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from app.assessment.view_schemas import ActivityView, SubmissionView, TaskView
 from app.learning.models import ProgressStatus, StepKind
 from app.learning.schemas import GlossaryOut, LiteratureOut
 
@@ -76,6 +77,9 @@ class StepContentOut(BaseModel):
     materials: list[MaterialView]
     glossary: list[GlossaryOut]
     literature: list[LiteratureOut]
+    activities: list[ActivityView] = []
+    task: TaskView | None = None
+    submission: SubmissionView | None = None
 
 
 class ContinueOut(BaseModel):

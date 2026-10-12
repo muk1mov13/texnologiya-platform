@@ -2,6 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.assessment import views
+from app.assessment.models import ACTIVITY_STEP_KINDS
 from app.auth.models import User
 from app.core.errors import AppError
 from app.core.types import utcnow
@@ -216,6 +218,12 @@ async def step_content(db: AsyncSession, user: User, step_id: int) -> StepConten
         if step.kind == StepKind.literature
         else []
     )
+    activities = (
+        await views.activity_views(db, user.id, step.id) if step.kind in ACTIVITY_STEP_KINDS else []
+    )
+    task, submission = (
+        await views.task_view(db, user.id, step.id) if step.kind == StepKind.task else (None, None)
+    )
     return StepContentOut(
         id=step.id,
         topic_id=topic.id,
@@ -226,6 +234,9 @@ async def step_content(db: AsyncSession, user: User, step_id: int) -> StepConten
         materials=materials,
         glossary=glossary,
         literature=literature,
+        activities=activities,
+        task=task,
+        submission=submission,
     )
 
 
