@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
-### Audit 8-band — kichik tuzatishlar (7-band esa keyinga qoldirildi)
+### `1c6f5bd` — Audit 8-band: kichik tuzatishlar (7-band esa keyinga qoldirildi)
 - **Foydalanuvchi qarorlari:**
   - yangi testlar (audit 7-band) loyiha yakunlangandan keyin yoziladi;
   - hozircha testlar umuman ishga tushirilmaydi, faqat statik tekshiruvlar (ruff, mypy, `tsc`) qoladi;
