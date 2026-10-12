@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
 
-### 2A Task 7 — urinishlar, bosqichni tugatish va XP
+### `79ff6b8` — 2A Task 7: urinishlar, bosqichni tugatish va XP
 - Yangi `POST /api/activities/{id}/attempts`:
   - javoblar serverda tekshiriladi, natijada ball va to'liq tahlil qaytadi (to'g'ri javob va izoh bilan); natija urinish ichiga nusxa qilib saqlanadi;
   - noto'g'ri formatdagi javoblar `ATTEMPT_INVALID_ANSWERS` oladi;
