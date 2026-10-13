@@ -16,7 +16,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   
   `feat/phase-1b-frontend` dagi barcha commitlar avvaldan `main`da edi.
 - Roadmap: ish tartibidagi "alohida branch, PR orqali merge" qoidasi "faqat `main`" ga almashtirildi, keyingi qadamlar yangilandi. `CLAUDE.md`: 2-bosqich `main`da.
-- Ehtiyot: 2B uchun Vitest va E2E testlari hali yozilmagan. Push'dan keyin CI'dagi `frontend`/`e2e` joblari yiqilishi mumkin; natijasi alohida tekshiriladi.
+- Push'dan keyingi CI (`d671806`, run 38388329700): `backend`, `frontend` va `e2e` joblari yashil. 2B uchun yangi Vitest/E2E testlari hali yozilmagan; mavjud testlar o'tdi.
 
 ### `db8b1c5` — Krossvord: "begona" so'z to'g'ri ko'rsatiladi
 - Muammo: `build_layout` eng uzun so'zni to'rga birinchi qo'yadi. Boshqalar bilan umumiy harfi yo'q so'z eng uzun bo'lsa (masalan, `OLMA`, `ANOR`, `BUXGU`), `CROSSWORD_UNPLACEABLE` xatosi to'g'ri so'zlarga (`OLMA`, `ANOR`) tushardi.

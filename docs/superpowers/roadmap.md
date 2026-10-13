@@ -232,7 +232,7 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 
 ## Keyingi aniq qadam
 
-1. ✅ 2-bosqich `main`ga merge qilindi va push qilindi (2026-10-13). Push'dan keyingi CI natijasini tekshirish kerak: 2B uchun testlar yozilmagan, `frontend`/`e2e` joblari yiqilishi mumkin.
+1. ✅ 2-bosqich `main`ga merge qilindi va push qilindi (2026-10-13). CI uchala job bilan yashil.
 2. 2-bosqichning "Tayyor" mezonini qo'lda brauzerda tekshirish: talaba test yechadi va XP oladi, o'qituvchi vazifani baholaydi, talaba ballni ko'radi.
 3. Qoldirilgan testlar: 2B uchun Vitest testlari va E2E baholash oqimi (testlarni loyiha oxirida yozish qarori o'zgarmasa, bu band 4-bosqichdan keyinga qoladi; o'shanda CI'dagi `frontend` va `e2e` joblari ham tekshiriladi).
 4. 3-bosqich (AI) mini-spec'i.
