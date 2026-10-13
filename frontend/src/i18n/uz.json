@@ -541,5 +541,35 @@
   },
   "aiReport": {
     "title": "Haftalik AI tahlili ({{from}} – {{to}})"
+  },
+  "adminAi": {
+    "title": "AI sozlamalari",
+    "settings": "Sozlamalar",
+    "notConfigured": "AI kaliti sozlanmagan (GEMINI_API_KEY). AI funksiyalari ishlamaydi.",
+    "provider": "Provayder",
+    "chatModel": "Chat modeli",
+    "embeddingModel": "Embedding modeli",
+    "enabled": "AI yoqilgan",
+    "dailyLimit": "Talaba uchun kunlik limit",
+    "dailyLimitHint": "0–500 so'rov; o'qituvchi va admin uchun limit yo'q",
+    "limitRange": "0 dan 500 gacha",
+    "saved": "Sozlamalar saqlandi",
+    "usage": "Sarf",
+    "days": "{{count}} kun",
+    "total": "Jami so'rovlar: {{count}}",
+    "day": "Kun",
+    "requests": "So'rovlar",
+    "users": "Foydalanuvchilar",
+    "noUsage": "Bu davrda so'rovlar yo'q",
+    "chunks": "Indeksdagi bo'laklar: {{chunks}}",
+    "stale": "Eskirgan bo'laklar: {{count}} — indeksni qayta quring",
+    "index": "Indeks",
+    "reindexText": "Embedding modeli o'zgarsa yoki qidiruv yomonlashsa, indeksni qayta quring.",
+    "reindexStale": "Eskirganlarini qayta qurish",
+    "reindexAll": "Hammasini qayta qurish",
+    "reindexAllTitle": "Butun indeksni qayta qurish",
+    "reindexAllText": "Barcha materiallar qayta indekslanadi; bu provayder limitini sarflaydi va vaqt oladi.",
+    "queued": "Navbatga qo'yildi",
+    "privacy": "AI'ga ism, email, telefon va fayl nomlari yuborilmaydi. Dars materiallari, savollar va talaba javoblari matni tashqi provayderga (Google Gemini, Groq) yuboriladi."
   }
 }

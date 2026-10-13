@@ -6,6 +6,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 8: admin `/admin/ai` sahifasi
+- Yangi `features/admin/AdminAiPage.tsx`:
+  - **Sozlamalar:** kalit sozlanmaganligi haqida ogohlantirish, provayder (`gemini+groq`), chat va embedding modellari; "AI yoqilgan" va talaba kunlik limiti (0–500) formasi;
+  - **Sarf:** 7/30/90 kun, jami so'rovlar, kunlar jadvali (so'rovlar soniga proporsional chiziq, foydalanuvchilar), indeksdagi va eskirgan bo'laklar soni;
+  - **Indeks:** "Eskirganlarini qayta qurish" va "Hammasini qayta qurish" (tasdiqlash oynasi bilan), navbatga qo'yilgani toast bilan;
+  - maxfiylik eslatmasi.
+- `admin/schemas.ts`: `aiSettingsSchema`. Marshrut `admin/ai`, admin nav'ga "AI sozlamalari".
+- i18n `adminAi.*` (uz/ru).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 3B Task 7: o'qituvchi bosh sahifasida haftalik tahlil
 - Yangi `features/teach/WeeklyReport.tsx`: fan kartasida oxirgi haftalik AI tahlili yig'iladigan `<details>` blokda (davr sanalari bilan, markdown belgilarisiz). Hisobot yo'q, AI o'chiq yoki xato bo'lsa chizilmaydi; AI o'chiq bo'lsa so'rov ham yuborilmaydi.
 - `TeachHomePage`: `WeeklyReport` fan sarlavhasidan keyin.

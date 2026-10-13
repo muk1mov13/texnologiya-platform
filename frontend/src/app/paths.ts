@@ -26,7 +26,11 @@ export function navLinksFor(role: Role): NavItem[] {
     )
   }
   if (role === 'admin') {
-    items.push({ to: '/admin/users', label: 'nav.adminUsers' }, { to: '/admin/subjects', label: 'nav.adminSubjects' })
+    items.push(
+      { to: '/admin/users', label: 'nav.adminUsers' },
+      { to: '/admin/subjects', label: 'nav.adminSubjects' },
+      { to: '/admin/ai', label: 'nav.adminAi' },
+    )
   }
   return items
 }

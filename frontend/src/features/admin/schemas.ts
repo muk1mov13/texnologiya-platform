@@ -17,3 +17,15 @@ export const subjectSchema = z.object({
 })
 
 export type SubjectValues = z.infer<typeof subjectSchema>
+
+// Backend `AiSettingsUpdate.student_daily_limit`: 0..500.
+export const aiSettingsSchema = z.object({
+  enabled: z.boolean(),
+  student_daily_limit: z
+    .number({ error: 'adminAi.limitRange' })
+    .int({ error: 'adminAi.limitRange' })
+    .min(0, { error: 'adminAi.limitRange' })
+    .max(500, { error: 'adminAi.limitRange' }),
+})
+
+export type AiSettingsValues = z.infer<typeof aiSettingsSchema>

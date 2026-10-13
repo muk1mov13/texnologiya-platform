@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
+import { AdminAiPage } from '@/features/admin/AdminAiPage'
 import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
@@ -73,6 +74,7 @@ export const routes: RouteObject[] = [
               { path: 'admin', element: <Navigate to="/admin/users" replace /> },
               { path: 'admin/users', element: <AdminUsersPage /> },
               { path: 'admin/subjects', element: <AdminSubjectsPage /> },
+              { path: 'admin/ai', element: <AdminAiPage /> },
             ],
           },
         ],
