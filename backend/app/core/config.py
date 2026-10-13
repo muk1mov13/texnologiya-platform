@@ -26,10 +26,23 @@ class Settings(BaseSettings):
     login_rate_window_seconds: int = 900
     soffice_path: str = "soffice"
     conversion_timeout_seconds: int = 180
+    ai_provider: Literal["gemini", "fake"] = "gemini"
+    gemini_api_key: str = ""
+    ai_model_chat: str = "gemini-2.5-flash"
+    ai_model_fast: str = "gemini-2.5-flash-lite"
+    ai_embedding_model: str = "gemini-embedding-001"
+    ai_rpm: int = Field(default=10, ge=1)
+    ai_min_similarity: float = Field(default=0.55, ge=0, le=1)
+    ai_hint_similarity: float = Field(default=0.85, ge=0, le=1)
 
     @property
     def is_prod(self) -> bool:
         return self.env == "prod"
+
+    @property
+    def ai_configured(self) -> bool:
+        """AI ishlata oladimi: sinov provayderi yoki Gemini kaliti bor."""
+        return self.ai_provider == "fake" or bool(self.gemini_api_key)
 
     @model_validator(mode="after")
     def _require_prod_secret(self) -> "Settings":
