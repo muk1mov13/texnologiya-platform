@@ -6,7 +6,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
-### 3-bosqich (AI) mini-spec'i
+### `497967f` — 3-bosqich (AI) mini-spec'i
 - Yangi `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md`. Foydalanuvchi qarorlari:
   - lokalda `VectorStore` (SQLite BLOB + numpy), CI/prod'da pgvector;
   - haftalik tahlil CLI `weekly-report` orqali;
