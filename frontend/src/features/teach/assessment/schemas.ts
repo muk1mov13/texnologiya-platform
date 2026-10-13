@@ -39,3 +39,21 @@ export const crosswordSchema = z.object({
 export type QuizValues = z.infer<typeof quizSchema>
 export type YesNoValues = z.infer<typeof yesnoSchema>
 export type CrosswordValues = z.infer<typeof crosswordSchema>
+
+export const taskSchema = z.object({
+  title: text(200),
+  description: text(10000),
+  type: z.enum(['text', 'file', 'both']),
+  // `valueAsNumber` bo'sh maydonda NaN beradi — u ham "to'ldirilishi shart" xatosi bo'ladi.
+  max_score: z
+    .number({ error: 'validation.required' })
+    .int({ error: 'taskEdit.scoreRange' })
+    .min(1, { error: 'taskEdit.scoreRange' })
+    .max(100, { error: 'taskEdit.scoreRange' }),
+  rubric: z.string().trim().max(5000, { error: 'validation.tooLong' }),
+  deadline: z
+    .string()
+    .refine((value) => value === '' || !Number.isNaN(new Date(value).getTime()), { error: 'taskEdit.badDate' }),
+})
+
+export type TaskValues = z.infer<typeof taskSchema>

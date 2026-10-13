@@ -404,5 +404,24 @@
     "previewLabel": "Krossvord to'ri",
     "deleteTitle": "Faoliyatni o'chirish",
     "deleteText": "«{{title}}» o'chiriladi. Bu amalni qaytarib bo'lmaydi."
+  },
+  "taskEdit": {
+    "empty": "Bu bosqichda hali vazifa yo'q. Quyidagi formani to'ldirib, yarating.",
+    "title": "Vazifa nomi",
+    "description": "Topshiriq matni",
+    "type": "Javob turi",
+    "typeText": "Faqat matn",
+    "typeFile": "Faqat fayl",
+    "typeBoth": "Matn va/yoki fayl",
+    "maxScore": "Maksimal ball",
+    "scoreRange": "1 dan 100 gacha butun son kiriting",
+    "deadline": "Muddat",
+    "deadlineHint": "Ixtiyoriy",
+    "badDate": "Sana noto'g'ri",
+    "rubric": "Baholash mezoni (ixtiyoriy)",
+    "saved": "Vazifa saqlandi",
+    "delete": "Vazifani o'chirish",
+    "deleteTitle": "Vazifani o'chirish",
+    "deleteText": "«{{title}}» va talabalarning unga yuborgan barcha javoblari o'chiriladi. Bu amalni qaytarib bo'lmaydi."
   }
 }

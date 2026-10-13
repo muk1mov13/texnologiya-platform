@@ -8,6 +8,7 @@ import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { ACTIVITY_KINDS, FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
 import { ActivitiesTab } from './assessment/ActivitiesTab'
+import { TaskTab } from './assessment/TaskTab'
 import { GlossaryTab } from './GlossaryTab'
 import { LiteratureTab } from './LiteratureTab'
 import { MaterialsTab } from './MaterialsTab'
@@ -68,6 +69,8 @@ export function TopicEditorPage() {
                     <LiteratureTab topicId={data.id} items={data.literature} />
                   ) : ACTIVITY_KINDS.has(tab) && step ? (
                     <ActivitiesTab key={step.id} topicId={data.id} stepId={step.id} />
+                  ) : tab === 'task' && step ? (
+                    <TaskTab topicId={data.id} stepId={step.id} />
                   ) : (
                     <EmptyState icon="🛠️" title={t('teach.comingSoon')} text={t('teach.comingSoonText')} />
                   )}
