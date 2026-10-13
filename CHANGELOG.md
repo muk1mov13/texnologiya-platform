@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 7: talabaning kunlik AI limiti
+- Yangi `app/ai/usage.py`:
+  - `today()` (Asia/Tashkent), `used_today`;
+  - `ensure_within_limit` — 429 `AI_LIMIT_REACHED`, `details.limit`;
+  - `record_request` — atomik +1, parallel so'rovda `IntegrityError` dan keyin qayta `UPDATE`.
+- O'qituvchi va admin limitga tushmaydi.
+- Tekshiruv: ruff, mypy toza.
+
 ### Ish tartibi tezlashtirildi
 - Sabab: ko'p kunlik ishda ko'rinadigan natija kam bo'ldi, tokenlar esa tez sarflandi. Asosiy sabablar:
   - bitta juda uzun sessiya (~740k token kontekst);
