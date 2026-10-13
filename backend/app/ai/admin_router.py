@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 
 from app.ai.constants import REINDEX_JOB
 from app.ai.models import AiSettings, AiUsage, DocChunk
+from app.ai.providers import FallbackProvider
 from app.ai.schemas import AiSettingsOut, AiSettingsUpdate, AiUsageDay, AiUsageOut, ReindexIn
 from app.ai.services import AiServices, get_ai_settings, require_ai
 from app.ai.usage import today
@@ -24,7 +25,7 @@ def _settings_out(row: AiSettings, settings: Settings, ai: AiServices) -> AiSett
         enabled=row.enabled,
         student_daily_limit=row.student_daily_limit,
         configured=ai.configured,
-        provider=settings.ai_provider,
+        provider=settings.ai_provider + ("+groq" if isinstance(ai.llm, FallbackProvider) else ""),
         chat_model=settings.ai_model_chat,
         embedding_model=ai.embedder.model_name,
     )

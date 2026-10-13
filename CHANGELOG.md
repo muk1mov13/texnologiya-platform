@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### AI: Groq zaxira provayderi
+- Foydalanuvchi qarori: Gemini band bo'lsa (429/5xx) matn Groq'da yaratilsin.
+- `app/ai/providers.py`:
+  - yangi `GroqProvider` (`httpx`, OpenAI'ga mos `chat/completions`): `generate`, `generate_json` (`json_schema`, `strict: false`, Pydantic bilan tekshiruv), SSE `stream`;
+  - yangi `FallbackProvider`: asosiy provayder `ProviderBusy` bersa zaxiraga o'tadi va model nomini almashtiradi; oqim faqat birinchi bo'lakdan oldin o'tkaziladi;
+  - `with_retry` endi `httpx` xatolarini ham taniydi.
+- Groq'da embedding yo'q, shuning uchun indeks va qidiruv Gemini'da qoladi.
+- Sozlamalar: `GROQ_API_KEY` (bo'sh bo'lsa zaxira o'chiq), `GROQ_MODEL_CHAT=openai/gpt-oss-120b`, `GROQ_MODEL_FAST=openai/gpt-oss-20b`, `GROQ_RPM=30`.
+- `GET /api/admin/ai/settings`: zaxira ulangan bo'lsa `provider` maydoni `gemini+groq` bo'ladi (sxema o'zgarmagan).
+- `httpx` asosiy bog'liqliklarga ko'chirildi.
+- Tekshiruv: `ruff`, `mypy` toza; `AI_PROVIDER=fake` bilan ilova yig'iladi; o'tish mantig'i bir martalik skriptda tekshirildi.
+
 ### 3A Task 14: haqiqiy Gemini kaliti bilan qo'lda tekshiruv (oraliq)
 - Tuzatish `app/ai/providers.py`: `GeminiProvider.stream()` da 503/429 xatosi birinchi bo'lakni o'qishda chiqardi va `with_retry` uni ushlamasdi — repetitor darhol `AI_BUSY` berardi, logga ham yozilmasdi. Endi oqim ochilishi va birinchi bo'lak retry ichida; oqim o'rtasidagi xato logga yoziladi.
 - `app/ai/grading.py`: AI tekshiruvi yiqilganda sabab turi logga yoziladi (matnsiz).

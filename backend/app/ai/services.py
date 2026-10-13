@@ -9,7 +9,9 @@ from app.ai.models import AiDraft, AiSettings, DraftStatus
 from app.ai.providers import (
     EmbeddingProvider,
     FakeProvider,
+    FallbackProvider,
     GeminiProvider,
+    GroqProvider,
     LLMProvider,
     TokenBucket,
 )
@@ -40,6 +42,17 @@ def build_ai(settings: Settings, dialect_name: str) -> AiServices:
             settings.gemini_api_key, settings.ai_embedding_model, TokenBucket(settings.ai_rpm)
         )
         llm, embedder = gemini, gemini
+        if settings.groq_api_key:
+            # Groq'da embedding yo'q: indeks Gemini'da qoladi, Groq faqat matn uchun zaxira.
+            llm = FallbackProvider(
+                gemini,
+                GroqProvider(settings.groq_api_key, TokenBucket(settings.groq_rpm)),
+                {
+                    settings.ai_model_chat: settings.groq_model_chat,
+                    settings.ai_model_fast: settings.groq_model_fast,
+                },
+                settings.groq_model_chat,
+            )
     else:
         fake = FakeProvider()
         llm, embedder = fake, fake

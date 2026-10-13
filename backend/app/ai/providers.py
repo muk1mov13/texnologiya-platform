@@ -5,6 +5,7 @@ Boshqa modullar faqat `LLMProvider` / `EmbeddingProvider` protokollarini biladi.
 
 import asyncio
 import hashlib
+import json
 import logging
 import math
 import re
@@ -13,6 +14,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, Protocol, TypeVar
 
+import httpx
 from pydantic import BaseModel
 
 from app.ai.constants import EMBED_BATCH, EMBEDDING_DIM
@@ -130,12 +132,22 @@ class FakeProvider:
 RETRY_DELAYS = (1.0, 2.0, 4.0)
 
 
-def _retryable(exc: BaseException) -> bool:
+def _status(exc: BaseException) -> int | None:
+    """Gemini (`APIError.code`) yoki Groq (`httpx.HTTPStatusError`) xatosining HTTP kodi."""
     from google.genai import errors
 
     if isinstance(exc, errors.APIError):
-        return exc.code == 429 or (exc.code or 0) >= 500
-    return isinstance(exc, TimeoutError | ConnectionError)
+        return exc.code or 0
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code
+    return None
+
+
+def _retryable(exc: BaseException) -> bool:
+    status = _status(exc)
+    if status is not None:
+        return status == 429 or status >= 500
+    return isinstance(exc, TimeoutError | ConnectionError | httpx.TransportError)
 
 
 async def with_retry[T](call: Callable[[], Awaitable[T]]) -> T:
@@ -144,8 +156,6 @@ async def with_retry[T](call: Callable[[], Awaitable[T]]) -> T:
     Boshqa API xatolari (masalan, noto'g'ri kalit yoki model nomi) darhol `ProviderBusy` bo'ladi:
     foydalanuvchiga ichki tafsilot ko'rsatilmaydi, sababi esa logga yoziladi.
     """
-    from google.genai import errors
-
     for delay in (*RETRY_DELAYS, None):
         try:
             return await call()
@@ -153,10 +163,8 @@ async def with_retry[T](call: Callable[[], Awaitable[T]]) -> T:
             if delay is not None and _retryable(exc):
                 await asyncio.sleep(delay)
                 continue
-            if isinstance(exc, errors.APIError) or _retryable(exc):
-                logger.warning(
-                    "AI provider error: %s %s", type(exc).__name__, getattr(exc, "code", "")
-                )
+            if _status(exc) is not None or _retryable(exc):
+                logger.warning("AI provider error: %s %s", type(exc).__name__, _status(exc) or "")
                 raise ProviderBusy(type(exc).__name__) from exc
             raise
     raise AssertionError("unreachable")
@@ -260,3 +268,142 @@ class GeminiProvider:
             )
             result.extend(normalize(list(e.values or [])) for e in response.embeddings or [])
         return result
+
+
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+
+
+class GroqProvider:
+    """Groq (OpenAI'ga mos API) — faqat matn yaratish; embedding modeli yo'q."""
+
+    def __init__(self, api_key: str, limiter: TokenBucket) -> None:
+        self._client = httpx.AsyncClient(
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=httpx.Timeout(60.0, connect=10.0),
+        )
+        self._limiter = limiter
+
+    @staticmethod
+    def _messages(system: str, messages: Sequence[ChatMessage]) -> list[dict[str, str]]:
+        return [{"role": "system", "content": system}] + [
+            {"role": m.role, "content": m.text} for m in messages
+        ]
+
+    async def _complete(self, body: dict[str, Any]) -> str:
+        async def call() -> str:
+            response = await self._client.post(GROQ_URL, json=body)
+            response.raise_for_status()
+            return str(response.json()["choices"][0]["message"].get("content") or "")
+
+        await self._limiter.acquire()
+        return await with_retry(call)
+
+    async def generate(self, model: str, system: str, messages: Sequence[ChatMessage]) -> str:
+        return await self._complete({"model": model, "messages": self._messages(system, messages)})
+
+    async def generate_json(
+        self, model: str, system: str, messages: Sequence[ChatMessage], schema: type[ModelT]
+    ) -> ModelT:
+        """Sxemaga mos kelmasa `pydantic.ValidationError` — chaqiruvchi qayta so'raydi."""
+        text = await self._complete(
+            {
+                "model": model,
+                "messages": self._messages(system, messages),
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": schema.__name__,
+                        "schema": schema.model_json_schema(),
+                        "strict": False,
+                    },
+                },
+            }
+        )
+        return schema.model_validate_json(text or "{}")
+
+    async def stream(
+        self, model: str, system: str, messages: Sequence[ChatMessage]
+    ) -> AsyncIterator[str]:
+        body = {"model": model, "messages": self._messages(system, messages), "stream": True}
+
+        async def start() -> httpx.Response:
+            request = self._client.build_request("POST", GROQ_URL, json=body)
+            response = await self._client.send(request, stream=True)
+            if response.is_error:
+                await response.aclose()
+                response.raise_for_status()
+            return response
+
+        await self._limiter.acquire()
+        response = await with_retry(start)
+        try:
+            async for line in response.aiter_lines():
+                if not line.startswith("data:"):
+                    continue
+                data = line[5:].strip()
+                if data == "[DONE]":
+                    break
+                choices = json.loads(data).get("choices") or []
+                piece = choices[0].get("delta", {}).get("content") if choices else None
+                if piece:
+                    yield piece
+        except httpx.HTTPError as exc:  # oqim o'rtasida qayta urinib bo'lmaydi
+            logger.warning("AI provider stream error: %s", type(exc).__name__)
+            raise ProviderBusy(type(exc).__name__) from exc
+        finally:
+            await response.aclose()
+
+
+class FallbackProvider:
+    """Asosiy provayder `ProviderBusy` bersa, so'rovni zaxira provayderga o'tkazadi.
+
+    Model nomi `model_map` orqali zaxira provayder modeliga almashtiriladi. Oqim faqat birinchi
+    bo'lakdan oldin yiqilsa o'tkaziladi, aks holda ikki javob aralashib ketadi.
+    """
+
+    def __init__(
+        self,
+        primary: LLMProvider,
+        secondary: LLMProvider,
+        model_map: dict[str, str],
+        default_model: str,
+    ) -> None:
+        self.primary = primary
+        self.secondary = secondary
+        self._model_map = model_map
+        self._default_model = default_model
+
+    def _fallback_model(self, model: str) -> str:
+        logger.warning("AI fallback: asosiy provayder band, zaxira provayder ishlatiladi")
+        return self._model_map.get(model, self._default_model)
+
+    async def generate(self, model: str, system: str, messages: Sequence[ChatMessage]) -> str:
+        try:
+            return await self.primary.generate(model, system, messages)
+        except ProviderBusy:
+            return await self.secondary.generate(self._fallback_model(model), system, messages)
+
+    async def generate_json(
+        self, model: str, system: str, messages: Sequence[ChatMessage], schema: type[ModelT]
+    ) -> ModelT:
+        try:
+            return await self.primary.generate_json(model, system, messages, schema)
+        except ProviderBusy:
+            return await self.secondary.generate_json(
+                self._fallback_model(model), system, messages, schema
+            )
+
+    async def stream(
+        self, model: str, system: str, messages: Sequence[ChatMessage]
+    ) -> AsyncIterator[str]:
+        started = False
+        try:
+            async for piece in self.primary.stream(model, system, messages):
+                started = True
+                yield piece
+            return
+        except ProviderBusy:
+            if started:
+                raise
+        async for piece in self.secondary.stream(self._fallback_model(model), system, messages):
+            yield piece
