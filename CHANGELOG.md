@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `66f73b0` — 2B Task 9: o'qituvchi uchun vazifa formasi
+- Yangi `features/teach/assessment/TaskTab.tsx` (mavzu muharririning `task` tabi):
+  - bitta forma ham yaratadi, ham tahrirlaydi: nom, topshiriq matni, javob turi (matn / fayl / ikkalasi), maksimal ball (1–100), muddat (ixtiyoriy) va baholash mezoni;
+  - saqlanganda toast chiqadi. Xatolar (masalan, `MAX_SCORE_BELOW_GRADED`) forma ostida ko'rsatiladi;
+  - "Vazifani o'chirish" tasdiqlash oynasi bilan ishlaydi; oynada talabalar javoblari ham o'chirilishi ogohlantiriladi.
+- `schemas.ts` ga `taskSchema` qo'shildi.
+- Yangi `lib/datetime.ts`: `toLocalInput` / `fromLocalInput`. `datetime-local` maydoni mahalliy vaqtda ko'rsatiladi, backend'ga esa ISO UTC yuboriladi.
+- `TopicEditorPage.test.tsx`: Task 8 dan beri yiqilayotgan "tez kunda" testi amaliyot tabidagi faoliyatlar ro'yxatini tekshiradigan qilib moslandi. Endi barcha 7 tab ishlaydi.
+- i18n: yangi `taskEdit.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `0d3bc4f` — 2B Task 8: o'qituvchi uchun faoliyat muharrirlari
 - Yangi `features/teach/assessment/schemas.ts`: test, ha/yo'q va krossvord uchun zod sxemalari. Cheklovlar backend `assessment/schemas.py` bilan bir xil.
 - Yangi `ActivitiesTab.tsx` (mavzu muharririning `review`/`practice` tablari, oldingi "Tez orada" o'rniga):
