@@ -6,6 +6,30 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `69eae22` — 3A Task 6: indekslash job'lari va hook'lar
+- Yangi `app/ai/indexing.py`. Job'lar AI o'chiq bo'lsa hech narsa qilmaydi:
+  - `index_material` — PDF sahifalari → bo'laklar → embedding → `doc_chunks`. Material orada o'chirilgan bo'lsa, natija yozilmaydi;
+  - `index_topic_glossary` — mavzu glossariysi bitta manba (`source_id = topic_id`), har atama alohida bo'lak;
+  - `index_topic_questions` — faqat nashr qilingan faoliyatlarning savol matni (test savoli, ha/yo'q bayonoti, krossvord izohi) va vazifa nomi/tavsifi; to'g'ri javoblar kirmaydi;
+  - `reindex_all` — model o'zgargan yoki hamma bo'laklar;
+  - yordamchilar: `index_material_quietly`, `enqueue_questions_for_step`.
+- Hook'lar:
+  - `learning/materials.py`:
+    - PDF yuklanganda `index_material` navbatga qo'yiladi;
+    - konvertatsiya job'i oxirida indekslash chaqiriladi (job ichidan job qo'yilmaydi; xatosi konvertatsiyaga ta'sir qilmaydi);
+    - material o'chirilganda bo'laklari ham o'chadi (`doc_chunks.source_id` FK emas).
+  - `learning/teach_items_router.py`: glossariy qo'shish/tahrirlash/o'chirish → `index_topic_glossary`.
+  - `assessment/teach_router.py`: faoliyat yaratish/tahrirlash/nashr/o'chirish va vazifa saqlash/o'chirish → `index_topic_questions`. O'chirishda `step_id` oldindan olinadi.
+  
+  API (URL, tana, javob) o'zgarmadi.
+- Tekshiruv:
+  - ruff va mypy toza; import tsikli yo'q; 5 ta job ro'yxatdan o'tdi;
+  - smoke (`fake`, vaqtinchalik SQLite):
+    - material, glossariy, faoliyat va vazifa — har biri 1 bo'lak;
+    - test variantlari (to'g'ri javob ham) va nashr qilinmagan faoliyat indeksga tushmadi;
+    - qayta indekslash bo'laklarni takrorlamadi;
+    - material o'chirilganda uning bo'laklari ham o'chdi.
+
 ### `785d686` — 3A Task 5: AI xizmatlarini ilovaga ulash
 - Yangi `app/ai/services.py`:
   - `AiServices` (llm, embedder, vectors, `configured`, chat/fast modellar);
