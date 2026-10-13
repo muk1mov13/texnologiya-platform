@@ -6,6 +6,25 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `b623637` — 3A Task 3: AI provayder adapteri
+- Yangi `app/ai/providers.py`:
+  - `LLMProvider` (`generate`, `generate_json`, `stream`) va `EmbeddingProvider` (`embed`) protokollari;
+  - `ChatMessage`, `ProviderBusy`;
+  - `normalize` (L2, cosine = skalyar ko'paytma).
+- `TokenBucket` — provayderga umumiy so'rov oqimi (`AI_RPM`). `max_wait` soniyadan ko'p kutish kerak bo'lsa `ProviderBusy`.
+- `with_retry`:
+  - 429/5xx/tarmoq xatosida 1, 2, 4 s kutib 3 marta qayta urinadi;
+  - boshqa API xatolari (noto'g'ri kalit yoki model) darhol `ProviderBusy`;
+  - logga faqat xato turi va kodi yoziladi, prompt matni yozilmaydi.
+- `GeminiProvider` (`google-genai`): chat, JSON sxemali javob (`response_schema`), oqim, embedding (`output_dimensionality=768`, `RETRIEVAL_QUERY`/`RETRIEVAL_DOCUMENT`, 100 tadan paket).
+- `FakeProvider`: internetsiz, deterministik hash-embedding, sxemaning `fake_sample()` dan JSON va qisqa oqim.
+- Rejadan farq (ruff talabi): `TokenBucket.acquire(timeout)` → `acquire(max_wait)` (ASYNC109); `with_retry` PEP 695 generik sintaksisiga o'tdi (UP047).
+- Tekshiruv:
+  - ruff va mypy toza;
+  - `FakeProvider` embedding: o'lcham 768, `olma anor` ↔ `olma` o'xshashligi 0,707;
+  - offlayn tekshiruv: 429→429→ok 3 chaqiruvda o'tdi; 400 darhol `ProviderBusy`; doimiy 429 4 urinishdan keyin `ProviderBusy`; bo'sh `TokenBucket` `ProviderBusy` berdi, 30 s dan keyin token qaytdi.
+  - Haqiqiy Gemini chaqiruvi Task 14 da tekshiriladi.
+
 ### `b1d039c` — 3A Task 2: AI modellari, `Vector` tipi va migratsiya
 - `core/types.py`: yangi `Vector(dim)` tipi:
   - PostgreSQL'da pgvector `vector(dim)`, SQLite'da float32 BLOB;
