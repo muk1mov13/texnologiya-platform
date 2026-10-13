@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Form, Response, UploadFile
 
+from app.ai import grading
 from app.assessment import attempts, reports, tasks
 from app.assessment.schemas import (
     AttemptDetailOut,
@@ -11,7 +12,7 @@ from app.assessment.schemas import (
     SubmitOut,
 )
 from app.auth.deps import ActiveUser
-from app.core.deps import AppSettings, AppStorage, DbSession
+from app.core.deps import Ai, AppSettings, AppStorage, DbSession, Jobs
 from app.core.files import file_response
 from app.core.types import DbIdPath
 
@@ -32,12 +33,16 @@ async def submit_task(
     db: DbSession,
     settings: AppSettings,
     storage: AppStorage,
+    jobs: Jobs,
+    ai: Ai,
     text: Annotated[str | None, Form(max_length=20000)] = None,
     file: UploadFile | None = None,
 ) -> SubmitOut:
-    return await tasks.submit(
+    out = await tasks.submit(
         db, user, task_id, text=text, upload=file, storage=storage, settings=settings
     )
+    await grading.queue_check(db, ai, jobs, out.submission.id)
+    return out
 
 
 @router.get("/submissions/{submission_id}/file", response_class=Response)

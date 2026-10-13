@@ -3,10 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from sqlalchemy import select
 
-from app.ai import drafts
+from app.ai import drafts, grading
 from app.ai.models import AiDraft
 from app.ai.schemas import DraftCreateIn, DraftOut, DraftUpdateIn
 from app.ai.services import require_ai
+from app.assessment import review
 from app.auth.deps import StaffUser
 from app.core.deps import Ai, DbSession, Jobs
 from app.core.types import DB_ID_MAX, DbIdPath
@@ -61,3 +62,13 @@ async def approve_draft(draft_id: DbIdPath, user: StaffUser, db: DbSession, jobs
 async def reject_draft(draft_id: DbIdPath, user: StaffUser, db: DbSession) -> AiDraft:
     draft = await drafts.get_editable_draft(db, user, draft_id)
     return await drafts.reject_draft(db, draft)
+
+
+@router.post("/submissions/{submission_id}/ai-check", status_code=202)
+async def rerun_ai_check(
+    submission_id: DbIdPath, user: StaffUser, db: DbSession, ai: Ai, jobs: Jobs
+) -> dict[str, str]:
+    await review.get_reviewable(db, user, submission_id)
+    await require_ai(db, ai)
+    await grading.queue_check(db, ai, jobs, submission_id)
+    return {"ai_status": "pending"}

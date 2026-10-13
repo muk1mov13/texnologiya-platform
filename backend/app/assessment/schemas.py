@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
 
-from app.assessment.models import ActivityType, SubmissionStatus, TaskType
+from app.assessment.models import ActivityType, AiCheckStatus, SubmissionStatus, TaskType
 from app.assessment.view_schemas import LayoutWord, SubmissionView
 from app.core.types import DbId, trimmed_str
 from app.gamification.schemas import RewardsOut
@@ -180,6 +180,12 @@ class SubmissionQueueItem(BaseModel):
     is_late: bool
 
 
+class AiFeedbackOut(BaseModel):
+    feedback: str
+    strengths: list[str]
+    issues: list[str]
+
+
 class SubmissionDetailOut(SubmissionQueueItem):
     task_description: str
     rubric: str | None
@@ -190,6 +196,9 @@ class SubmissionDetailOut(SubmissionQueueItem):
     score: int | None
     feedback: str | None
     graded_at: datetime | None
+    ai_status: AiCheckStatus
+    ai_score: int | None
+    ai_feedback: AiFeedbackOut | None
 
 
 class GradeIn(BaseModel):

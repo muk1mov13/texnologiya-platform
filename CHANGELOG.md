@@ -6,6 +6,20 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 10: vazifa javobini AI bilan tekshirish
+- Yangi `app/ai/grading.py`:
+  - `extract_text` — textarea, PDF, DOCX; boshqa turlar `unsupported`; matn 20 000 belgida kesiladi;
+  - `queue_check` — AI yoqilgan bo'lsa `ai_status=pending` va job; xatosi javob yuborishni to'xtatmaydi;
+  - `ai_check_job` — LLM'ga faqat topshiriq, mezon, `max_score`, mavzu parchalari va javob matni ketadi (ism, email, fayl nomi yo'q); ball `0..max_score` ga qisiladi; javob orada qayta yuborilgan bo'lsa, natija yozilmaydi.
+- `assessment/router.py`: talaba javob yuborgach `queue_check`.
+- `assessment/schemas.py` / `review.py`: `SubmissionDetailOut` ga `ai_status`, `ai_score`, `ai_feedback` (faqat o'qituvchi uchun; talaba sxemalari o'zgarmadi).
+- `POST /api/teach/submissions/{id}/ai-check` (202) — qayta tekshirish.
+- Tekshiruv (HTTP smoke, `fake`):
+  - talaba javobida `ai_*` maydonlari yo'q;
+  - o'qituvchi tafsilotida `done`, ball 5 (7 → `max_score` 5 ga qisildi), izoh;
+  - qayta tekshirish 202 → `done`.
+  - ruff va mypy toza.
+
 ### 3A Task 9: AI qoralamalari (kontent yaratish)
 - Yangi `app/ai/drafts.py` va `app/ai/teach_router.py`; `api.py` ga ulandi.
 - Oqim:

@@ -2,7 +2,12 @@ from sqlalchemy import Row, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.assessment.models import Submission, SubmissionStatus, Task
-from app.assessment.schemas import GradeIn, SubmissionDetailOut, SubmissionQueueItem
+from app.assessment.schemas import (
+    AiFeedbackOut,
+    GradeIn,
+    SubmissionDetailOut,
+    SubmissionQueueItem,
+)
 from app.assessment.views import is_late
 from app.auth.models import Role, User
 from app.core.errors import AppError
@@ -70,6 +75,11 @@ def _detail(row: ReviewRow) -> SubmissionDetailOut:
         score=submission.score,
         feedback=submission.feedback,
         graded_at=submission.graded_at,
+        ai_status=submission.ai_status,
+        ai_score=submission.ai_score,
+        ai_feedback=AiFeedbackOut.model_validate(submission.ai_feedback)
+        if submission.ai_feedback
+        else None,
     )
 
 
