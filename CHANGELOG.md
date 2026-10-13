@@ -6,6 +6,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `980f10d` — 2B Task 11: o'qituvchi statistikasi
+- Yangi `features/teach/StatsPage.tsx` (`/teach/stats`):
+  - fan tanlanadi (sukut bo'yicha birinchisi), tanlov manzilda saqlanadi (`?subject=`);
+  - jadval ustunlari: mavzu, boshlagan, tugatgan, o'rtacha natija ("—" yoki "78%"), tekshirilmagan javoblar;
+  - telefonda jadval faqat o'z konteynerida suriladi, sahifada gorizontal scroll paydo bo'lmaydi;
+  - o'qituvchiga fan biriktirilmagan bo'lsa, bo'sh holat ko'rsatiladi.
+- Menyu: o'qituvchi va admin uchun "Statistika" havolasi.
+- i18n: `nav.stats`, yangi `stats.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `10d6c7c` — 2B Task 10: o'qituvchi uchun tekshirish navbati
 - Yangi `features/teach/ReviewQueuePage.tsx` (`/teach/review`):
   - "Tekshirilmagan", "Qaytarilgan" va "Baholangan" tablari; tanlangan tab manzilda saqlanadi (`?status=`);
