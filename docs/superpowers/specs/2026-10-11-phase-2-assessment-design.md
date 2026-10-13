@@ -183,6 +183,7 @@ Sof funksiyalar, baza bilan ishlamaydi: `normalize_word(raw) -> list[str]` (kata
 **Cheklovlar:** faoliyatda 3–20 so'z, har so'z 2–20 katak, takrorlangan so'z yo'q. Buzilsa → 422 `ACTIVITY_INVALID_ITEMS`.
 
 **Joylashtirish:**
+0. Avval so'zlar umumiy kataklar bo'yicha guruhlanadi (umumiy katagi bor ikki so'z bir guruhda). Guruh bittadan ko'p bo'lsa, krossvord hech qanday joylashtirishda tuzilmaydi: asosiy guruh tanlanadi (eng ko'p so'z, so'ng eng ko'p katak, so'ng eng kichik kiritish indeksi) va undan tashqaridagi so'zlar bilan darhol → 422 `CROSSWORD_UNPLACEABLE`. Shunda eng uzun "begona" so'z to'rga birinchi qo'yilib, xato to'g'ri so'zlarga tushmaydi (2026-10-13 da qo'shildi).
 1. So'zlar katak soni bo'yicha kamayish tartibida saralanadi. Teng bo'lsa, kiritilgan tartib saqlanadi.
 2. Birinchi so'z (0, 0) dan gorizontal qo'yiladi.
 3. Har keyingi so'z uchun joylashgan so'zlar bilan barcha mos harf kesishmalari sinab ko'riladi. Yangi so'z kesishgan so'zga perpendikulyar qo'yiladi. Joy yaroqli bo'lishi uchun:

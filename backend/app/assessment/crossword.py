@@ -142,11 +142,42 @@ def _candidates(
     return result
 
 
+def _detached(words: Sequence[Sequence[str]]) -> list[int]:
+    """Umumiy katagi yo'q so'zlar hech qachon kesisha olmaydi. So'zlar umumiy kataklar bo'yicha
+    bir nechta guruhga bo'linsa, krossvord umuman tuzilmaydi: asosiy guruh (eng ko'p so'z, so'ng
+    eng ko'p katak, so'ng eng kichik indeks) tanlanadi va qolgan so'zlarning indekslari qaytariladi.
+    Hamma so'z bitta guruhda bo'lsa — bo'sh ro'yxat."""
+    letters = [set(cells) for cells in words]
+    group_of: dict[int, int] = {}
+    groups: list[list[int]] = []
+    for start in range(len(words)):
+        if start in group_of:
+            continue
+        group = [start]
+        group_of[start] = len(groups)
+        for current in group:  # BFS: ro'yxat aylanish davomida to'ldiriladi
+            for other in range(len(words)):
+                if other not in group_of and letters[current] & letters[other]:
+                    group_of[other] = len(groups)
+                    group.append(other)
+        groups.append(sorted(group))
+    if len(groups) == 1:
+        return []
+    main = min(groups, key=lambda g: (-len(g), -sum(len(words[i]) for i in g), g[0]))
+    return [i for i in range(len(words)) if i not in main]
+
+
 def build_layout(words: Sequence[Sequence[str]]) -> Layout:
     """`words` — normallashtirilgan so'zlar (kataklar ro'yxati). Joylashmagan so'zlar bo'lsa,
-    `UnplaceableError` ularning kiritilgan tartibdagi indekslari bilan ko'tariladi."""
+    `UnplaceableError` ularning kiritilgan tartibdagi indekslari bilan ko'tariladi.
+
+    Avval umumiy katagi bo'yicha asosiy guruhdan ajralgan so'zlar tekshiriladi (`_detached`):
+    aks holda eng uzun "begona" so'z to'r markaziga qo'yilib, xato to'g'ri so'zlarga tushardi."""
     if not words:
         raise ValueError("so'zlar ro'yxati bo'sh")
+    detached = _detached(words)
+    if detached:
+        raise UnplaceableError(detached)
     order = sorted(range(len(words)), key=lambda i: (-len(words[i]), i))
     grid = _Grid()
     placed: dict[int, tuple[int, int, Direction]] = {}
