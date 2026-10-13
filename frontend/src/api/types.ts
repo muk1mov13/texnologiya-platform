@@ -528,6 +528,17 @@ export interface SubmissionDetail extends SubmissionQueueItem {
   score: number | null
   feedback: string | null
   graded_at: string | null
+  ai_status: AiCheckStatus
+  ai_score: number | null
+  ai_feedback: AiFeedback | null
+}
+
+export type AiCheckStatus = 'none' | 'pending' | 'done' | 'unsupported' | 'failed'
+
+export interface AiFeedback {
+  feedback: string
+  strengths: string[]
+  issues: string[]
 }
 
 export interface GradeIn {

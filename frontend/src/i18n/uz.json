@@ -102,6 +102,15 @@
     "SUBMISSION_GRADED": "Baholangan javobni o'zgartirib bo'lmaydi",
     "SUBMISSION_NOT_SUBMITTED": "Faqat tekshiruvdagi javob bilan ishlash mumkin",
     "MAX_SCORE_BELOW_GRADED": "Maksimal ball baholangan javoblardagi baldan kam bo'lishi mumkin emas",
+    "AI_DISABLED": "AI yordamchisi hozircha o'chirilgan",
+    "AI_BUSY": "AI hozir band, birozdan so'ng urinib ko'ring",
+    "AI_LIMIT_REACHED": "Bugungi AI so'rovlari limiti tugadi",
+    "CONVERSATION_NOT_FOUND": "Suhbat topilmadi",
+    "AI_DRAFT_NOT_FOUND": "Qoralama topilmadi",
+    "AI_DRAFT_WRONG_STEP": "Bu tur bu bosqichga mos emas",
+    "AI_DRAFT_NOT_READY": "Qoralama hali tayyorlanmoqda",
+    "AI_DRAFT_CLOSED": "Qoralama yopilgan",
+    "AI_DRAFT_INVALID": "Qoralama noto'g'ri to'ldirilgan",
     "UNKNOWN": "Kutilmagan xato yuz berdi"
   },
   "materialErrors": {

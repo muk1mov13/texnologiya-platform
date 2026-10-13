@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 13: frontend uchun AI API sxemasi va xato matnlari
+- `npm run gen:api` — `schema.gen.ts` ga AI endpoint'lari tushdi.
+- `src/api/types.ts`: `SubmissionDetail` ga `ai_status`, `ai_score`, `ai_feedback`; yangi `AiCheckStatus`, `AiFeedback` (kontrakt tekshiruvi talab qildi).
+- `uz.json` / `ru.json` `errors.*`: `AI_DISABLED`, `AI_BUSY`, `AI_LIMIT_REACHED`, `CONVERSATION_NOT_FOUND`, `AI_DRAFT_NOT_FOUND`, `AI_DRAFT_WRONG_STEP`, `AI_DRAFT_NOT_READY`, `AI_DRAFT_CLOSED`, `AI_DRAFT_INVALID`.
+- Tekshiruv: lint, typecheck, build o'tdi; `gen:api` qayta ishga tushirilganda farq yo'q.
+
 ### 3A Task 12: admin AI API
 - Yangi `app/ai/admin_router.py` (`/api/admin/ai`, faqat admin):
   - `GET` / `PATCH /settings` — `enabled`, `student_daily_limit` (0–500), shuningdek `configured`, provayder va modellar; kalitning o'zi qaytarilmaydi;
