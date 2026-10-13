@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 14 yakuni: Gemini + Groq bilan qayta smoke
+- Toza baza (`e2e/start-backend.mjs`, port 8011), ikkala kalit bilan. `.env` dagi `AI_MODEL_CHAT=gemini-2.5-flash` Gemini'da 404 berdi, shuning uchun matn so'rovlari Groq'ga o'tdi (logda `AI fallback`), embedding Gemini'da ishladi.
+- Natija: PDF → `doc_chunks` ✅; repetitor `answer` + `[1]` ✅, `refusal` ✅, `hint` ✅; qoralama → tasdiqlash → faoliyat ✅; vazifa AI tekshiruvi `done`, ball 9/10 ✅; `weekly-report` ✅; admin sozlamalarida `provider=gemini+groq` ✅.
+- Kuzatuv: yangi `hint` ko'rsatmasi bilan javob `[1]` ga yo'naltiradi va yo'naltiruvchi savol beradi, lekin model beshala turni qavs ichida yana sanadi — ochiq masala.
+- Roadmap: Task 14 ✅. `CLAUDE.md`: `FallbackProvider`/`GroqProvider` bandi.
+
 ### AI: hint rejimi ko'rsatmasi kuchaytirildi
 - Smoke'da repetitor yechilmagan test savoliga (Klimov tasnifi, "nechta tur?") beshala turni sanab berdi, ya'ni javobni bilvosita aytdi.
 - `app/ai/tutor.py` `HINT`: son, sana, atama yoki ta'rifni aytmaslik va javob bo'ladigan ro'yxatni to'liq sanamaslik; o'rniga 2-3 jumlada tushuncha, materialning qaysi qismini `[n]` o'qishni ko'rsatish va bitta yo'naltiruvchi savol.
