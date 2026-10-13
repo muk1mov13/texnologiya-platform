@@ -482,5 +482,48 @@
     "deleteTitle": "Suhbatni o'chirish",
     "deleteText": "\"{{title}}\" suhbati o'chiriladi.",
     "disabled": "AI repetitor hozircha o'chirilgan"
+  },
+  "aiDraft": {
+    "create": "AI bilan yaratish",
+    "modalTitle": "AI bilan yaratish",
+    "kind": "Turi",
+    "kinds": {
+      "quiz": "Test",
+      "yesno": "Ha yoki yo'q",
+      "crossword": "Krossvord",
+      "glossary": "Glossariy",
+      "task": "Vazifa"
+    },
+    "materials": "Materiallar (3 tagacha)",
+    "noMaterials": "Avval ma'ruza yoki taqdimot faylini yuklang.",
+    "pickMaterial": "Kamida bitta material tanlang",
+    "tooManyMaterials": "Ko'pi bilan 3 ta material",
+    "count": "Soni",
+    "countRange": "Son ruxsat etilgan oraliqda emas",
+    "difficultyLabel": "Qiyinlik",
+    "difficulty": {
+      "easy": "Oson",
+      "medium": "O'rtacha",
+      "hard": "Qiyin"
+    },
+    "submit": "Yaratish",
+    "started": "Qoralama yaratilmoqda…",
+    "status": {
+      "generating": "Yaratilmoqda",
+      "draft": "Qoralama",
+      "approved": "Tasdiqlangan",
+      "rejected": "Rad etilgan",
+      "failed": "Xato"
+    },
+    "generating": "AI materialni o'qib, qoralama tayyorlamoqda…",
+    "failedText": "Qoralama yaratilmadi. Birozdan so'ng qayta urinib ko'ring.",
+    "dismiss": "Yopish",
+    "itemCount": "{{count}} ta element",
+    "review": "Ko'rish va tahrirlash",
+    "approve": "Tasdiqlash",
+    "approved": "Qoralama tasdiqlandi va nashr qilinmagan holda qo'shildi",
+    "reject": "Rad etish",
+    "rejectTitle": "Qoralamani rad etish",
+    "rejectText": "Qoralama o'chiriladi va qayta tiklanmaydi."
   }
 }

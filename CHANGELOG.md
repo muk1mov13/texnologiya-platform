@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 5: "✨ AI bilan yaratish" va qoralamalar
+- Yangi `features/teach/ai/`:
+  - `AiDraftsSection` — takrorlash, amaliyot, glossariy va vazifa tablari tepasida "✨ AI bilan yaratish" tugmasi va shu bosqichning ochiq (`generating`/`draft`/`failed`) qoralamalari; AI o'chiq bo'lsa chizilmaydi va qoralamalar so'ralmaydi;
+  - `DraftCreateModal` — turi (faoliyat bosqichida test/ha-yo'q/krossvord), `ready` ma'ruza/taqdimot materiallari (1–3), soni (tur oralig'ida), qiyinlik;
+  - `DraftCard` — holat belgisi, yaratilmoqda spinneri (3 s polling), xato va yopish, qisqa ko'rinish, tahrirlash, tasdiqlash (toast) va rad etish (tasdiqlash oynasi);
+  - `DraftEditor` — mavjud `ActivityEditor`/`TaskForm` tashqi saver bilan, `DraftGlossaryEditor` — `GlossaryForm` bilan atamalarni tahrirlash/o'chirish;
+  - `draftKinds.ts` (son oraliqlari, ikonlar, bosqich → turlar), `schemas.ts` (zod).
+- `useDrafts(topicId, enabled)` — AI o'chiq bo'lsa so'rov yuborilmaydi (mavjud `TopicEditorPage` testlari uchun ham).
+- `TopicEditorPage`: `AiDraftsSection` tab kontentidan oldin.
+- i18n `aiDraft.*` (uz/ru).
+- Tekshiruv: lint (`watch` o'rniga `useWatch` — React Compiler ogohlantirishi), typecheck, build o'tdi.
+
 ### 3B Task 4: muharrirlarga tashqi saqlash
 - Yangi `features/teach/assessment/saver.ts`: `ActivitySaver`, `TaskSaver` tiplari.
 - `ActivityEditor`: ixtiyoriy `saver` prop (berilsa faoliyat API'si o'rniga ishlatiladi); `initial` endi `id` siz ham bo'lishi mumkin (AI qoralamasi) — yangilash/yaratish `initial.id` bo'yicha tanlanadi.

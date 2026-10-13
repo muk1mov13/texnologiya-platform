@@ -11,11 +11,12 @@ export const teachAiKeys = {
 
 const POLL_MS = 3000
 
-/** Mavzu qoralamalari; `generating` bor ekan har 3 soniyada yangilanadi. */
-export function useDrafts(topicId: number) {
+/** Mavzu qoralamalari; `generating` bor ekan har 3 soniyada yangilanadi. AI o'chiq bo'lsa so'ralmaydi. */
+export function useDrafts(topicId: number, enabled = true) {
   return useQuery({
     queryKey: teachAiKeys.drafts(topicId),
     queryFn: ({ signal }) => apiFetch<AiDraft[]>(`/api/teach/ai/drafts?topic_id=${topicId}`, { signal }),
+    enabled,
     refetchInterval: (query) =>
       query.state.data?.some((draft) => draft.status === 'generating') ? POLL_MS : false,
   })

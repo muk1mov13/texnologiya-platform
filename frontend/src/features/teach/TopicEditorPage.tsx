@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { ACTIVITY_KINDS, FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
+import { AiDraftsSection } from './ai/AiDraftsSection'
 import { ActivitiesTab } from './assessment/ActivitiesTab'
 import { TaskTab } from './assessment/TaskTab'
 import { GlossaryTab } from './GlossaryTab'
@@ -61,6 +62,7 @@ export function TopicEditorPage() {
               </div>
               <div className="px-4 pb-5 sm:px-5">
                 <TabPanel id={tab}>
+                  {step && <AiDraftsSection key={step.id} topic={data} step={step} />}
                   {FILE_KINDS.has(tab) && step ? (
                     <MaterialsTab topicId={data.id} step={step} />
                   ) : tab === 'glossary' ? (
