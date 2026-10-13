@@ -4,9 +4,11 @@ interface ProgressRingProps {
   completed: number
   total: number
   size?: number
+  /** Qiymat yonidagi matnda allaqachon yozilgan bo'lsa — halqa ekran o'quvchidan yashiriladi. */
+  decorative?: boolean
 }
 
-export function ProgressRing({ completed, total, size = 56 }: ProgressRingProps) {
+export function ProgressRing({ completed, total, size = 56, decorative = false }: ProgressRingProps) {
   const { t } = useTranslation()
   const stroke = 6
   const radius = (size - stroke) / 2
@@ -18,8 +20,9 @@ export function ProgressRing({ completed, total, size = 56 }: ProgressRingProps)
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      role="img"
-      aria-label={t('common.progress', { completed, total })}
+      {...(decorative
+        ? { 'aria-hidden': true }
+        : { role: 'img', 'aria-label': t('common.progress', { completed, total }) })}
       className="shrink-0"
     >
       <circle cx={center} cy={center} r={radius} fill="none" stroke="var(--color-brand-100)" strokeWidth={stroke} />

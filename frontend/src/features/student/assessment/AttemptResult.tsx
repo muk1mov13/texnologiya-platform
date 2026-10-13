@@ -21,7 +21,8 @@ export function AttemptResult({ score, maxScore, items, onRetry, onBack }: Attem
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex items-center gap-4">
-        <ProgressRing completed={score} total={maxScore} size={64} />
+        {/* Ball yonidagi matnda yozilgan; halqaning "Bajarildi: …" yozuvi bu yerda noto'g'ri bo'lardi. */}
+        <ProgressRing completed={score} total={maxScore} size={64} decorative />
         <div>
           <p className="text-2xl font-extrabold">{t('activity.score', { score, max: maxScore })}</p>
           <p className="text-slate-600">{percent}%</p>

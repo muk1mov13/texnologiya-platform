@@ -29,7 +29,7 @@ export function TaskStep({ topicId, stepId, task, submission }: TaskStepProps) {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-3 p-5">
-        <h2 className="text-lg font-bold text-brand-900">{task.title}</h2>
+        <h3 className="text-lg font-bold text-brand-900">{task.title}</h3>
         <p className="whitespace-pre-line text-slate-700">{task.description}</p>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <Badge tone="brand">{t('task.maxScore', { score: task.max_score })}</Badge>
