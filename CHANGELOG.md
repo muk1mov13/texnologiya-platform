@@ -6,6 +6,25 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `785d686` — 3A Task 5: AI xizmatlarini ilovaga ulash
+- Yangi `app/ai/services.py`:
+  - `AiServices` (llm, embedder, vectors, `configured`, chat/fast modellar);
+  - `build_ai` — baza dialektiga qarab SQLite/PG vektor ombori; kalit bo'lsa `GeminiProvider`, bo'lmasa `FakeProvider` (`configured=False`);
+  - `get_ai_settings` — bitta qatorli sozlamalar, yo'q bo'lsa yaratiladi;
+  - `ai_enabled` / `require_ai` — 503 `AI_DISABLED`;
+  - `recover_interrupted_ai` — qayta ishga tushganda `generating` qoralamalar `failed`/`INTERRUPTED` ga, `pending` AI tekshiruvlari `failed` ga o'tadi.
+- `core/jobs.py`: `JobContext.ai` (sukut `None`; tip faqat `TYPE_CHECKING` da, import tsiklisiz).
+- `core/deps.py`: `get_ai` va `Ai` alias'i.
+- `main.py`: `app.state.ai`, `JobContext(..., ai=ai)`, lifespan'da `recover_interrupted_ai` (faqat `InlineJobRunner` bo'lsa).
+- Tekshiruv (smoke, vaqtinchalik SQLite):
+  - `fake` → `FakeProvider`, yoqilgan;
+  - kalitsiz `gemini` → o'chiq;
+  - kalitli `gemini` → `GeminiProvider`, yoqilgan (tarmoqqa so'rov yuborilmadi);
+  - job konteksti o'sha `AiServices` ni oladi;
+  - `generating` qoralama qayta ishga tushganda `failed`/`INTERRUPTED` bo'ldi;
+  - admin `enabled=False` qilganda AI o'chdi.
+  - ruff va mypy toza.
+
 ### `9863190` — 3A Task 4: vektor ombori va bo'laklash
 - Yangi `app/ai/vectors.py`:
   - `ChunkRow`, `Hit` tiplari;
