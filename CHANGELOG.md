@@ -6,6 +6,25 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `9863190` — 3A Task 4: vektor ombori va bo'laklash
+- Yangi `app/ai/vectors.py`:
+  - `ChunkRow`, `Hit` tiplari;
+  - `VectorStore` bazasi: `delete` (manba turi / manba / mavzu bo'yicha) va `add` umumiy, commit qilmaydi;
+  - `SqliteVectorStore` — SQL filtri, so'ng numpy bilan skalyar ko'paytma va top-k;
+  - `PgVectorStore` — `<=>` (cosine masofa), HNSW indeksi, `score = 1 - distance`;
+  - bo'sh `topic_ids` bo'lsa, so'rov yuborilmaydi.
+- Yangi `app/ai/chunking.py`:
+  - `pdf_pages` (PyMuPDF);
+  - `split_text` — ~3200 belgi, so'z chegarasida, ~400 belgi ustma-ust, 40 belgidan qisqa bo'laklar tashlanadi;
+  - `chunk_pages` — bo'laklar sahifa chegarasidan o'tmaydi, shunda iqtibosdagi sahifa raqami aniq.
+- Tekshiruv (smoke, `FakeProvider` bilan, xotiradagi SQLite):
+  - 8000 belgili matn → 3 bo'lak (eng uzuni 3199), ustma-ustlik bor;
+  - 2 sahifali PDF'ning bo'sh sahifasi bo'lak bermadi;
+  - qidiruvda eng o'xshash bo'lak birinchi (0,8 va 0,447);
+  - mavzu va tur filtrlari ishladi;
+  - o'chirilgan manba qidiruvdan yo'qoldi.
+  - ruff va mypy toza. `PgVectorStore` lokal tekshirilmadi (PostgreSQL yo'q), loyiha oxiridagi testlarda va CI'da tekshiriladi.
+
 ### `b623637` — 3A Task 3: AI provayder adapteri
 - Yangi `app/ai/providers.py`:
   - `LLMProvider` (`generate`, `generate_json`, `stream`) va `EmbeddingProvider` (`embed`) protokollari;
