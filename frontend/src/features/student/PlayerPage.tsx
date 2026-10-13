@@ -10,6 +10,7 @@ import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { isStepKind, STEP_ICONS } from '@/lib/steps'
 import { StepContentView } from './StepContent'
+import { TutorDock } from './tutor/TutorDock'
 
 export function PlayerPage() {
   const { t } = useTranslation()
@@ -89,7 +90,7 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
       >
         ← {topic.subject.title}
       </Link>
-      <div className="grid gap-6 md:grid-cols-[260px_1fr]">
+      <div className="grid gap-6 md:grid-cols-[260px_1fr] lg:grid-cols-[240px_1fr_340px]">
         <aside className="md:sticky md:top-20 md:self-start">
           <Card className="flex flex-col gap-4 p-4">
             <div className="flex items-center gap-3">
@@ -121,6 +122,7 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
           </h2>
           <StepContentView key={current.id} topicId={topicId} step={current} nextKind={next?.kind} />
         </section>
+        <TutorDock topicId={topicId} />
       </div>
     </div>
   )

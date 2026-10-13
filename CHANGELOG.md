@@ -6,6 +6,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 2: pleyerda repetitor
+- Yangi `features/student/tutor/TutorDock.tsx`:
+  - keng ekranda (≥1024px) pleyerning o'ng ustunidagi sticky panel;
+  - telefonda pastki o'ngdagi "🤖 Repetitor" tugmasi orqali pastdan ochiladigan panel (Escape va fonni bosish bilan yopiladi, yopilganda suhbat saqlanadi);
+  - AI o'chiq bo'lsa (`/api/ai/usage` → `enabled: false`) hech narsa chizilmaydi.
+- Yangi `lib/useMediaQuery.ts` (`useSyncExternalStore`).
+- `PlayerPage`: grid `lg:grid-cols-[240px_1fr_340px]`, `TutorDock` qo'shildi.
+- `src/test/server.ts`: `/api/ai/usage` uchun standart javob (AI o'chiq) — mavjud pleyer testlari ishlov berilmagan so'rov bilan yiqilmasligi uchun; yangi test yozilmagan.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 3B Task 1: repetitor holati va paneli
 - Yangi `features/student/tutor/useTutorChat.ts`: suhbat holati — optimistik talaba xabari, `delta` bo'laklari bilan oqimli javob, `meta` dan rejim (`answer`/`hint`/`refusal`) va manbalar; xatoda bo'sh javob olib tashlanadi; tugagach `usage` va suhbatlar keshi yangilanadi; unmount'da oqim bekor qilinadi.
 - Yangi `TutorPanel.tsx`: sarlavha va kunlik limit, `role="log"` xabarlar ro'yxati, maslahat/rad belgisi, `[n]` manbalar (nom va sahifa), Enter bilan yuborish, limit tugasa forma o'chadi, xato `FormError` da.
