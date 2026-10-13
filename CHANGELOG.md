@@ -6,6 +6,25 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `10d6c7c` — 2B Task 10: o'qituvchi uchun tekshirish navbati
+- Yangi `features/teach/ReviewQueuePage.tsx` (`/teach/review`):
+  - "Tekshirilmagan", "Qaytarilgan" va "Baholangan" tablari; tanlangan tab manzilda saqlanadi (`?status=`);
+  - har javob kartasida: talaba, vazifa, fan · mavzu, sana va "Kechikkan" belgisi; karta tafsilotlar sahifasiga olib boradi.
+- Yangi `ReviewDetailPage.tsx` (`/teach/review/:submissionId`):
+  - topshiriq matni va mezoni, talaba javobi va faylini yuklab olish;
+  - tekshirilmagan javob uchun forma: ball (0–maks) va izoh, "Baholash" va "Qayta ishlashga qaytarish" tugmalari (qaytarishda izoh majburiy);
+  - boshqa holatda natija (ball, izoh) ko'rsatiladi. Muvaffaqiyatdan keyin toast chiqadi va navbatga qaytiladi;
+  - ID noto'g'ri bo'lsa, "Sahifa topilmadi" chiqadi.
+- `TeachHomePage`: tekshirilmagan javoblar bo'lsa, "Tekshirilishi kerak: N ta javob" kartasi navbatga olib boradi.
+- Menyu (`paths.ts`):
+  - o'qituvchi va admin uchun "Tekshirish" havolasi; "Mavzu muharriri" endi faqat `/teach` da faol ko'rinadi, aks holda u navbat sahifasida ham ajralib turardi;
+  - talaba uchun "Natijalarim" havolasi (Task 7 da qo'shilmay qolgan edi);
+  - "Statistika" havolasi Task 11 da, sahifa bilan birga qo'shiladi.
+- `lib/download.ts`: `useProtectedDownload` hook'i (yuklanish holati va xato toast'i). `TaskStep` ham shu hook'ka o'tkazildi.
+- `test/server.ts`: `/api/teach/summary` uchun standart nol javob (dashboard mock'i kabi).
+- i18n: `nav.results`, `nav.review`, yangi `review.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `66f73b0` — 2B Task 9: o'qituvchi uchun vazifa formasi
 - Yangi `features/teach/assessment/TaskTab.tsx` (mavzu muharririning `task` tabi):
   - bitta forma ham yaratadi, ham tahrirlaydi: nom, topshiriq matni, javob turi (matn / fayl / ikkalasi), maksimal ball (1–100), muddat (ixtiyoriy) va baholash mezoni;
@@ -40,7 +59,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
   - Rejadagi jadval o'rniga kartali ro'yxat ishlatildi, shunda 375px kenglikda gorizontal scroll bo'lmaydi.
   - Natija bo'lmasa, bo'sh holat ko'rsatiladi.
 - Yangi `features/student/AttemptDetailPage.tsx` (`/app/results/attempts/:attemptId`): faoliyat nomi, turi va sanasi, so'ng `AttemptResult` (qayta urinish tugmasisiz). ID noto'g'ri bo'lsa, abadiy spinner o'rniga "Sahifa topilmadi" chiqadi.
-- `router.tsx`: ikkita yangi marshrut. Menyudagi `nav.results` havolasi Task 3 dan beri bor.
+- `router.tsx`: ikkita yangi marshrut. Menyudagi "Natijalarim" havolasi bu task'da qo'shilmay qolgan edi; u `10d6c7c` (Task 10) da qo'shildi.
 - i18n: yangi `results.*` bo'limi (uz/ru).
 - Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
 
