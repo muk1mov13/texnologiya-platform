@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `9e46bbf` — 2B Task 7: "Natijalarim" va urinish tahlili
+- Yangi `features/student/ResultsPage.tsx` (`/app/results`): fan → mavzu bo'yicha guruhlangan natijalar.
+  - Faoliyatlar: nom, tur, urinishlar soni, oxirgi sana, eng yaxshi foiz va "Tahlil" havolasi (oxirgi urinishga).
+  - Vazifalar: holat ("Tekshirilmoqda" / "Qaytarildi" / "Baholandi: ball / maks"), "Kechikkan" belgisi va o'qituvchi izohi.
+  - Rejadagi jadval o'rniga kartali ro'yxat ishlatildi, shunda 375px kenglikda gorizontal scroll bo'lmaydi.
+  - Natija bo'lmasa, bo'sh holat ko'rsatiladi.
+- Yangi `features/student/AttemptDetailPage.tsx` (`/app/results/attempts/:attemptId`): faoliyat nomi, turi va sanasi, so'ng `AttemptResult` (qayta urinish tugmasisiz). ID noto'g'ri bo'lsa, abadiy spinner o'rniga "Sahifa topilmadi" chiqadi.
+- `router.tsx`: ikkita yangi marshrut. Menyudagi `nav.results` havolasi Task 3 dan beri bor.
+- i18n: yangi `results.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `f31dd94` — 2B Task 6: vazifa bosqichi (talaba)
 - Yangi `lib/download.ts`: `downloadProtected(url, filename)` himoyalangan faylni Bearer token bilan yuklab, brauzerda saqlaydi.
 - Yangi `features/student/assessment/TaskStep.tsx`:
