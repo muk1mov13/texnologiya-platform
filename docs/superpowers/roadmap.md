@@ -14,7 +14,7 @@ Hozirgi holat (2026-10-13):
   - Mini-spec: `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`.
   - 2A (backend) bajarildi: reja `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`.
   - 2B (frontend) bajarildi: reja `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md` (Task 0–12).
-  - Ikkalasi `feat/phase-2-assessment` branch'ida, PR #4 orqali `main`ga kiradi.
+  - Ikkalasi 2026-10-13 da `main`ga to'g'ridan-to'g'ri merge qilindi (`1f23fcc`). Feature branch'lar o'chirildi.
   - 2B uchun Vitest va E2E testlari foydalanuvchi qarori bilan loyiha oxiriga qoldirilgan: kod faqat lint, typecheck va build bilan tekshirilgan.
 - **Qolganlari yozilmagan:** AI (3), kutubxona, CMS, ochiq sayt va deploy (4).
 - **Lokal muhit:** `uv`, Python 3.12, Node 24, Playwright Chromium bor. LibreOffice va Docker o'rnatilmagan.
@@ -25,8 +25,8 @@ Manba: `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`, 10-bo
 
 1. **Mini-spec:** asosiy spec'ga tayanib qisqa qo'shimcha spec yoziladi (brainstorming). 1B uchun asosiy spec yetarli edi.
 2. **Reja:** `docs/superpowers/plans/<sana>-phase-N-*.md`, TDD tasklari bilan (writing-plans).
-3. **Amalga oshirish:** alohida branch'da, task ketma-task. Bir vaqtda faqat bitta task bajariladi, har task'dan keyin foydalanuvchi tasdig'i kutiladi; subagent ishlatilmaydi (`CLAUDE.md`, "Execution Constraints").
-4. **Yopish:** code review, CI yashil bo'lishi, tayyor bo'lish mezonini qo'lda tekshirish, so'ng PR orqali `main`ga merge (`main` ga to'g'ridan-to'g'ri push qilinmaydi).
+3. **Amalga oshirish:** 2026-10-13 dan boshlab faqat `main` branch'ida (foydalanuvchi qarori, feature branch va PR ishlatilmaydi), task ketma-task. Bir vaqtda faqat bitta task bajariladi, har task'dan keyin foydalanuvchi tasdig'i kutiladi; subagent ishlatilmaydi (`CLAUDE.md`, "Execution Constraints").
+4. **Yopish:** code review, CI yashil bo'lishi, tayyor bo'lish mezonini qo'lda tekshirish, so'ng `main`ga push (foydalanuvchi so'raganda). 1- va 2A-bosqichlar PR orqali (#1–#3), 2-bosqich oxiri to'g'ridan-to'g'ri `main`ga kirdi.
 
 ---
 
@@ -232,7 +232,7 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 
 ## Keyingi aniq qadam
 
-1. `feat/phase-2-assessment` ni push qilish va PR #4 tavsifini 2B bilan yangilash (draft holatidan chiqarish foydalanuvchi bilan hal qilinadi).
+1. ✅ 2-bosqich `main`ga merge qilindi va push qilindi (2026-10-13). Push'dan keyingi CI natijasini tekshirish kerak: 2B uchun testlar yozilmagan, `frontend`/`e2e` joblari yiqilishi mumkin.
 2. 2-bosqichning "Tayyor" mezonini qo'lda brauzerda tekshirish: talaba test yechadi va XP oladi, o'qituvchi vazifani baholaydi, talaba ballni ko'radi.
 3. Qoldirilgan testlar: 2B uchun Vitest testlari va E2E baholash oqimi (testlarni loyiha oxirida yozish qarori o'zgarmasa, bu band 4-bosqichdan keyinga qoladi; o'shanda CI'dagi `frontend` va `e2e` joblari ham tekshiriladi).
-4. PR #4 ni review va merge qilish, so'ng 3-bosqich (AI) mini-spec'i.
+4. 3-bosqich (AI) mini-spec'i.

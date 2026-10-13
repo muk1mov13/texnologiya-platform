@@ -6,6 +6,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `1f23fcc` — 2-bosqich `main`ga merge qilindi; endi faqat `main`da ishlanadi
+- Foydalanuvchi qarori: barcha ish `main`ga push qilinadi, `main`dan boshqa branch'lar o'chiriladi, keyingi ish faqat `main`da olib boriladi (feature branch va PR'siz).
+- `feat/phase-2-assessment` (2A + 2B, 67 commit) lokal `main`ga `--no-ff` bilan merge qilindi (`1f23fcc`), konflikt bo'lmadi. Oldin lokal `main` `origin/main`ga (PR #3 merge, `878e50d`) yetkazildi.
+- Push tartibi:
+  - avval `feat/phase-2-assessment` push qilindi, shunda PR #4 ning oxirgi commiti yangilandi;
+  - so'ng `main` push qilindi;
+  - keyin remote `feat/phase-2-assessment` va lokal `feat/phase-1b-frontend`, `feat/phase-2-assessment` o'chirildi.
+  
+  `feat/phase-1b-frontend` dagi barcha commitlar avvaldan `main`da edi.
+- Roadmap: ish tartibidagi "alohida branch, PR orqali merge" qoidasi "faqat `main`" ga almashtirildi, keyingi qadamlar yangilandi. `CLAUDE.md`: 2-bosqich `main`da.
+- Ehtiyot: 2B uchun Vitest va E2E testlari hali yozilmagan. Push'dan keyin CI'dagi `frontend`/`e2e` joblari yiqilishi mumkin; natijasi alohida tekshiriladi.
+
 ### `db8b1c5` — Krossvord: "begona" so'z to'g'ri ko'rsatiladi
 - Muammo: `build_layout` eng uzun so'zni to'rga birinchi qo'yadi. Boshqalar bilan umumiy harfi yo'q so'z eng uzun bo'lsa (masalan, `OLMA`, `ANOR`, `BUXGU`), `CROSSWORD_UNPLACEABLE` xatosi to'g'ri so'zlarga (`OLMA`, `ANOR`) tushardi.
 - `backend/app/assessment/crossword.py`: yangi sof funksiya `_detached`:
