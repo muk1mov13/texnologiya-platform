@@ -377,10 +377,10 @@ class AiReport(IdMixin, CreatedAtMixin, Base):
 
 class AiUsage(IdMixin, Base):
     __tablename__ = "ai_usage"
-    __table_args__ = (UniqueConstraint("user_id", "date"),)
+    __table_args__ = (UniqueConstraint("user_id", "day"),)
 
     user_id: Mapped[int] = mapped_column(BigIntPK, ForeignKey("users.id", ondelete="CASCADE"))
-    date: Mapped[date] = mapped_column(Date)
+    day: Mapped[date] = mapped_column(Date)  # `date` nomi tipni soya qilardi
     requests: Mapped[int] = mapped_column(Integer, default=0)
 
 
@@ -1359,7 +1359,7 @@ def today(now: datetime | None = None) -> date:
 
 async def used_today(db: AsyncSession, user_id: int) -> int:
     value = await db.scalar(
-        select(AiUsage.requests).where(AiUsage.user_id == user_id, AiUsage.date == today())
+        select(AiUsage.requests).where(AiUsage.user_id == user_id, AiUsage.day == today())
     )
     return int(value or 0)
 
@@ -1377,7 +1377,7 @@ async def ensure_within_limit(db: AsyncSession, user: User) -> None:
 async def _increment(db: AsyncSession, user_id: int, day: date) -> int:
     result = await db.execute(
         update(AiUsage)
-        .where(AiUsage.user_id == user_id, AiUsage.date == day)
+        .where(AiUsage.user_id == user_id, AiUsage.day == day)
         .values(requests=AiUsage.requests + 1)
     )
     return result.rowcount  # type: ignore[attr-defined,no-any-return]
@@ -1392,7 +1392,7 @@ async def record_request(db: AsyncSession, user: User) -> None:
         return
     try:
         async with db.begin_nested():
-            db.add(AiUsage(user_id=user.id, date=day, requests=1))
+            db.add(AiUsage(user_id=user.id, day=day, requests=1))
     except IntegrityError:  # parallel so'rov qatorni yaratib ulgurgan
         await _increment(db, user.id, day)
 ```
@@ -2940,10 +2940,10 @@ async def usage_stats(
 ) -> AiUsageOut:
     since = today() - timedelta(days=days - 1)
     rows = await db.execute(
-        select(AiUsage.date, func.sum(AiUsage.requests), func.count(AiUsage.user_id))
-        .where(AiUsage.date >= since)
-        .group_by(AiUsage.date)
-        .order_by(AiUsage.date)
+        select(AiUsage.day, func.sum(AiUsage.requests), func.count(AiUsage.user_id))
+        .where(AiUsage.day >= since)
+        .group_by(AiUsage.day)
+        .order_by(AiUsage.day)
     )
     chunks = await db.scalar(select(func.count()).select_from(DocChunk))
     stale = await db.scalar(
