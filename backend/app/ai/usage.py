@@ -4,7 +4,6 @@ O'qituvchi va admin limitga tushmaydi va hisoblanmaydi.
 """
 
 from datetime import date, datetime
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
@@ -16,7 +15,8 @@ from app.auth.models import Role, User
 from app.core.errors import AppError
 from app.core.types import utcnow
 
-TASHKENT = ZoneInfo("Asia/Tashkent")
+# `zoneinfo` emas: Windows'da `tzdata` yo'q. Gamifikatsiyadagi bilan bir xil (UTC+5, yozgi vaqtsiz).
+from app.gamification.service import TASHKENT
 
 
 def today(now: datetime | None = None) -> date:

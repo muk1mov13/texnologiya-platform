@@ -6,6 +6,25 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 8: talaba repetitori (SSE) va suhbatlar
+- Yangi `app/ai/schemas.py` (chat, suhbat, usage va qoralama sxemalari), `app/ai/tutor.py`, `app/ai/router.py`; `api.py` ga ulandi.
+- `POST /api/ai/chat` — `text/event-stream`, hodisalar `delta`… → `meta` (`conversation_id`, `mode`, javobda haqiqatan ishlatilgan `citations`) → `done`; provayder xatosida `error` (`AI_BUSY`).
+- Ishlash tartibi:
+  - tekshiruvlar oqimdan oldin oddiy JSON xato bilan: `AI_DISABLED` 503, `AI_LIMIT_REACHED` 429, `CONVERSATION_NOT_FOUND` / `TOPIC_NOT_FOUND` 404;
+  - salomlashish va "qanday foydalanaman" savollariga tayyor javob (`canned`) — LLM va limit ishlatilmaydi;
+  - qidiruv kaskadi: mavzu → fan → platforma (faqat nashr qilingan, `material`/`glossary` bo'laklari);
+  - chegaradan past bo'lsa, LLM'siz rad javobi (`refusal`, limitdan ayiriladi);
+  - yakunlanmagan faoliyat yoki vazifaga juda o'xshash savolda maslahat rejimi (`hint`).
+- `GET /api/ai/usage`, `GET /api/ai/conversations`, `GET` / `DELETE /api/ai/conversations/{id}` (faqat egasiga).
+- Tuzatish (Task 7): `usage.py` `zoneinfo("Asia/Tashkent")` o'rniga gamifikatsiyadagi `TASHKENT` (UTC+5) ni ishlatadi. Sabab: Windows'da `tzdata` yo'q, import paytida xato berardi.
+- Tekshiruv (HTTP smoke, `fake`):
+  - mavzu savoli `delta, delta, meta, done` va 1 ta iqtibos (3-sahifa) berdi;
+  - aloqasiz savol → rad javobi;
+  - "Salom!" → tayyor javob, limitdan ayirilmadi;
+  - suhbat tafsilotida savol va javob saqlandi;
+  - limit 2 da 429, AI o'chirilganda 503.
+  - ruff va mypy toza.
+
 ### 3A Task 7: talabaning kunlik AI limiti
 - Yangi `app/ai/usage.py`:
   - `today()` (Asia/Tashkent), `used_today`;
