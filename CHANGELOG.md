@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `7075f69` — 3A Task 1: AI bog'liqliklari va sozlamalari
+- Yangi bog'liqliklar (`uv add`): `google-genai` 2.30.0, `pgvector` 0.5.1, `numpy` 2.5.4, `python-docx` 1.2.0. Yon ta'sir: `google-genai` talabi bilan `websockets` 17.2 → 16.1.1 ga tushdi (loyiha websocket ishlatmaydi).
+- `Settings` ga AI maydonlari qo'shildi:
+  - `ai_provider` (`gemini|fake`), `gemini_api_key`;
+  - `ai_model_chat` / `ai_model_fast` / `ai_embedding_model`;
+  - `ai_rpm` (sukut 10), `ai_min_similarity` (0,55), `ai_hint_similarity` (0,85);
+  - `ai_configured` xossasi.
+- `.env.example`: AI bo'limi, kalit bo'sh. Rasmiy "Rate limits" sahifasida bepul tarifning aniq raqamlari yo'q (limitlar akkauntga bog'liq va AI Studio'da ko'rsatiladi). Shuning uchun `AI_RPM=10` ehtiyotkor sukut qiymat sifatida qoldirildi va izohda AI Studio havolasi berildi.
+- Yangi `app/ai/` paketi va `constants.py`: `EMBEDDING_DIM=768`, job nomlari, chegaralar.
+- Tekshiruv: `ruff format --check`, `ruff check`, `mypy app` toza; `Settings()` lokal `.env` bilan `ai_configured=False` (kalit yo'q).
+
 ### `149d4a9` — 3A (AI backend) implementatsiya rejasi
 - Yangi `docs/superpowers/plans/2026-10-13-phase-3a-backend.md`: 16 task (0–15), har birida aniq fayllar va kod:
   - bog'liqliklar va sozlamalar;
