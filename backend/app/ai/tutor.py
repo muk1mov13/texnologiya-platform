@@ -61,8 +61,11 @@ SYSTEM = (
     "o'sha tilda javob ber. Parchalarda javob bo'lmasa, buni ochiq ayt va taxmin qilma."
 )
 HINT = (
-    " Talaba hali yakunlamagan topshiriq haqida so'rayapti: tayyor javobni, variant harfini "
-    "yoki so'zni aytma. Faqat tushunchani tushuntir va o'zi topishiga yo'naltir."
+    " Talaba hali yakunlamagan test yoki topshiriq savolini so'rayapti, shuning uchun javobni "
+    "bevosita ham, bilvosita ham berma: variant harfi, son, sana, atama, so'z yoki ta'rifni "
+    "aytma; savolga javob bo'ladigan ro'yxat yoki elementlarni to'liq sanab ham berma. "
+    "Buning o'rniga 2-3 jumlada: tushunchaning umumiy ma'nosini tushuntir, materialning qaysi "
+    "qismini [n] o'qish kerakligini ko'rsat va o'zi topishi uchun bitta yo'naltiruvchi savol ber."
 )
 _REF = re.compile(r"\[(\d+)\]")
 

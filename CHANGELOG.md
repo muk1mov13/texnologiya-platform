@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### AI: hint rejimi ko'rsatmasi kuchaytirildi
+- Smoke'da repetitor yechilmagan test savoliga (Klimov tasnifi, "nechta tur?") beshala turni sanab berdi, ya'ni javobni bilvosita aytdi.
+- `app/ai/tutor.py` `HINT`: son, sana, atama yoki ta'rifni aytmaslik va javob bo'ladigan ro'yxatni to'liq sanamaslik; o'rniga 2-3 jumlada tushuncha, materialning qaysi qismini `[n]` o'qishni ko'rsatish va bitta yo'naltiruvchi savol.
+- Tekshiruv: `ruff`, `mypy` toza; natija Task 14 qayta smoke'ida ko'riladi.
+
 ### AI: Groq zaxira provayderi
 - Foydalanuvchi qarori: Gemini band bo'lsa (429/5xx) matn Groq'da yaratilsin.
 - `app/ai/providers.py`:
