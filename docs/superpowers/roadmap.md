@@ -4,7 +4,7 @@
 
 Bu fayl platformani oxirigacha qurish va ishga tushirish uchun bosqichma-bosqich yo'l xaritasi. U 2026-10-09 da tasdiqlangan va dastlab faqat lokal saqlangan edi; 2026-10-10 da repoga ko'chirildi.
 
-Hozirgi holat (2026-10-12):
+Hozirgi holat (2026-10-13):
 
 - **1-bosqich tugadi.**
   - 1A (backend) — PR #1, merge commit `59def80`.
@@ -12,8 +12,10 @@ Hozirgi holat (2026-10-12):
   - CI uchta job bilan yashil: `backend`, `frontend`, `e2e`.
 - **2-bosqich jarayonda.**
   - Mini-spec: `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`.
-  - 2A (backend) bajarildi: reja `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`, `feat/phase-2-assessment` branch'ida, hali PR ochilmagan.
-  - 2B (frontend) rejasi yozilmagan.
+  - 2A (backend) bajarildi: reja `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`.
+  - 2B (frontend) bajarildi: reja `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md` (Task 0–12).
+  - Ikkalasi `feat/phase-2-assessment` branch'ida, PR #4 orqali `main`ga kiradi.
+  - 2B uchun Vitest va E2E testlari foydalanuvchi qarori bilan loyiha oxiriga qoldirilgan: kod faqat lint, typecheck va build bilan tekshirilgan.
 - **Qolganlari yozilmagan:** AI (3), kutubxona, CMS, ochiq sayt va deploy (4).
 - **Lokal muhit:** `uv`, Python 3.12, Node 24, Playwright Chromium bor. LibreOffice va Docker o'rnatilmagan.
 
@@ -95,7 +97,7 @@ Backend'ga 1B davomida 3 ta ataylab qilingan auth tuzatishi kirdi (refresh grace
 
 ---
 
-## 2-bosqich: Baholash va gamifikatsiya — 🟡 2A (backend) bajarildi, 2B (frontend) navbatda
+## 2-bosqich: Baholash va gamifikatsiya — 🟡 2A va 2B bajarildi; testlar va merge qoldi
 
 **Mini-spec'da hal qilinadigan masalalar:**
 - XP qiymatlari konfiguratsiyasi;
@@ -230,4 +232,7 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 
 ## Keyingi aniq qadam
 
-2B (frontend) implementatsiya rejasi: mini-spec'ning 8-bo'limi asosida `docs/superpowers/plans/` ichida yoziladi. Unda bosh sahifa, o'ynash ekranlari, muharrirlar, tekshirish navbati, statistika va E2E baholash oqimi bo'ladi. 2A va 2B bitta branch'da bo'lsa, PR 2B dan keyin ochiladi; 2A ni alohida PR qilish ham mumkin, bu foydalanuvchi bilan hal qilinadi.
+1. `feat/phase-2-assessment` ni push qilish va PR #4 tavsifini 2B bilan yangilash (draft holatidan chiqarish foydalanuvchi bilan hal qilinadi).
+2. 2-bosqichning "Tayyor" mezonini qo'lda brauzerda tekshirish: talaba test yechadi va XP oladi, o'qituvchi vazifani baholaydi, talaba ballni ko'radi.
+3. Qoldirilgan testlar: 2B uchun Vitest testlari va E2E baholash oqimi (testlarni loyiha oxirida yozish qarori o'zgarmasa, bu band 4-bosqichdan keyinga qoladi; o'shanda CI'dagi `frontend` va `e2e` joblari ham tekshiriladi).
+4. PR #4 ni review va merge qilish, so'ng 3-bosqich (AI) mini-spec'i.

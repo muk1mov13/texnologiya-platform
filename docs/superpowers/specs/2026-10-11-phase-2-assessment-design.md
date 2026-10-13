@@ -271,6 +271,12 @@ Faoliyatda 1–50 ta element bo'ladi (krossvordda 3–20). Buzilsa → 422 `ACTI
 
 Barcha matnlar `uz.json` va `ru.json` ga qo'shiladi, yangi xato kodlari `errors.<CODE>` ga kiradi. Qo'lda yozilgan tiplar `types.ts` ga qo'shiladi va `types.contract.ts` orqali tekshiriladi.
 
+**Amalga oshirishdagi farqlar (2B, 2026-10-13):**
+- **`/app` soddalashtirildi.** Alohida bosh sahifa va `/app/subjects` yaratilmadi: fanlar ro'yxati `/app` da qoldi, XP, seriya va nishonlar bloki shu sahifaning yuqorisida, "Davom ettirish" kartasi esa avvalgidek turibdi. Blok faqat talabaga ko'rinadi (o'qituvchi va admin XP olmaydi).
+- **Menyu:** talaba uchun "Fanlar" va "Natijalarim"; o'qituvchi va admin uchun "Mavzu muharriri", "Tekshirish" va "Statistika".
+- **Krossvord preview** saqlash bilan avtomatik chiqmaydi: faoliyatlar ro'yxatidagi "To'r ko'rinishi" tugmasi saqlangan to'rni ochadi.
+- **"Natijalarim"** urinishlar ro'yxati o'rniga har faoliyatning eng yaxshi natijasini ko'rsatadi; "Tahlil" havolasi oxirgi urinishni ochadi.
+
 ## 9. Xatolar, ruxsatlar va testlar
 
 ### Yangi xato kodlari
