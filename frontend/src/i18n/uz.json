@@ -525,5 +525,18 @@
     "reject": "Rad etish",
     "rejectTitle": "Qoralamani rad etish",
     "rejectText": "Qoralama o'chiriladi va qayta tiklanmaydi."
+  },
+  "aiReview": {
+    "title": "AI tavsiyasi",
+    "none": "AI hali tekshirmagan.",
+    "check": "AI bilan tekshirish",
+    "recheck": "Qayta tekshirish",
+    "pending": "AI tekshirmoqda…",
+    "score": "Taklif qilingan ball: {{score}} / {{max}}",
+    "strengths": "Kuchli tomonlar",
+    "issues": "Kamchiliklar",
+    "notice": "Bu faqat tavsiya: ballni o'qituvchi qo'yadi.",
+    "unsupported": "AI bu turdagi javobni o'qiy olmaydi (rasm yoki skan).",
+    "failed": "AI tekshira olmadi. Qayta urinib ko'ring."
   }
 }

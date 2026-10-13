@@ -13,6 +13,7 @@ import { QueryState } from '@/components/ui/QueryState'
 import { pushToast } from '@/components/ui/toast-store'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { useProtectedDownload } from '@/lib/download'
+import { AiSuggestionCard } from './AiSuggestionCard'
 
 /** Bitta javobni tekshirish: topshiriq, talaba javobi va baholash/qaytarish formasi. */
 export function ReviewDetailPage() {
@@ -81,6 +82,7 @@ function ReviewBody({ detail }: { detail: SubmissionDetail }) {
           </div>
         )}
       </Card>
+      <AiSuggestionCard detail={detail} />
       {detail.status === 'submitted' ? <GradeForm detail={detail} /> : <ReviewOutcome detail={detail} />}
     </>
   )

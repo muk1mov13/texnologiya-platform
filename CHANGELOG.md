@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 6: tekshirish sahifasida AI tavsiyasi
+- Yangi `features/teach/AiSuggestionCard.tsx`: holatlar `none` (tugma "AI bilan tekshirish"), `pending` (spinner, sahifa 3 s polling bilan yangilanadi), `done` (taklif qilingan ball / maksimal, izoh, kuchli tomonlar, kamchiliklar, "ballni o'qituvchi qo'yadi" eslatmasi), `unsupported`, `failed`; `pending` dan boshqa holatda "Qayta tekshirish". AI o'chiq va tekshiruv bo'lmagan bo'lsa karta chizilmaydi.
+- `ReviewDetailPage`: karta baholash formasi/natijasidan oldin.
+- i18n `aiReview.*` (uz/ru).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 3B Task 5: "✨ AI bilan yaratish" va qoralamalar
 - Yangi `features/teach/ai/`:
   - `AiDraftsSection` — takrorlash, amaliyot, glossariy va vazifa tablari tepasida "✨ AI bilan yaratish" tugmasi va shu bosqichning ochiq (`generating`/`draft`/`failed`) qoralamalari; AI o'chiq bo'lsa chizilmaydi va qoralamalar so'ralmaydi;
