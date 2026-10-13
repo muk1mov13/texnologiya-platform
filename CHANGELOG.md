@@ -6,6 +6,31 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `149d4a9` — 3A (AI backend) implementatsiya rejasi
+- Yangi `docs/superpowers/plans/2026-10-13-phase-3a-backend.md`: 16 task (0–15), har birida aniq fayllar va kod:
+  - bog'liqliklar va sozlamalar;
+  - `Vector` tipi, modellar va migratsiya;
+  - Gemini/Fake provayderlar;
+  - vektor ombori va bo'laklash;
+  - xizmatlarni ulash;
+  - indekslash hook'lari;
+  - kunlik limit;
+  - SSE repetitor;
+  - qoralamalar;
+  - vazifani AI bilan tekshirish;
+  - haftalik tahlil CLI;
+  - admin API;
+  - frontend sxemasi;
+  - haqiqiy kalit bilan qo'lda tekshiruv;
+  - hujjatlar.
+- Kodni o'qish paytida spec'dan 5 ta aniqlik qilindi. Ular rejaning boshida yozilgan va Task 15 da spec'ga ham kiritiladi:
+  - `EMBEDDING_DIM` konstanta;
+  - `question` o'rniga `activity`/`task` manba turlari;
+  - glossariy `source_id=topic_id`;
+  - SSE `meta` oxirida;
+  - `canned` rejimi.
+- Ish tartibi: bir vaqtda bitta task, har biridan keyin tasdiq, faqat `main`. Testlar loyiha oxirida, ro'yxati reja oxirida.
+
 ### `497967f` — 3-bosqich (AI) mini-spec'i
 - Yangi `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md`. Foydalanuvchi qarorlari:
   - lokalda `VectorStore` (SQLite BLOB + numpy), CI/prod'da pgvector;
