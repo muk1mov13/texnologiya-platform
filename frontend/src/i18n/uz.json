@@ -340,5 +340,23 @@
     "cellLabel": "{{number}}-so'z, {{direction}}, {{k}}-harf",
     "letters": "{{count}} harf",
     "hint": "Katakni bosing va harf yozing. Kesishgan katakni qayta bossangiz, yo'nalish almashadi."
+  },
+  "task": {
+    "maxScore": "Maksimal ball: {{score}}",
+    "deadline": "Muddat: {{date}}",
+    "overdue": "Muddat o'tgan",
+    "rubric": "Baholash mezoni",
+    "answer": "Javobingiz",
+    "file": "Fayl",
+    "fileHint": "PDF, DOC, PPT yoki rasm, 20 MB gacha",
+    "send": "Yuborish",
+    "resend": "Qayta yuborish",
+    "sent": "Javob yuborildi",
+    "statusSubmitted": "Tekshirilmoqda",
+    "statusReturned": "Qaytarildi",
+    "statusGraded": "Baholandi: {{score}} / {{max}}",
+    "late": "Kechikkan",
+    "feedback": "O'qituvchi izohi",
+    "download": "Faylni yuklab olish"
   }
 }

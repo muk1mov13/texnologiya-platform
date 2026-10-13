@@ -12,6 +12,7 @@ import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { ACTIVITY_KINDS, FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
 import { ActivityList } from './assessment/ActivityList'
+import { TaskStep } from './assessment/TaskStep'
 
 // PdfViewer (react-pdf + pdf.js) alohida chunk'ga ajratiladi — asosiy bundle faqat lecture/
 // presentation bosqichida kerak bo'lgan ~1 MB'lik kodni yuklamaydi. `PlayerPage` bu chunk'ni
@@ -54,7 +55,10 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
             {ACTIVITY_KINDS.has(data.kind) && (
               <ActivityList topicId={topicId} stepId={data.id} activities={data.activities} />
             )}
-            {ACTIVITY_KINDS.has(data.kind) && nextKind && (
+            {data.kind === 'task' && data.task && (
+              <TaskStep topicId={topicId} stepId={data.id} task={data.task} submission={data.submission} />
+            )}
+            {(ACTIVITY_KINDS.has(data.kind) || data.kind === 'task') && nextKind && (
               <div className="border-t-2 border-slate-100 pt-4">
                 <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
                   {t('player.next')} →
