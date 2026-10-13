@@ -277,3 +277,17 @@ Barcha matnlar `uz.json` / `ru.json` da bo'ladi, xato kodlari `errors.<CODE>` ga
 - O'qituvchi tekshirish navbatida AI tavsiyasini ko'radi.
 - `weekly-report` buyrug'i fan uchun hisobot yaratadi va u o'qituvchi bosh sahifasida ko'rinadi.
 - `GEMINI_API_KEY` bo'lmasa ham sayt xatosiz ishlaydi.
+
+## 10. Amalga oshirishdagi aniqliklar (3A)
+
+3A rejasini bajarishda kodni o'qish natijasida spec'ga quyidagi aniqliklar kiritildi (`docs/superpowers/plans/2026-10-13-phase-3a-backend.md`):
+
+1. **`AI_EMBEDDING_DIM` sozlama emas, konstanta.** `app/ai/constants.py` dagi `EMBEDDING_DIM = 768`. Ustun o'lchami migratsiyada qat'iy, o'zgartirish uchun yangi migratsiya kerak.
+2. **`question` manba turi ikkiga bo'lindi:**
+   - `activity`: `source_id` = faoliyat ID, har savol, bayonot yoki izoh alohida bo'lak;
+   - `task`: `source_id` = vazifa ID.
+
+   Maslahat rejimi "talaba shu faoliyat yoki vazifani yakunlaganmi" degan savolga aynan shu ID orqali javob beradi.
+3. **Glossariy bo'laklari** `source_type=glossary`, `source_id = topic_id` bilan yoziladi. Mavzu glossariysi bitta manba sifatida yangilanadi, lekin har atama alohida bo'lak bo'lib qoladi.
+4. **SSE `meta` hodisasi** javob oxirida (`done` dan oldin) yuboriladi, chunki `conversation_id` va haqiqatan ishlatilgan `citations` faqat shu paytda ma'lum bo'ladi.
+5. **Qo'shimcha `canned` rejimi** — salomlashish va "qanday foydalanaman" savollariga tayyor javob qaytaradi. Bunda LLM ham, kunlik limit ham ishlatilmaydi.

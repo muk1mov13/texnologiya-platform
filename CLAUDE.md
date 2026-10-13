@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the phase roadmap (phases 0–4, status, next step) is `docs/superpowers/roadmap.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend, 2A backend, 2B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. Phase 2 (assessment + gamification) has a mini-spec (`docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`); its backend (2A) and frontend (2B) are built and merged into `main`, but the Vitest and E2E tests for 2B were deliberately deferred and have not been run yet. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
+A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the phase roadmap (phases 0–4, status, next step) is `docs/superpowers/roadmap.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend, 2A backend, 2B frontend, 3A backend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. Phase 2 (assessment + gamification) has a mini-spec (`docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`); its backend (2A) and frontend (2B) are built and merged into `main`, but the Vitest and E2E tests for 2B were deliberately deferred and have not been run yet. Phase 3 (AI) has a mini-spec (`docs/superpowers/specs/2026-10-13-phase-3-ai-design.md`); its backend (3A) is built on `main` (tests deferred to the end of the project), the frontend (3B) is not written yet. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
 
 Code comments, docstrings, user-facing error messages and docs are written in **Uzbek (Latin script)**. Keep new ones in Uzbek to match.
 
@@ -20,6 +20,7 @@ cp .env.example .env
 uv run alembic upgrade head
 uv run python -m app.cli create-admin --email admin@example.uz --name "Administrator"   # password from --password, ADMIN_PASSWORD, or prompt
 uv run uvicorn app.main:create_app --factory --reload   # API docs: http://localhost:8000/api/docs (disabled when ENV=prod)
+uv run python -m app.cli weekly-report [--week-start YYYY-MM-DD] [--subject ID]   # weekly AI report (default: last Mon–Sun)
 
 uv run pytest -q                          # all tests
 uv run pytest tests/test_materials.py -q  # one file
@@ -76,6 +77,14 @@ Student-facing schemas live in `assessment/view_schemas.py` and never contain co
 - `rules.py` holds the XP values and badge definitions as code.
 - `service.award()` writes an `xp_events` row inside a savepoint. The unique constraint makes it idempotent, so a repeated event gives no XP. It does not commit; the caller commits.
 - `sync_badges()` runs in the app lifespan and in the test `app` fixture.
+
+`app/ai/` (phase 3) wraps the LLM provider:
+- `services.build_ai()` puts an `AiServices` (llm, embedder, vectors, model names, `configured`) on `app.state.ai`. Routes get it through the `Ai` alias in `core/deps.py`, jobs through `JobContext.ai`. Without `GEMINI_API_KEY`, AI endpoints return 503 `AI_DISABLED` and the rest of the site works. Admins can also switch AI off at runtime (`ai_settings` row, `require_ai()`).
+- `providers.py`: `GeminiProvider` (`google-genai`, global `TokenBucket` on `AI_RPM`, retries on 429/5xx, then `ProviderBusy`) and `FakeProvider` (`AI_PROVIDER=fake`: deterministic hash embeddings and canned JSON, no network; use it for local smoke checks and tests).
+- `vectors.py`: `VectorStore` with two dialects chosen from the engine: `SqliteVectorStore` (float32 BLOB + numpy dot product) and `PgVectorStore` (pgvector, HNSW index created only on PostgreSQL). Embeddings are L2-normalised; `EMBEDDING_DIM` is a constant in `constants.py`, changing it needs a migration.
+- `indexing.py`: jobs `index_material`, `index_topic_glossary`, `index_topic_questions`, `reindex_all`. Hooks: a material that becomes `ready` is indexed (`learning/materials.py`), deleting a material deletes its `doc_chunks` by hand (`source_id` is not a FK), glossary edits and activity/task edits re-enqueue their topic. Question chunks (`activity`/`task`) never contain correct answers and are used only to detect hint mode, never as tutor context.
+- `tutor.py` (SSE tutor, `ai_usage` daily limit in `usage.py`), `drafts.py` (draft → teacher approves → real unpublished activity/glossary/task), `grading.py` (AI suggestion for submissions, teacher-only fields), `reports.py` (weekly report, `weekly-report` CLI). The startup lifespan marks interrupted `generating` drafts and `pending` AI checks as `failed`.
+- Prompts never include a user's name, email, phone or file name, and logs never include prompt or answer text.
 
 Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (unique on `topic_id, kind`). Only `lecture`/`presentation` steps accept files, and only lecture/presentation/glossary/literature can be self-completed. `review`/`practice` steps complete once every published activity has an attempt; a `task` step completes when the student submits. Steps are never locked. Topic progress counts only steps that have content.
 

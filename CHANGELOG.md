@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 15: hujjatlar va yakun
+- Spec `2026-10-13-phase-3-ai-design.md`: yangi 10-bo'lim "Amalga oshirishdagi aniqliklar (3A)" (5 band).
+- `CLAUDE.md`: loyiha holati (3A qurilgan), `app/ai/` arxitektura bandi, `weekly-report` buyrug'i.
+- Roadmap: 3A qurildi; Task 14 (haqiqiy kalit bilan qo'lda tekshiruv) kalitni kutmoqda; keyingisi — 3B rejasi.
+- Yakuniy tekshiruv: `ruff format --check`, `ruff check`, `mypy app`, `alembic check` toza; frontend lint, typecheck va build o'tdi, `gen:api` farqsiz.
+
 ### 3A Task 13: frontend uchun AI API sxemasi va xato matnlari
 - `npm run gen:api` — `schema.gen.ts` ga AI endpoint'lari tushdi.
 - `src/api/types.ts`: `SubmissionDetail` ga `ai_status`, `ai_score`, `ai_feedback`; yangi `AiCheckStatus`, `AiFeedback` (kontrakt tekshiruvi talab qildi).
