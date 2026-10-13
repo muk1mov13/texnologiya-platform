@@ -1,0 +1,63 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Query
+from sqlalchemy import select
+
+from app.ai import drafts
+from app.ai.models import AiDraft
+from app.ai.schemas import DraftCreateIn, DraftOut, DraftUpdateIn
+from app.ai.services import require_ai
+from app.auth.deps import StaffUser
+from app.core.deps import Ai, DbSession, Jobs
+from app.core.types import DB_ID_MAX, DbIdPath
+from app.learning import editing
+
+router = APIRouter(prefix="/teach", tags=["teach-ai"])
+
+TopicQuery = Annotated[int, Query(ge=1, le=DB_ID_MAX)]
+
+
+@router.post("/ai/drafts", response_model=DraftOut, status_code=201)
+async def create_draft(
+    data: DraftCreateIn, user: StaffUser, db: DbSession, ai: Ai, jobs: Jobs
+) -> AiDraft:
+    await require_ai(db, ai)
+    return await drafts.create_draft(db, user, data, jobs)
+
+
+@router.get("/ai/drafts", response_model=list[DraftOut])
+async def list_drafts(topic_id: TopicQuery, user: StaffUser, db: DbSession) -> list[AiDraft]:
+    await editing.ensure_can_edit_topic(db, user, topic_id)
+    return list(
+        await db.scalars(
+            select(AiDraft)
+            .where(AiDraft.topic_id == topic_id)
+            .order_by(AiDraft.id.desc())
+            .limit(50)
+        )
+    )
+
+
+@router.get("/ai/drafts/{draft_id}", response_model=DraftOut)
+async def get_draft(draft_id: DbIdPath, user: StaffUser, db: DbSession) -> AiDraft:
+    return await drafts.get_editable_draft(db, user, draft_id)
+
+
+@router.put("/ai/drafts/{draft_id}", response_model=DraftOut)
+async def update_draft(
+    draft_id: DbIdPath, data: DraftUpdateIn, user: StaffUser, db: DbSession
+) -> AiDraft:
+    draft = await drafts.get_editable_draft(db, user, draft_id)
+    return await drafts.update_draft(db, draft, data.payload)
+
+
+@router.post("/ai/drafts/{draft_id}/approve", response_model=DraftOut)
+async def approve_draft(draft_id: DbIdPath, user: StaffUser, db: DbSession, jobs: Jobs) -> AiDraft:
+    draft = await drafts.get_editable_draft(db, user, draft_id)
+    return await drafts.approve_draft(db, draft, jobs)
+
+
+@router.post("/ai/drafts/{draft_id}/reject", response_model=DraftOut)
+async def reject_draft(draft_id: DbIdPath, user: StaffUser, db: DbSession) -> AiDraft:
+    draft = await drafts.get_editable_draft(db, user, draft_id)
+    return await drafts.reject_draft(db, draft)

@@ -6,6 +6,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 9: AI qoralamalari (kontent yaratish)
+- Yangi `app/ai/drafts.py` va `app/ai/teach_router.py`; `api.py` ga ulandi.
+- Oqim:
+  - `POST /api/teach/ai/drafts` (`step_id`, `kind`, `material_ids` 1–3, `count`, `difficulty`);
+  - `generate_draft` job'i LLM'ni JSON sxemasi bilan chaqiradi; natija mavjud kirish sxemalari (`QuizActivityIn`, `YesNoActivityIn`, `CrosswordActivityIn`, `GlossaryIn`, `TaskIn`) va qo'shimcha qoidalar bilan tekshiriladi (4 ta turli variant, takror yo'q, krossvord so'zlari joylashadi);
+  - xato bo'lsa, xato matni bilan bir marta qayta so'raladi; bo'lmasa `failed`.
+- `GET` (ro'yxat / bitta), `PUT` (tahrir), `POST …/approve`, `POST …/reject`.
+- Tasdiqlash mavjud `create_activity` / `add_glossary_term` / `upsert_task` ni chaqiradi; faoliyat **nashr qilinmagan** holda yaratiladi.
+- Xato kodlari: `AI_DRAFT_WRONG_STEP` 400, `AI_DRAFT_INVALID` 422, `AI_DRAFT_NOT_READY` / `AI_DRAFT_CLOSED` 409, `AI_DRAFT_NOT_FOUND` 404 (ruxsat bo'lmasa ham 404).
+- Tekshiruv (HTTP smoke, `fake`):
+  - test, krossvord, glossariy va vazifa qoralamalari `generating → draft → approve` dan o'tdi;
+  - 2 ta nashr qilinmagan faoliyat, 3 ta atama va 1 ta vazifa yaratildi;
+  - noto'g'ri bosqich 400, begona material 422, qayta tasdiqlash 409, noto'g'ri tahrir 422, rad etish ishladi.
+  - ruff va mypy toza.
+
 ### 3A Task 8: talaba repetitori (SSE) va suhbatlar
 - Yangi `app/ai/schemas.py` (chat, suhbat, usage va qoralama sxemalari), `app/ai/tutor.py`, `app/ai/router.py`; `api.py` ga ulandi.
 - `POST /api/ai/chat` — `text/event-stream`, hodisalar `delta`… → `meta` (`conversation_id`, `mode`, javobda haqiqatan ishlatilgan `citations`) → `done`; provayder xatosida `error` (`AI_BUSY`).
