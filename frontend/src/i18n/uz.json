@@ -6,6 +6,7 @@
     "teach": "Mavzu muharriri",
     "results": "Natijalarim",
     "review": "Tekshirish",
+    "stats": "Statistika",
     "adminUsers": "Foydalanuvchilar",
     "adminSubjects": "Fanlarni boshqarish",
     "profile": "Profil",
@@ -442,5 +443,15 @@
     "returned": "Javob talabaga qaytarildi",
     "pending": "Tekshirilishi kerak: {{count}} ta javob",
     "back": "Tekshirish navbati"
+  },
+  "stats": {
+    "title": "Statistika",
+    "subject": "Fan",
+    "topic": "Mavzu",
+    "started": "Boshlagan",
+    "completed": "Tugatgan",
+    "avg": "O'rtacha natija",
+    "pending": "Tekshirilmagan",
+    "empty": "Bu fanda hali mavzu yo'q"
   }
 }

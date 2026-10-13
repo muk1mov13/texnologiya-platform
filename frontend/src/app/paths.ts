@@ -18,7 +18,11 @@ export function navLinksFor(role: Role): NavItem[] {
   // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.
   if (role === 'student') items.push({ to: '/app/results', label: 'nav.results' })
   if (role === 'teacher' || role === 'admin') {
-    items.push({ to: '/teach', label: 'nav.teach', end: true }, { to: '/teach/review', label: 'nav.review' })
+    items.push(
+      { to: '/teach', label: 'nav.teach', end: true },
+      { to: '/teach/review', label: 'nav.review' },
+      { to: '/teach/stats', label: 'nav.stats' },
+    )
   }
   if (role === 'admin') {
     items.push({ to: '/admin/users', label: 'nav.adminUsers' }, { to: '/admin/subjects', label: 'nav.adminSubjects' })
