@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B (AI frontend) rejasi
+- Push: `main` → `origin/main` (30 commit, `a1cd33e` gacha); CI uchala job yashil.
+- Yangi reja `docs/superpowers/plans/2026-10-13-phase-3b-frontend.md` (spec 7-bo'lim): Task 0 — AI tiplari, kontrakt, `apiStream`, SSE parser va hook'lar; 1–3 — repetitor (panel, pleyerda o'ng panel/mobil bottom sheet, `/app/tutor`); 4–5 — muharrirlarga tashqi saver va "✨ AI bilan yaratish" qoralamalari; 6 — AI tavsiyasi kartasi; 7 — haftalik tahlil; 8 — `/admin/ai`; 9 — hujjatlar va qo'lda smoke. uz/ru i18n kalitlari rejada.
+- Roadmap: 3B rejasi yozildi, keyingisi Batch 1.
+
 ### 3A Task 14 yakuni: Gemini + Groq bilan qayta smoke
 - Toza baza (`e2e/start-backend.mjs`, port 8011), ikkala kalit bilan. `.env` dagi `AI_MODEL_CHAT=gemini-2.5-flash` Gemini'da 404 berdi, shuning uchun matn so'rovlari Groq'ga o'tdi (logda `AI fallback`), embedding Gemini'da ishladi.
 - Natija: PDF → `doc_chunks` ✅; repetitor `answer` + `[1]` ✅, `refusal` ✅, `hint` ✅; qoralama → tasdiqlash → faoliyat ✅; vazifa AI tekshiruvi `done`, ball 9/10 ✅; `weekly-report` ✅; admin sozlamalarida `provider=gemini+groq` ✅.

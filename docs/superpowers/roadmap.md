@@ -20,7 +20,7 @@ Hozirgi holat (2026-10-13):
   - Mini-spec: `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md`.
   - 3A (backend) qurildi: reja `docs/superpowers/plans/2026-10-13-phase-3a-backend.md` (Task 0–13, 15), to'g'ridan-to'g'ri `main`da. Testlar loyiha oxiriga qoldirilgan; kod `ruff`, `mypy`, `alembic check` va `AI_PROVIDER=fake` bilan smoke-tekshiruvdan o'tgan.
   - Task 14 (haqiqiy kalitlar bilan qo'lda tekshiruv) ✅ 2026-10-13: Gemini band yoki xato bersa matn Groq'da yaratiladi (`GROQ_API_KEY`), embedding Gemini'da qoladi.
-  - 3B (frontend) rejasi hali yozilmagan.
+  - 3B (frontend) rejasi yozildi: `docs/superpowers/plans/2026-10-13-phase-3b-frontend.md` (Task 0–9, 3 batch).
 - **Qolganlari yozilmagan:** kutubxona, CMS, ochiq sayt va deploy (4).
 - **Lokal muhit:** `uv`, Python 3.12, Node 24, Playwright Chromium bor. LibreOffice va Docker o'rnatilmagan.
 
@@ -248,4 +248,4 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 3. Qoldirilgan testlar: 2B uchun Vitest testlari va E2E baholash oqimi (testlarni loyiha oxirida yozish qarori o'zgarmasa, bu band 4-bosqichdan keyinga qoladi; o'shanda CI'dagi `frontend` va `e2e` joblari ham tekshiriladi).
 4. ✅ 3-bosqich (AI) mini-spec'i yozildi.
 5. ✅ 3A (backend) qurildi va Task 14 qo'lda tekshiruvi o'tdi (2026-10-13). Groq zaxira provayderi qo'shildi. Ochiq kuzatuv: `hint` rejimida model ba'zan javob elementlarini qavs ichida sanaydi (prompt kuchaytirilgan, to'liq kafolat yo'q).
-6. Keyingisi: 3B (frontend) rejasi `docs/superpowers/plans/` ichida yoziladi (spec 7-bo'lim).
+6. ✅ 3B (frontend) rejasi yozildi (2026-10-13). Keyingisi: Batch 1 — Task 0–2 (AI API, repetitor paneli, pleyerda repetitor).
