@@ -6,12 +6,28 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `db8b1c5` — Krossvord: "begona" so'z to'g'ri ko'rsatiladi
+- Muammo: `build_layout` eng uzun so'zni to'rga birinchi qo'yadi. Boshqalar bilan umumiy harfi yo'q so'z eng uzun bo'lsa (masalan, `OLMA`, `ANOR`, `BUXGU`), `CROSSWORD_UNPLACEABLE` xatosi to'g'ri so'zlarga (`OLMA`, `ANOR`) tushardi.
+- `backend/app/assessment/crossword.py`: yangi sof funksiya `_detached`:
+  - so'zlarni umumiy kataklar bo'yicha guruhlaydi (`Oʻ`/`Gʻ` bitta katak);
+  - guruh bittadan ko'p bo'lsa, asosiy guruhni tanlaydi: eng ko'p so'z, so'ng eng ko'p katak, so'ng eng kichik indeks;
+  - qolgan so'zlar darhol `UnplaceableError` bilan qaytariladi.
+  
+  Endi misol `BUXGU` ni qaytaradi.
+- So'zlar bitta guruhda bo'lsa, algoritm avvalgidek ishlaydi. Yetti misolda o'zgarishdan oldingi va keyingi natijalar taqqoslandi: faqat yuqoridagi misol o'zgardi, barcha muvaffaqiyatli layout'lar va mavjud `ABC, DEF, ABX → [1]` holati bir xil qoldi. API, xato kodi va frontend o'zgarmadi.
+- Spec, 6-bo'lim: "Joylashtirish"ga 0-qadam yozildi.
+- Tekshiruv: `ruff format --check`, `ruff check`, `mypy app` toza. Testlar lokal ishga tushirilmadi.
+- Loyiha oxirida `tests/test_crossword.py` ga qo'shiladigan holatlar:
+  - begona so'z eng uzun bo'lsa, faqat u qaytariladi;
+  - teng guruhlarda tanlov deterministik (`AB, BA, XY, YX → [2, 3]`);
+  - `Oʻ` umumiy katak hisoblanadi.
+
 ### `1d3eb85` — Qo'lda tekshiruvdan keyingi a11y tuzatishlari
 - 2-bosqichning "Tayyor" mezoni lokal toza bazada (port 8001) brauzerda qo'lda tekshirildi. Talaba test yechib XP oldi, o'qituvchi vazifani baholadi, talaba ballni ko'rdi; uchalasi ishladi. Repoga o'zgarish kiritilmagan, faqat quyidagi ikki kichik kamchilik tuzatildi.
 - `ProgressRing`: ixtiyoriy `decorative` prop qo'shildi (`Spinner` dagi kabi). U halqani ekran o'quvchidan yashiradi. `AttemptResult` uni ishlatadi: ball yonidagi matnda yozilgan, halqaning "Bajarildi: 1 / 2" yozuvi esa ball uchun noto'g'ri edi.
 - `TaskStep`: vazifa nomi `<h2>` dan `<h3>` ga o'tkazildi. Bosqich sarlavhasi `<h2>`, faoliyat sarlavhasi ham `<h3>`.
 - Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
-- Qayd: krossvordda joylashmagan so'zlar uzun so'z atrofida qurilgan to'rga nisbatan aniqlanadi. Shuning uchun "begona" so'z uzunroq bo'lsa, qizil bilan to'g'ri so'zlar belgilanadi. Bu backend algoritmining xatti-harakati, ma'lumot buzilmaydi. Yaxshilash ixtiyoriy, alohida task sifatida ko'rib chiqiladi.
+- Qayd: krossvordda joylashmagan so'zlar uzun so'z atrofida qurilgan to'rga nisbatan aniqlanadi. Shuning uchun "begona" so'z uzunroq bo'lsa, qizil bilan to'g'ri so'zlar belgilanadi. Bu backend algoritmining xatti-harakati, ma'lumot buzilmaydi. `db8b1c5` da hal qilindi.
 
 ### `73a20c9` — 2B Task 12: yakuniy tekshiruv va hujjatlar
 - Yakuniy tekshiruv: `npm run lint`, `typecheck` va `build` o'tdi. `npm run gen:api` `schema.gen.ts` da farq bermadi.
