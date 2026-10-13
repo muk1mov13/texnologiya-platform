@@ -358,5 +358,15 @@
     "late": "Kechikkan",
     "feedback": "O'qituvchi izohi",
     "download": "Faylni yuklab olish"
+  },
+  "results": {
+    "title": "Natijalarim",
+    "empty": "Hali natijalar yo'q",
+    "emptyText": "Test yoki vazifani bajarsangiz, natijalar shu yerda ko'rinadi",
+    "activities": "Faoliyatlar",
+    "tasks": "Vazifalar",
+    "review": "Tahlil",
+    "lastAttempt": "oxirgi: {{date}}",
+    "back": "Natijalarim"
   }
 }
