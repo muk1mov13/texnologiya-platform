@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Response
 
+from app.ai.indexing import enqueue_questions_for_step
 from app.assessment import activities, tasks
 from app.assessment.models import Task
 from app.assessment.schemas import (
@@ -13,7 +14,7 @@ from app.assessment.schemas import (
     TaskOut,
 )
 from app.auth.deps import StaffUser
-from app.core.deps import AppStorage, DbSession
+from app.core.deps import AppStorage, DbSession, Jobs
 from app.core.types import DbIdPath
 
 router = APIRouter(prefix="/teach", tags=["teach"])
@@ -31,10 +32,11 @@ async def list_activities(
 
 @router.post("/steps/{step_id}/activities", response_model=ActivityTeachOut, status_code=201)
 async def create_activity(
-    step_id: DbIdPath, data: ActivityBody, user: StaffUser, db: DbSession
+    step_id: DbIdPath, data: ActivityBody, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> ActivityTeachOut:
     step = await activities.activity_step(db, user, step_id)
     activity = await activities.create_activity(db, step, data)
+    await enqueue_questions_for_step(db, jobs, step.id)
     return (await activities.teach_out(db, [activity]))[0]
 
 
@@ -49,26 +51,32 @@ async def reorder_activities(
 
 @router.put("/activities/{activity_id}", response_model=ActivityTeachOut)
 async def update_activity(
-    activity_id: DbIdPath, data: ActivityBody, user: StaffUser, db: DbSession
+    activity_id: DbIdPath, data: ActivityBody, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> ActivityTeachOut:
     activity = await activities.ensure_can_edit_activity(db, user, activity_id)
     activity = await activities.update_activity(db, activity, data)
+    await enqueue_questions_for_step(db, jobs, activity.step_id)
     return (await activities.teach_out(db, [activity]))[0]
 
 
 @router.patch("/activities/{activity_id}", response_model=ActivityTeachOut)
 async def publish_activity(
-    activity_id: DbIdPath, data: ActivityPublishIn, user: StaffUser, db: DbSession
+    activity_id: DbIdPath, data: ActivityPublishIn, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> ActivityTeachOut:
     activity = await activities.ensure_can_edit_activity(db, user, activity_id)
     activity = await activities.set_published(db, activity, data.is_published)
+    await enqueue_questions_for_step(db, jobs, activity.step_id)
     return (await activities.teach_out(db, [activity]))[0]
 
 
 @router.delete("/activities/{activity_id}", status_code=204)
-async def delete_activity(activity_id: DbIdPath, user: StaffUser, db: DbSession) -> Response:
+async def delete_activity(
+    activity_id: DbIdPath, user: StaffUser, db: DbSession, jobs: Jobs
+) -> Response:
     activity = await activities.ensure_can_edit_activity(db, user, activity_id)
+    step_id = activity.step_id  # o'chirilgandan keyin obyekt atributlari o'qilmaydi
     await activities.delete_activity(db, activity)
+    await enqueue_questions_for_step(db, jobs, step_id)
     return Response(status_code=204)
 
 
@@ -79,15 +87,21 @@ async def get_task(step_id: DbIdPath, user: StaffUser, db: DbSession) -> Task | 
 
 
 @router.put("/steps/{step_id}/task", response_model=TaskOut)
-async def upsert_task(step_id: DbIdPath, data: TaskIn, user: StaffUser, db: DbSession) -> Task:
+async def upsert_task(
+    step_id: DbIdPath, data: TaskIn, user: StaffUser, db: DbSession, jobs: Jobs
+) -> Task:
     step = await tasks.task_step(db, user, step_id)
-    return await tasks.upsert_task(db, step, data)
+    task = await tasks.upsert_task(db, step, data)
+    await enqueue_questions_for_step(db, jobs, step.id)
+    return task
 
 
 @router.delete("/tasks/{task_id}", status_code=204)
 async def delete_task(
-    task_id: DbIdPath, user: StaffUser, db: DbSession, storage: AppStorage
+    task_id: DbIdPath, user: StaffUser, db: DbSession, storage: AppStorage, jobs: Jobs
 ) -> Response:
     task = await tasks.ensure_can_edit_task(db, user, task_id)
+    step_id = task.step_id  # o'chirilgandan keyin obyekt atributlari o'qilmaydi
     storage.delete_quietly(await tasks.delete_task(db, task))
+    await enqueue_questions_for_step(db, jobs, step_id)
     return Response(status_code=204)

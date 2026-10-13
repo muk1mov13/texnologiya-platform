@@ -3,9 +3,12 @@ import tempfile
 from pathlib import Path
 
 from fastapi import UploadFile
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.ai.constants import INDEX_MATERIAL_JOB
+from app.ai.indexing import index_material_quietly
+from app.ai.models import ChunkSource, DocChunk
 from app.auth.models import User
 from app.core.config import Settings
 from app.core.errors import AppError
@@ -71,6 +74,10 @@ async def add_material(
     await db.commit()
     if material.status == MaterialStatus.processing:
         await jobs.enqueue(CONVERT_JOB, material_id=material.id)
+    else:
+        # PDF darhol tayyor: AI repetitori uchun indekslanadi (AI o'chiq bo'lsa job hech
+        # narsa qilmaydi).
+        await jobs.enqueue(INDEX_MATERIAL_JOB, material_id=material.id)
     return material
 
 
@@ -102,6 +109,12 @@ async def delete_material(db: AsyncSession, material: Material, storage: Storage
     if material.status == MaterialStatus.processing:
         raise AppError(409, "MATERIAL_PROCESSING", "Material hali qayta ishlanmoqda")
     paths = {material.original_file, material.pdf_file}
+    # `doc_chunks.source_id` FK emas (manba turi har xil), shuning uchun bo'laklar qo'lda o'chadi.
+    await db.execute(
+        delete(DocChunk).where(
+            DocChunk.source_type == ChunkSource.material, DocChunk.source_id == material.id
+        )
+    )
     await db.delete(material)
     await db.commit()
     storage.delete_quietly(paths)
@@ -192,3 +205,7 @@ async def convert_material_job(ctx: JobContext, material_id: int) -> None:
         # holatida abadiy ushlab turmasligi kerak.
         logger.exception("Material konvertatsiyasida kutilmagan xato: material_id=%s", material_id)
         await _mark_failed_if_processing(ctx, material_id, "CONVERSION_FAILED")
+    # Job ichidan boshqa job navbatga qo'yilmaydi — indekslash shu yerda bajariladi. Material
+    # `ready` bo'lmasa (konvertatsiya xatosi) u hech narsa qilmaydi; uning xatosi esa
+    # konvertatsiya natijasiga ta'sir qilmaydi.
+    await index_material_quietly(ctx, material_id)

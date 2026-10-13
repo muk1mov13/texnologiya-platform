@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Response
 
+from app.ai.constants import INDEX_GLOSSARY_JOB
 from app.auth.deps import StaffUser
-from app.core.deps import DbSession
+from app.core.deps import DbSession, Jobs
 from app.core.types import DbIdPath
 from app.learning import editing, topic_items
 from app.learning.models import GlossaryTerm, LiteratureItem
@@ -25,27 +26,37 @@ async def list_glossary(topic_id: DbIdPath, user: StaffUser, db: DbSession) -> l
 
 @router.post("/glossary", response_model=GlossaryOut, status_code=201)
 async def add_glossary_term(
-    topic_id: DbIdPath, data: GlossaryIn, user: StaffUser, db: DbSession
+    topic_id: DbIdPath, data: GlossaryIn, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> GlossaryTerm:
     await editing.ensure_can_edit_topic(db, user, topic_id)
-    return await topic_items.add_glossary_term(db, topic_id, data)
+    term = await topic_items.add_glossary_term(db, topic_id, data)
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
+    return term
 
 
 @router.patch("/glossary/{term_id}", response_model=GlossaryOut)
 async def update_glossary_term(
-    topic_id: DbIdPath, term_id: DbIdPath, data: GlossaryUpdate, user: StaffUser, db: DbSession
+    topic_id: DbIdPath,
+    term_id: DbIdPath,
+    data: GlossaryUpdate,
+    user: StaffUser,
+    db: DbSession,
+    jobs: Jobs,
 ) -> GlossaryTerm:
     await editing.ensure_can_edit_topic(db, user, topic_id)
     term = await topic_items.get_glossary_term(db, topic_id, term_id)
-    return await topic_items.update_glossary_term(db, term, data)
+    term = await topic_items.update_glossary_term(db, term, data)
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
+    return term
 
 
 @router.delete("/glossary/{term_id}", status_code=204)
 async def delete_glossary_term(
-    topic_id: DbIdPath, term_id: DbIdPath, user: StaffUser, db: DbSession
+    topic_id: DbIdPath, term_id: DbIdPath, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> Response:
     await editing.ensure_can_edit_topic(db, user, topic_id)
     await topic_items.delete_item(db, await topic_items.get_glossary_term(db, topic_id, term_id))
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
     return Response(status_code=204)
 
 
