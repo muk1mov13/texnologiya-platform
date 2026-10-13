@@ -97,3 +97,33 @@ class AiReportOut(BaseModel):
     stats: dict[str, Any]
     content: str
     created_at: datetime
+
+
+class AiSettingsOut(BaseModel):
+    enabled: bool
+    student_daily_limit: int
+    configured: bool
+    provider: str
+    chat_model: str
+    embedding_model: str
+
+
+class AiSettingsUpdate(BaseModel):
+    enabled: bool | None = None
+    student_daily_limit: int | None = Field(default=None, ge=0, le=500)
+
+
+class AiUsageDay(BaseModel):
+    day: date
+    requests: int
+    users: int
+
+
+class AiUsageOut(BaseModel):
+    days: list[AiUsageDay]
+    chunks: int
+    stale_chunks: int
+
+
+class ReindexIn(BaseModel):
+    all: bool = False

@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 12: admin AI API
+- Yangi `app/ai/admin_router.py` (`/api/admin/ai`, faqat admin):
+  - `GET` / `PATCH /settings` — `enabled`, `student_daily_limit` (0–500), shuningdek `configured`, provayder va modellar; kalitning o'zi qaytarilmaydi;
+  - `GET /usage?days=1..90` — kunlar bo'yicha so'rovlar va foydalanuvchilar soni, jami va eskirgan bo'laklar;
+  - `POST /reindex` (202) — `reindex_all` job'i; AI o'chiq bo'lsa 503.
+- `schemas.py`: `AiSettingsOut`, `AiSettingsUpdate`, `AiUsageDay` (`day`), `AiUsageOut`, `ReindexIn`.
+- Tekshiruv (smoke): sozlamalar o'qildi va o'zgartirildi, javobda kalit yo'q; limit 9999 → 422; AI o'chiqda reindex 503, yoqilganda 202; o'qituvchiga 403. ruff va mypy toza.
+
 ### 3A Task 11: haftalik AI tahlili (CLI)
 - `assessment/reports.py`: hisob ruxsatsiz `topic_stats(db, subject_id)` ga ajratildi; `teach_stats` endi ruxsat + `topic_stats` (xatti-harakati o'zgarmadi).
 - Yangi `app/ai/reports.py`:
