@@ -2,12 +2,15 @@ import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.config import Settings
 from app.core.storage import Storage
+
+if TYPE_CHECKING:  # import tsikli bo'lmasligi uchun faqat tip tekshiruvida
+    from app.ai.services import AiServices
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +20,7 @@ class JobContext:
     sessionmaker: async_sessionmaker[AsyncSession]
     settings: Settings
     storage: Storage
+    ai: "AiServices | None" = None
 
 
 JobFunc = Callable[..., Awaitable[None]]

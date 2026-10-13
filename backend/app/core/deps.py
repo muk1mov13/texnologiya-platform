@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.services import AiServices
 from app.core.config import Settings
 from app.core.jobs import JobRunner
 from app.core.ratelimit import InMemoryRateLimiter
@@ -31,8 +32,13 @@ def get_login_limiter(request: Request) -> InMemoryRateLimiter:
     return request.app.state.login_limiter  # type: ignore[no-any-return]
 
 
+def get_ai(request: Request) -> AiServices:
+    return request.app.state.ai  # type: ignore[no-any-return]
+
+
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 AppSettings = Annotated[Settings, Depends(get_app_settings)]
 AppStorage = Annotated[Storage, Depends(get_storage)]
 Jobs = Annotated[JobRunner, Depends(get_jobs)]
 LoginLimiter = Annotated[InMemoryRateLimiter, Depends(get_login_limiter)]
+Ai = Annotated[AiServices, Depends(get_ai)]
