@@ -8,6 +8,7 @@ import type { ActivityIn, ActivityTeach, ActivityType, CrosswordItemOut, QuizIte
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Select, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
+import type { ActivitySaver } from './saver'
 import {
   crosswordSchema,
   quizSchema,
@@ -17,11 +18,16 @@ import {
   type YesNoValues,
 } from './schemas'
 
+/** Boshlang'ich qiymatlar: mavjud faoliyat (`id` bilan) yoki AI qoralamasi (`id` siz). */
+type ActivityInitial = Pick<ActivityTeach, 'title' | 'items'> & { id?: number }
+
 interface ActivityEditorProps {
   topicId: number
   stepId: number
   type: ActivityType
-  initial?: ActivityTeach
+  initial?: ActivityInitial
+  /** Berilsa, faoliyat API'si o'rniga shu orqali saqlanadi (masalan, AI qoralamasi). */
+  saver?: ActivitySaver
   onDone: () => void
 }
 
@@ -34,17 +40,22 @@ export function ActivityEditor(props: ActivityEditorProps) {
 
 type EditorProps = Omit<ActivityEditorProps, 'type'>
 
-/** Yaratish yoki yangilash — `initial` bor-yo'qligiga qarab; muvaffaqiyatda `onDone`. */
-function useSaveActivity({ topicId, stepId, initial, onDone }: EditorProps) {
+/**
+ * Yaratish yoki yangilash — `initial.id` bor-yo'qligiga qarab; muvaffaqiyatda `onDone`.
+ * Tashqi `saver` berilsa, u ishlatiladi (hook'lar baribir chaqiriladi — hook tartibi o'zgarmasin).
+ */
+function useSaveActivity({ topicId, stepId, initial, saver, onDone }: EditorProps): ActivitySaver {
   const create = useCreateActivity(topicId, stepId)
   const update = useUpdateActivity(topicId, stepId)
-  const mutation = initial ? update : create
+  const existingId = initial?.id
+  const mutation = existingId !== undefined ? update : create
   const save = (data: ActivityIn, onError?: (error: unknown) => void) => {
     const options = { onSuccess: onDone, onError }
-    if (initial) update.mutate({ id: initial.id, data }, options)
+    if (existingId !== undefined) update.mutate({ id: existingId, data }, options)
     else create.mutate(data, options)
   }
-  return { save, pending: mutation.isPending, error: mutation.isError ? mutation.error : null }
+  const own = { save, pending: mutation.isPending, error: mutation.isError ? mutation.error : null }
+  return saver ?? own
 }
 
 const blankQuiz = (): QuizValues['items'][number] => ({

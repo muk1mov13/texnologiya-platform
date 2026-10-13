@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDeleteTask, useSaveTask, useStepTask } from '@/api/teachAssessment'
-import type { TaskOut } from '@/api/types'
+import type { TaskIn, TaskOut } from '@/api/types'
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Select, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { pushToast } from '@/components/ui/toast-store'
 import { fromLocalInput, toLocalInput } from '@/lib/datetime'
+import type { TaskSaver } from './saver'
 import { taskSchema, type TaskValues } from './schemas'
 
 /** Vazifa bosqichidagi yagona topshiriq: yaratish, tahrirlash va o'chirish. */
@@ -24,11 +25,20 @@ export function TaskTab({ topicId, stepId }: { topicId: number; stepId: number }
   )
 }
 
-function TaskForm({ topicId, stepId, task }: { topicId: number; stepId: number; task: TaskOut | null }) {
+interface TaskFormProps {
+  topicId: number
+  stepId: number
+  task: TaskOut | null
+  /** AI qoralamasini tahrirlash: boshlang'ich qiymatlar va saqlash qoralamaga; o'chirish yo'q. */
+  draft?: { initial: TaskIn; saver: TaskSaver }
+}
+
+export function TaskForm({ topicId, stepId, task, draft }: TaskFormProps) {
   const { t } = useTranslation()
   const save = useSaveTask(topicId, stepId)
   const remove = useDeleteTask(topicId, stepId)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const initial = draft?.initial ?? task
   const {
     register,
     handleSubmit,
@@ -36,25 +46,26 @@ function TaskForm({ topicId, stepId, task }: { topicId: number; stepId: number; 
   } = useForm<TaskValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      title: task?.title ?? '',
-      description: task?.description ?? '',
-      type: task?.type ?? 'both',
-      max_score: task?.max_score ?? 10,
-      rubric: task?.rubric ?? '',
-      deadline: toLocalInput(task?.deadline ?? null),
+      title: initial?.title ?? '',
+      description: initial?.description ?? '',
+      type: initial?.type ?? 'both',
+      max_score: initial?.max_score ?? 10,
+      rubric: initial?.rubric ?? '',
+      deadline: toLocalInput(initial?.deadline ?? null),
     },
   })
+  const pending = draft ? draft.saver.pending : save.isPending
+  const error = draft ? draft.saver.error : save.isError ? save.error : null
 
-  const onSubmit = handleSubmit((values) =>
-    save.mutate(
-      { ...values, rubric: values.rubric || null, deadline: fromLocalInput(values.deadline) },
-      { onSuccess: () => pushToast('success', t('taskEdit.saved')) },
-    ),
-  )
+  const onSubmit = handleSubmit((values) => {
+    const data: TaskIn = { ...values, rubric: values.rubric || null, deadline: fromLocalInput(values.deadline) }
+    if (draft) draft.saver.save(data)
+    else save.mutate(data, { onSuccess: () => pushToast('success', t('taskEdit.saved')) })
+  })
 
   return (
     <form noValidate className="flex flex-col gap-4" onSubmit={onSubmit}>
-      {!task && <p className="text-slate-500">{t('taskEdit.empty')}</p>}
+      {!task && !draft && <p className="text-slate-500">{t('taskEdit.empty')}</p>}
       <Field id="task-title" label={t('taskEdit.title')} error={errors.title?.message}>
         <Input id="task-title" {...register('title')} />
       </Field>
@@ -79,9 +90,9 @@ function TaskForm({ topicId, stepId, task }: { topicId: number; stepId: number; 
       <Field id="task-rubric" label={t('taskEdit.rubric')} error={errors.rubric?.message}>
         <Textarea id="task-rubric" rows={3} {...register('rubric')} />
       </Field>
-      {save.isError && <FormError error={save.error} />}
+      {error !== null && <FormError error={error} />}
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" loading={save.isPending}>
+        <Button type="submit" loading={pending}>
           {t('common.save')}
         </Button>
         {task && (

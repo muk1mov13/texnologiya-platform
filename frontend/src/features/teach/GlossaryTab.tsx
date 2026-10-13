@@ -78,14 +78,15 @@ export function GlossaryTab({ topicId, items }: { topicId: number; items: Glossa
 
 interface GlossaryFormProps {
   idPrefix: string
-  initial?: GlossaryTerm
+  initial?: Pick<GlossaryTerm, 'term' | 'definition'>
   submitLabel: string
   pending: boolean
   onSubmit: (values: GlossaryValues, reset: () => void) => void
   onCancel?: () => void
 }
 
-function GlossaryForm({ idPrefix, initial, submitLabel, pending, onSubmit, onCancel }: GlossaryFormProps) {
+/** Bitta atama formasi; AI glossariy qoralamasi muharriri ham ishlatadi. */
+export function GlossaryForm({ idPrefix, initial, submitLabel, pending, onSubmit, onCancel }: GlossaryFormProps) {
   const { t } = useTranslation()
   const {
     register,

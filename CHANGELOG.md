@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 4: muharrirlarga tashqi saqlash
+- Yangi `features/teach/assessment/saver.ts`: `ActivitySaver`, `TaskSaver` tiplari.
+- `ActivityEditor`: ixtiyoriy `saver` prop (berilsa faoliyat API'si o'rniga ishlatiladi); `initial` endi `id` siz ham bo'lishi mumkin (AI qoralamasi) — yangilash/yaratish `initial.id` bo'yicha tanlanadi.
+- `TaskTab`: `TaskForm` eksport qilindi, ixtiyoriy `draft` (`initial` + `saver`) — qoralama rejimida o'chirish tugmasi va "vazifa yo'q" matni ko'rsatilmaydi.
+- `GlossaryTab`: `GlossaryForm` eksport qilindi, `initial` faqat `term`/`definition` talab qiladi.
+- Mavjud xatti-harakat o'zgarmagan. Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 3B Task 3: `/app/tutor` sahifasi
 - Yangi `features/student/TutorPage.tsx`:
   - chapda suhbatlar ro'yxati (sana, tanlangani belgilangan), "Yangi suhbat" va o'chirish (tasdiqlash oynasi bilan);
