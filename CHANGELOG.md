@@ -6,6 +6,22 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `0d3bc4f` — 2B Task 8: o'qituvchi uchun faoliyat muharrirlari
+- Yangi `features/teach/assessment/schemas.ts`: test, ha/yo'q va krossvord uchun zod sxemalari. Cheklovlar backend `assessment/schemas.py` bilan bir xil.
+- Yangi `ActivitiesTab.tsx` (mavzu muharririning `review`/`practice` tablari, oldingi "Tez orada" o'rniga):
+  - har faoliyat: tur, nom, elementlar soni, "Nashr qilingan"/"Qoralama", "Nashr qilish"/"Yashirish", ↑/↓ tartib, tahrirlash va o'chirish (tasdiqlash oynasi bilan);
+  - krossvordda saqlangan to'rni harflari bilan ko'rsatuvchi "To'r ko'rinishi" tugmasi bor;
+  - pastda "+ Test", "+ Ha/yo'q", "+ Krossvord" tugmalari.
+- Yangi `ActivityEditor.tsx` (`react-hook-form` + `useFieldArray`), yaratish va tahrirlashda inline ochiladi:
+  - test: savol, 4 variant va to'g'ri variant (radio), izoh;
+  - ha/yo'q: bayonot, to'g'ri javob, izoh;
+  - krossvord: so'z va ta'rif;
+  - elementlarni qo'shish, o'chirish va ↑/↓ ko'chirish; bo'sh izoh `null` bo'lib yuboriladi;
+  - backend xatosi forma ostida chiqadi. `CROSSWORD_UNPLACEABLE` / `CROSSWORD_INVALID_WORD` dagi so'zlar mos maydonda ham belgilanadi.
+- `TopicEditorPage`: faoliyat tablarida son belgisi ko'rsatilmaydi.
+- i18n: yangi `activityEditor.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ### `9e46bbf` — 2B Task 7: "Natijalarim" va urinish tahlili
 - Yangi `features/student/ResultsPage.tsx` (`/app/results`): fan → mavzu bo'yicha guruhlangan natijalar.
   - Faoliyatlar: nom, tur, urinishlar soni, oxirgi sana, eng yaxshi foiz va "Tahlil" havolasi (oxirgi urinishga).
