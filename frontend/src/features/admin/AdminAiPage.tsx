@@ -85,13 +85,15 @@ function SettingsForm({ data }: { data: AiSettingsView }) {
           hint={t('adminAi.dailyLimitHint')}
           error={errors.student_daily_limit?.message}
         >
-          <Input
-            id="ai-daily-limit"
-            type="number"
-            min={0}
-            max={500}
-            {...register('student_daily_limit', { valueAsNumber: true })}
-          />
+          <div className="w-36">
+            <Input
+              id="ai-daily-limit"
+              type="number"
+              min={0}
+              max={500}
+              {...register('student_daily_limit', { valueAsNumber: true })}
+            />
+          </div>
         </Field>
         <div>
           <Button type="submit" loading={update.isPending}>
@@ -112,18 +114,19 @@ function UsageCard() {
     <Card className="flex flex-col gap-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-bold">{t('adminAi.usage')}</h2>
-        <Select
-          aria-label={t('adminAi.usage')}
-          className="w-auto"
-          value={days}
-          onChange={(event) => setDays(Number(event.target.value))}
-        >
-          {DAY_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {t('adminAi.days', { count: option })}
-            </option>
-          ))}
-        </Select>
+        <div className="w-36">
+          <Select
+            aria-label={t('adminAi.usage')}
+            value={days}
+            onChange={(event) => setDays(Number(event.target.value))}
+          >
+            {DAY_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {t('adminAi.days', { count: option })}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
       <QueryState query={usage}>
         {(data) => {

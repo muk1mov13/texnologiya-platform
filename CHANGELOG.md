@@ -4,6 +4,26 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — 3B yakuni
+
+### 3B Task 9: qo'lda tekshiruv, tuzatishlar va hujjatlar
+- `npm run gen:api` — `schema.gen.ts` farqsiz.
+- Brauzerda (toza baza, backend 8011, `vite` 5174, Playwright) Gemini+Groq bilan tekshirildi:
+  - pleyerdagi repetitor: oqimli javob, `[1] Ma'ruza, 1-bet` manbasi, limit 3/30 → 4/30;
+  - 375px: "🤖 Repetitor" tugmasi va pastdan ochiladigan panel;
+  - "✨ AI bilan yaratish" → qoralama (5 savol) → mavjud test muharririda saqlash → tasdiqlash → nashr qilinmagan faoliyat;
+  - tekshirish sahifasida AI tavsiyasi (9/10, izoh, kuchli tomonlar, kamchiliklar), baholash maydoni bo'sh qoladi;
+  - o'qituvchi bosh sahifasida haftalik tahlil; `/admin/ai` (`gemini+groq`, sarf, indeks);
+  - admin AI'ni o'chirganda pleyer repetitori, "AI bilan yaratish" yashirindi, `/app/tutor` "o'chirilgan" holatini ko'rsatdi.
+- Topilgan va tuzatilgan:
+  - `TopicEditorPage`: `AiDraftsSection` va `ActivitiesTab` bir xil `key={step.id}` olgan edi (React ogohlantirishi) → `ai-${step.id}`;
+  - `PlayerPage` (oldindan bor xato): telefonda sahifa gorizontal scroll bo'lardi — grid ustunlari `minmax(0,1fr)` emas edi va bosqich havolalaridagi `sr-only` (absolute) matn scroll konteynerdan chiqardi (`ol` ga `relative`). 375px'da `scrollWidth` 917 → 360;
+  - `TutorPanel`: "Yangi suhbat" chiqqanda sarlavha ikki qatorga tushmaydi (`truncate`);
+  - `AdminAiPage`: kunlar tanlovi va limit maydoni tor o'ramda.
+- Kuzatuv (tuzatilmagan): admin nav'ida havolalar ko'payib, u gorizontal scroll bo'ladi (mavjud nav xatti-harakati).
+- `CLAUDE.md`: loyiha holati (3B qurilgan), frontend "AI (phase 3)" bandi, `src/test/server.ts` dagi `/api/ai/usage` handleri. Roadmap: 3-bosqich ✅, keyingisi 4-bosqich mini-spec'i.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ## 2026-10-13 — 2B frontend davomi
 
 ### 3B Task 8: admin `/admin/ai` sahifasi

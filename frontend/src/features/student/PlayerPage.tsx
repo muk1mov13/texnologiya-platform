@@ -90,14 +90,19 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
       >
         ← {topic.subject.title}
       </Link>
-      <div className="grid gap-6 md:grid-cols-[260px_1fr] lg:grid-cols-[240px_1fr_340px]">
+      {/* `minmax(0,1fr)`: aks holda bosqichlar ro'yxati (gorizontal scroll) mobil ustunni kengaytiradi. */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)_340px]">
         <aside className="md:sticky md:top-20 md:self-start">
           <Card className="flex flex-col gap-4 p-4">
             <div className="flex items-center gap-3">
               <ProgressRing completed={topic.progress.completed} total={topic.progress.total} size={48} />
               <h1 className="font-bold leading-tight">{topic.title}</h1>
             </div>
-            <ol aria-label={t('player.steps')} className="flex gap-2 overflow-x-auto pb-1 md:flex-col md:overflow-visible">
+            {/* `relative`: havolalardagi `sr-only` (absolute) matn scroll konteynerdan chiqib sahifani kengaytirmasin. */}
+            <ol
+              aria-label={t('player.steps')}
+              className="relative flex gap-2 overflow-x-auto pb-1 md:flex-col md:overflow-visible"
+            >
               {steps.map((step) => (
                 <li key={step.id} className="shrink-0">
                   <StepLink topicId={topicId} step={step} active={step.id === current.id} />

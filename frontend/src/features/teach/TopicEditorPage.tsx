@@ -62,7 +62,7 @@ export function TopicEditorPage() {
               </div>
               <div className="px-4 pb-5 sm:px-5">
                 <TabPanel id={tab}>
-                  {step && <AiDraftsSection key={step.id} topic={data} step={step} />}
+                  {step && <AiDraftsSection key={`ai-${step.id}`} topic={data} step={step} />}
                   {FILE_KINDS.has(tab) && step ? (
                     <MaterialsTab topicId={data.id} step={step} />
                   ) : tab === 'glossary' ? (

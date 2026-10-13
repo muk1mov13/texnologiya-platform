@@ -55,7 +55,7 @@ export function TutorPanel({ topicId, initial, onNew }: TutorPanelProps) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex items-center gap-2 border-b-2 border-slate-100 px-4 py-3">
-        <h2 className="flex-1 font-bold">
+        <h2 className="min-w-0 flex-1 truncate font-bold">
           <span aria-hidden="true">🤖 </span>
           {t('tutor.title')}
         </h2>
