@@ -140,7 +140,8 @@ async def ai_check_job(ctx: JobContext, submission_id: int, submitted_at: str) -
         result = await ai.llm.generate_json(
             ai.chat_model, SYSTEM, [ChatMessage("user", prompt)], GradeGen
         )
-    except (ProviderBusy, ValidationError):
+    except (ProviderBusy, ValidationError) as exc:
+        logger.warning("ai check failed for submission %s: %s", submission_id, type(exc).__name__)
         await _set_status(ctx, submission_id, submitted_at, AiCheckStatus.failed)
         return
     result.score = min(max(result.score, 0), task.max_score)

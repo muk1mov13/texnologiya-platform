@@ -220,19 +220,28 @@ class GeminiProvider:
     ) -> AsyncIterator[str]:
         from google.genai import errors, types
 
-        await self._limiter.acquire()
-        chunks = await with_retry(
-            lambda: self._client.aio.models.generate_content_stream(
+        async def start() -> tuple[AsyncIterator[Any], Any]:
+            # HTTP xatosi birinchi bo'lakni o'qishda chiqadi, shuning uchun u ham retry ichida.
+            chunks = await self._client.aio.models.generate_content_stream(
                 model=model,
                 contents=self._contents(messages),
                 config=types.GenerateContentConfig(system_instruction=system),
             )
-        )
+            iterator = aiter(chunks)
+            return iterator, await anext(iterator, None)
+
+        await self._limiter.acquire()
+        iterator, first = await with_retry(start)
+        if first is None:
+            return
+        if first.text:
+            yield first.text
         try:
-            async for chunk in chunks:
+            async for chunk in iterator:
                 if chunk.text:
                     yield chunk.text
         except errors.APIError as exc:  # oqim o'rtasida qayta urinib bo'lmaydi
+            logger.warning("AI provider stream error: %s %s", type(exc).__name__, exc.code)
             raise ProviderBusy(type(exc).__name__) from exc
 
     async def embed(self, texts: Sequence[str], task: EmbedTask) -> list[list[float]]:

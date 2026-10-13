@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 14: haqiqiy Gemini kaliti bilan qo'lda tekshiruv (oraliq)
+- Tuzatish `app/ai/providers.py`: `GeminiProvider.stream()` da 503/429 xatosi birinchi bo'lakni o'qishda chiqardi va `with_retry` uni ushlamasdi — repetitor darhol `AI_BUSY` berardi, logga ham yozilmasdi. Endi oqim ochilishi va birinchi bo'lak retry ichida; oqim o'rtasidagi xato logga yoziladi.
+- `app/ai/grading.py`: AI tekshiruvi yiqilganda sabab turi logga yoziladi (matnsiz).
+- Natija (toza baza, `e2e/start-backend.mjs`, port 8011):
+  - PDF → `doc_chunks` to'ldi ✅;
+  - repetitor: mavzu savoli → `answer` + `[1]` manba ✅; aloqasiz savol → `refusal` (LLM'siz) ✅; nashr qilingan test savoli → `hint` ✅;
+  - test qoralamasi → `draft` (3 savol) → tasdiqlash → faoliyat ✅ (bir urinishda 429, daqiqadan keyin o'tdi);
+  - `weekly-report --week-start 2026-10-12` → hisobot yaratildi va `GET /teach/ai/reports` da ko'rinadi ✅;
+  - matnli vazifani AI tekshirish → ikki marta `ClientError 429` → `failed` ❌ (ochiq).
+- Tekshiruv: `ruff format`, `ruff check`, `mypy app` toza.
+
 ### 3A Task 15: hujjatlar va yakun
 - Spec `2026-10-13-phase-3-ai-design.md`: yangi 10-bo'lim "Amalga oshirishdagi aniqliklar (3A)" (5 band).
 - `CLAUDE.md`: loyiha holati (3A qurilgan), `app/ai/` arxitektura bandi, `weekly-report` buyrug'i.
