@@ -6,6 +6,19 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### Ish tartibi tezlashtirildi
+- Sabab: ko'p kunlik ishda ko'rinadigan natija kam bo'ldi, tokenlar esa tez sarflandi. Asosiy sabablar:
+  - bitta juda uzun sessiya (~740k token kontekst);
+  - ECC "GateGuard" hook'i (35+ blok, kod qayta yuborildi);
+  - 13 ta plagin;
+  - har task'dan keyin tasdiq va ikki commit.
+- `CLAUDE.md` "Execution Constraints":
+  - reja 3–5 tasklik bo'laklarda bajariladi, tasdiq bo'lak oxirida;
+  - har task uchun bitta commit, CHANGELOG yozuvi shu commit ichida;
+  - hisobotlar qisqa.
+- Claude Code sozlamasi (repodan tashqarida): `ecc`, `vercel`, `task-observer`, `claude-mem`, `claude-code-setup` va `skill-creator` plaginlari o'chirildi.
+- Ustuvorlik (foydalanuvchi qarori): avval AI (3A qolgan tasklari, 3B), keyin deploy. Server hali yo'q.
+
 ### `69eae22` — 3A Task 6: indekslash job'lari va hook'lar
 - Yangi `app/ai/indexing.py`. Job'lar AI o'chiq bo'lsa hech narsa qilmaydi:
   - `index_material` — PDF sahifalari → bo'laklar → embedding → `doc_chunks`. Material orada o'chirilgan bo'lsa, natija yozilmaydi;

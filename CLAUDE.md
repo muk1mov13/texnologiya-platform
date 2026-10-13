@@ -102,6 +102,7 @@ Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (uniqu
 ## Execution Constraints (Token & Subagent Control)
 
 - DO NOT spawn background subagents or use subagent-driven workflows.
-- Execute only ONE task at a time as requested by the user.
-- Stop immediately after finishing the single task and await user approval before touching anything else.
+- Work through a plan in batches of 3–5 tasks. Stop and ask for approval at the end of each batch, not after every task.
+- One commit per task, with its `CHANGELOG.md` entry in the same commit (no separate "add hash" commits; the hash lives in git log).
+- Keep reports short: what was done, how it was verified, what the next batch is.
 - Do not run continuous or looping test-fix cycles. If a test fails twice, stop and report the error.
