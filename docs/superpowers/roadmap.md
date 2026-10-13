@@ -142,9 +142,15 @@ Backend'ga 1B davomida 3 ta ataylab qilingan auth tuzatishi kirdi (refresh grace
 
 ---
 
-## 3-bosqich: AI
+## 3-bosqich: AI — 🟡 mini-spec yozildi
 
-**Mini-spec'da hal qilinishi shart bo'lgan masalalar:**
+Mini-spec: `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md` (2026-10-13). Hal qilingan masalalar:
+- **vektor:** `VectorStore`, lokalda SQLite + numpy, CI/prod'da pgvector;
+- **haftalik tahlil:** CLI `weekly-report`, 4-bosqichda arq cron;
+- **provayder:** Gemini (`google-genai`);
+- **bo'linish:** 3A backend, 3B frontend.
+
+**Mini-spec'dan oldingi ochiq masalalar (tarix uchun):**
 - **Vektor qidiruv lokal muhitda.** `doc_chunks.embedding` uchun pgvector kerak, lokal baza esa SQLite. Variantlar:
   - (a) lokalda embedding'larni JSON yoki BLOB qilib saqlash va o'xshashlikni Python'da cosine bilan hisoblash, prod'da pgvector ishlatish (ikkalasi bir `VectorStore` interfeysi orqali);
   - (b) 3-bosqichdan boshlab lokalda ham PostgreSQL ishlatish.
@@ -235,4 +241,4 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 1. ✅ 2-bosqich `main`ga merge qilindi va push qilindi (2026-10-13). CI uchala job bilan yashil.
 2. 2-bosqichning "Tayyor" mezonini qo'lda brauzerda tekshirish: talaba test yechadi va XP oladi, o'qituvchi vazifani baholaydi, talaba ballni ko'radi.
 3. Qoldirilgan testlar: 2B uchun Vitest testlari va E2E baholash oqimi (testlarni loyiha oxirida yozish qarori o'zgarmasa, bu band 4-bosqichdan keyinga qoladi; o'shanda CI'dagi `frontend` va `e2e` joblari ham tekshiriladi).
-4. 3-bosqich (AI) mini-spec'i.
+4. ✅ 3-bosqich (AI) mini-spec'i yozildi. Keyingisi: foydalanuvchi spec'ni ko'rib chiqadi, so'ng 3A (backend) rejasi `docs/superpowers/plans/` ichida yoziladi.

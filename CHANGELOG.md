@@ -6,6 +6,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3-bosqich (AI) mini-spec'i
+- Yangi `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md`. Foydalanuvchi qarorlari:
+  - lokalda `VectorStore` (SQLite BLOB + numpy), CI/prod'da pgvector;
+  - haftalik tahlil CLI `weekly-report` orqali;
+  - provayder Gemini (`google-genai`; sukut modellar `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-embedding-001` / 768);
+  - 3A backend, 3B frontend.
+- Spec mazmuni:
+  - `app/ai/` arxitekturasi va ma'lumotlar modeli;
+  - indekslash (`question` bo'laklari maslahat rejimi uchun, javobsiz);
+  - repetitor oqimi (SSE, rad javobi, maslahat rejimi);
+  - qoralama yaratish va tasdiqlash (mavjud `create_activity` / `upsert_task` / `add_glossary_term` qayta ishlatiladi);
+  - vazifani AI bilan tekshirish, haftalik tahlil, admin;
+  - API, xato kodlari, maxfiylik va tayyor bo'lish mezoni.
+- Roadmap'ning 3-bosqich bo'limi va keyingi qadamlari yangilandi.
+
 ### `1f23fcc` — 2-bosqich `main`ga merge qilindi; endi faqat `main`da ishlanadi
 - Foydalanuvchi qarori: barcha ish `main`ga push qilinadi, `main`dan boshqa branch'lar o'chiriladi, keyingi ish faqat `main`da olib boriladi (feature branch va PR'siz).
 - `feat/phase-2-assessment` (2A + 2B, 67 commit) lokal `main`ga `--no-ff` bilan merge qilindi (`1f23fcc`), konflikt bo'lmadi. Oldin lokal `main` `origin/main`ga (PR #3 merge, `878e50d`) yetkazildi.
