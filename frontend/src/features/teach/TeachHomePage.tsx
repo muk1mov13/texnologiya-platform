@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
+import { WeeklyReport } from './WeeklyReport'
 
 export function TeachHomePage() {
   const { t } = useTranslation()
@@ -149,6 +150,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
         <h2 className="text-lg font-bold">{subject.title}</h2>
         <PublishedBadge published={subject.is_published} />
       </header>
+      <WeeklyReport subjectId={subject.id} />
       {topics.length === 0 ? (
         <p className="text-slate-500">{t('teach.noTopics')}</p>
       ) : (

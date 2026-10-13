@@ -538,5 +538,8 @@
     "notice": "Bu faqat tavsiya: ballni o'qituvchi qo'yadi.",
     "unsupported": "AI bu turdagi javobni o'qiy olmaydi (rasm yoki skan).",
     "failed": "AI tekshira olmadi. Qayta urinib ko'ring."
+  },
+  "aiReport": {
+    "title": "Haftalik AI tahlili ({{from}} – {{to}})"
   }
 }
