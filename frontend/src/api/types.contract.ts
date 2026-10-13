@@ -70,6 +70,16 @@ export type ResponseContract = [
   Check<Receives<T.TaskView, S['TaskView']>>,
   Check<Receives<T.SubmissionView, S['SubmissionView']>>,
   Check<Receives<T.StudentLayout, S['StudentLayout']>>,
+  Check<Receives<T.Citation, S['Citation']>>,
+  Check<Receives<T.ConversationBrief, S['ConversationOut']>>,
+  Check<Receives<T.ChatMessageView, S['MessageOut']>>,
+  Check<Receives<T.ConversationDetail, S['ConversationDetailOut']>>,
+  Check<Receives<T.AiUsageMe, S['UsageOut']>>,
+  Check<Receives<T.AiDraft, S['DraftOut']>>,
+  Check<Receives<T.AiReport, S['AiReportOut']>>,
+  Check<Receives<T.AiSettingsView, S['AiSettingsOut']>>,
+  Check<Receives<T.AiUsageDay, S['AiUsageDay']>>,
+  Check<Receives<T.AiUsageStats, S['AiUsageOut']>>,
 ]
 
 export type RequestContract = [
@@ -94,4 +104,9 @@ export type RequestContract = [
   Check<Sends<Extract<T.ActivityIn, { type: 'quiz' }>, S['QuizActivityIn']>>,
   Check<Sends<Extract<T.ActivityIn, { type: 'yesno' }>, S['YesNoActivityIn']>>,
   Check<Sends<Extract<T.ActivityIn, { type: 'crossword' }>, S['CrosswordActivityIn']>>,
+  Check<Sends<T.ChatIn, S['ChatIn']>>,
+  Check<Sends<T.DraftCreateIn, S['DraftCreateIn']>>,
+  Check<Sends<T.DraftUpdateIn, S['DraftUpdateIn']>>,
+  Check<Sends<T.AiSettingsUpdate, S['AiSettingsUpdate']>>,
+  Check<Sends<T.ReindexIn, S['ReindexIn']>>,
 ]

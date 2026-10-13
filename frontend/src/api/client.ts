@@ -236,6 +236,11 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   return (await response.json()) as T
 }
 
+/** Oqimli javob (SSE): 401 da refresh va xato formati `apiFetch` bilan bir xil, tana o'qilmaydi. */
+export function apiStream(path: string, options: RequestOptions = {}): Promise<Response> {
+  return request(path, options)
+}
+
 export async function apiBuffer(path: string, signal?: AbortSignal): Promise<ArrayBuffer> {
   const response = await request(path, { signal })
   return response.arrayBuffer()

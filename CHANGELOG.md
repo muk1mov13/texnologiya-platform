@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 0: AI tiplari, API hook'lari va SSE klient
+- `src/api/types.ts`: AI tiplari (`Citation`, `ConversationBrief`/`Detail`, `ChatMessageView`, `AiUsageMe`, `ChatIn`, `ChatMeta`, `AiDraft`, `DraftCreateIn`/`UpdateIn`, `AiReport`, `AiSettingsView`/`Update`, `AiUsageStats`, `ReindexIn`); `types.contract.ts` ga 10 ta javob va 5 ta so'rov kontrakti — hammasi birinchi urinishda mos keldi.
+- `client.ts`: `apiStream()` — 401/refresh va xato formati `apiFetch` bilan bir xil, tana oqim sifatida qaytadi.
+- Yangi `lib/sse.ts`: `readSse()` SSE parser. Rejadagi `TextDecoderStream` TS DOM tiplariga mos kelmadi, o'rniga `TextDecoder` `stream: true` bilan.
+- Yangi `api/ai.ts` (`useAiUsage`, suhbatlar, `streamChat`), `api/teachAi.ts` (qoralamalar `generating` da 3 s polling, tasdiqlash keshlarni yangilaydi, `useAiCheck`, `useAiReports`), `api/adminAi.ts` (sozlamalar, sarf, reindex).
+- `useSubmission`: `ai_status=pending` da 3 s polling.
+- Tekshiruv: `npm run lint`, `typecheck`, `build` o'tdi.
+
 ### 3B (AI frontend) rejasi
 - Push: `main` → `origin/main` (30 commit, `a1cd33e` gacha); CI uchala job yashil.
 - Yangi reja `docs/superpowers/plans/2026-10-13-phase-3b-frontend.md` (spec 7-bo'lim): Task 0 — AI tiplari, kontrakt, `apiStream`, SSE parser va hook'lar; 1–3 — repetitor (panel, pleyerda o'ng panel/mobil bottom sheet, `/app/tutor`); 4–5 — muharrirlarga tashqi saver va "✨ AI bilan yaratish" qoralamalari; 6 — AI tavsiyasi kartasi; 7 — haftalik tahlil; 8 — `/admin/ai`; 9 — hujjatlar va qo'lda smoke. uz/ru i18n kalitlari rejada.

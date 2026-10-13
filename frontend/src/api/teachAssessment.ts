@@ -133,6 +133,8 @@ export function useSubmission(id: number) {
     queryKey: teachAssessmentKeys.submission(id),
     queryFn: ({ signal }) => apiFetch<SubmissionDetail>(`/api/teach/submissions/${id}`, { signal }),
     enabled: Number.isInteger(id) && id > 0,
+    // AI tekshiruvi fonda ishlaydi: natija kelguncha sahifa o'zi yangilanadi.
+    refetchInterval: (query) => (query.state.data?.ai_status === 'pending' ? 3000 : false),
   })
 }
 

@@ -554,3 +554,126 @@ export interface TopicStats {
   avg_best_percent: number | null
   pending_submissions: number
 }
+
+// --- AI (3-bosqich) -----------------------------------------------------------------------
+
+export type MessageMode = 'answer' | 'hint' | 'refusal' | 'canned'
+export type MessageRole = 'user' | 'assistant'
+
+export interface Citation {
+  n: number
+  source_type: string
+  source_id: number
+  title: string
+  page: number | null
+}
+
+export interface ConversationBrief {
+  id: number
+  topic_id: number | null
+  title: string
+  updated_at: string
+}
+
+export interface ChatMessageView {
+  id: number
+  role: MessageRole
+  content: string
+  citations: Citation[]
+  mode: MessageMode | null
+  created_at: string
+}
+
+export interface ConversationDetail extends ConversationBrief {
+  messages: ChatMessageView[]
+}
+
+export interface AiUsageMe {
+  used: number
+  limit: number | null
+  enabled: boolean
+}
+
+export interface ChatIn {
+  message: string
+  topic_id?: number | null
+  conversation_id?: number | null
+}
+
+/** SSE `meta` hodisasi (OpenAPI'da yo'q — kontraktsiz). */
+export interface ChatMeta {
+  conversation_id: number
+  mode: MessageMode
+  citations: Citation[]
+}
+
+export type DraftKind = 'quiz' | 'yesno' | 'crossword' | 'glossary' | 'task'
+export type DraftStatus = 'generating' | 'draft' | 'approved' | 'rejected' | 'failed'
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
+export interface DraftCreateIn {
+  step_id: number
+  kind: DraftKind
+  material_ids: number[]
+  count: number
+  difficulty?: Difficulty
+}
+
+export interface DraftUpdateIn {
+  payload: Record<string, unknown>
+}
+
+export interface AiDraft {
+  id: number
+  topic_id: number
+  step_id: number
+  kind: DraftKind
+  status: DraftStatus
+  params: Record<string, unknown>
+  payload: Record<string, unknown> | null
+  error: string | null
+  approved_ref: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AiReport {
+  id: number
+  subject_id: number
+  locale: string
+  period_start: string
+  period_end: string
+  stats: Record<string, unknown>
+  content: string
+  created_at: string
+}
+
+export interface AiSettingsView {
+  enabled: boolean
+  student_daily_limit: number
+  configured: boolean
+  provider: string
+  chat_model: string
+  embedding_model: string
+}
+
+export interface AiSettingsUpdate {
+  enabled?: boolean | null
+  student_daily_limit?: number | null
+}
+
+export interface AiUsageDay {
+  day: string
+  requests: number
+  users: number
+}
+
+export interface AiUsageStats {
+  days: AiUsageDay[]
+  chunks: number
+  stale_chunks: number
+}
+
+export interface ReindexIn {
+  all?: boolean
+}
