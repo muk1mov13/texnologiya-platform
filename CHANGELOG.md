@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `1d3eb85` — Qo'lda tekshiruvdan keyingi a11y tuzatishlari
+- 2-bosqichning "Tayyor" mezoni lokal toza bazada (port 8001) brauzerda qo'lda tekshirildi. Talaba test yechib XP oldi, o'qituvchi vazifani baholadi, talaba ballni ko'rdi; uchalasi ishladi. Repoga o'zgarish kiritilmagan, faqat quyidagi ikki kichik kamchilik tuzatildi.
+- `ProgressRing`: ixtiyoriy `decorative` prop qo'shildi (`Spinner` dagi kabi). U halqani ekran o'quvchidan yashiradi. `AttemptResult` uni ishlatadi: ball yonidagi matnda yozilgan, halqaning "Bajarildi: 1 / 2" yozuvi esa ball uchun noto'g'ri edi.
+- `TaskStep`: vazifa nomi `<h2>` dan `<h3>` ga o'tkazildi. Bosqich sarlavhasi `<h2>`, faoliyat sarlavhasi ham `<h3>`.
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+- Qayd: krossvordda joylashmagan so'zlar uzun so'z atrofida qurilgan to'rga nisbatan aniqlanadi. Shuning uchun "begona" so'z uzunroq bo'lsa, qizil bilan to'g'ri so'zlar belgilanadi. Bu backend algoritmining xatti-harakati, ma'lumot buzilmaydi. Yaxshilash ixtiyoriy, alohida task sifatida ko'rib chiqiladi.
+
 ### `73a20c9` — 2B Task 12: yakuniy tekshiruv va hujjatlar
 - Yakuniy tekshiruv: `npm run lint`, `typecheck` va `build` o'tdi. `npm run gen:api` `schema.gen.ts` da farq bermadi.
 - Spec 8-bo'limiga amalga oshirishdagi farqlar yozildi:
