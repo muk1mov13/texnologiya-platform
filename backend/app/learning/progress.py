@@ -1,10 +1,17 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.models import User
+from app.assessment import views
+from app.assessment.models import ACTIVITY_STEP_KINDS
+from app.auth.models import Role, User
 from app.core.errors import AppError
 from app.core.types import utcnow
+from app.gamification import rules
+from app.gamification.rules import XpReason
+from app.gamification.service import Rewards, award, rewards_out
 from app.learning import editing, topic_items
 from app.learning.content import all_step_ids, count_progress, load_progress, load_step_infos
 from app.learning.models import (
@@ -23,6 +30,7 @@ from app.learning.student_schemas import (
     MaterialView,
     ProgressOut,
     StepBrief,
+    StepCompleteOut,
     StepContentOut,
     SubjectCard,
     SubjectDetailOut,
@@ -158,7 +166,7 @@ async def _progress_row(db: AsyncSession, user_id: int, step_id: int) -> StepPro
     )
 
 
-async def _get_or_create_progress(db: AsyncSession, user_id: int, step_id: int) -> StepProgress:
+async def get_or_create_progress(db: AsyncSession, user_id: int, step_id: int) -> StepProgress:
     """`StepProgress`'ni o'qiydi, topilmasa yaratadi. Ikki parallel so'rov bir xil
     user+step uchun bir vaqtda qator yaratishga urinsa, unique constraint
     violatsiyasi SAVEPOINT ichida ushlanadi va boshqa so'rov yaratgan qator
@@ -180,13 +188,75 @@ async def _get_or_create_progress(db: AsyncSession, user_id: int, step_id: int) 
     return row
 
 
+async def reward(
+    db: AsyncSession,
+    user: User,
+    reason: XpReason,
+    *,
+    ref_type: str,
+    ref_id: int,
+    amount: int,
+    now: datetime,
+) -> Rewards:
+    """XP faqat talabalarga beriladi: o'qituvchi yoki admin kursni ko'rib chiqayotganda
+    progress saqlanadi, lekin XP, seriya va nishon berilmaydi."""
+    if user.role != Role.student:
+        return Rewards()
+    return await award(
+        db, user.id, reason, ref_type=ref_type, ref_id=ref_id, amount=amount, now=now
+    )
+
+
+async def topic_completion_rewards(
+    db: AsyncSession, user: User, topic_id: int, now: datetime
+) -> Rewards:
+    """Mavzuning kontenti bor barcha bosqichlari tugagan bo'lsa, `topic_completed`
+    XP'sini beradi."""
+    await db.flush()
+    infos = (await load_step_infos(db, [topic_id]))[topic_id]
+    status = await load_progress(db, user.id, [info.id for info in infos])
+    done, total = count_progress(infos, status)
+    if total == 0 or done < total:
+        return Rewards()
+    return await reward(
+        db,
+        user,
+        XpReason.topic_completed,
+        ref_type="topic",
+        ref_id=topic_id,
+        amount=rules.TOPIC_COMPLETED_XP,
+        now=now,
+    )
+
+
+async def mark_step_completed(
+    db: AsyncSession, user: User, row: StepProgress, topic_id: int, now: datetime
+) -> Rewards:
+    """Bosqichni tugatilgan deb belgilaydi; mavzu to'liq tugagan bo'lsa uning XP'sini beradi."""
+    if row.status != ProgressStatus.completed:
+        row.status = ProgressStatus.completed
+        row.completed_at = now
+    row.updated_at = now
+    return await topic_completion_rewards(db, user, topic_id, now)
+
+
+async def visible_topic_or(db: AsyncSession, user: User, topic_id: int, error: AppError) -> Topic:
+    """`get_visible_topic`, lekin ko'rinmasa berilgan xato ko'tariladi: ichki obyektning
+    (faoliyat, vazifa) borligi oshkor qilinmaydi."""
+    try:
+        topic, _subject = await get_visible_topic(db, user, topic_id)
+    except AppError:
+        raise error from None
+    return topic
+
+
 async def step_content(db: AsyncSession, user: User, step_id: int) -> StepContentOut:
     step = await editing.get_step(db, step_id)
     topic, _ = await get_visible_topic(db, user, step.topic_id)
     infos = (await load_step_infos(db, [topic.id]))[topic.id]
     info = next(i for i in infos if i.id == step.id)
 
-    row = await _get_or_create_progress(db, user.id, step.id)
+    row = await get_or_create_progress(db, user.id, step.id)
     row.updated_at = utcnow()  # "davom ettirish" uchun oxirgi ochilgan bosqich
     await db.commit()
 
@@ -216,6 +286,12 @@ async def step_content(db: AsyncSession, user: User, step_id: int) -> StepConten
         if step.kind == StepKind.literature
         else []
     )
+    activities = (
+        await views.activity_views(db, user.id, step.id) if step.kind in ACTIVITY_STEP_KINDS else []
+    )
+    task, submission = (
+        await views.task_view(db, user.id, step.id) if step.kind == StepKind.task else (None, None)
+    )
     return StepContentOut(
         id=step.id,
         topic_id=topic.id,
@@ -226,10 +302,13 @@ async def step_content(db: AsyncSession, user: User, step_id: int) -> StepConten
         materials=materials,
         glossary=glossary,
         literature=literature,
+        activities=activities,
+        task=task,
+        submission=submission,
     )
 
 
-async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepBrief:
+async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepCompleteOut:
     step = await editing.get_step(db, step_id)
     topic, _ = await get_visible_topic(db, user, step.topic_id)
     if step.kind not in SELF_COMPLETE_STEP_KINDS:
@@ -238,16 +317,24 @@ async def complete_step(db: AsyncSession, user: User, step_id: int) -> StepBrief
     if not next(i for i in infos if i.id == step.id).has_content:
         raise AppError(400, "STEP_EMPTY", "Bu bosqichda hali material yo'q")
 
-    row = await _get_or_create_progress(db, user.id, step.id)
-    if row.status != ProgressStatus.completed:
-        row.status = ProgressStatus.completed
-        row.completed_at = utcnow()
-    row.updated_at = utcnow()
+    now = utcnow()
+    row = await get_or_create_progress(db, user.id, step.id)
+    rewards = await reward(
+        db,
+        user,
+        XpReason.step_completed,
+        ref_type="step",
+        ref_id=step.id,
+        amount=rules.STEP_COMPLETED_XP,
+        now=now,
+    )
+    rewards += await mark_step_completed(db, user, row, topic.id, now)
     await db.commit()
-    return StepBrief(
+    return StepCompleteOut(
         id=step.id,
         kind=step.kind,
         order=step.order,
         has_content=True,
         status=ProgressStatus.completed,
+        rewards=rewards_out(rewards),
     )

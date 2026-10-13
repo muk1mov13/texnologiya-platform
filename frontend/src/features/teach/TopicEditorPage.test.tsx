@@ -101,12 +101,15 @@ test("fayl yuklash so'rovi to'g'ri bosqichga yuboriladi", async () => {
   expect(await screen.findByText(i18n.t('teach.materialUploaded'))).toBeInTheDocument()
 })
 
-test('tab almashtirish manzilga yoziladi; 2-bosqich tablari "tez kunda" deydi', async () => {
-  server.use(http.get('/api/teach/topics/10', () => HttpResponse.json(editorTopic())))
+test("tab almashtirish manzilga yoziladi; amaliyot tabida faoliyatlar ro'yxati chiqadi", async () => {
+  server.use(
+    http.get('/api/teach/topics/10', () => HttpResponse.json(editorTopic())),
+    http.get('/api/teach/steps/103/activities', () => HttpResponse.json([])),
+  )
   const { router } = renderRoute(<TopicEditorPage />, { path: PATH, url: '/teach/topics/10', user: teacherUser })
   await userEvent.click(await screen.findByRole('tab', { name: new RegExp(i18n.t('steps.practice')) }))
   expect(router.state.location.search).toBe('?tab=practice')
-  expect(screen.getByText(i18n.t('teach.comingSoon'))).toBeInTheDocument()
+  expect(await screen.findByText(i18n.t('activityEditor.empty'))).toBeInTheDocument()
 })
 
 test("mavzu ma'lumotlarini saqlash PATCH yuboradi", async () => {

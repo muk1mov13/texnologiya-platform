@@ -13,6 +13,7 @@ from app.core.jobs import InlineJobRunner, JobContext
 from app.core.middleware import install_request_id
 from app.core.ratelimit import InMemoryRateLimiter
 from app.core.storage import Storage
+from app.gamification.service import sync_badges
 from app.learning.materials import recover_interrupted_conversions
 
 
@@ -23,6 +24,8 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     # tashqi navbat runner uchun bu kerak emas (ishlar navbatda saqlanadi).
     if isinstance(app.state.jobs, InlineJobRunner):
         await recover_interrupted_conversions(app.state.sessionmaker)
+    async with app.state.sessionmaker() as session:
+        await sync_badges(session)
     yield
 
 

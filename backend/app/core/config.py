@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     media_root: str = "./media"
     media_accel_redirect: bool = False
     max_material_mb: int = 50
+    max_submission_mb: int = 20
     login_rate_limit: int = 10
     login_rate_window_seconds: int = 900
     soffice_path: str = "soffice"

@@ -5,7 +5,7 @@ from app.core.deps import DbSession
 from app.core.types import DbIdPath
 from app.learning import progress
 from app.learning.student_schemas import (
-    StepBrief,
+    StepCompleteOut,
     StepContentOut,
     SubjectCard,
     SubjectDetailOut,
@@ -35,6 +35,6 @@ async def get_step(step_id: DbIdPath, user: ActiveUser, db: DbSession) -> StepCo
     return await progress.step_content(db, user, step_id)
 
 
-@router.post("/steps/{step_id}/complete", response_model=StepBrief)
-async def complete_step(step_id: DbIdPath, user: ActiveUser, db: DbSession) -> StepBrief:
+@router.post("/steps/{step_id}/complete", response_model=StepCompleteOut)
+async def complete_step(step_id: DbIdPath, user: ActiveUser, db: DbSession) -> StepCompleteOut:
     return await progress.complete_step(db, user, step_id)

@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import APIRouter, Response
 
 from app.auth.deps import AdminUser
@@ -7,8 +5,6 @@ from app.core.deps import AppStorage, DbSession
 from app.core.types import DbIdPath
 from app.learning import editing
 from app.learning.schemas import SubjectAdminOut, SubjectCreate, SubjectUpdate, TeachersIn
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin/subjects", tags=["admin"])
 
@@ -38,11 +34,7 @@ async def delete_subject(
     subject_id: DbIdPath, admin: AdminUser, db: DbSession, storage: AppStorage
 ) -> Response:
     subject = await editing.get_subject(db, subject_id)
-    for path in await editing.delete_subject(db, subject):
-        try:
-            storage.delete(path)
-        except OSError:
-            logger.warning("Faylni o'chirib bo'lmadi: %s", path)
+    storage.delete_quietly(await editing.delete_subject(db, subject))
     return Response(status_code=204)
 
 

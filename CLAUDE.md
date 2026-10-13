@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the phase roadmap (phases 0–4, status, next step) is `docs/superpowers/roadmap.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
+A rebuild of the Bukhara State Pedagogical Institute's "Metodik ta'minot" learning platform (subject → topic → 7 steps; students, teachers, admins). The full design spec is `docs/superpowers/specs/2026-10-08-texnologiya-platform-design.md`; the phase roadmap (phases 0–4, status, next step) is `docs/superpowers/roadmap.md`; phase plans live in `docs/superpowers/plans/` (1A backend, 1B frontend, 2A backend, 2B frontend). Phase 1 (backend in `backend/`, React + Vite frontend in `frontend/`) is built. Phase 2 (assessment + gamification) has a mini-spec (`docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md`); its backend (2A) and frontend (2B) are built on `feat/phase-2-assessment`, but the Vitest and E2E tests for 2B were deliberately deferred and have not been run yet. The `deploy/` directory (Docker Compose, nginx, arq worker) described in the spec hasn't been created yet.
 
 Code comments, docstrings, user-facing error messages and docs are written in **Uzbek (Latin script)**. Keep new ones in Uzbek to match.
 
@@ -64,7 +64,20 @@ Local development needs no Docker, PostgreSQL or Redis. PPT/DOC → PDF conversi
 - `topic_items.py`: glossary and literature items.
 - `progress.py`, `content.py` and `resume.py`: the student-facing views, step completion and the "continue where you left off" feature.
 
-Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (unique on `topic_id, kind`). Only `lecture`/`presentation` steps accept files, and only lecture/presentation/glossary/literature can be self-completed in Phase 1. Steps are never locked. Topic progress counts only steps that have content.
+`app/assessment/` (phase 2) follows the same split:
+- `activities.py`: quiz, yes/no and crossword editing. An activity is saved whole: its items are replaced and the crossword grid is rebuilt by `crossword.py`, which holds pure, deterministic functions.
+- `attempts.py`: grading, plus completing `review`/`practice` steps.
+- `tasks.py` and `review.py`: submissions and grading.
+- `views.py` and `reports.py`: student and teacher views.
+
+Student-facing schemas live in `assessment/view_schemas.py` and never contain correct answers. `learning.student_schemas` imports them, and `assessment.schemas` imports `learning.student_schemas`. Keep that direction to avoid an import cycle.
+
+`app/gamification/` imports no other module:
+- `rules.py` holds the XP values and badge definitions as code.
+- `service.award()` writes an `xp_events` row inside a savepoint. The unique constraint makes it idempotent, so a repeated event gives no XP. It does not commit; the caller commits.
+- `sync_badges()` runs in the app lifespan and in the test `app` fixture.
+
+Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (unique on `topic_id, kind`). Only `lecture`/`presentation` steps accept files, and only lecture/presentation/glossary/literature can be self-completed. `review`/`practice` steps complete once every published activity has an attempt; a `task` step completes when the student submits. Steps are never locked. Topic progress counts only steps that have content.
 
 **New models** must be imported in `app/models_registry.py`. Alembic autogenerate and the test `create_all` both rely on that import. Constraint names come from `NAMING_CONVENTION` in `app/core/db.py`. Alembic runs with `render_as_batch` on SQLite and disables foreign keys during migrations (see `alembic/env.py`) so table rebuilds don't cascade-delete rows. `tests/test_migrations.py` checks that the migrations produce the same schema as the models, so always generate a migration when you change a model.
 
@@ -80,6 +93,7 @@ Every topic gets exactly one `Step` for each `StepKind`, in a fixed order (uniqu
 - **Routing:** route guards live in `src/app/guards.tsx`. `RequireAuth roles=[...]` sends pending users to `/pending` and users with the wrong role to `homePathFor(user)`. `RedirectIfAuthed` covers `/login` and `/register`.
 - **Data states:** pages render queries through `QueryState` (`src/components/ui/QueryState.tsx`): data first, then spinner, then `ErrorState` (retry only for 5xx/network errors).
 - **Errors:** every API error is an `ApiError` carrying the backend `code`. User-facing text comes from `errors.<CODE>` in i18n via `errorText()`. Mutations show a global error toast unless `meta: { silent: true }` is set; silent mutations render a `FormError` inline instead.
+- **Assessment (phase 2):** student hooks live in `src/api/assessment.ts`, teacher hooks in `src/api/teachAssessment.ts`. Mutations that return `rewards` call `announceRewards()` (`src/lib/rewards.ts`), which shows "+N XP" and new-badge toasts. UI lives in `features/student/assessment/` (activity players, crossword, task step) and `features/teach/assessment/` (activity editors, task form, zod schemas), plus the pages `ResultsPage`, `AttemptDetailPage`, `ReviewQueuePage`, `ReviewDetailPage` and `StatsPage`. Protected files (submissions) are downloaded with `useProtectedDownload` from `src/lib/download.ts`. `src/test/server.ts` has default empty handlers for `/api/me/dashboard` and `/api/teach/summary`.
 - **API types:** `src/api/types.ts` is hand-written and used by the code. `src/api/types.contract.ts` checks it against the generated `schema.gen.ts` at type level, so after a backend schema change run `npm run gen:api` and fix whatever `typecheck` reports. Never edit `schema.gen.ts` by hand.
 - **i18n:** never hard-code UI text. Add every key to both `src/i18n/uz.json` and `ru.json`; `i18n.test.ts` enforces this.
 - **Lint rule:** files exporting components must not export anything else (react-refresh). Put zod schemas in `schemas.ts` and helpers in `.ts` files.

@@ -47,7 +47,7 @@ test('useCompleteStep: natija darhol keshga yoziladi, bog\'liq so\'rovlar invali
 
   server.use(
     http.post('/api/steps/:id/complete', () =>
-      HttpResponse.json({ id: step.id, kind: step.kind, order: step.order, has_content: true, status: 'completed' }),
+      HttpResponse.json({ id: step.id, kind: step.kind, order: step.order, has_content: true, status: 'completed', rewards: { xp: 0, new_badges: [] } }),
     ),
   )
 
@@ -85,7 +85,7 @@ test('useCompleteStep: allaqachon tugatilgan bosqichda progress hisoblagichi qay
 
   server.use(
     http.post('/api/steps/:id/complete', () =>
-      HttpResponse.json({ id: step.id, kind: step.kind, order: step.order, has_content: true, status: 'completed' }),
+      HttpResponse.json({ id: step.id, kind: step.kind, order: step.order, has_content: true, status: 'completed', rewards: { xp: 0, new_badges: [] } }),
     ),
   )
 

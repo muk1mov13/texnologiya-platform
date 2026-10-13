@@ -7,6 +7,7 @@ from sqlalchemy import ColumnElement, delete, func, insert, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.assessment.models import Submission, Task
 from app.auth.models import Role, User
 from app.core.errors import AppError
 from app.learning.models import (
@@ -128,9 +129,21 @@ async def _material_paths(db: AsyncSession, *conditions: ColumnElement[bool]) ->
     return sorted({path for row in rows for path in row if path})
 
 
+async def _submission_paths(db: AsyncSession, *conditions: ColumnElement[bool]) -> list[str]:
+    rows = await db.scalars(
+        select(Submission.file)
+        .join(Task, Submission.task_id == Task.id)
+        .join(Step, Task.step_id == Step.id)
+        .join(Topic, Step.topic_id == Topic.id)
+        .where(Submission.file.is_not(None), *conditions)
+    )
+    return sorted({path for path in rows if path})
+
+
 async def delete_subject(db: AsyncSession, subject: Subject) -> list[str]:
     """Fanni o'chiradi va diskdan o'chirilishi kerak bo'lgan fayl yo'llarini qaytaradi."""
-    paths = await _material_paths(db, Topic.subject_id == subject.id)
+    condition = Topic.subject_id == subject.id
+    paths = await _material_paths(db, condition) + await _submission_paths(db, condition)
     await db.delete(subject)
     await db.commit()
     return paths
@@ -272,7 +285,8 @@ async def update_topic(db: AsyncSession, topic: Topic, data: TopicUpdate) -> Top
 
 
 async def delete_topic(db: AsyncSession, topic: Topic) -> list[str]:
-    paths = await _material_paths(db, Step.topic_id == topic.id)
+    condition = Step.topic_id == topic.id
+    paths = await _material_paths(db, condition) + await _submission_paths(db, condition)
     await db.delete(topic)
     await db.commit()
     return paths

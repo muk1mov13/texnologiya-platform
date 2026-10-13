@@ -165,7 +165,7 @@ async def test_concurrent_progress_creation_does_not_500(
 ) -> None:
     """Ikki parallel so'rov bir xil user+step uchun StepProgress yaratishga urinishi mumkin.
     `_progress_row`'ni birinchi chaqiruvda `None` qaytarib (go'yoki qator hali yo'q),
-    lekin qatorning allaqachon mavjud ekanligini simulyatsiya qilamiz: `_get_or_create_progress`
+    lekin qatorning allaqachon mavjud ekanligini simulyatsiya qilamiz: `get_or_create_progress`
     unique constraint xatosini ushlab, mavjud qatorni qayta o'qishi va 500 bermasligi kerak."""
     course = await build_course(client, db, settings)
     lecture = await step_of(db, course.topic1, StepKind.lecture)

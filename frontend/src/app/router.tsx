@@ -7,9 +7,14 @@ import { LoginPage } from '@/features/public/LoginPage'
 import { NotFoundPage } from '@/features/public/NotFoundPage'
 import { PendingPage } from '@/features/public/PendingPage'
 import { RegisterPage } from '@/features/public/RegisterPage'
+import { AttemptDetailPage } from '@/features/student/AttemptDetailPage'
 import { PlayerPage } from '@/features/student/PlayerPage'
+import { ResultsPage } from '@/features/student/ResultsPage'
 import { SubjectPage } from '@/features/student/SubjectPage'
 import { SubjectsPage } from '@/features/student/SubjectsPage'
+import { ReviewDetailPage } from '@/features/teach/ReviewDetailPage'
+import { ReviewQueuePage } from '@/features/teach/ReviewQueuePage'
+import { StatsPage } from '@/features/teach/StatsPage'
 import { TeachHomePage } from '@/features/teach/TeachHomePage'
 import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
@@ -48,11 +53,16 @@ export const routes: RouteObject[] = [
           { path: 'app/subjects/:slug', element: <SubjectPage /> },
           { path: 'app/topics/:topicId/:kind?', element: <PlayerPage /> },
           { path: 'app/profile', element: <ProfilePage /> },
+          { path: 'app/results', element: <ResultsPage /> },
+          { path: 'app/results/attempts/:attemptId', element: <AttemptDetailPage /> },
           {
             element: <RequireAuth roles={['teacher', 'admin']} />,
             children: [
               { path: 'teach', element: <TeachHomePage /> },
               { path: 'teach/topics/:topicId', element: <TopicEditorPage /> },
+              { path: 'teach/review', element: <ReviewQueuePage /> },
+              { path: 'teach/review/:submissionId', element: <ReviewDetailPage /> },
+              { path: 'teach/stats', element: <StatsPage /> },
             ],
           },
           {

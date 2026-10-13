@@ -6,13 +6,17 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
-import { FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
+import { ACTIVITY_KINDS, FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
+import { ActivitiesTab } from './assessment/ActivitiesTab'
+import { TaskTab } from './assessment/TaskTab'
 import { GlossaryTab } from './GlossaryTab'
 import { LiteratureTab } from './LiteratureTab'
 import { MaterialsTab } from './MaterialsTab'
 import { TopicDetailsForm } from './TopicDetailsForm'
 
-function itemCount(topic: TopicEditor, kind: StepKind): number {
+/** Tab yonidagi son; faoliyat bosqichlari uchun `null` (ro'yxat alohida so'rov bilan keladi). */
+function itemCount(topic: TopicEditor, kind: StepKind): number | null {
+  if (ACTIVITY_KINDS.has(kind)) return null
   if (kind === 'glossary') return topic.glossary.length
   if (kind === 'literature') return topic.literature.length
   return topic.steps.find((step) => step.kind === kind)?.materials.length ?? 0
@@ -50,7 +54,7 @@ export function TopicEditorPage() {
                     return {
                       id: kind,
                       label: `${STEP_ICONS[kind]} ${t(`steps.${kind}`)}`,
-                      badge: count > 0 ? <span className="rounded-full bg-slate-100 px-1.5 text-xs">{count}</span> : undefined,
+                      badge: count ? <span className="rounded-full bg-slate-100 px-1.5 text-xs">{count}</span> : undefined,
                     }
                   })}
                 />
@@ -63,6 +67,10 @@ export function TopicEditorPage() {
                     <GlossaryTab topicId={data.id} items={data.glossary} />
                   ) : tab === 'literature' ? (
                     <LiteratureTab topicId={data.id} items={data.literature} />
+                  ) : ACTIVITY_KINDS.has(tab) && step ? (
+                    <ActivitiesTab key={step.id} topicId={data.id} stepId={step.id} />
+                  ) : tab === 'task' && step ? (
+                    <TaskTab topicId={data.id} stepId={step.id} />
                   ) : (
                     <EmptyState icon="🛠️" title={t('teach.comingSoon')} text={t('teach.comingSoonText')} />
                   )}

@@ -60,7 +60,7 @@ test('glossariy bosqichini "Tugatdim" bilan yakunlash', async () => {
   server.use(
     http.post('/api/steps/105/complete', () => {
       completed = true
-      return HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' })
+      return HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed', rewards: { xp: 0, new_badges: [] } })
     }),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
@@ -85,7 +85,7 @@ test('"Tugatdim" so\'rov kutilayotganda qayta bosilsa ikkinchi so\'rov yuborilma
       posts += 1
       await held
       completed = true
-      return HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' })
+      return HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed', rewards: { xp: 0, new_badges: [] } })
     }),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })
@@ -216,7 +216,7 @@ test('bosqichni tugatgandan keyin fon qayta so\'rovi 500 bo\'lsa ham kontent ko\
   mockTopic(() => false)
   server.use(
     http.post('/api/steps/105/complete', () =>
-      HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed' }),
+      HttpResponse.json({ id: 105, kind: 'glossary', order: 6, has_content: true, status: 'completed', rewards: { xp: 0, new_badges: [] } }),
     ),
   )
   renderRoute(<PlayerPage />, { path: PATH, url: '/app/topics/10/glossary', user: studentUser })

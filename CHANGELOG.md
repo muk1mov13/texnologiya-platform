@@ -4,7 +4,410 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
-## 2026-10-11 — Kichik tozalash
+## 2026-10-13 — 2B frontend davomi
+
+### `db8b1c5` — Krossvord: "begona" so'z to'g'ri ko'rsatiladi
+- Muammo: `build_layout` eng uzun so'zni to'rga birinchi qo'yadi. Boshqalar bilan umumiy harfi yo'q so'z eng uzun bo'lsa (masalan, `OLMA`, `ANOR`, `BUXGU`), `CROSSWORD_UNPLACEABLE` xatosi to'g'ri so'zlarga (`OLMA`, `ANOR`) tushardi.
+- `backend/app/assessment/crossword.py`: yangi sof funksiya `_detached`:
+  - so'zlarni umumiy kataklar bo'yicha guruhlaydi (`Oʻ`/`Gʻ` bitta katak);
+  - guruh bittadan ko'p bo'lsa, asosiy guruhni tanlaydi: eng ko'p so'z, so'ng eng ko'p katak, so'ng eng kichik indeks;
+  - qolgan so'zlar darhol `UnplaceableError` bilan qaytariladi.
+  
+  Endi misol `BUXGU` ni qaytaradi.
+- So'zlar bitta guruhda bo'lsa, algoritm avvalgidek ishlaydi. Yetti misolda o'zgarishdan oldingi va keyingi natijalar taqqoslandi: faqat yuqoridagi misol o'zgardi, barcha muvaffaqiyatli layout'lar va mavjud `ABC, DEF, ABX → [1]` holati bir xil qoldi. API, xato kodi va frontend o'zgarmadi.
+- Spec, 6-bo'lim: "Joylashtirish"ga 0-qadam yozildi.
+- Tekshiruv: `ruff format --check`, `ruff check`, `mypy app` toza. Testlar lokal ishga tushirilmadi.
+- Loyiha oxirida `tests/test_crossword.py` ga qo'shiladigan holatlar:
+  - begona so'z eng uzun bo'lsa, faqat u qaytariladi;
+  - teng guruhlarda tanlov deterministik (`AB, BA, XY, YX → [2, 3]`);
+  - `Oʻ` umumiy katak hisoblanadi.
+
+### `1d3eb85` — Qo'lda tekshiruvdan keyingi a11y tuzatishlari
+- 2-bosqichning "Tayyor" mezoni lokal toza bazada (port 8001) brauzerda qo'lda tekshirildi. Talaba test yechib XP oldi, o'qituvchi vazifani baholadi, talaba ballni ko'rdi; uchalasi ishladi. Repoga o'zgarish kiritilmagan, faqat quyidagi ikki kichik kamchilik tuzatildi.
+- `ProgressRing`: ixtiyoriy `decorative` prop qo'shildi (`Spinner` dagi kabi). U halqani ekran o'quvchidan yashiradi. `AttemptResult` uni ishlatadi: ball yonidagi matnda yozilgan, halqaning "Bajarildi: 1 / 2" yozuvi esa ball uchun noto'g'ri edi.
+- `TaskStep`: vazifa nomi `<h2>` dan `<h3>` ga o'tkazildi. Bosqich sarlavhasi `<h2>`, faoliyat sarlavhasi ham `<h3>`.
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+- Qayd: krossvordda joylashmagan so'zlar uzun so'z atrofida qurilgan to'rga nisbatan aniqlanadi. Shuning uchun "begona" so'z uzunroq bo'lsa, qizil bilan to'g'ri so'zlar belgilanadi. Bu backend algoritmining xatti-harakati, ma'lumot buzilmaydi. `db8b1c5` da hal qilindi.
+
+### `73a20c9` — 2B Task 12: yakuniy tekshiruv va hujjatlar
+- Yakuniy tekshiruv: `npm run lint`, `typecheck` va `build` o'tdi. `npm run gen:api` `schema.gen.ts` da farq bermadi.
+- Spec 8-bo'limiga amalga oshirishdagi farqlar yozildi:
+  - `/app` soddalashtirildi: fanlar `/app` da qoldi, XP/seriya/nishonlar bloki shu sahifada;
+  - menyu tarkibi;
+  - krossvord preview "To'r ko'rinishi" tugmasi orqali ochiladi;
+  - "Natijalarim" har faoliyatning eng yaxshi natijasini ko'rsatadi.
+- `CLAUDE.md`: loyiha holati (2B qurilgan, testlari qoldirilgan) va frontend arxitekturasiga "Assessment" bandi qo'shildi.
+- Roadmap: 2B bajarildi. Keyingi qadamlar: push va PR #4 tavsifini yangilash, "Tayyor" mezonini qo'lda tekshirish, qoldirilgan testlar, merge.
+- Push qilinmadi va PR #4 yangilanmadi: bu foydalanuvchi qaroriga qoldirildi.
+
+### `980f10d` — 2B Task 11: o'qituvchi statistikasi
+- Yangi `features/teach/StatsPage.tsx` (`/teach/stats`):
+  - fan tanlanadi (sukut bo'yicha birinchisi), tanlov manzilda saqlanadi (`?subject=`);
+  - jadval ustunlari: mavzu, boshlagan, tugatgan, o'rtacha natija ("—" yoki "78%"), tekshirilmagan javoblar;
+  - telefonda jadval faqat o'z konteynerida suriladi, sahifada gorizontal scroll paydo bo'lmaydi;
+  - o'qituvchiga fan biriktirilmagan bo'lsa, bo'sh holat ko'rsatiladi.
+- Menyu: o'qituvchi va admin uchun "Statistika" havolasi.
+- i18n: `nav.stats`, yangi `stats.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `10d6c7c` — 2B Task 10: o'qituvchi uchun tekshirish navbati
+- Yangi `features/teach/ReviewQueuePage.tsx` (`/teach/review`):
+  - "Tekshirilmagan", "Qaytarilgan" va "Baholangan" tablari; tanlangan tab manzilda saqlanadi (`?status=`);
+  - har javob kartasida: talaba, vazifa, fan · mavzu, sana va "Kechikkan" belgisi; karta tafsilotlar sahifasiga olib boradi.
+- Yangi `ReviewDetailPage.tsx` (`/teach/review/:submissionId`):
+  - topshiriq matni va mezoni, talaba javobi va faylini yuklab olish;
+  - tekshirilmagan javob uchun forma: ball (0–maks) va izoh, "Baholash" va "Qayta ishlashga qaytarish" tugmalari (qaytarishda izoh majburiy);
+  - boshqa holatda natija (ball, izoh) ko'rsatiladi. Muvaffaqiyatdan keyin toast chiqadi va navbatga qaytiladi;
+  - ID noto'g'ri bo'lsa, "Sahifa topilmadi" chiqadi.
+- `TeachHomePage`: tekshirilmagan javoblar bo'lsa, "Tekshirilishi kerak: N ta javob" kartasi navbatga olib boradi.
+- Menyu (`paths.ts`):
+  - o'qituvchi va admin uchun "Tekshirish" havolasi; "Mavzu muharriri" endi faqat `/teach` da faol ko'rinadi, aks holda u navbat sahifasida ham ajralib turardi;
+  - talaba uchun "Natijalarim" havolasi (Task 7 da qo'shilmay qolgan edi);
+  - "Statistika" havolasi Task 11 da, sahifa bilan birga qo'shiladi.
+- `lib/download.ts`: `useProtectedDownload` hook'i (yuklanish holati va xato toast'i). `TaskStep` ham shu hook'ka o'tkazildi.
+- `test/server.ts`: `/api/teach/summary` uchun standart nol javob (dashboard mock'i kabi).
+- i18n: `nav.results`, `nav.review`, yangi `review.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `66f73b0` — 2B Task 9: o'qituvchi uchun vazifa formasi
+- Yangi `features/teach/assessment/TaskTab.tsx` (mavzu muharririning `task` tabi):
+  - bitta forma ham yaratadi, ham tahrirlaydi: nom, topshiriq matni, javob turi (matn / fayl / ikkalasi), maksimal ball (1–100), muddat (ixtiyoriy) va baholash mezoni;
+  - saqlanganda toast chiqadi. Xatolar (masalan, `MAX_SCORE_BELOW_GRADED`) forma ostida ko'rsatiladi;
+  - "Vazifani o'chirish" tasdiqlash oynasi bilan ishlaydi; oynada talabalar javoblari ham o'chirilishi ogohlantiriladi.
+- `schemas.ts` ga `taskSchema` qo'shildi.
+- Yangi `lib/datetime.ts`: `toLocalInput` / `fromLocalInput`. `datetime-local` maydoni mahalliy vaqtda ko'rsatiladi, backend'ga esa ISO UTC yuboriladi.
+- `TopicEditorPage.test.tsx`: Task 8 dan beri yiqilayotgan "tez kunda" testi amaliyot tabidagi faoliyatlar ro'yxatini tekshiradigan qilib moslandi. Endi barcha 7 tab ishlaydi.
+- i18n: yangi `taskEdit.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `0d3bc4f` — 2B Task 8: o'qituvchi uchun faoliyat muharrirlari
+- Yangi `features/teach/assessment/schemas.ts`: test, ha/yo'q va krossvord uchun zod sxemalari. Cheklovlar backend `assessment/schemas.py` bilan bir xil.
+- Yangi `ActivitiesTab.tsx` (mavzu muharririning `review`/`practice` tablari, oldingi "Tez orada" o'rniga):
+  - har faoliyat: tur, nom, elementlar soni, "Nashr qilingan"/"Qoralama", "Nashr qilish"/"Yashirish", ↑/↓ tartib, tahrirlash va o'chirish (tasdiqlash oynasi bilan);
+  - krossvordda saqlangan to'rni harflari bilan ko'rsatuvchi "To'r ko'rinishi" tugmasi bor;
+  - pastda "+ Test", "+ Ha/yo'q", "+ Krossvord" tugmalari.
+- Yangi `ActivityEditor.tsx` (`react-hook-form` + `useFieldArray`), yaratish va tahrirlashda inline ochiladi:
+  - test: savol, 4 variant va to'g'ri variant (radio), izoh;
+  - ha/yo'q: bayonot, to'g'ri javob, izoh;
+  - krossvord: so'z va ta'rif;
+  - elementlarni qo'shish, o'chirish va ↑/↓ ko'chirish; bo'sh izoh `null` bo'lib yuboriladi;
+  - backend xatosi forma ostida chiqadi. `CROSSWORD_UNPLACEABLE` / `CROSSWORD_INVALID_WORD` dagi so'zlar mos maydonda ham belgilanadi.
+- `TopicEditorPage`: faoliyat tablarida son belgisi ko'rsatilmaydi.
+- i18n: yangi `activityEditor.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `9e46bbf` — 2B Task 7: "Natijalarim" va urinish tahlili
+- Yangi `features/student/ResultsPage.tsx` (`/app/results`): fan → mavzu bo'yicha guruhlangan natijalar.
+  - Faoliyatlar: nom, tur, urinishlar soni, oxirgi sana, eng yaxshi foiz va "Tahlil" havolasi (oxirgi urinishga).
+  - Vazifalar: holat ("Tekshirilmoqda" / "Qaytarildi" / "Baholandi: ball / maks"), "Kechikkan" belgisi va o'qituvchi izohi.
+  - Rejadagi jadval o'rniga kartali ro'yxat ishlatildi, shunda 375px kenglikda gorizontal scroll bo'lmaydi.
+  - Natija bo'lmasa, bo'sh holat ko'rsatiladi.
+- Yangi `features/student/AttemptDetailPage.tsx` (`/app/results/attempts/:attemptId`): faoliyat nomi, turi va sanasi, so'ng `AttemptResult` (qayta urinish tugmasisiz). ID noto'g'ri bo'lsa, abadiy spinner o'rniga "Sahifa topilmadi" chiqadi.
+- `router.tsx`: ikkita yangi marshrut. Menyudagi "Natijalarim" havolasi bu task'da qo'shilmay qolgan edi; u `10d6c7c` (Task 10) da qo'shildi.
+- i18n: yangi `results.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `f31dd94` — 2B Task 6: vazifa bosqichi (talaba)
+- Yangi `lib/download.ts`: `downloadProtected(url, filename)` himoyalangan faylni Bearer token bilan yuklab, brauzerda saqlaydi.
+- Yangi `features/student/assessment/TaskStep.tsx`:
+  - topshiriq kartasi: sarlavha, tavsif, maksimal ball, muddat (o'tgan bo'lsa "Muddat o'tgan"), baholash mezoni;
+  - javob holati: "Tekshirilmoqda", "Qaytarildi" yoki "Baholandi: ball / maks", "Kechikkan" belgisi, o'qituvchi izohi va yuborilgan faylni yuklab olish;
+  - forma (baholanmaguncha ko'rinadi): vazifa turiga qarab matn va/yoki fayl (20 MB gacha), "Yuborish" / "Qayta yuborish"; xato forma ichida, muvaffaqiyatda toast. Qayta yuborishda yangi fayl tanlanmasa, eski fayl saqlanib qoladi (backend xatti-harakati).
+- `StepContent.tsx`: `task` bosqichida `TaskStep` va "Keyingi bosqich" havolasi.
+- i18n: yangi `task.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
+
+### `9480c38` — 2B Task 5: krossvord pleyeri
+- Yangi `features/student/assessment/crossword.ts` — sof yordamchilar: `cellKey`, `wordCells`, `cellOwners`, `answersFromCells`, `normalizeCellInput` (Oʻ / Gʻ bitta katak, apostrof turlari birlashtiriladi), `mayTakeApostrophe`.
+- Yangi `CrosswordPlayer.tsx`:
+  - katakli to'r: ustunlar `minmax(0, 2.5rem)`, shuning uchun 375px kenglikda gorizontal scroll yo'q; so'z boshida raqam, faol so'z ajratib ko'rsatiladi;
+  - harf yozilgach fokus keyingi katakka o'tadi. "O"/"G" dan keyin apostrof kutiladi, boshqa harf yozilsa u keyingi katakka o'tadi. Bo'sh katakda Backspace oldingisiga qaytadi;
+  - kesishgan katakni qayta bosish yo'nalishni almashtiradi;
+  - "Gorizontal" va "Vertikal" savollar ro'yxati, bosilsa o'sha so'z faollashadi;
+  - har katakda `aria-label` (so'z raqami, yo'nalish, harf o'rni).
+- `ActivityList`: krossvord uchun "Tez orada" o'rniga pleyer ulandi.
+- i18n: yangi `crossword.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `1768bc9` — 2B Task 4: pleyerda test va ha/yo'q faoliyatlari, natija ekrani
+- Yangi `features/student/assessment/`:
+  - `ActivityList`: faoliyat kartalari (tur, urinishlar soni, eng yaxshi foiz, "Boshlash" / "Qayta urinish"), yechish va natija o'rtasida o'tish;
+  - `ChoicePlayer`: test savollari bitta-bitta (radio variantlar, oldingi/keyingi), ha/yo'q bayonotlari ro'yxati (`aria-pressed` tugmalar); javobsiz savol bo'lsa tasdiqlash oynasi chiqadi;
+  - `AttemptResult`: ball va foiz (`ProgressRing`), har element bo'yicha ✓/✗, talaba javobi, to'g'ri javob va izoh; Task 7 da ham ishlatiladi.
+- `StepContent.tsx`: `review`/`practice` bosqichlarida faoliyatlar ro'yxati va "Keyingi bosqich" havolasi. `lib/steps.ts` ga `ACTIVITY_KINDS` qo'shildi.
+- Krossvord tanlansa, hozircha "Tez orada" holati ko'rinadi (pleyer Task 5 da).
+- i18n: yangi `activity.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `6d12350` — 2B Task 3: bosh sahifada XP, seriya va nishonlar
+- Yangi `features/student/DashboardStats.tsx` (`useDashboard`):
+  - uchta karta: seriya ("bugun o'qidingizmi" izohi bilan), XP (eng uzun seriya izohi bilan), olingan nishonlar soni;
+  - 10 ta nishon to'ri: olinmagani xira va kulrang, nomi va ta'rifi tilga qarab;
+  - ma'lumot yuklanmasa blok ko'rinmaydi, fanlar ro'yxatiga ta'sir qilmaydi.
+- `SubjectsPage.tsx`: blok salomlashuvdan keyin, faqat talaba rolida ko'rsatiladi.
+- i18n: yangi `dashboard.*` bo'limi (uz/ru).
+- `test/server.ts`: `/api/me/dashboard` uchun standart bo'sh mock (kelishilgan minimal mock yangilash, yangi test yo'q).
+- Rejadan farq: menyudagi "Natijalarim" havolasi Task 7 ga ko'chirildi. Sahifa o'sha task'da yaratiladi, hozir qo'shilsa havola 404 ga olib borardi.
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `e2e3f98` — 2B Task 2: "Tugatdim" mukofotlari va toast animatsiyasi
+- `api/student.ts`:
+  - `useCompleteStep` javobi `StepCompleteResult` (rewards bilan) deb tiplandi;
+  - muvaffaqiyatda `announceRewards()` "+N XP" va yangi nishon toast'larini chiqaradi;
+  - `['me']` prefiksi invalidatsiya qilinadi (davom ettirish, bosh sahifa, natijalar). `assessmentKeys` import qilinmadi, chunki import tsikl hosil qilardi.
+- `components/ui/Toast.tsx` va `index.css`: toast'lar `toast-pop` animatsiyasi bilan chiqadi, faqat `motion-safe`, ya'ni harakatni kamaytirish sozlamasida animatsiyasiz.
+- Mavjud testlar: `PlayerPage.test.tsx` va `api/student.test.tsx` dagi 5 ta "Tugatdim" mock'iga `rewards` maydoni qo'shildi (kelishilgan minimal mock yangilash, yangi test yo'q).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
+### `0c80037` — 2B Task 1: API tiplari, hook'lar va xato matnlari
+- `frontend/src/api/types.ts`: 2A'ning barcha javob va so'rov tiplari qo'shildi (mukofotlar, urinish, vazifa javobi, bosh sahifa, natijalar, o'qituvchi faoliyatlari, vazifa, navbat, statistika). `types.contract.ts` da 23 ta javob va 8 ta so'rov tekshiruvi qo'shildi.
+- Yangi `api/assessment.ts` (talaba): `useSubmitAttempt`, `useSubmitTask`, `useDashboard`, `useResults`, `useAttemptDetail`.
+- Yangi `api/teachAssessment.ts` (o'qituvchi): faoliyatlar CRUD, nashr qilish va tartiblash; vazifa; navbat, baholash va qaytarish; summary va statistika. `api/teach.ts` dagi `invalidateStudentCaches` eksport qilindi.
+- Yangi `lib/rewards.ts` (`announceRewards`) va `rewards.*` i18n kalitlari. Ular rejada Task 2 da edi, `assessment.ts` build'dan o'tishi uchun shu task'ga ko'chirildi.
+- `errors` i18n'ga 2A'ning 16 ta xato kodi qo'shildi (uz/ru).
+- Backend: `RewardsOut` va `ResultItem` dagi sukut qiymatlari olib tashlandi. Ular doim to'liq qaytariladi, lekin sukut qiymat tufayli OpenAPI'da ixtiyoriy chiqib, ichma-ich kontrakt tekshiruvini buzayotgan edi. `schema.gen.ts` qayta generatsiya qilindi.
+- Tekshiruv: lint, typecheck, build, ruff va mypy. Testlar foydalanuvchi qaroriga ko'ra lokal ishga tushirilmadi.
+
+### `f123da4` — 2B (frontend) implementatsiya rejasi
+- Yangi `docs/superpowers/plans/2026-10-12-phase-2b-frontend.md`: 13 ta task (0–12):
+  - API tiplari va hook'lar;
+  - mukofot toast'lari;
+  - bosh sahifada XP, seriya va nishonlar;
+  - test va ha/yo'q pleyeri, krossvord pleyeri;
+  - vazifa bosqichi;
+  - natijalarim;
+  - o'qituvchi muharrirlari va vazifa formasi;
+  - tekshirish navbati va statistika;
+  - hujjatlar.
+- Foydalanuvchi qarorlari:
+  - testlar yozilmaydi va lokal ishga tushirilmaydi, faqat lint, typecheck va build;
+  - CI'da buzilgan mavjud testlarning mock'lari minimal yangilanadi;
+  - E2E baholash oqimi loyiha oxiriga qoldi.
+- Spec 8-bo'limidan soddalashtirish: `/app` alohida bosh sahifaga ko'chirilmaydi, mavjud sahifa XP, seriya va nishonlar bilan to'ldiriladi.
+
+### `1c6f5bd` — Audit 8-band: kichik tuzatishlar (7-band esa keyinga qoldirildi)
+- **Foydalanuvchi qarorlari:**
+  - yangi testlar (audit 7-band) loyiha yakunlangandan keyin yoziladi;
+  - hozircha testlar umuman ishga tushirilmaydi, faqat statik tekshiruvlar (ruff, mypy, `tsc`) qoladi;
+  - XP, seriya va nishonlar faqat talabalarga beriladi.
+- XP faqat talabalarga:
+  - yangi `learning.progress.reward(db, user, ...)` talaba bo'lmasa bo'sh mukofot qaytaradi;
+  - "Tugatdim", urinish, vazifa yuborish, mavzu mukofoti va baholash shu orqali o'tadi (baholashda javob muallifining roli olinadi);
+  - `mark_step_completed` va `topic_completion_rewards` endi `user` qabul qiladi;
+  - `gamification` boshqa modullarni import qilmaydi.
+- `GradeIn.score`: sun'iy ±1 000 000 chegarasi olib tashlandi, oraliq servisda tekshiriladi (`SCORE_OUT_OF_RANGE`).
+- `GET /api/teach/submissions` ga `limit` (1–200, sukut 50) va `offset` qo'shildi. Javob shakli o'zgarmadi.
+- `PUT /api/teach/steps/{id}/task`: maksimal ballni baholangan javoblardagi eng katta baldan pastga tushirib bo'lmaydi — yangi 409 `MAX_SCORE_BELOW_GRADED` (`details.max_graded_score`).
+- Mini-spec yangilandi: xato kodlari jadvali, 5-bo'lim (kimga XP beriladi, seriya qarori) va 7-bo'lim (navbat parametrlari, vazifa cheklovi).
+- `frontend/src/api/schema.gen.ts` qayta generatsiya qilindi.
+- Tekshiruv: ruff, mypy va `tsc` toza. Testlar foydalanuvchi qaroriga ko'ra lokal ishga tushirilmadi. Ular push'dan keyin CI'da avtomatik ishlaydi.
+
+### `5c0c393` — Audit 6-band: takrorlangan bloklar umumiy funksiyalarga ajratildi (xatti-harakat o'zgarmadi)
+- `Storage.delete_quietly(paths)` diskdan o'chirish va xatoni logga yozishni bir joyga to'pladi. Avval bu sikl 5 joyda takrorlangan edi: `learning/teach_router.py`, `admin_router.py`, `materials.py`, `assessment/teach_router.py`, `tasks.py`.
+- `progress.mark_step_completed(db, row, topic_id, now)` bosqichni tugatish va mavzu mukofotini bir joyga to'pladi. Avval 3 joyda edi: `complete_step`, `attempts.refresh_activity_step`, `tasks.submit`.
+- `progress.visible_topic_or(db, user, topic_id, error)` — "mavzu ko'rinmasa ichki obyekt uchun 404" bloki. Avval `attempts.py` va `tasks.py` da takrorlangan edi.
+- `attempts.refresh_activity_step` endi o'z so'rovi o'rniga `views.attempt_stats()` ni ishlatadi. `reports.py` dagi ikkita foiz so'rovi boshqa shakldagi natija qaytaradi (oxirgi urinish, talabalar bo'yicha guruhlash), shuning uchun ataylab qoldirildi.
+- 4 ta modulda keraksiz bo'lib qolgan `logger` olib tashlandi.
+- Test: `test_delete_quietly_skips_missing_and_logs_os_errors`. Jami 219 test yashil.
+
+### `818d7e2` — Audit 5-band: `award()` faqat takroriy hodisani yutadi
+- `gamification/service.py`:
+  - `IntegrityError` dan keyin hodisa bazada haqiqatan bormi, tekshiriladi (`_event_exists`). Bor bo'lsa, bu takror va 0 XP qaytadi. Yo'q bo'lsa, masalan mavjud bo'lmagan foydalanuvchi (FK xatosi), xato ko'tariladi.
+  - Nishon berishda ham shunday (`_badge_owned`).
+  - SQLite unique xatosida constraint nomini bermaydi, shuning uchun xato matni o'rniga bazaning o'zi tekshiriladi: usul ikkala bazada bir xil ishlaydi.
+- Test: `test_award_does_not_hide_other_integrity_errors`. Avval xato jimgina yutilardi. Jami 218 test yashil.
+- CHANGELOG yozuvi hook tufayli kod commit'iga tushmay qoldi va alohida commit qilindi.
+
+### `84e219b` — Audit 3-band: `sync_badges` parallel ishga tushishga chidamli
+- `gamification/service.py`:
+  - `sync_badges()` yangi nishonni savepoint ichida qo'shadi. Boshqa server jarayoni uni shu orada qo'shgan bo'lsa (`badges.code` unique to'qnashuvi), nishon qayta o'qiladi va yangilanadi, jarayon qulamaydi.
+  - `_existing_badges()` va `_apply_rule()` ajratildi.
+- Migratsiya qilinmagan bazada ilova avvalgidek ochiq xato bilan to'xtaydi. Bu ataylab qoldirildi.
+- Test: `test_sync_badges_survives_concurrent_insert`. Jami 217 test yashil.
+
+### `870c7bb` — Audit 2-band: parallel yaratishda 500 o'rniga davom etish
+- `assessment/tasks.py`:
+  - `submit()` birinchi javobni savepoint ichida yaratadi. Agar parallel so'rov (masalan, tugma ikki marta bosilgan) uni allaqachon yaratgan bo'lsa, mavjud javob qayta o'qiladi va so'rov tahrir sifatida davom etadi; baholangan bo'lsa `SUBMISSION_GRADED` (409) qaytadi.
+  - `upsert_task()` ham shu uslubda ishlaydi.
+  - Avval ikkala holat ham 500 qaytarardi (testda takrorlandi).
+- Yangi xato kodi kerak bo'lmadi. `_find_submission()` va `_ensure_editable()` ajratildi.
+- Testlar: `tests/test_tasks.py` ga 3 ta yangi test (parallel birinchi yuborish, baholangan javobga parallel yuborish, parallel vazifa yaratish). Jami 216 test yashil.
+- **Audit 4-band, foydalanuvchi qarori:** o'qituvchi baho qo'yganda talabaning seriyasi oshaveradi. Bu hozirgi xatti-harakat va spec 5-bo'limidagi "XP hodisasi bo'lgan kun faol" qoidasiga mos, kod o'zgarmadi.
+
+### Texnik audit (faqat o'qish)
+- Kod o'zgartirilmadi.
+- Kritik xavflar:
+  - 2A Postgres'da tekshirilmagan edi (quyida yopildi);
+  - `sync_badges` bir nechta worker ishga tushganda to'qnashishi mumkin;
+  - vazifaga ikki marta yuborish 500 qaytaradi;
+  - o'qituvchi baho qo'yganda talaba seriyasi oshadi.
+- Zaif joylar: takrorlangan bloklar (bosqichni tugatish, fayl o'chirish, eng yaxshi foiz so'rovi), `award()` barcha `IntegrityError` larni yutadi, navbatda sahifalash yo'q, testi yo'q chegara holatlari.
+- 9 bandlik tuzatish rejasi tuzildi. 1-band (push va CI) bajarildi.
+
+### GitHub: PR #3 (avval qayd etilmagan) va draft PR #4
+- **PR #3** (`878e50d`, 2026-10-11, foydalanuvchi tomonidan) `feat/phase-2-assessment` dan `main` ga faqat 5 ta hujjat commit'ini qo'shgan: `263c327`, `125b8f5`, `7f3c56a`, `b5c3925`, `b467a71`. Bu yozuv kechikib qayd etildi.
+- 2A'ning 26 ta commit'i push qilindi (`b467a71..98f91f0`). CI faqat `main` push'ida va PR'da ishlagani uchun **draft PR #4** ochildi: https://github.com/muk1mov13/texnologiya-platform/pull/4 ("Phase 2A: assessment and gamification backend"). Merge qilinmagan.
+- CI run `38243313479` — uchala job yashil:
+  - `backend`: ruff, mypy, SQLite'da 213 test; PostgreSQL'da migratsiyalar, `alembic check` (drift yo'q) va 213 test;
+  - `frontend`;
+  - `e2e`.
+
+## 2026-10-11 — 2-bosqich mini-spec'i va 2A rejasi
+
+### `7e615ae` — 2A Task 11: API tiplari, hujjatlar va yakuniy tekshiruv (2A yopildi)
+- `frontend/src/api/schema.gen.ts` `npm run gen:api` bilan qayta generatsiya qilindi.
+- `types.ts` ga talaba ko'rinishi tiplari qo'shildi: `ActivityView`, `TaskView`, `SubmissionView`, `StudentLayout` va boshqalar. `StepContent` ga `activities`, `task`, `submission` qo'shildi, ular `types.contract.ts` da tekshiriladi. `test/fixtures.ts` yangilandi. UI o'zgarmadi.
+- `CLAUDE.md`: 2-bosqich holati, `app/assessment/` va `app/gamification/` arxitekturasi (import yo'nalishi, `award()` idempotentligi, `sync_badges`) va bosqichni tugatish qoidalari yozildi.
+- `docs/superpowers/roadmap.md`: "Hozirgi holat"da 2A bajarildi, "Keyingi aniq qadam" — 2B frontend rejasi.
+- Yakuniy tekshiruv:
+  - backend: ruff, mypy, 213 pytest;
+  - frontend: lint, typecheck, 178 Vitest, build;
+  - E2E: Playwright 1/1, yangi migratsiyalar bilan toza bazada.
+
+### `d2a6c06` — 2A Task 10: bosh sahifa, natijalarim va o'qituvchi statistikasi
+- `GET /api/me/dashboard`: `xp_total`, `streak` (`current`, `longest`, `active_today`), 10 ta nishon (`awarded_at` yoki `null`) va `continue_step`. Seriya kechadan eski bo'lsa `current` 0 ko'rsatiladi. Yangi `gamification.service.profile()` va `DashboardOut`.
+- `GET /api/me/results`: fan va mavzu bo'yicha har faoliyatning eng yaxshi foizi, urinishlar soni va oxirgi urinishi, hamda vazifa javoblari (holat, ball, izoh, `is_late`).
+- `GET /api/me/attempts/{id}`: urinish tahlili, faqat egasiga (`ATTEMPT_NOT_FOUND`).
+- `GET /api/teach/stats?subject_id=`: mavzular bo'yicha boshlagan va tugatgan talabalar soni, o'rtacha eng yaxshi foiz va tekshirilmagan javoblar. Faqat talabalar hisobga olinadi. Biriktirilmagan o'qituvchi `NOT_SUBJECT_TEACHER` oladi.
+- Yangi `assessment/reports.py`.
+- Testlar: `tests/test_reports.py` (5 ta). Jami 213 test yashil.
+
+### `6ad0405` — 2A Task 9: tekshirish navbati, baholash va qaytarish
+- Yangi endpoint'lar (`/api/teach`, o'qituvchi faqat biriktirilgan fanlar bo'yicha, admin hammasi bo'yicha):
+  - `GET /submissions?status=&subject_id=` — navbat, sukut bo'yicha `submitted`, eng eskisi birinchi, ko'pi bilan 200 ta;
+  - `GET /submissions/{id}` va `/file`;
+  - `POST /submissions/{id}/grade` — `graded`. Ball 0..max oralig'idan tashqarida bo'lsa `SCORE_OUT_OF_RANGE`. Talabaga `task_graded` XP beriladi (30 × ball/max);
+  - `POST /submissions/{id}/return` — `returned`, izoh majburiy;
+  - `GET /summary` — `pending_submissions`.
+- Baholash va qaytarish faqat `submitted` holatidan mumkin, aks holda `SUBMISSION_NOT_SUBMITTED` (409). Biriktirilmagan o'qituvchi javobni so'rasa 404 oladi.
+- SQLAlchemy 2.1 da `Row.tuple()` eskirgan, shuning uchun qatorlar to'g'ridan-to'g'ri ochiladi. `Select`/`Row` annotatsiyalari yangi generik ko'rinishda (`Select[A, B, ...]`) yozildi.
+- Yangi fayllar: `assessment/review.py`, `assessment/review_router.py`.
+- Testlar: `tests/test_review.py` (4 ta). Jami 208 test yashil.
+
+### `55d7667` — 2A Task 8: vazifalar va javob yuborish
+- O'qituvchi (`/api/teach`):
+  - `GET` va `PUT /steps/{id}/task` — bosqichda bitta vazifa, faqat `task` bosqichida (`TASK_WRONG_STEP`);
+  - `DELETE /tasks/{id}` — javoblar va ularning fayllari bilan.
+- Talaba:
+  - `PUT /api/tasks/{id}/submission` (multipart: matn va/yoki fayl). Turi bo'yicha qoidalar: `SUBMISSION_FIELD_NOT_ALLOWED`, `SUBMISSION_EMPTY`. Baholangan javob tahrirlansa `SUBMISSION_GRADED` (409).
+  - Javob yuborilganda bosqich tugaydi va birinchi marta `task_submitted` (20 XP) beriladi.
+  - Kechikish `is_late` bilan belgilanadi.
+  - `GET /api/submissions/{id}/file` — faqat javob egasiga.
+- Fayl: 20 MB gacha, pdf/doc/docx/ppt/pptx/jpg/png, magic bytes bilan tekshiriladi. Almashtirilgan eski fayl diskdan o'chiriladi.
+- `learning/editing.py`: fan yoki mavzu o'chirilganda javob fayllari ham diskdan o'chiriladi (`_submission_paths`).
+- Yangi `assessment/tasks.py`.
+- Testlar: `tests/test_tasks.py` (8 ta). Jami 204 test yashil.
+
+### `79ff6b8` — 2A Task 7: urinishlar, bosqichni tugatish va XP
+- Yangi `POST /api/activities/{id}/attempts`:
+  - javoblar serverda tekshiriladi, natijada ball va to'liq tahlil qaytadi (to'g'ri javob va izoh bilan); natija urinish ichiga nusxa qilib saqlanadi;
+  - noto'g'ri formatdagi javoblar `ATTEMPT_INVALID_ANSWERS` oladi;
+  - nashr qilinmagan yoki yashirin mavzudagi faoliyat `ACTIVITY_NOT_FOUND` (404) oladi;
+  - krossvord javoblari normallashtirib solishtiriladi.
+- Bosqich nashr qilingan har bir faoliyatga urinish bo'lganda tugaydi. `best_score` — eng yaxshi foizlar o'rtachasi.
+- XP:
+  - `activity_completed` (10–20) va `activity_perfect` (+10) har faoliyat uchun bir marta beriladi;
+  - "Tugatdim" uchun `step_completed` (10);
+  - mavzuning barcha kontentli bosqichlari tugaganda `topic_completed` (50).
+- `POST /api/steps/{id}/complete` javobi `StepCompleteOut` bo'ldi (`rewards` qo'shildi, eski maydonlar saqlangan).
+- `progress._get_or_create_progress` nomi `get_or_create_progress` ga o'zgardi va yangi `topic_completion_rewards()` qo'shildi.
+- Yangi fayllar: `assessment/attempts.py`, `assessment/router.py`.
+- Testlar: `tests/test_attempts.py` (7 ta). Jami 196 test yashil.
+
+### `2994808` — 2A Task 6: talaba bosqich ko'rinishi (javobsiz) va kontent hisobi
+- `learning/content.py`: `review`/`practice` bosqichi nashr qilingan faoliyati bo'lsa, `task` bosqichi vazifasi bo'lsa "kontentli" hisoblanadi va mavzu progressiga kiradi.
+- `GET /api/steps/{id}` javobiga yangi maydonlar qo'shildi:
+  - `activities` — faqat nashr qilinganlar, to'g'ri javobsiz: test variantlari, ha/yo'q bayonotlari, krossvordda faqat koordinata, uzunlik va savol, hamda talabaning eng yaxshi foizi va urinishlar soni;
+  - `task` va `submission`.
+- Yangi `assessment/views.py` (`activity_views`, `task_view`, `submission_view`, `is_late`, `ATTEMPT_PERCENT`). `assessment/view_schemas.py` talaba sxemalari bilan to'ldirildi.
+- Testlar: `tests/test_student_activities.py` (3 ta). Ulardan biri javobda `correct_index`, `answer`, `cells`, `word`, `word_id` va `explanation` kalitlari yo'qligini rekursiv tekshiradi. Jami 189 test yashil.
+
+### `d420690` — 2A Task 5: o'qituvchi uchun faoliyatlar API
+- Yangi endpoint'lar (`/api/teach`, faqat fanga biriktirilgan o'qituvchi yoki admin):
+  - `GET` va `POST /steps/{id}/activities`;
+  - `PUT /steps/{id}/activities/order`;
+  - `PUT`, `PATCH` (nashr qilish) va `DELETE /activities/{id}`.
+- Faoliyat butunligicha saqlanadi: elementlar to'liq almashtiriladi, krossvord to'ri serverda qayta quriladi. So'rov tanasi `type` bo'yicha discriminator bilan tekshiriladi (test / ha-yo'q / krossvord).
+- Faoliyat faqat `review` yoki `practice` bosqichiga qo'shiladi (`ACTIVITY_WRONG_STEP`). Krossvord xatolari:
+  - `CROSSWORD_INVALID_WORD`;
+  - `CROSSWORD_UNPLACEABLE` (joylashmagan so'zlar bilan);
+  - `ACTIVITY_INVALID_ITEMS` (takrorlangan so'z, uzunlik, turni o'zgartirish).
+- Yangi fayllar: `assessment/schemas.py`, `view_schemas.py`, `items.py`, `activities.py`, `teach_router.py`. `tests/factories.py` ga faoliyat yordamchilari qo'shildi.
+- Testlar: `tests/test_teach_activities.py` (8 ta). Jami 186 test yashil.
+
+### `d229654` — 2A Task 4: baholash modellari va umumiy fayl yordamchilari
+- Yangi `app/assessment/models.py`:
+  - jadvallar `activities` (krossvordda `layout` JSON), `quiz_questions`, `yesno_items`, `crossword_words`, `attempts` (`result` — har element bo'yicha natija nusxasi), `tasks` (`step_id` unique) va `submissions` ((task, user) unique, `submitted_at`);
+  - enum'lar `ActivityType`, `TaskType`, `SubmissionStatus`;
+  - `ACTIVITY_STEP_KINDS` (review, practice).
+- Yangi `app/core/files.py`:
+  - `signature_matches()` — magic bytes tekshiruvi `learning/materials.py` dan ko'chirildi, jpg/jpeg/png imzolari qo'shildi;
+  - `file_response()` — himoyalangan faylni beradi (prod'da X-Accel-Redirect).
+- `Settings.max_submission_mb = 20`. `.env.example` ga qo'shilmadi, chunki u yerda `MAX_MATERIAL_MB` ham yo'q va sukut qiymatlari koddan olinadi.
+- Migratsiya `19d9e2025f03_assessment_tables`: 7 jadval va indekslar. Generatsiyadan keyin `ruff format` bilan formatlandi.
+- Testlar: `tests/test_files.py` (6 holat). Jami 178 test yashil.
+
+### `33f878b` — 2A Task 3: krossvord algoritmi
+- Yangi `app/assessment/crossword.py` (sof funksiyalar, baza bilan ishlamaydi):
+  - `normalize_word()` so'zni katta harfli kataklarga bo'ladi. Oʻ va Gʻ bitta katak, apostrof turlari (`'`, `ʻ`, `ʼ`, `’`, `‘`, `` ` ``) birlashtiriladi, harf bo'lmagan belgi bo'lsa xato beradi.
+  - `build_layout()` deterministik "ochko'z" algoritm. Uzun so'z birinchi joylashadi, tanlash tartibi: ko'p kesishma, kichik maydon, koordinata. Yon tomondan tegish taqiqlanadi. Joylashmagan so'zlar `UnplaceableError` bilan qaytadi. Raqamlash `(row, col)` bo'yicha.
+  - `layout_to_json()` va `word_matches()`.
+- Testlar: `tests/test_crossword.py` (13 ta). Ular aniq to'r koordinatalarini, to'rning to'g'riligini (ortiqcha harf qatori yo'qligi), deterministiklikni, joylashmaydigan so'zni va javobni normallashtirishni tekshiradi. Jami 172 test yashil.
+- CHANGELOG yozuvi hook tufayli kod commit'iga tushmay qoldi va alohida commit qilindi.
+
+### `cc875f6` — 2A Task 2: XP berish, seriya va nishonlar
+- `app/gamification/service.py`:
+  - `award()` XP hodisasini savepoint ichida yozadi. Unique to'qnashuvda hech narsa o'zgarmaydi, shuning uchun XP ikki marta berilmaydi.
+  - Seriya Toshkent kuni bo'yicha yangilanadi (doimiy UTC+5, `tzdata` kerak emas). 0 XP'lik hodisa seriyaga ta'sir qilmaydi.
+  - Nishon shartlari `xp_events` sonlari va joriy seriyadan tekshiriladi.
+  - `award()` commit qilmaydi. Yangi `Rewards`, `rewards_out()`, `xp_total()`.
+- `app/gamification/schemas.py`: `BadgeBrief`, `RewardsOut`, `BadgeOut`, `StreakOut`, `ProfileOut`.
+- Testlar: takroriy hodisa, nishon bir marta berilishi, ketma-ket kunlar, Toshkent kun chegarasi (UTC 18:59 / 19:00), uzilish, 0 XP, mavzu nishonlari. Jami 159 test yashil.
+
+### `9e9666c` — 2A Task 1: gamifikatsiya modellari va nishonlar
+- Yangi `app/gamification/` moduli:
+  - `models.py` — `xp_events` ((user, reason, ref_type, ref_id) unique), `streaks`, `badges`, `user_badges`;
+  - `rules.py` — `XpReason`, XP qiymatlari, yarmi yuqoriga yaxlitlash (`round_half_up`), 10 ta nishon ta'rifi (`BADGES`);
+  - `service.py` — `sync_badges()`: nishonlarni bazaga idempotent yozadi.
+- `sync_badges` ilova lifespan'ida va testlardagi `app` fixture'ida chaqiriladi.
+- Migratsiya `c82b084aa586_gamification_tables`.
+- Testlar: `tests/test_gamification.py` (XP yaxlitlash, sinxronizatsiya idempotentligi). Jami 152 test yashil.
+
+### `0e631a6` — 2A (backend) implementatsiya rejasi
+- Yangi `docs/superpowers/plans/2026-10-11-phase-2a-backend.md`: 12 ta task (0–11), TDD bilan:
+  - gamifikatsiya modellari va `award()`;
+  - krossvord algoritmi;
+  - baholash modellari;
+  - o'qituvchi faoliyat muharriri;
+  - talaba bosqich ko'rinishi;
+  - urinishlar;
+  - vazifalar;
+  - tekshirish navbati;
+  - bosh sahifa, natijalar va statistika;
+  - API tiplari.
+- Mini-spec'ga 6 ta aniqlik kiritildi:
+  - format xatolari `VALIDATION_ERROR` bilan qaytadi;
+  - yangi `GET /teach/steps/{id}/task`;
+  - bosh sahifada `continue` → `continue_step`;
+  - uzilgan seriya 0 deb ko'rsatiladi;
+  - biriktirilmagan o'qituvchiga javob 404 bilan qaytadi;
+  - XP testi takroriy chaqiruv orqali tekshiriladi.
+
+### `3880fb3` — 2-bosqich mini-spec'i
+- Yangi `docs/superpowers/specs/2026-10-11-phase-2-assessment-design.md` (baholash va gamifikatsiya). Brainstorming'da hal qilingan qarorlar:
+  - reja 2A (backend) va 2B (frontend) ga bo'linadi;
+  - `review`/`practice` bosqichida bir nechta faoliyat bo'lishi mumkin, bosqich hammasi yakunlanganda tugaydi;
+  - urinishdan keyin to'liq tahlil ko'rsatiladi;
+  - har talabada vazifaga bitta javob, o'qituvchi uni qaytara oladi;
+  - muddat o'tsa javob "kechikkan" belgisi bilan qabul qilinadi.
+- Gamifikatsiya: XP jadvali kodda, seriya Toshkent kuni bo'yicha, 10 ta nishon.
+- Krossvord uchun deterministik ochko'z algoritm tanlandi.
+- Asosiy spec'dagi modellarga soddalashtirishlar kiritildi, API, frontend sahifalari, xato kodlari va testlar ro'yxati yozildi.
+
+### `feat/phase-2-assessment` GitHub'ga push qilindi
+- Branch `origin/feat/phase-2-assessment` ga upstream bilan push qilindi (`b467a71` gacha). PR hali ochilmagan.
 
 ### `b5c3925` — `.gitignore`: Playwright MCP papkasi
 - `.gitignore`ga `.playwright-mcp/` qo'shildi: Playwright MCP vositasi yaratadigan vaqtinchalik fayllar repoga tushmaydi.
