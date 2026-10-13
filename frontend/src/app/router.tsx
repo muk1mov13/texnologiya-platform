@@ -12,6 +12,7 @@ import { PlayerPage } from '@/features/student/PlayerPage'
 import { ResultsPage } from '@/features/student/ResultsPage'
 import { SubjectPage } from '@/features/student/SubjectPage'
 import { SubjectsPage } from '@/features/student/SubjectsPage'
+import { TutorPage } from '@/features/student/TutorPage'
 import { ReviewDetailPage } from '@/features/teach/ReviewDetailPage'
 import { ReviewQueuePage } from '@/features/teach/ReviewQueuePage'
 import { StatsPage } from '@/features/teach/StatsPage'
@@ -55,6 +56,7 @@ export const routes: RouteObject[] = [
           { path: 'app/profile', element: <ProfilePage /> },
           { path: 'app/results', element: <ResultsPage /> },
           { path: 'app/results/attempts/:attemptId', element: <AttemptDetailPage /> },
+          { path: 'app/tutor', element: <TutorPage /> },
           {
             element: <RequireAuth roles={['teacher', 'admin']} />,
             children: [

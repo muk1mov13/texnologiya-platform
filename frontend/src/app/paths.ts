@@ -17,6 +17,7 @@ export function navLinksFor(role: Role): NavItem[] {
   const items: NavItem[] = [{ to: '/app', label: 'nav.subjects', end: true }]
   // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.
   if (role === 'student') items.push({ to: '/app/results', label: 'nav.results' })
+  items.push({ to: '/app/tutor', label: 'nav.tutor' })
   if (role === 'teacher' || role === 'admin') {
     items.push(
       { to: '/teach', label: 'nav.teach', end: true },

@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 3: `/app/tutor` sahifasi
+- Yangi `features/student/TutorPage.tsx`:
+  - chapda suhbatlar ro'yxati (sana, tanlangani belgilangan), "Yangi suhbat" va o'chirish (tasdiqlash oynasi bilan);
+  - o'ngda tanlangan suhbat davomi (mavzu konteksti saqlanadi) yoki yangi umumiy suhbat;
+  - AI o'chiq bo'lsa "AI repetitor hozircha o'chirilgan" holati.
+- Marshrut `app/tutor`; nav'da barcha rollar uchun "AI repetitor" havolasi.
+- i18n: `nav.tutor`, `nav.adminAi` (8-task uchun oldindan).
+- Tekshiruv: lint, typecheck, build o'tdi; mavjud nav testlari faqat ma'lum havolalar borligini tekshiradi — yangi havola ularni buzmaydi.
+
 ### 3B Task 2: pleyerda repetitor
 - Yangi `features/student/tutor/TutorDock.tsx`:
   - keng ekranda (≥1024px) pleyerning o'ng ustunidagi sticky panel;

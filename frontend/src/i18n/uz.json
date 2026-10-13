@@ -14,7 +14,9 @@
     "login": "Kirish",
     "register": "Ro'yxatdan o'tish",
     "cabinet": "Kabinet",
-    "language": "Interfeys tili"
+    "language": "Interfeys tili",
+    "tutor": "AI repetitor",
+    "adminAi": "AI sozlamalari"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": { "text": "© {{year}} Buxoro davlat pedagogika instituti · Texnologik ta'lim" },
