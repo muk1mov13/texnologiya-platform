@@ -6,6 +6,29 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `b1d039c` — 3A Task 2: AI modellari, `Vector` tipi va migratsiya
+- `core/types.py`: yangi `Vector(dim)` tipi:
+  - PostgreSQL'da pgvector `vector(dim)`, SQLite'da float32 BLOB;
+  - noto'g'ri o'lcham yozishda rad etiladi.
+- Yangi `app/ai/models.py`:
+  - jadvallar: `doc_chunks`, `ai_conversations`, `ai_messages`, `ai_drafts`, `ai_reports`, `ai_usage`, `ai_settings`;
+  - enum'lar: `ChunkSource`, `MessageRole`/`MessageMode`, `DraftKind`/`DraftStatus`;
+  - PostgreSQL uchun `vector` kengaytmasi va HNSW indeksi DDL hodisalari orqali (SQLite'da hech narsa qilmaydi).
+- `assessment/models.py`: `AiCheckStatus` enum'i va `submissions` ga `ai_status` (sukut `none`), `ai_score`, `ai_feedback` ustunlari.
+- `models_registry.py` ga `app.ai.models`.
+- `alembic/env.py`: HNSW indeksi taqqoslashdan chiqarildi, `Vector` ustun turi taqqoslanmaydi (pgvector reflektsiyasi farq bermasligi uchun).
+- Migratsiya `60d2171f1205_ai_tables`:
+  - autogenerate `Vector` ni o'lchamsiz yozgan edi, `Vector(dim=768)` ga tuzatildi;
+  - PostgreSQL uchun kengaytma va HNSW indeksi qo'lda qo'shildi (downgrade'da olib tashlanadi).
+- CI: PostgreSQL image'i `postgres:16` → `pgvector/pgvector:pg16`.
+- Rejadan farq: `ai_usage` dagi sana ustuni `date` emas, `day` deb nomlandi, chunki `date: Mapped[date]` sinf ichida `datetime.date` tipini soya qiladi. Reja hujjatidagi murojaatlar ham yangilandi (`5130fb2`).
+- Tekshiruv:
+  - `alembic upgrade head` → `downgrade -1` → `upgrade head` lokal SQLite'da o'tdi;
+  - `alembic check` farqsiz;
+  - `create_all` yangi jadvallar bilan ishladi;
+  - `Vector` 768 o'lchamda o'zgarmasdan qaytdi, noto'g'ri o'lcham rad etildi;
+  - ruff va mypy toza. PostgreSQL yo'li lokal tekshirilmadi (CI'da tekshiriladi).
+
 ### `7075f69` — 3A Task 1: AI bog'liqliklari va sozlamalari
 - Yangi bog'liqliklar (`uv add`): `google-genai` 2.30.0, `pgvector` 0.5.1, `numpy` 2.5.4, `python-docx` 1.2.0. Yon ta'sir: `google-genai` talabi bilan `websockets` 17.2 → 16.1.1 ga tushdi (loyiha websocket ishlatmaydi).
 - `Settings` ga AI maydonlari qo'shildi:
