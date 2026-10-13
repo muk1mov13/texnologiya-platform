@@ -6,6 +6,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### `73a20c9` — 2B Task 12: yakuniy tekshiruv va hujjatlar
+- Yakuniy tekshiruv: `npm run lint`, `typecheck` va `build` o'tdi. `npm run gen:api` `schema.gen.ts` da farq bermadi.
+- Spec 8-bo'limiga amalga oshirishdagi farqlar yozildi:
+  - `/app` soddalashtirildi: fanlar `/app` da qoldi, XP/seriya/nishonlar bloki shu sahifada;
+  - menyu tarkibi;
+  - krossvord preview "To'r ko'rinishi" tugmasi orqali ochiladi;
+  - "Natijalarim" har faoliyatning eng yaxshi natijasini ko'rsatadi.
+- `CLAUDE.md`: loyiha holati (2B qurilgan, testlari qoldirilgan) va frontend arxitekturasiga "Assessment" bandi qo'shildi.
+- Roadmap: 2B bajarildi. Keyingi qadamlar: push va PR #4 tavsifini yangilash, "Tayyor" mezonini qo'lda tekshirish, qoldirilgan testlar, merge.
+- Push qilinmadi va PR #4 yangilanmadi: bu foydalanuvchi qaroriga qoldirildi.
+
 ### `980f10d` — 2B Task 11: o'qituvchi statistikasi
 - Yangi `features/teach/StatsPage.tsx` (`/teach/stats`):
   - fan tanlanadi (sukut bo'yicha birinchisi), tanlov manzilda saqlanadi (`?subject=`);
