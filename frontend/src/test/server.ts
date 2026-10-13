@@ -9,7 +9,11 @@ const emptyDashboard: Dashboard = {
   continue_step: null,
 }
 
-// Har test o'ziga kerakli handler'larni `server.use(...)` bilan qo'shadi. Talaba bosh sahifasidagi
-// XP/seriya bloki (`/api/me/dashboard`) uchun standart bo'sh javob shu yerda: unga tegishli
-// bo'lmagan testlar alohida handler yozishi shart emas.
-export const server = setupServer(http.get('/api/me/dashboard', () => HttpResponse.json(emptyDashboard)))
+// Har test o'ziga kerakli handler'larni `server.use(...)` bilan qo'shadi. Bosh sahifalardagi
+// yordamchi bloklar — talabaning XP/seriyasi (`/api/me/dashboard`) va o'qituvchining
+// tekshirilmagan javoblar soni (`/api/teach/summary`) — uchun standart bo'sh javoblar shu yerda:
+// ularga tegishli bo'lmagan testlar alohida handler yozishi shart emas.
+export const server = setupServer(
+  http.get('/api/me/dashboard', () => HttpResponse.json(emptyDashboard)),
+  http.get('/api/teach/summary', () => HttpResponse.json({ pending_submissions: 0 })),
+)

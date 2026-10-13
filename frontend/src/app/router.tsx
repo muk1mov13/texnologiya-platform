@@ -12,6 +12,8 @@ import { PlayerPage } from '@/features/student/PlayerPage'
 import { ResultsPage } from '@/features/student/ResultsPage'
 import { SubjectPage } from '@/features/student/SubjectPage'
 import { SubjectsPage } from '@/features/student/SubjectsPage'
+import { ReviewDetailPage } from '@/features/teach/ReviewDetailPage'
+import { ReviewQueuePage } from '@/features/teach/ReviewQueuePage'
 import { TeachHomePage } from '@/features/teach/TeachHomePage'
 import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
@@ -57,6 +59,8 @@ export const routes: RouteObject[] = [
             children: [
               { path: 'teach', element: <TeachHomePage /> },
               { path: 'teach/topics/:topicId', element: <TopicEditorPage /> },
+              { path: 'teach/review', element: <ReviewQueuePage /> },
+              { path: 'teach/review/:submissionId', element: <ReviewDetailPage /> },
             ],
           },
           {

@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'rea
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { useCreateTopic, useDeleteTopic, useReorderTopics, useTeachSubjects } from '@/api/teach'
+import { useTeachSummary } from '@/api/teachAssessment'
 import type { TeachSubject, TeachTopicBrief } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -21,6 +22,7 @@ export function TeachHomePage() {
       {(data) => (
         <div className="flex flex-col gap-6">
           <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
+          <PendingReviews />
           {data.length === 0 ? (
             <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
           ) : (
@@ -29,6 +31,29 @@ export function TeachHomePage() {
         </div>
       )}
     </QueryState>
+  )
+}
+
+/** Tekshirilmagan javoblar bo'lsa, navbatga havola; bo'lmasa (yoki yuklanmasa) hech narsa. */
+function PendingReviews() {
+  const { t } = useTranslation()
+  const summary = useTeachSummary()
+  const count = summary.data?.pending_submissions ?? 0
+  if (count === 0) return null
+  return (
+    <Link
+      to="/teach/review"
+      className={cx(
+        'flex items-center gap-3 rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 font-semibold text-amber-900 transition hover:border-amber-300',
+        FOCUS_RING,
+      )}
+    >
+      <span className="text-xl" aria-hidden="true">
+        📝
+      </span>
+      <span className="flex-1">{t('review.pending', { count })}</span>
+      <span aria-hidden="true">→</span>
+    </Link>
   )
 }
 

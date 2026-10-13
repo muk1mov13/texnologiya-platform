@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSubmitTask } from '@/api/assessment'
-import { errorText } from '@/api/errors'
 import type { SubmissionView, TaskView } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -9,7 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Field, Input, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
 import { pushToast } from '@/components/ui/toast-store'
-import { downloadProtected } from '@/lib/download'
+import { useProtectedDownload } from '@/lib/download'
 
 const ACCEPT = '.pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png'
 
@@ -58,19 +57,8 @@ export function TaskStep({ topicId, stepId, task, submission }: TaskStepProps) {
 
 function SubmissionStatusCard({ submission, maxScore }: { submission: SubmissionView; maxScore: number }) {
   const { t } = useTranslation()
-  const [downloading, setDownloading] = useState(false)
+  const { download, pending: downloading } = useProtectedDownload()
   const { file_url: fileUrl, original_name: fileName } = submission
-
-  const download = async (url: string, filename: string) => {
-    setDownloading(true)
-    try {
-      await downloadProtected(url, filename)
-    } catch (error) {
-      pushToast('error', errorText(error))
-    } finally {
-      setDownloading(false)
-    }
-  }
 
   return (
     <Card className="flex flex-col gap-3 p-5">
