@@ -4,6 +4,18 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-13 — 2B frontend davomi
+
+### `f31dd94` — 2B Task 6: vazifa bosqichi (talaba)
+- Yangi `lib/download.ts`: `downloadProtected(url, filename)` himoyalangan faylni Bearer token bilan yuklab, brauzerda saqlaydi.
+- Yangi `features/student/assessment/TaskStep.tsx`:
+  - topshiriq kartasi: sarlavha, tavsif, maksimal ball, muddat (o'tgan bo'lsa "Muddat o'tgan"), baholash mezoni;
+  - javob holati: "Tekshirilmoqda", "Qaytarildi" yoki "Baholandi: ball / maks", "Kechikkan" belgisi, o'qituvchi izohi va yuborilgan faylni yuklab olish;
+  - forma (baholanmaguncha ko'rinadi): vazifa turiga qarab matn va/yoki fayl (20 MB gacha), "Yuborish" / "Qayta yuborish"; xato forma ichida, muvaffaqiyatda toast. Qayta yuborishda yangi fayl tanlanmasa, eski fayl saqlanib qoladi (backend xatti-harakati).
+- `StepContent.tsx`: `task` bosqichida `TaskStep` va "Keyingi bosqich" havolasi.
+- i18n: yangi `task.*` bo'limi (uz/ru).
+- Tekshiruv: lint, typecheck va build. Testlar lokal ishga tushirilmadi.
+
 ## 2026-10-12 — Texnik audit va 2A'ni CI'da tekshirish
 
 ### `9480c38` — 2B Task 5: krossvord pleyeri
