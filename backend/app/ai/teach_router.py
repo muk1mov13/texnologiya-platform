@@ -4,8 +4,8 @@ from fastapi import APIRouter, Query
 from sqlalchemy import select
 
 from app.ai import drafts, grading
-from app.ai.models import AiDraft
-from app.ai.schemas import DraftCreateIn, DraftOut, DraftUpdateIn
+from app.ai.models import AiDraft, AiReport
+from app.ai.schemas import AiReportOut, DraftCreateIn, DraftOut, DraftUpdateIn
 from app.ai.services import require_ai
 from app.assessment import review
 from app.auth.deps import StaffUser
@@ -72,3 +72,17 @@ async def rerun_ai_check(
     await require_ai(db, ai)
     await grading.queue_check(db, ai, jobs, submission_id)
     return {"ai_status": "pending"}
+
+
+@router.get("/ai/reports", response_model=list[AiReportOut])
+async def reports(subject_id: TopicQuery, user: StaffUser, db: DbSession) -> list[AiReport]:
+    """O'qituvchi tilidagi oxirgi 4 ta haftalik tahlil."""
+    await editing.ensure_can_edit_subject(db, user, subject_id)
+    return list(
+        await db.scalars(
+            select(AiReport)
+            .where(AiReport.subject_id == subject_id, AiReport.locale == user.locale.value)
+            .order_by(AiReport.period_start.desc())
+            .limit(4)
+        )
+    )

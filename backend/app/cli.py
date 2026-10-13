@@ -59,6 +59,21 @@ def _resolve_password(args: argparse.Namespace) -> str:
     return first
 
 
+def _weekly_report(args: argparse.Namespace) -> int:
+    from datetime import date
+
+    from app.ai.reports import weekly_report
+
+    try:
+        week_start = date.fromisoformat(args.week_start) if args.week_start else None
+        count = asyncio.run(weekly_report(get_settings(), week_start, args.subject))
+    except ValueError as exc:
+        print(f"Xato: {exc}", file=sys.stderr)
+        return 1
+    print(f"Hisobotlar: {count}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -70,7 +85,13 @@ def main(argv: list[str] | None = None) -> int:
         "--password", default=None, help="Berilmasa, ADMIN_PASSWORD yoki interaktiv so'rov"
     )
     create.add_argument("--name", default="Administrator")
+    report = commands.add_parser("weekly-report", help="Fanlar bo'yicha haftalik AI tahlili")
+    report.add_argument("--week-start", default=None, help="YYYY-MM-DD (dushanba)")
+    report.add_argument("--subject", type=int, default=None)
     args = parser.parse_args(argv)
+
+    if args.command == "weekly-report":
+        return _weekly_report(args)
 
     try:
         email = _resolve_email(args)

@@ -6,6 +6,21 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3A Task 11: haftalik AI tahlili (CLI)
+- `assessment/reports.py`: hisob ruxsatsiz `topic_stats(db, subject_id)` ga ajratildi; `teach_stats` endi ruxsat + `topic_stats` (xatti-harakati o'zgarmadi).
+- Yangi `app/ai/reports.py`:
+  - `week_bounds` — sukut o'tgan dushanba–yakshanba (Tashkent), dushanba bo'lmagan sana rad etiladi;
+  - `subject_week_stats` — mavzular statistikasi, hafta urinishlari, eng qiyin 5 savol (kamida 3 javob), yuborilgan/baholangan vazifalar, 7 kun faolsiz talabalar;
+  - `weekly_report` — fanga biriktirilgan o'qituvchilarning har tili uchun hisobot (`ai_reports`, upsert); faollik bo'lmasa LLM chaqirilmaydi.
+- CLI: `uv run python -m app.cli weekly-report [--week-start YYYY-MM-DD] [--subject ID]`; AI sozlanmagan bo'lsa xato matni va exit 1.
+- `GET /api/teach/ai/reports?subject_id=` — o'qituvchi tilidagi oxirgi 4 ta hisobot.
+- Tekshiruv (smoke, `fake`):
+  - hafta chegaralari to'g'ri, dushanba bo'lmagan sana rad etildi;
+  - faolliksiz hafta → tayyor matn, faollik qo'shilgach shu qator yangilandi (1 ta hisobot, `ru`);
+  - `hardest` to'g'ri hisoblandi; endpoint 200;
+  - lokal `.env` bilan CLI tushunarli xato berdi.
+  - ruff va mypy toza.
+
 ### 3A Task 10: vazifa javobini AI bilan tekshirish
 - Yangi `app/ai/grading.py`:
   - `extract_text` — textarea, PDF, DOCX; boshqa turlar `unsupported`; matn 20 000 belgida kesiladi;

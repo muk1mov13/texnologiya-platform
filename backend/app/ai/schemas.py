@@ -1,6 +1,6 @@
 """AI API sxemalari."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -86,3 +86,14 @@ class DraftOut(BaseModel):
     approved_ref: dict[str, Any] | None
     created_at: datetime
     updated_at: datetime
+
+
+class AiReportOut(BaseModel):
+    id: int
+    subject_id: int
+    locale: str
+    period_start: date
+    period_end: date
+    stats: dict[str, Any]
+    content: str
+    created_at: datetime

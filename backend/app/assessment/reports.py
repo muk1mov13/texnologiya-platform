@@ -141,8 +141,12 @@ async def attempt_detail(db: AsyncSession, user: User, attempt_id: int) -> Attem
 
 
 async def teach_stats(db: AsyncSession, user: User, subject_id: int) -> list[TopicStatsOut]:
-    """Mavzular bo'yicha statistika (faqat talabalar hisobga olinadi)."""
     await editing.ensure_can_edit_subject(db, user, subject_id)
+    return await topic_stats(db, subject_id)
+
+
+async def topic_stats(db: AsyncSession, subject_id: int) -> list[TopicStatsOut]:
+    """Mavzular bo'yicha statistika (faqat talabalar). Ruxsat tekshirilmaydi."""
     topics = list(
         await db.scalars(
             select(Topic).where(Topic.subject_id == subject_id).order_by(Topic.order, Topic.id)
