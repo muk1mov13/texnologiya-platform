@@ -5,14 +5,28 @@ from alembic import context
 from sqlalchemy.engine import Connection
 
 import app.models_registry  # noqa: F401
+from app.ai.models import HNSW_INDEX
 from app.core.config import get_settings
 from app.core.db import Base, make_engine
+from app.core.types import Vector
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
+
+
+def _include_object(obj, name, type_, reflected, compare_to):  # type: ignore[no-untyped-def]
+    # HNSW indeksi modelda yo'q (faqat PostgreSQL'da DDL bilan yaratiladi) — taqqoslanmaydi.
+    return not (type_ == "index" and name == HNSW_INDEX)
+
+
+def _compare_type(context, inspected_column, metadata_column, inspected_type, metadata_type):  # type: ignore[no-untyped-def]  # noqa: E501
+    # pgvector ustuni reflektsiyada boshqa tip bo'lib ko'rinadi; o'lcham migratsiyada qat'iy.
+    if isinstance(metadata_type, Vector):
+        return False
+    return None  # qolgan ustunlar uchun Alembic'ning standart taqqoslashi
 
 
 def database_url() -> str:
@@ -26,7 +40,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         render_as_batch=url.startswith("sqlite"),
-        compare_type=True,
+        compare_type=_compare_type,
+        include_object=_include_object,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -55,7 +70,8 @@ def do_run_migrations(connection: Connection) -> None:
         connection=connection,
         target_metadata=target_metadata,
         render_as_batch=is_sqlite,
-        compare_type=True,
+        compare_type=_compare_type,
+        include_object=_include_object,
     )
     with context.begin_transaction():
         context.run_migrations()

@@ -28,6 +28,16 @@ class SubmissionStatus(StrEnum):
     returned = "returned"
 
 
+class AiCheckStatus(StrEnum):
+    """Javobni AI bilan tekshirish holati (3-bosqich). Faqat o'qituvchiga ko'rinadi."""
+
+    none = "none"
+    pending = "pending"
+    done = "done"
+    unsupported = "unsupported"
+    failed = "failed"
+
+
 ACTIVITY_STEP_KINDS = frozenset({StepKind.review, StepKind.practice})
 
 
@@ -134,3 +144,8 @@ class Submission(IdMixin, CreatedAtMixin, Base):
         BigIntPK, ForeignKey("users.id", ondelete="SET NULL")
     )
     graded_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    ai_status: Mapped[AiCheckStatus] = mapped_column(
+        str_enum(AiCheckStatus), default=AiCheckStatus.none, server_default="none"
+    )
+    ai_score: Mapped[int | None] = mapped_column(Integer)
+    ai_feedback: Mapped[dict[str, Any] | None] = mapped_column(JSON)

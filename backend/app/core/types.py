@@ -2,9 +2,10 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Any
 
+import numpy as np
 from fastapi import Path
 from pydantic import Field, StringConstraints
-from sqlalchemy import BigInteger, DateTime, Dialect, Enum, Integer
+from sqlalchemy import BigInteger, DateTime, Dialect, Enum, Integer, LargeBinary
 from sqlalchemy.types import TypeDecorator
 
 # PostgreSQL'da BIGINT, SQLite'da INTEGER (SQLite autoincrement faqat INTEGER PK bilan ishlaydi).
@@ -58,6 +59,40 @@ class UTCDateTime(TypeDecorator[datetime]):
         if value.tzinfo is None:
             return value.replace(tzinfo=UTC)
         return value.astimezone(UTC)
+
+
+class Vector(TypeDecorator[list[float]]):
+    """Embedding vektori: PostgreSQL'da pgvector `vector(dim)`, SQLite'da float32 baytlar (BLOB)."""
+
+    impl = LargeBinary
+    cache_ok = True
+
+    def __init__(self, dim: int) -> None:
+        super().__init__()
+        self.dim = dim
+
+    def load_dialect_impl(self, dialect: Dialect) -> Any:
+        if dialect.name == "postgresql":
+            from pgvector.sqlalchemy import Vector as PgVector
+
+            return dialect.type_descriptor(PgVector(self.dim))
+        return dialect.type_descriptor(LargeBinary())
+
+    def process_bind_param(self, value: Any, dialect: Dialect) -> Any:
+        if value is None:
+            return None
+        if len(value) != self.dim:
+            raise ValueError(f"vector dimension {len(value)} != {self.dim}")
+        if dialect.name == "postgresql":
+            return [float(x) for x in value]
+        return np.asarray(value, dtype=np.float32).tobytes()
+
+    def process_result_value(self, value: Any, dialect: Dialect) -> list[float] | None:
+        if value is None:
+            return None
+        if dialect.name == "postgresql":
+            return [float(x) for x in value]
+        return [float(x) for x in np.frombuffer(value, dtype=np.float32)]
 
 
 def str_enum(enum_cls: type[StrEnum], length: int = 20) -> Enum:

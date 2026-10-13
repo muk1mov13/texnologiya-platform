@@ -3,6 +3,7 @@
 Har bir yangi modul modeli shu yerga qo'shiladi.
 """
 
+import app.ai.models  # noqa: F401
 import app.assessment.models  # noqa: F401
 import app.auth.models  # noqa: F401
 import app.gamification.models  # noqa: F401
