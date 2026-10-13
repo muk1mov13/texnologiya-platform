@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-13 — 2B frontend davomi
 
+### 3B Task 1: repetitor holati va paneli
+- Yangi `features/student/tutor/useTutorChat.ts`: suhbat holati — optimistik talaba xabari, `delta` bo'laklari bilan oqimli javob, `meta` dan rejim (`answer`/`hint`/`refusal`) va manbalar; xatoda bo'sh javob olib tashlanadi; tugagach `usage` va suhbatlar keshi yangilanadi; unmount'da oqim bekor qilinadi.
+- Yangi `TutorPanel.tsx`: sarlavha va kunlik limit, `role="log"` xabarlar ro'yxati, maslahat/rad belgisi, `[n]` manbalar (nom va sahifa), Enter bilan yuborish, limit tugasa forma o'chadi, xato `FormError` da.
+- Yangi `lib/plainText.ts`: LLM javobidagi `**`/`__`/`#` belgilarini olib tashlaydi.
+- i18n: `tutor.*` (uz/ru; Task 2–3 kalitlari ham shu bo'limda).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 3B Task 0: AI tiplari, API hook'lari va SSE klient
 - `src/api/types.ts`: AI tiplari (`Citation`, `ConversationBrief`/`Detail`, `ChatMessageView`, `AiUsageMe`, `ChatIn`, `ChatMeta`, `AiDraft`, `DraftCreateIn`/`UpdateIn`, `AiReport`, `AiSettingsView`/`Update`, `AiUsageStats`, `ReindexIn`); `types.contract.ts` ga 10 ta javob va 5 ta so'rov kontrakti — hammasi birinchi urinishda mos keldi.
 - `client.ts`: `apiStream()` — 401/refresh va xato formati `apiFetch` bilan bir xil, tana oqim sifatida qaytadi.

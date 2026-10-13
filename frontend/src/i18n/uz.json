@@ -462,5 +462,23 @@
     "avg": "O'rtacha natija",
     "pending": "Tekshirilmagan",
     "empty": "Bu fanda hali mavzu yo'q"
+  },
+  "tutor": {
+    "title": "AI repetitor",
+    "open": "Repetitor",
+    "new": "Yangi suhbat",
+    "usage": "Bugun: {{used}} / {{limit}}",
+    "empty": "Mavzu bo'yicha savol bering — javob dars materiallaridan olinadi.",
+    "placeholder": "Savolingizni yozing…",
+    "send": "Yuborish",
+    "thinking": "O'ylayapti…",
+    "modeHint": "💡 Maslahat: javobni o'zingiz toping",
+    "modeRefusal": "Mavzudan tashqari",
+    "sources": "Manbalar",
+    "page": "{{page}}-bet",
+    "conversations": "Suhbatlar",
+    "deleteTitle": "Suhbatni o'chirish",
+    "deleteText": "\"{{title}}\" suhbati o'chiriladi.",
+    "disabled": "AI repetitor hozircha o'chirilgan"
   }
 }
