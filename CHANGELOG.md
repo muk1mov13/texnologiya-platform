@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A (backend) rejasi
+- Yangi `docs/superpowers/plans/2026-10-14-phase-4a-backend.md`: Task 0 — sozlamalar, webp imzosi, `save_checked()`, `library`/`cms` modellari va migratsiya, `contact_limiter`; 1 — papkalar va hujjatlar; 2 — kitoblar va tasdiqlash; 3 — yangiliklar; 4 — FAQ va sayt sozlamalari; 5 — bog'lanish formasi (rate limit, honeypot) va admin xabarlar; 6 — kutubxona AI indeksi (`doc_chunks.subject_id` nullable, qidiruv va manbalar); 7 — `sitemap.xml`/`robots.txt`; 8 — `gen:api`, xato matnlari, hujjatlar.
+- Mini-spec'dan aniqliklar: `FOLDER_SECTION_MISMATCH` (400) qo'shiladi, sozlamalarda noma'lum kalit `VALIDATION_ERROR` bilan (`SETTING_UNKNOWN` o'rniga).
+- Roadmap: keyingisi 4A Batch 1.
+
 ### 4-bosqich mini-spec'i
 - Push: `a1cd33e..a268662`, so'ng CI tuzatishi `0f19675`; CI uchala job bilan yashil.
 - Yangi `docs/superpowers/specs/2026-10-14-phase-4-design.md`: kutubxona (papkalar, hujjatlar, kitoblar), CMS (yangiliklar, FAQ, bog'lanish, sayt sozlamalari), ochiq sayt, SEO va deploy.

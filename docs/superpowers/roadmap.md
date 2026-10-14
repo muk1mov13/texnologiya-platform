@@ -256,4 +256,5 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 5. ✅ 3A (backend) qurildi va Task 14 qo'lda tekshiruvi o'tdi (2026-10-13). Groq zaxira provayderi qo'shildi. Ochiq kuzatuv: `hint` rejimida model ba'zan javob elementlarini qavs ichida sanaydi (prompt kuchaytirilgan, to'liq kafolat yo'q).
 6. ✅ 3B (frontend) qurildi va brauzerda qo'lda tekshirildi (2026-10-14).
 7. ✅ 4-bosqich mini-spec'i yozildi (2026-10-14).
-8. Keyingisi: 4A (backend: kutubxona, CMS, AI indeksi, SEO) rejasi `docs/superpowers/plans/2026-10-14-phase-4a-backend.md`.
+8. ✅ 4A (backend) rejasi yozildi: `docs/superpowers/plans/2026-10-14-phase-4a-backend.md` (Task 0–8, 3 batch).
+9. Keyingisi: 4A Batch 1 — Task 0–2 (modellar va migratsiya, papkalar va hujjatlar, kitoblar).
