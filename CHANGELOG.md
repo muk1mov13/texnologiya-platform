@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 9: "Ta'limingizni yangi bosqichga olib chiqmoqchimisiz?"
+- `home/CtaSection.tsx`: to'q teal gradient panel (ko'rinishga kirganda kattalashib ochiladi), ichida suzuvchi bloblar, katak naqsh va ustidan o'tib turadigan yaltiroq chiziq (`animate-shine`, reduced-motion'da yashirin). "Boshlash" (`/register`, kirganga — kabinet) va "Bog'lanish" (`/contact`) tugmalari.
+- i18n: `home.cta.*` (uz/ru).
+- Tekshiruv: lint, typecheck o'tdi; 1280px da ko'rildi.
+
 ### Redizayn Task 8: FAQ
 - Umumiy `components/ui/FaqAccordion.tsx`: `button` + `aria-expanded`/`aria-controls`, javob balandligi `AnimatePresence` bilan ochiladi, "+" aylanib "×" ga aylanadi, ochiq savol ajralib turadi. `/faq` sahifasi ham shunga o'tdi (`<details>` o'rniga).
 - `home/FaqSection.tsx` (`#faq`): chapda sarlavha (`lg` da sticky), "Barcha savollar →" va "Bizga yozing"; o'ngda CMS'dagi (`useFaq`) birinchi 6 savol. Ro'yxat bo'sh yoki xato bo'lsa bo'lim chiqmaydi.

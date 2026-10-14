@@ -263,6 +263,11 @@
       "subtitle": "Platforma, ro'yxatdan o'tish va o'qish jarayoni haqida qisqa javoblar",
       "all": "Barcha savollar"
     },
+    "cta": {
+      "title": "Ta'limingizni yangi bosqichga olib chiqmoqchimisiz?",
+      "text": "Ro'yxatdan o'ting — fanlar, mavzular, mashqlar va AI repetitor bir hisobda sizni kutmoqda.",
+      "contact": "Bog'lanish"
+    },
     "latestNews": "So'nggi yangiliklar",
     "allNews": "Barcha yangiliklar",
     "library": {

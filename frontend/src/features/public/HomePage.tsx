@@ -1,4 +1,5 @@
 import { usePageMeta } from '@/lib/usePageMeta'
+import { CtaSection } from './home/CtaSection'
 import { ExploreSection } from './home/ExploreSection'
 import { FaqSection } from './home/FaqSection'
 import { FeaturesSection } from './home/FeaturesSection'
@@ -17,6 +18,7 @@ export function HomePage() {
       <NewsSection />
       <ExploreSection />
       <FaqSection />
+      <CtaSection />
     </>
   )
 }
