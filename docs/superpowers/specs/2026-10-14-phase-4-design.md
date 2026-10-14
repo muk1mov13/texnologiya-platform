@@ -120,3 +120,14 @@ Fayl xatolari mavjud kodlardan foydalanadi.
 - `sitemap.xml` va `robots.txt` to'g'ri; ochiq sahifalarda title va OG bor.
 - `deploy/` fayllari CI'da tekshiriladi (compose config, build).
 - Interfeys uz/ru'da, 375px kenglikda gorizontal scroll yo'q.
+
+## 10. Amalga oshirishdagi aniqliklar (4A)
+
+1. **`FOLDER_SECTION_MISMATCH` (400)** qo'shildi: ichki papka ota papka bilan bir bo'limda bo'lishi kerak.
+2. **`SETTING_UNKNOWN` kiritilmadi:** `SiteUpdate` `extra="forbid"` bilan, noma'lum kalit umumiy `VALIDATION_ERROR` (422) qaytaradi. Ijtimoiy havolalar faqat `https://`.
+3. **Multipart matn maydonlari** (`TitleForm`, `LongTitleForm`, `CategoryForm`) `app/core/forms.py` da; materiallar router'i ham shulardan foydalanadi.
+4. **Fayl yordamchisi** `core/files.py: save_checked()` — saqlash, magic bytes (webp — `RIFF....WEBP`), hajm; kutubxona va CMS shundan foydalanadi.
+5. **AI ulanishi** to'liq Task 6 da (Task 1 da emas): `doc_chunks.subject_id` nullable bo'lmaguncha indekslash yuklashni buzardi.
+6. **Yangiliklar `views`:** `UPDATE ... SET views = views + 1` (`synchronize_session=False`, `updated_at` o'zgarmaydi — sitemap `lastmod` buzilmasin).
+7. **CMS xabar sxemalari** `ContactMessageOut` / `ContactMessageUpdate` deb nomlandi: AI'dagi `MessageOut` bilan bir xil nom OpenAPI'da `app__...` nomlarga aylanib, frontend tip kontraktini buzgan edi.
+8. **Bog'lanish limiti:** `InMemoryRateLimiter` har yuborishni sanaydi (honeypot ham); validatsiyadan o'tmagan so'rov sanalmaydi.

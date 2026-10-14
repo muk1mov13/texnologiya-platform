@@ -6,11 +6,11 @@ from app.auth.deps import AdminUser
 from app.cms import contact, faq, news, site
 from app.cms.models import ContactMessage, FaqItem
 from app.cms.schemas import (
+    ContactMessageOut,
+    ContactMessageUpdate,
     FaqIn,
     FaqOut,
     FaqUpdate,
-    MessageOut,
-    MessageUpdate,
     NewsAdminOut,
     NewsIn,
     NewsUpdate,
@@ -113,16 +113,16 @@ async def update_site(data: SiteUpdate, admin: AdminUser, db: DbSession) -> Site
 # --- bog'lanish xabarlari --------------------------------------------------------------------
 
 
-@messages_router.get("", response_model=list[MessageOut])
+@messages_router.get("", response_model=list[ContactMessageOut])
 async def list_messages(
     admin: AdminUser, db: DbSession, unread: Annotated[bool, Query()] = False
 ) -> list[ContactMessage]:
     return await contact.admin_list(db, unread_only=unread)
 
 
-@messages_router.patch("/{message_id}", response_model=MessageOut)
+@messages_router.patch("/{message_id}", response_model=ContactMessageOut)
 async def update_message(
-    message_id: DbIdPath, data: MessageUpdate, admin: AdminUser, db: DbSession
+    message_id: DbIdPath, data: ContactMessageUpdate, admin: AdminUser, db: DbSession
 ) -> ContactMessage:
     return await contact.update_message(db, await contact.get_message(db, message_id), data)
 

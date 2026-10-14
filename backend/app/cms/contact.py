@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cms.models import ContactMessage
-from app.cms.schemas import ContactIn, MessageUpdate
+from app.cms.schemas import ContactIn, ContactMessageUpdate
 from app.core.errors import AppError
 
 ADMIN_LIST_LIMIT = 200
@@ -35,7 +35,7 @@ async def admin_list(db: AsyncSession, *, unread_only: bool) -> list[ContactMess
 
 
 async def update_message(
-    db: AsyncSession, message: ContactMessage, data: MessageUpdate
+    db: AsyncSession, message: ContactMessage, data: ContactMessageUpdate
 ) -> ContactMessage:
     message.is_read = data.is_read
     await db.commit()

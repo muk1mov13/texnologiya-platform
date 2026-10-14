@@ -113,6 +113,17 @@
     "AI_DRAFT_NOT_READY": "Qoralama hali tayyorlanmoqda",
     "AI_DRAFT_CLOSED": "Qoralama yopilgan",
     "AI_DRAFT_INVALID": "Qoralama noto'g'ri to'ldirilgan",
+    "FOLDER_NOT_FOUND": "Papka topilmadi",
+    "FOLDER_NOT_EMPTY": "Papka bo'sh emas: avval ichidagi papka va hujjatlarni o'chiring",
+    "FOLDER_SECTION_MISMATCH": "Ichki papka boshqa bo'limda bo'la olmaydi",
+    "DOCUMENT_NOT_FOUND": "Hujjat topilmadi",
+    "BOOK_NOT_FOUND": "Kitob topilmadi",
+    "BOOK_ALREADY_APPROVED": "Tasdiqlangan kitobni faqat administrator o'chiradi",
+    "NEWS_NOT_FOUND": "Yangilik topilmadi",
+    "NEWS_SLUG_TAKEN": "Bu manzil (slug) band",
+    "FAQ_NOT_FOUND": "Savol topilmadi",
+    "MESSAGE_NOT_FOUND": "Xabar topilmadi",
+    "CONTACT_RATE_LIMITED": "Juda ko'p xabar yuborildi. Birozdan so'ng urinib ko'ring",
     "UNKNOWN": "Kutilmagan xato yuz berdi"
   },
   "materialErrors": {

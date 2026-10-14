@@ -113,6 +113,17 @@
     "AI_DRAFT_NOT_READY": "Черновик ещё готовится",
     "AI_DRAFT_CLOSED": "Черновик закрыт",
     "AI_DRAFT_INVALID": "Черновик заполнен неверно",
+    "FOLDER_NOT_FOUND": "Папка не найдена",
+    "FOLDER_NOT_EMPTY": "Папка не пуста: сначала удалите вложенные папки и документы",
+    "FOLDER_SECTION_MISMATCH": "Вложенная папка не может быть в другом разделе",
+    "DOCUMENT_NOT_FOUND": "Документ не найден",
+    "BOOK_NOT_FOUND": "Книга не найдена",
+    "BOOK_ALREADY_APPROVED": "Утверждённую книгу может удалить только администратор",
+    "NEWS_NOT_FOUND": "Новость не найдена",
+    "NEWS_SLUG_TAKEN": "Этот адрес (slug) занят",
+    "FAQ_NOT_FOUND": "Вопрос не найден",
+    "MESSAGE_NOT_FOUND": "Сообщение не найдено",
+    "CONTACT_RATE_LIMITED": "Отправлено слишком много сообщений. Попробуйте позже",
     "UNKNOWN": "Произошла непредвиденная ошибка"
   },
   "materialErrors": {

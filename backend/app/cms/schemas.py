@@ -129,7 +129,7 @@ class ContactIn(BaseModel):
     website: str = Field(default="", max_length=200)
 
 
-class MessageOut(BaseModel):
+class ContactMessageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -140,5 +140,5 @@ class MessageOut(BaseModel):
     created_at: datetime
 
 
-class MessageUpdate(BaseModel):
+class ContactMessageUpdate(BaseModel):
     is_read: bool

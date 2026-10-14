@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 8: API sxemasi, xato matnlari va hujjatlar
+- `npm run gen:api` — `schema.gen.ts` ga kutubxona va CMS endpoint'lari (diff katta, chunki yangi yo'llar alifbo tartibida o'rtaga tushgan).
+- Tuzatish: CMS'dagi `MessageOut`/`MessageUpdate` AI'dagi `MessageOut` bilan to'qnashib, OpenAPI'da `app__...` nomlarga aylangan va 3B tip kontraktini buzgan edi — `ContactMessageOut`/`ContactMessageUpdate` ga qayta nomlandi.
+- `uz.json`/`ru.json` `errors.*`: `FOLDER_NOT_FOUND`, `FOLDER_NOT_EMPTY`, `FOLDER_SECTION_MISMATCH`, `DOCUMENT_NOT_FOUND`, `BOOK_NOT_FOUND`, `BOOK_ALREADY_APPROVED`, `NEWS_NOT_FOUND`, `NEWS_SLUG_TAKEN`, `FAQ_NOT_FOUND`, `MESSAGE_NOT_FOUND`, `CONTACT_RATE_LIMITED`.
+- Mini-spec'ga 10-bo'lim "Amalga oshirishdagi aniqliklar (4A)"; `CLAUDE.md` — loyiha holati va `app/library`/`app/cms` bandi; roadmap — 4A ✅, keyingisi 4B rejasi.
+- Tekshiruv: backend `ruff format --check`, `ruff check`, `mypy app` toza; frontend lint, typecheck, build o'tdi.
+
 ### 4A Task 7: sitemap va robots
 - Yangi `app/cms/seo.py`: `sitemap_xml()` — ochiq statik sahifalar (`/`, `/news`, `/library`, `/faq`, `/about`, `/contact`) va nashr qilingan yangiliklar (`lastmod` — `updated_at`, 5000 tagacha, XML ekranlangan); `robots_txt()` — `/app`, `/teach`, `/admin`, `/api`, `/pending` yopiq, sitemap manzili. Manzillar `PUBLIC_BASE_URL` dan.
 - Ochiq `GET /api/seo/sitemap.xml` (`application/xml`), `GET /api/seo/robots.txt` (`text/plain`), OpenAPI'da ko'rinmaydi; prod'da nginx `/sitemap.xml` va `/robots.txt` ni ularga proksilaydi (4C).
