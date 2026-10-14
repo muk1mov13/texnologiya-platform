@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
 
+### Header menyusi o'ngga surildi
+- `PublicLayout`: `lg+` dagi menyu havolalari logo yonida emas, o'ng tomonda (til almashtirgich va tugmalar oldida) — `justify-end`.
+- Tekshiruv: lint, typecheck o'tdi.
+
 ### Menyudan "Bosh sahifa" olib tashlandi
 - `paths.ts: PUBLIC_NAV` dan `/` bandi o'chirildi (bosh sahifaga logo orqali o'tiladi) — header, mobil menyu va footerdagi "Bo'limlar" ustuniga taalluqli; i18n `nav.home` (uz/ru) o'chirildi.
 - Tekshiruv: lint, typecheck o'tdi; 1280px da menyu ko'rildi.

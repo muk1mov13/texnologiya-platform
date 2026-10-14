@@ -47,7 +47,7 @@ export function PublicLayout() {
           )}
         >
           <BrandLogo className="mr-auto lg:mr-6" />
-          <nav aria-label={t('nav.main')} className="hidden flex-1 items-center gap-1 lg:flex">
+          <nav aria-label={t('nav.main')} className="hidden flex-1 items-center justify-end gap-1 lg:mr-3 lg:flex">
             {PUBLIC_NAV.map((item) => (
               <NavLink
                 key={item.to}
