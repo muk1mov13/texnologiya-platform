@@ -31,6 +31,7 @@ class SubjectAdminOut(BaseModel):
     slug: str
     description: str
     cover: str | None
+    syllabus_name: str | None
     order: int
     is_published: bool
     teacher_ids: list[int] = []

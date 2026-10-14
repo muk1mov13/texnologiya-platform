@@ -36,6 +36,7 @@ class SubjectDetailOut(BaseModel):
     slug: str
     description: str
     cover: str | None
+    syllabus_name: str | None
     topics: list[TopicCard]
 
 

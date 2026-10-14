@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 2: fanning o'quv dasturi (`Subject.syllabus`)
+- `Subject.syllabus_pdf`, `syllabus_name` (migratsiya `f2dac920e580`); `SubjectAdminOut` va `SubjectDetailOut` da `syllabus_name` (null — dastur yo'q).
+- `app/learning/syllabus.py`: PDF/DOC/DOCX qabul qilinadi, DOC/DOCX so'rov ichida PDF'ga o'giriladi (rejadan farqi: fon ishi va `processing` holati yo'q, faqat PDF saqlanadi). `attach_syllabus()` diskdagi fayl bilan ham ishlaydi (import uchun).
+- Endpointlar: `PUT/DELETE /api/admin/subjects/{id}/syllabus`, `GET /api/subjects/{slug}/syllabus` (faol foydalanuvchi; nashr qilinmagan fan — faqat tahrirlovchilar). Fan o'chirilganda dastur fayli ham o'chadi.
+- Tekshiruv: `alembic upgrade head`, `alembic check`, ruff, mypy o'tdi.
+
 ### Task 1: mavzu turi (`lesson_type`)
 - `Topic.lesson_type` (`LessonType`: `lecture`, `practical`, `seminar`, `lab`; standart `lecture`), migratsiya `6771fa5f102b`.
 - `TopicCreate/Update`, `TopicEditorOut`, `TeachTopicBrief`, `TopicCard`, `TopicDetailOut` maydonni qabul qiladi/qaytaradi.

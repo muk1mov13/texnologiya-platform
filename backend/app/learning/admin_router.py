@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, UploadFile
 
 from app.auth.deps import AdminUser
-from app.core.deps import AppStorage, DbSession
+from app.core.deps import AppSettings, AppStorage, DbSession
 from app.core.types import DbIdPath
-from app.learning import editing
+from app.learning import editing, syllabus
 from app.learning.schemas import SubjectAdminOut, SubjectCreate, SubjectUpdate, TeachersIn
 
 router = APIRouter(prefix="/admin/subjects", tags=["admin"])
@@ -44,3 +44,26 @@ async def set_teachers(
 ) -> SubjectAdminOut:
     await editing.set_subject_teachers(db, subject_id, data.teacher_ids)
     return await editing.subject_admin_out(db, await editing.get_subject(db, subject_id))
+
+
+@router.put("/{subject_id}/syllabus", response_model=SubjectAdminOut)
+async def upload_syllabus(
+    subject_id: DbIdPath,
+    file: UploadFile,
+    admin: AdminUser,
+    db: DbSession,
+    settings: AppSettings,
+    storage: AppStorage,
+) -> SubjectAdminOut:
+    subject = await editing.get_subject(db, subject_id)
+    subject = await syllabus.upload_syllabus(db, subject, file, settings=settings, storage=storage)
+    return await editing.subject_admin_out(db, subject)
+
+
+@router.delete("/{subject_id}/syllabus", response_model=SubjectAdminOut)
+async def delete_syllabus(
+    subject_id: DbIdPath, admin: AdminUser, db: DbSession, storage: AppStorage
+) -> SubjectAdminOut:
+    subject = await editing.get_subject(db, subject_id)
+    subject = await syllabus.remove_syllabus(db, subject, storage)
+    return await editing.subject_admin_out(db, subject)

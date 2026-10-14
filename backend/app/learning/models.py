@@ -70,6 +70,8 @@ class Subject(IdMixin, CreatedAtMixin, Base):
     slug: Mapped[str] = mapped_column(String(220), unique=True)
     description: Mapped[str] = mapped_column(Text, default="")
     cover: Mapped[str | None] = mapped_column(String(500))
+    syllabus_pdf: Mapped[str | None] = mapped_column(String(500))
+    syllabus_name: Mapped[str | None] = mapped_column(String(255))
     order: Mapped[int] = mapped_column(Integer, default=0)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False)
 

@@ -133,6 +133,7 @@ async def subject_detail(db: AsyncSession, user: User, slug: str) -> SubjectDeta
         slug=subject.slug,
         description=subject.description,
         cover=subject.cover,
+        syllabus_name=subject.syllabus_name,
         topics=cards,
     )
 

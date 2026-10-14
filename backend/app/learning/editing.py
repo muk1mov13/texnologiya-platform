@@ -144,6 +144,8 @@ async def delete_subject(db: AsyncSession, subject: Subject) -> list[str]:
     """Fanni o'chiradi va diskdan o'chirilishi kerak bo'lgan fayl yo'llarini qaytaradi."""
     condition = Topic.subject_id == subject.id
     paths = await _material_paths(db, condition) + await _submission_paths(db, condition)
+    if subject.syllabus_pdf:
+        paths.append(subject.syllabus_pdf)
     await db.delete(subject)
     await db.commit()
     return paths
