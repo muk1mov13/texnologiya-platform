@@ -27,6 +27,18 @@ async def convert_to_pdf(
     timeout: int,  # noqa: ASYNC109 (subprocess uchun, asyncio scope emas)
 ) -> Path:
     """LibreOffice (headless) yordamida PPT/PPTX/DOC/DOCX faylni PDF'ga aylantiradi."""
+    return await convert_to(source, out_dir, "pdf", soffice=soffice, timeout=timeout)
+
+
+async def convert_to(
+    source: Path,
+    out_dir: Path,
+    fmt: str,
+    *,
+    soffice: str,
+    timeout: int,  # noqa: ASYNC109 (subprocess uchun, asyncio scope emas)
+) -> Path:
+    """LibreOffice (headless) yordamida faylni `fmt` formatiga (pdf, docx, ...) aylantiradi."""
     executable = _resolve_soffice(soffice)
     if executable is None:
         raise ConversionError("LIBREOFFICE_NOT_FOUND")
@@ -39,7 +51,7 @@ async def convert_to_pdf(
         "--headless",
         "--norestore",
         "--convert-to",
-        "pdf",
+        fmt,
         "--outdir",
         str(out_dir),
         str(source),
@@ -51,7 +63,7 @@ async def convert_to_pdf(
         )
     except subprocess.TimeoutExpired as exc:
         raise ConversionError("CONVERSION_TIMEOUT") from exc
-    output = out_dir / f"{source.stem}.pdf"
+    output = out_dir / f"{source.stem}.{fmt}"
     if result.returncode != 0 or not output.is_file():
         raise ConversionError("CONVERSION_FAILED")
     return output

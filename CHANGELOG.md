@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 4: `resource/` parserlari
+- `app/learning/resource_parse.py`: `scan()` — fan → bo'lim (kalit so'z bo'yicha `lesson_type`, `dastur` papkasi → o'quv dasturi) → mavzu papkalari (raqam bo'yicha; fayllar `N)` prefiksi bilan aniqlanadi, bitta ichki papka ham o'qiladi). Parserlar: `parse_title` (KATTA harfli sarlavha → oddiy), `parse_quiz` (`Javoblar:` kaliti), `parse_crossword` (`N. (H): savol` + `N. So'z`, yaroqsiz/takror so'zlar tashlanadi), `parse_glossary`, `parse_literature` (muallif, yil, URL), `parse_task`. `.doc` avval LibreOffice bilan `.docx`ga o'giriladi.
+- `convert.py`: umumiy `convert_to(source, out_dir, fmt)`; `convert_to_pdf` uni chaqiradi.
+- Tekshiruv: ruff, mypy o'tdi; `scan()` 60 mavzu topdi (30 + 30). Biologiya `.docx` fayllarida har bir mavzu: 10 test, 7–14 krossvord so'zi, 10 atama, 5 adabiyot. Fiziologiya `.doc` fayllari LibreOffice yo'qligi sababli hali tekshirilmadi.
+
 ### Task 3: frontend API turlari
 - `npm run gen:api` — `schema.gen.ts` yangilandi; `types.ts`: `LessonType`, `lesson_type` (`TopicCard`, `TopicDetail`, `TopicEditor`, `TeachTopicBrief`, `TopicCreate`), `syllabus_name` (`SubjectDetail`, `SubjectAdmin`).
 - Test fixture'lari yangi maydonlar bilan to'ldirildi (faqat typecheck uchun; testlar ishga tushirilmadi).
