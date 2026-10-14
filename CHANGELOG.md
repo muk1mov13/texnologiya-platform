@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/landing-pageni-sectionlarini-zebra-zippy-spark.md`.
 
+### Task 3: CTA footer chegarasida
+- `CtaSection`: bo'limning pastki yarmi `brand-950` — panel oq fon bilan footer chegarasida turadi; FAQ bilan oradagi bo'shliq qisqardi (`pt-4 sm:pt-8`), to'q fonda cheti ko'rinishi uchun `ring-white/10`.
+- `SiteFooter`: `flush` prop — tepa chegara bezagi (`edge`: hairline va nur) chiqmaydi, kontent tepadan `pt-20`; `PublicLayout` uni faqat bosh sahifada beradi.
+- Tekshiruv: lint, typecheck, build o'tdi; `/` 1280px va 375px da ko'rildi — zebra ritmi, to'q bo'lim kontrasti, CTA→footer choksiz, gorizontal scroll yo'q.
+
 ### Task 2: "Qanday ishlaydi" — to'q bo'lim
 - `HowItWorksSection`: fon `brand-950` (footer rangi). Bezak footer'ning A temasidan: tepada nur, xira katak, tepa va pastda yorug' hairline. Matnlar `text-white` / `text-brand-100/75`, bog'lovchi chiziq asosi `bg-white/15`, to'lish `brand-300→500`, ikonka halqasi `ring-brand-950`.
 - `styles.ts`: `EYEBROW_DARK`, `SECTION_TITLE_DARK`.

@@ -9,19 +9,23 @@ import { fadeUp, scaleIn, stagger, VIEWPORT_ONCE } from '@/lib/motion'
 
 const WHITE_FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
 
-/** Yakuniy chaqiriq: "Ta'limingizni yangi bosqichga olib chiqmoqchimisiz?" — gradient panel. */
+/**
+ * Yakuniy chaqiriq: "Ta'limingizni yangi bosqichga olib chiqmoqchimisiz?" — gradient panel
+ * footer chegarasida turadi: bo'limning pastki yarmi footer rangida (`SiteFooter flush`).
+ */
 export function CtaSection() {
   const { t } = useTranslation()
   const user = useCurrentUser()
 
   return (
-    <section aria-labelledby="home-cta" className="px-4 py-20 sm:py-24">
+    <section aria-labelledby="home-cta" className="relative isolate bg-white px-4 pt-4 sm:pt-8">
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-brand-950" />
       <m.div
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT_ONCE}
         variants={scaleIn}
-        className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-800 to-brand-950 px-6 py-16 text-center text-white shadow-glow sm:px-12 sm:py-20"
+        className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-800 to-brand-950 px-6 py-16 text-center text-white shadow-glow ring-1 ring-white/10 sm:px-12 sm:py-20"
       >
         {/* Bezaklar: bloblar, katak va ustidan o'tadigan yaltiroq chiziq. */}
         <div aria-hidden="true" className="absolute inset-0 -z-10">

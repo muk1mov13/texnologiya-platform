@@ -18,6 +18,8 @@ const LATEST_NEWS = 3
 interface FooterTheme {
   root: string
   decor: ReactNode
+  /** Tepa chegara bezagi (chiziq, nur); `flush` bo'lsa chiqmaydi — ustidagi bo'lim bilan chok qolmaydi. */
+  edge?: ReactNode
   heading: string
   text: string
   muted: string
@@ -42,7 +44,8 @@ const THEMES: Record<FooterThemeKey, FooterTheme> = {
   // A — chuqur teal: CTA panelining davomi, bir rang oilasi.
   a: {
     root: 'bg-brand-950 text-brand-50',
-    decor: (
+    decor: null,
+    edge: (
       <>
         <div className="absolute -top-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-brand-700/35 blur-3xl" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300/60 to-transparent" />
@@ -114,8 +117,10 @@ function Column({ title, theme, children }: { title: string; theme: FooterTheme;
 /**
  * Ochiq sayt footer'i: brend va ijtimoiy tarmoqlar, bo'limlar, platforma havolalari,
  * so'nggi yangiliklar va kontaktlar (`/api/site`). Ma'lumot bo'lmagan ustun chiqmaydi.
+ * `flush`: ustidagi bo'lim (bosh sahifa CTA) footer rangida tugaydi — chok chizig'i yo'q,
+ * tepada panel uchun qo'shimcha joy.
  */
-export function SiteFooter() {
+export function SiteFooter({ flush = false }: { flush?: boolean }) {
   const { t, i18n } = useTranslation()
   const theme = THEMES[FOOTER_THEME]
   const user = useCurrentUser()
@@ -132,8 +137,14 @@ export function SiteFooter() {
     <footer className={cx('relative isolate overflow-hidden', theme.root)}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         {theme.decor}
+        {!flush && theme.edge}
       </div>
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.9fr_1.2fr_1.2fr] lg:gap-8">
+      <div
+        className={cx(
+          'mx-auto grid max-w-6xl gap-10 px-4 pb-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.9fr_1.2fr_1.2fr] lg:gap-8',
+          flush ? 'pt-20' : 'pt-14',
+        )}
+      >
         <div className="flex flex-col items-start gap-4 sm:col-span-2 lg:col-span-1">
           <BrandLogo tone={theme.logo} />
           <p className={cx('max-w-xs text-sm leading-relaxed', theme.text)}>{t('footer.tagline')}</p>

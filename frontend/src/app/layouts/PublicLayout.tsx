@@ -113,7 +113,7 @@ export function PublicLayout() {
       <main className={cx('w-full flex-1', !isHome && 'mx-auto max-w-6xl px-4 py-8')}>
         <Outlet />
       </main>
-      <SiteFooter />
+      <SiteFooter flush={isHome} />
     </div>
   )
 }
