@@ -21,6 +21,7 @@ uv run alembic upgrade head
 uv run python -m app.cli create-admin --email admin@example.uz --name "Administrator"   # password from --password, ADMIN_PASSWORD, or prompt
 uv run uvicorn app.main:create_app --factory --reload   # API docs: http://localhost:8000/api/docs (disabled when ENV=prod)
 uv run python -m app.cli weekly-report [--week-start YYYY-MM-DD] [--subject ID]   # weekly AI report (default: last Mon–Sun)
+uv run python -m app.cli seed-demo [--force]   # demo news, FAQ and site settings for the public site (idempotent)
 
 uv run pytest -q                          # all tests
 uv run pytest tests/test_materials.py -q  # one file

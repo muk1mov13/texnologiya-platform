@@ -74,6 +74,14 @@ def _weekly_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _seed_demo(args: argparse.Namespace) -> int:
+    from app.cms.demo import seed_demo
+
+    added = asyncio.run(seed_demo(get_settings(), force=args.force))
+    print(f"Yangiliklar: {added['news']}, FAQ: {added['faq']}, Sozlamalar: {added['site']}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -88,10 +96,18 @@ def main(argv: list[str] | None = None) -> int:
     report = commands.add_parser("weekly-report", help="Fanlar bo'yicha haftalik AI tahlili")
     report.add_argument("--week-start", default=None, help="YYYY-MM-DD (dushanba)")
     report.add_argument("--subject", type=int, default=None)
+    seed = commands.add_parser(
+        "seed-demo", help="Ochiq sayt uchun demo yangiliklar, FAQ va sozlamalar"
+    )
+    seed.add_argument(
+        "--force", action="store_true", help="Mavjud sayt sozlamalarini ham demo bilan almashtirish"
+    )
     args = parser.parse_args(argv)
 
     if args.command == "weekly-report":
         return _weekly_report(args)
+    if args.command == "seed-demo":
+        return _seed_demo(args)
 
     try:
         email = _resolve_email(args)

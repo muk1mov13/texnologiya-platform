@@ -4,6 +4,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — Landing: demo kontent, boyitilgan footer, footer ranglari
+
+Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
+
+### Task 1: `seed-demo` CLI
+- `app/cms/demo.py`: 6 ta demo yangilik (oxirgi 1–30 kun), 8 ta FAQ, sayt sozlamalari (kontaktlar, ijtimoiy tarmoqlar, "Biz haqimizda"). Qayta ishga tushirish xavfsiz (slug/savol bo'yicha o'tkazib yuboradi); `--force` sayt sozlamalarini almashtiradi.
+- `python -m app.cli seed-demo [--force]`; `CLAUDE.md` buyruqlar ro'yxatiga qo'shildi.
+- Tekshiruv: ruff, mypy o'tdi; lokal bazada 1-marta 6/8/3, 2-marta 0/0/0 qo'shildi.
+
+---
+
 ## 2026-10-14 — Bosh sahifa redizayni (premium, animatsiyali UI)
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
