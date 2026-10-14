@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 6: "Platforma qanday ishlaydi"
+- `home/HowItWorksSection.tsx` (`#how-it-works`): 4 qadam — ro'yxatdan o'tish, administrator tasdig'i, fan va mavzuni tanlash, 7 bosqich va XP. Gradient raqamli ikonkalar; ularni bog'lovchi chiziq scroll bilan to'ladi (`useScroll` + `useSpring`; `lg` da gorizontal, telefonda vertikal).
+- i18n: `home.how.*` (uz/ru).
+- Tekshiruv: lint, typecheck o'tdi; 1280px da ko'rildi.
+
 ### Redizayn Task 5: platforma xususiyatlari
 - `home/FeaturesSection.tsx` (`#features`): sarlavha bloki va 4 ustunli bento grid, 6 karta — 7 bosqichli mavzular (bosqichlar chiplari bilan), dars pleyeri, test/ha-yo'q/krossvord, XP va nishonlar, AI repetitor (namuna savol-javob pufakchalari bilan), ochiq kutubxona. Kartalar stagger bilan paydo bo'ladi.
 - `home/SpotlightCard.tsx`: kursorni kuzatuvchi yorug'lik dog'i, hoverda ko'tarilish va ikonka aylanishi.

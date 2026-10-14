@@ -8,6 +8,7 @@ import { cx, FOCUS_RING } from '@/lib/cx'
 import { usePageMeta } from '@/lib/usePageMeta'
 import { FeaturesSection } from './home/FeaturesSection'
 import { HeroSection } from './home/HeroSection'
+import { HowItWorksSection } from './home/HowItWorksSection'
 import { NewsCard } from './NewsCard'
 
 const LIBRARY_LINKS = [
@@ -28,6 +29,7 @@ export function HomePage() {
     <>
       <HeroSection />
       <FeaturesSection />
+      <HowItWorksSection />
       <div className="mx-auto flex max-w-6xl flex-col gap-16 px-4 py-16">
 
       {news.data && news.data.items.length > 0 && (

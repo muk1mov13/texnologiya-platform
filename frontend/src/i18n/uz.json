@@ -232,6 +232,29 @@
         "text": "Metodik va huquqiy hujjatlar hamda kitoblar — ro'yxatdan o'tmasdan"
       }
     },
+    "how": {
+      "eyebrow": "Qanday ishlaydi",
+      "title": "To'rt qadamda boshlang",
+      "subtitle": "Ro'yxatdan o'tishdan birinchi XP gacha bir necha daqiqa",
+      "steps": {
+        "register": {
+          "title": "Ro'yxatdan o'ting",
+          "text": "Ism, email va parol bilan bir daqiqada hisob yarating"
+        },
+        "approve": {
+          "title": "Tasdiqni kuting",
+          "text": "Administrator hisobingizni tekshiradi va faollashtiradi"
+        },
+        "choose": {
+          "title": "Fan va mavzuni tanlang",
+          "text": "Kabinetda fanlaringiz va ulardagi mavzular ro'yxati turadi"
+        },
+        "learn": {
+          "title": "O'rganing va XP to'plang",
+          "text": "7 bosqichni o'ting, mashqlarni bajaring, nishonlarga ega bo'ling"
+        }
+      }
+    },
     "latestNews": "So'nggi yangiliklar",
     "allNews": "Barcha yangiliklar",
     "library": {
