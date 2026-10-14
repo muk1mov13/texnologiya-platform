@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Query, Response, UploadFile
 
 from app.auth.deps import AdminUser
-from app.core.deps import AppSettings, AppStorage, DbSession
+from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
 from app.core.forms import LongTitleForm
 from app.core.types import DbIdPath
 from app.library import books, documents, folders
@@ -49,9 +49,16 @@ async def add_document(
     db: DbSession,
     settings: AppSettings,
     storage: AppStorage,
+    jobs: Jobs,
 ) -> Document:
     return await documents.add_document(
-        db, folder_id=folder_id, title=title, upload=file, storage=storage, settings=settings
+        db,
+        folder_id=folder_id,
+        title=title,
+        upload=file,
+        storage=storage,
+        settings=settings,
+        jobs=jobs,
     )
 
 
@@ -85,9 +92,9 @@ async def list_books(
 
 @books_router.patch("/{book_id}", response_model=BookAdminOut)
 async def update_book(
-    book_id: DbIdPath, data: BookUpdate, admin: AdminUser, db: DbSession
+    book_id: DbIdPath, data: BookUpdate, admin: AdminUser, db: DbSession, jobs: Jobs
 ) -> BookAdminOut:
-    book = await books.update_book(db, await books.get_book(db, book_id), data)
+    book = await books.update_book(db, await books.get_book(db, book_id), data, jobs)
     return await books.admin_out(db, book)
 
 

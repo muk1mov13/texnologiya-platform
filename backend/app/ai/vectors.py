@@ -4,11 +4,11 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
-from sqlalchemy import Float, bindparam, delete, select
+from sqlalchemy import ColumnElement, Float, bindparam, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.constants import EMBEDDING_DIM
-from app.ai.models import ChunkSource, DocChunk
+from app.ai.models import LIBRARY_SOURCES, ChunkSource, DocChunk
 from app.core.types import Vector
 
 
@@ -16,7 +16,7 @@ from app.core.types import Vector
 class ChunkRow:
     source_type: ChunkSource
     source_id: int
-    subject_id: int
+    subject_id: int | None
     topic_id: int | None
     page: int | None
     chunk_index: int
@@ -32,6 +32,14 @@ class Hit:
     page: int | None
     text: str
     score: float
+
+
+def _scope(topic_ids: Sequence[int], include_library: bool) -> ColumnElement[bool]:
+    """Qidiruv doirasi: berilgan mavzular va (ixtiyoriy) mavzusiz kutubxona bo'laklari."""
+    scope: ColumnElement[bool] = DocChunk.topic_id.in_(topic_ids)
+    if include_library:
+        scope = or_(scope, DocChunk.source_type.in_(LIBRARY_SOURCES))
+    return scope
 
 
 _COLUMNS = (
@@ -85,6 +93,7 @@ class VectorStore:
         source_types: Sequence[ChunkSource],
         topic_ids: Sequence[int],
         k: int,
+        include_library: bool = False,
     ) -> list[Hit]:
         raise NotImplementedError
 
@@ -100,13 +109,14 @@ class SqliteVectorStore(VectorStore):
         source_types: Sequence[ChunkSource],
         topic_ids: Sequence[int],
         k: int,
+        include_library: bool = False,
     ) -> list[Hit]:
-        if not topic_ids:
+        if not topic_ids and not include_library:
             return []
         rows = (
             await db.execute(
                 select(*_COLUMNS, DocChunk.embedding).where(
-                    DocChunk.source_type.in_(source_types), DocChunk.topic_id.in_(topic_ids)
+                    DocChunk.source_type.in_(source_types), _scope(topic_ids, include_library)
                 )
             )
         ).all()
@@ -139,15 +149,16 @@ class PgVectorStore(VectorStore):
         source_types: Sequence[ChunkSource],
         topic_ids: Sequence[int],
         k: int,
+        include_library: bool = False,
     ) -> list[Hit]:
-        if not topic_ids:
+        if not topic_ids and not include_library:
             return []
         query = bindparam("query_vec", list(vec), type_=Vector(EMBEDDING_DIM))
         distance = DocChunk.embedding.op("<=>", return_type=Float)(query)
         rows = (
             await db.execute(
                 select(*_COLUMNS, distance.label("distance"))
-                .where(DocChunk.source_type.in_(source_types), DocChunk.topic_id.in_(topic_ids))
+                .where(DocChunk.source_type.in_(source_types), _scope(topic_ids, include_library))
                 .order_by(distance)
                 .limit(k)
             )

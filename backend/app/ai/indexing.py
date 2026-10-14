@@ -5,23 +5,26 @@ AI o'chiq bo'lsa hech narsa qilinmaydi — admin keyin `reindex_all` bilan to'ld
 
 import asyncio
 import logging
+from typing import Literal
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.chunking import chunk_pages, pdf_pages
 from app.ai.constants import (
     INDEX_GLOSSARY_JOB,
+    INDEX_LIBRARY_JOB,
     INDEX_MATERIAL_JOB,
     INDEX_QUESTIONS_JOB,
     REINDEX_JOB,
 )
-from app.ai.models import QUESTION_SOURCES, ChunkSource, DocChunk
+from app.ai.models import LIBRARY_SOURCES, QUESTION_SOURCES, ChunkSource, DocChunk
 from app.ai.services import AiServices, ai_enabled
 from app.ai.vectors import ChunkRow
 from app.assessment.models import Activity, CrosswordWord, QuizQuestion, Task, YesNoItem
 from app.core.jobs import JobContext, JobRunner, job
 from app.learning.models import GlossaryTerm, Material, MaterialStatus, Step, Topic
+from app.library.models import Book, Document
 
 logger = logging.getLogger(__name__)
 
@@ -177,12 +180,17 @@ async def reindex_all_job(ctx: JobContext, everything: bool = False) -> None:
     ai = await _ready_ai(ctx)
     if ai is None:
         return
+    library: list[tuple[LibrarySource, int]] = []
     async with ctx.sessionmaker() as db:
         if everything:
             materials = list(
                 await db.scalars(select(Material.id).where(Material.status == MaterialStatus.ready))
             )
             topics = list(await db.scalars(select(Topic.id)))
+            library += [("document", i) for i in await db.scalars(select(Document.id))]
+            library += [
+                ("book", i) for i in await db.scalars(select(Book.id).where(Book.is_approved))
+            ]
         else:
             stale = DocChunk.embedding_model != ai.embedder.model_name
             materials = list(
@@ -197,6 +205,12 @@ async def reindex_all_job(ctx: JobContext, everything: bool = False) -> None:
                 for t in await db.scalars(select(DocChunk.topic_id).where(stale).distinct())
                 if t is not None
             ]
+            rows = await db.execute(
+                select(DocChunk.source_type, DocChunk.source_id)
+                .where(stale, DocChunk.source_type.in_(LIBRARY_SOURCES))
+                .distinct()
+            )
+            library += [(_SOURCE_NAMES[s], i) for s, i in rows]
     for material_id in materials:
         await index_material_quietly(ctx, material_id)
     for topic_id in topics:
@@ -205,6 +219,75 @@ async def reindex_all_job(ctx: JobContext, everything: bool = False) -> None:
             await index_topic_questions_job(ctx, topic_id=topic_id)
         except Exception:
             logger.exception("reindex failed for topic %s", topic_id)
+    for source, source_id in library:
+        try:
+            await index_library_job(ctx, source=source, source_id=source_id)
+        except Exception:
+            logger.exception("reindex failed for %s %s", source, source_id)
+
+
+# --- kutubxona (4-bosqich) -----------------------------------------------------------------
+
+LibrarySource = Literal["document", "book"]
+_LIBRARY_MODELS: dict[str, tuple[type[Document] | type[Book], ChunkSource]] = {
+    "document": (Document, ChunkSource.document),
+    "book": (Book, ChunkSource.book),
+}
+_SOURCE_NAMES: dict[ChunkSource, LibrarySource] = {
+    ChunkSource.document: "document",
+    ChunkSource.book: "book",
+}
+
+
+async def _library_row(
+    db: AsyncSession, source: LibrarySource, source_id: int
+) -> Document | Book | None:
+    """Indekslanadigan yozuv: hujjat yoki tasdiqlangan kitob (aks holda None)."""
+    if source == "document":
+        return await db.get(Document, source_id)
+    book = await db.get(Book, source_id)
+    return book if book is not None and book.is_approved else None
+
+
+async def delete_library_chunks(db: AsyncSession, source: LibrarySource, source_id: int) -> None:
+    """Hujjat/kitob o'chirilganda yoki tasdiq bekor qilinganda; commit chaqiruvchida."""
+    _, chunk_source = _LIBRARY_MODELS[source]
+    await db.execute(
+        delete(DocChunk).where(
+            DocChunk.source_type == chunk_source, DocChunk.source_id == source_id
+        )
+    )
+
+
+@job(INDEX_LIBRARY_JOB)
+async def index_library_job(ctx: JobContext, source: LibrarySource, source_id: int) -> None:
+    """Kutubxona PDF'i: fanga bog'lanmagan bo'laklar (`subject_id`, `topic_id` NULL).
+    Tasdiqlanmagan kitob va PDF bo'lmagan fayllar indekslanmaydi."""
+    ai = await _ready_ai(ctx)
+    if ai is None:
+        return
+    chunk_source = _LIBRARY_MODELS[source][1]
+    async with ctx.sessionmaker() as db:
+        row = await _library_row(db, source, source_id)
+        rel = row.file if row is not None else None
+    if rel is None or not rel.endswith(".pdf"):
+        return
+    pages = await asyncio.to_thread(pdf_pages, ctx.storage.path(rel))
+    chunks = chunk_pages(pages)
+    vectors = await ai.embedder.embed([c.text for c in chunks], "document") if chunks else []
+    async with ctx.sessionmaker() as db:
+        if await _library_row(db, source, source_id) is None:
+            return  # orada o'chirilgan yoki tasdiq bekor qilingan
+        await ai.vectors.delete(db, source_types=[chunk_source], source_id=source_id)
+        await ai.vectors.add(
+            db,
+            [
+                ChunkRow(chunk_source, source_id, None, None, c.page, i, c.text, v)
+                for i, (c, v) in enumerate(zip(chunks, vectors, strict=True))
+            ],
+            ai.embedder.model_name,
+        )
+        await db.commit()
 
 
 async def index_material_quietly(ctx: JobContext, material_id: int) -> None:

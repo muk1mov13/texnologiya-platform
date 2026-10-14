@@ -8,6 +8,7 @@ INDEX_MATERIAL_JOB = "index_material"
 INDEX_GLOSSARY_JOB = "index_topic_glossary"
 INDEX_QUESTIONS_JOB = "index_topic_questions"
 REINDEX_JOB = "reindex_all"
+INDEX_LIBRARY_JOB = "index_library"
 GENERATE_DRAFT_JOB = "generate_draft"
 AI_CHECK_JOB = "ai_check_submission"
 

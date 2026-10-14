@@ -1,11 +1,14 @@
-"""Kutubxona hujjatlari: yuklash, tahrir va o'chirish."""
+"""Kutubxona hujjatlari: yuklash, tahrir va o'chirish. PDF hujjatlar AI indeksiga yuboriladi."""
 
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.constants import INDEX_LIBRARY_JOB
+from app.ai.indexing import delete_library_chunks
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.files import ALLOWED_DOC_EXT, save_checked
+from app.core.jobs import JobRunner
 from app.core.storage import Storage
 from app.library.folders import get_folder
 from app.library.models import Document
@@ -27,6 +30,7 @@ async def add_document(
     upload: UploadFile,
     storage: Storage,
     settings: Settings,
+    jobs: JobRunner,
 ) -> Document:
     await get_folder(db, folder_id)
     rel, original_name, size = await save_checked(
@@ -37,6 +41,8 @@ async def add_document(
     )
     db.add(document)
     await db.commit()
+    if rel.endswith(".pdf"):  # AI o'chiq bo'lsa job hech narsa qilmaydi
+        await jobs.enqueue(INDEX_LIBRARY_JOB, source="document", source_id=document.id)
     return document
 
 
@@ -53,6 +59,8 @@ async def update_document(db: AsyncSession, document: Document, data: DocumentUp
 async def delete_document(db: AsyncSession, document: Document) -> str:
     """Yozuvni o'chiradi va o'chiriladigan fayl yo'lini qaytaradi (commit'dan keyin o'chiriladi)."""
     rel = document.file
+    # `doc_chunks.source_id` FK emas — bo'laklar qo'lda o'chiriladi.
+    await delete_library_chunks(db, "document", document.id)
     await db.delete(document)
     await db.commit()
     return rel

@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 6: kutubxona AI indeksi
+- `doc_chunks.subject_id` nullable — migratsiya `6f7e4555d66d_doc_chunks_subject_nullable` (`existing_type` BIGINT/SQLite INTEGER; `downgrade` avval kutubxona bo'laklarini o'chiradi); `LIBRARY_SOURCES` (`document`, `book`); `ChunkRow.subject_id` ixtiyoriy.
+- `VectorStore.search(..., include_library=False)`: ikkala dialektda mavzusiz kutubxona bo'laklarini ham qamraydi (`_scope`).
+- `ai/indexing.py`: `index_library` job'i (faqat PDF; kitob faqat tasdiqlangan bo'lsa; yozishdan oldin qayta tekshiradi), `delete_library_chunks()`, `reindex_all` kutubxonani ham qayta quradi (eskirgan yoki hammasi).
+- Repetitor: uchinchi (platforma) daraja kutubxonani ham qidiradi; manba nomi hujjat/kitob sarlavhasidan.
+- Ulanishlar: PDF hujjat yuklanganda va PDF kitob tasdiqlanganda (admin yuklagani darhol) indekslanadi; hujjat/kitob o'chirilganda va tasdiq bekor qilinganda bo'laklar o'chiriladi.
+- Tekshiruv: `ruff`, `mypy` toza; `alembic upgrade` → `check` → `downgrade -1` → `upgrade`; `AI_PROVIDER=fake` bilan qo'lda: bo'laklar soni 1 → (tasdiqlanmagan kitob) 1 → (tasdiq) 2 → (bekor) 1 → (o'chirish) 0; mavzusiz suhbatda manba `document` "Attestatsiya nizomi".
+
 ### 4A Task 5: bog'lanish formasi va admin xabarlar
 - Yangi `app/cms/contact.py`; ochiq `POST /api/contact` (204): IP bo'yicha `contact_limiter` (soatiga 5 ta, oshsa 429 `CONTACT_RATE_LIMITED`; honeypot yuborishlari ham sanaladi), honeypot `website` maydoni to'ldirilsa xabar jim tashlanadi, bo'sh maydonlar 422.
 - Admin `/api/admin/messages`: `GET ?unread=` (yangidan eskiga, 200 ta), `PATCH /{id}` (`is_read`), `DELETE /{id}` (404 `MESSAGE_NOT_FOUND`).

@@ -6,10 +6,13 @@ from fastapi import UploadFile
 from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.constants import INDEX_LIBRARY_JOB
+from app.ai.indexing import delete_library_chunks
 from app.auth.models import Role, User
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.files import ALLOWED_DOC_EXT, ALLOWED_IMAGE_EXT, save_checked
+from app.core.jobs import JobRunner
 from app.core.storage import Storage
 from app.library.models import Book
 from app.library.schemas import BookAdminOut, BookOut, BookPage, BookUpdate
@@ -48,6 +51,7 @@ async def add_book(
     cover: UploadFile | None,
     storage: Storage,
     settings: Settings,
+    jobs: JobRunner,
 ) -> Book:
     rel, original_name, size = await save_checked(
         storage, upload, "books", allowed_ext=ALLOWED_DOC_EXT, max_mb=settings.max_library_mb
@@ -72,7 +76,15 @@ async def add_book(
     )
     db.add(book)
     await db.commit()
+    if book.is_approved:
+        await _enqueue_index(jobs, book)
     return book
+
+
+async def _enqueue_index(jobs: JobRunner, book: Book) -> None:
+    """Tasdiqlangan PDF kitob AI indeksiga (AI o'chiq bo'lsa job hech narsa qilmaydi)."""
+    if book.file.endswith(".pdf"):
+        await jobs.enqueue(INDEX_LIBRARY_JOB, source="book", source_id=book.id)
 
 
 def _like(q: str) -> str:
@@ -149,13 +161,18 @@ async def admin_list(
     ]
 
 
-async def update_book(db: AsyncSession, book: Book, data: BookUpdate) -> Book:
+async def update_book(db: AsyncSession, book: Book, data: BookUpdate, jobs: JobRunner) -> Book:
     values = data.model_dump(exclude_unset=True, exclude_none=True)
     if "author" in values:
         values["author"] = values["author"].strip()
+    was_approved = book.is_approved
     for key, value in values.items():
         setattr(book, key, value)
+    if was_approved and not book.is_approved:  # tasdiq bekor qilindi — repetitor ko'rmasin
+        await delete_library_chunks(db, "book", book.id)
     await db.commit()
+    if book.is_approved and not was_approved:
+        await _enqueue_index(jobs, book)
     return book
 
 
@@ -172,6 +189,7 @@ async def replace_cover(
 
 async def delete_book(db: AsyncSession, book: Book) -> list[str | None]:
     files = [book.file, book.cover]
+    await delete_library_chunks(db, "book", book.id)
     await db.delete(book)
     await db.commit()
     return files

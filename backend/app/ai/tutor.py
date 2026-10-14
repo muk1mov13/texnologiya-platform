@@ -12,6 +12,7 @@ from app.ai import usage
 from app.ai.constants import HISTORY_MESSAGES, TOP_K
 from app.ai.models import (
     CONTEXT_SOURCES,
+    LIBRARY_SOURCES,
     QUESTION_SOURCES,
     AiConversation,
     AiMessage,
@@ -29,6 +30,7 @@ from app.core.config import Settings
 from app.core.errors import AppError
 from app.learning import progress
 from app.learning.models import Material, Topic
+from app.library.models import Book, Document
 
 BUSY_MESSAGE = "AI hozir band, birozdan so'ng urinib ko'ring"
 REFUSAL = {
@@ -98,14 +100,19 @@ async def _visible_topic_ids(db: AsyncSession, subject_id: int | None) -> list[i
 async def _retrieve(
     db: AsyncSession, ai: AiServices, vec: list[float], topic: Topic | None, settings: Settings
 ) -> list[Hit]:
-    """Mavzu → fan → platforma. Chegaradan o'tgan birinchi daraja qaytariladi, bo'lmasa []."""
-    levels: list[list[int]] = []
+    """Mavzu → fan → platforma (+ kutubxona). Chegaradan o'tgan birinchi daraja qaytariladi."""
+    levels: list[tuple[list[int], bool]] = []
     if topic is not None:
-        levels += [[topic.id], await _visible_topic_ids(db, topic.subject_id)]
-    levels.append(await _visible_topic_ids(db, None))
-    for topic_ids in levels:
+        levels += [([topic.id], False), (await _visible_topic_ids(db, topic.subject_id), False)]
+    levels.append((await _visible_topic_ids(db, None), True))
+    for topic_ids, include_library in levels:
         hits = await ai.vectors.search(
-            db, vec, source_types=CONTEXT_SOURCES, topic_ids=topic_ids, k=TOP_K
+            db,
+            vec,
+            source_types=CONTEXT_SOURCES + LIBRARY_SOURCES if include_library else CONTEXT_SOURCES,
+            topic_ids=topic_ids,
+            k=TOP_K,
+            include_library=include_library,
         )
         if hits and hits[0].score >= settings.ai_min_similarity:
             return hits
@@ -140,23 +147,29 @@ async def _is_hint(
     return False
 
 
+_TITLE_MODELS: dict[ChunkSource, type[Material] | type[Document] | type[Book]] = {
+    ChunkSource.material: Material,
+    ChunkSource.document: Document,
+    ChunkSource.book: Book,
+}
+
+
 async def _citations(db: AsyncSession, hits: list[Hit]) -> list[Citation]:
-    material_ids = [h.source_id for h in hits if h.source_type == ChunkSource.material]
-    titles: dict[int, str] = {}
-    if material_ids:
-        rows = await db.execute(
-            select(Material.id, Material.title).where(Material.id.in_(material_ids))
-        )
-        titles = {row.id: row.title for row in rows}
+    titles: dict[tuple[ChunkSource, int], str] = {}
+    for source, model in _TITLE_MODELS.items():
+        ids = [h.source_id for h in hits if h.source_type == source]
+        if ids:
+            rows = await db.execute(select(model.id, model.title).where(model.id.in_(ids)))
+            titles.update({(source, row.id): row.title for row in rows})
     return [
         Citation(
             n=i,
             source_type=h.source_type.value,
             source_id=h.source_id,
             page=h.page,
-            title=titles.get(h.source_id, "")
-            if h.source_type == ChunkSource.material
-            else "Glossariy",
+            title="Glossariy"
+            if h.source_type == ChunkSource.glossary
+            else titles.get((h.source_type, h.source_id), ""),
         )
         for i, h in enumerate(hits, start=1)
     ]

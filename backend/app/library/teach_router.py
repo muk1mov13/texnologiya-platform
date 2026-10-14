@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Response, UploadFile
 
 from app.auth.deps import StaffUser
-from app.core.deps import AppSettings, AppStorage, DbSession
+from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
 from app.core.forms import CategoryForm, LongTitleForm
 from app.core.types import DbIdPath
 from app.library import books
@@ -29,6 +29,7 @@ async def upload_book(
     db: DbSession,
     settings: AppSettings,
     storage: AppStorage,
+    jobs: Jobs,
     author: Annotated[str, Form(max_length=200)] = "",
     cover: UploadFile | None = None,
 ) -> Book:
@@ -42,6 +43,7 @@ async def upload_book(
         cover=cover,
         storage=storage,
         settings=settings,
+        jobs=jobs,
     )
 
 

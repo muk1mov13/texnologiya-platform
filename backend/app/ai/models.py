@@ -36,6 +36,9 @@ class ChunkSource(StrEnum):
 # Repetitor kontekstiga kiradigan manbalar. `activity`/`task` — faqat maslahat rejimi uchun.
 CONTEXT_SOURCES = (ChunkSource.material, ChunkSource.glossary)
 QUESTION_SOURCES = (ChunkSource.activity, ChunkSource.task)
+# Kutubxona bo'laklari hech qaysi fan/mavzuga bog'lanmagan (`subject_id`, `topic_id` NULL):
+# repetitor ularni faqat oxirgi (butun platforma) darajada qidiradi.
+LIBRARY_SOURCES = (ChunkSource.document, ChunkSource.book)
 
 
 class MessageRole(StrEnum):
@@ -72,7 +75,7 @@ class DocChunk(IdMixin, CreatedAtMixin, Base):
 
     source_type: Mapped[ChunkSource] = mapped_column(str_enum(ChunkSource))
     source_id: Mapped[int] = mapped_column(BigIntPK)
-    subject_id: Mapped[int] = mapped_column(
+    subject_id: Mapped[int | None] = mapped_column(
         BigIntPK, ForeignKey("subjects.id", ondelete="CASCADE"), index=True
     )
     topic_id: Mapped[int | None] = mapped_column(
