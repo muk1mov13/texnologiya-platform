@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const topicSchema = z.object({
   title: z.string().trim().min(2, { error: 'validation.titleMin' }).max(200, { error: 'validation.tooLong' }),
   summary: z.string().max(5000, { error: 'validation.tooLong' }),
+  lesson_type: z.enum(['lecture', 'practical', 'seminar', 'lab']),
   is_published: z.boolean(),
 })
 

@@ -164,6 +164,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
               >
                 {topic.title}
               </Link>
+              {topic.lesson_type !== 'lecture' && <Badge tone="slate">{t(`lessonType.${topic.lesson_type}`)}</Badge>}
               <PublishedBadge published={topic.is_published} />
               <Button
                 id={moveButtonId(topic.id, 'up')}

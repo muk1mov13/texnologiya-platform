@@ -5,8 +5,9 @@ import { useUpdateTopic } from '@/api/teach'
 import type { TopicEditor } from '@/api/types'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Checkbox, Field, Input, Textarea } from '@/components/ui/Field'
+import { Checkbox, Field, Input, Select, Textarea } from '@/components/ui/Field'
 import { pushToast } from '@/components/ui/toast-store'
+import { LESSON_TYPES } from '@/lib/lessonType'
 import { topicSchema, type TopicValues } from './schemas'
 
 export function TopicDetailsForm({ topic }: { topic: TopicEditor }) {
@@ -18,7 +19,12 @@ export function TopicDetailsForm({ topic }: { topic: TopicEditor }) {
     formState: { errors },
   } = useForm<TopicValues>({
     resolver: zodResolver(topicSchema),
-    defaultValues: { title: topic.title, summary: topic.summary, is_published: topic.is_published },
+    defaultValues: {
+      title: topic.title,
+      summary: topic.summary,
+      lesson_type: topic.lesson_type,
+      is_published: topic.is_published,
+    },
   })
 
   return (
@@ -32,6 +38,15 @@ export function TopicDetailsForm({ topic }: { topic: TopicEditor }) {
       >
         <Field id="topic-title" label={t('teach.topicTitle')} error={errors.title?.message}>
           <Input id="topic-title" aria-invalid={Boolean(errors.title)} {...register('title')} />
+        </Field>
+        <Field id="topic-lesson-type" label={t('teach.topicLessonType')}>
+          <Select id="topic-lesson-type" {...register('lesson_type')}>
+            {LESSON_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(`lessonType.${type}`)}
+              </option>
+            ))}
+          </Select>
         </Field>
         <Field id="topic-summary" label={t('teach.topicSummary')} error={errors.summary?.message}>
           <Textarea id="topic-summary" rows={3} aria-invalid={Boolean(errors.summary)} {...register('summary')} />
