@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### CI tuzatish: `useMediaQuery` jsdom'da
+- Push (`a1cd33e..a268662`) dan keyin CI `frontend` jobi yiqildi: `PlayerPage.test.tsx` dagi 14 test — `TypeError: window.matchMedia is not a function`. Sabab: `TutorDock` AI o'chiq bo'lsa ham `useMediaQuery` ni chaqiradi, jsdom'da esa `matchMedia` yo'q.
+- `lib/useMediaQuery.ts`: `matchMedia` bo'lmagan muhitda `false` qaytaradi va obuna bo'lmaydi.
+- Tekshiruv: lint, typecheck; testlar CI'da.
+
 ### 3B Task 9: qo'lda tekshiruv, tuzatishlar va hujjatlar
 - `npm run gen:api` — `schema.gen.ts` farqsiz.
 - Brauzerda (toza baza, backend 8011, `vite` 5174, Playwright) Gemini+Groq bilan tekshirildi:
