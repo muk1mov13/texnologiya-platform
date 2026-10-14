@@ -12,7 +12,7 @@ const emptyDashboard: Dashboard = {
 const aiDisabled: AiUsageMe = { used: 0, limit: null, enabled: false }
 
 const emptySite: SiteSettings = {
-  contacts: { phone: '', email: '', address: '' },
+  contacts: { phone: '', email: '', address: '', hours: '' },
   socials: { telegram: '', instagram: '', facebook: '', youtube: '' },
   about: '',
 }

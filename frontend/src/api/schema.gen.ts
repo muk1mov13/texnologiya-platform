@@ -2049,6 +2049,11 @@ export interface components {
              */
             email?: string;
             /**
+             * Hours
+             * @default
+             */
+            hours?: string;
+            /**
              * Phone
              * @default
              */

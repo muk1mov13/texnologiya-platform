@@ -827,6 +827,7 @@ export interface SiteContacts {
   phone: string
   email: string
   address: string
+  hours: string
 }
 
 export interface SiteSocials {

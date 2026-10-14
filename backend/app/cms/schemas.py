@@ -84,6 +84,7 @@ class Contacts(BaseModel):
     phone: str = Field(default="", max_length=50)
     email: str = Field(default="", max_length=150)
     address: str = Field(default="", max_length=300)
+    hours: str = Field(default="", max_length=100)
 
 
 class Socials(BaseModel):

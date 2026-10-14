@@ -35,6 +35,12 @@ function ContactInfo({ contacts }: { contacts: SiteContacts }) {
           {contacts.address}
         </p>
       )}
+      {contacts.hours && (
+        <p className="text-slate-700">
+          <span aria-hidden="true">🕘 </span>
+          {contacts.hours}
+        </p>
+      )}
     </Card>
   )
 }
@@ -43,7 +49,7 @@ export function ContactPage() {
   const { t } = useTranslation()
   const send = useSendContact()
   const contacts = useSite().data?.contacts
-  const hasContacts = !!contacts && !!(contacts.phone || contacts.email || contacts.address)
+  const hasContacts = !!contacts && !!(contacts.phone || contacts.email || contacts.address || contacts.hours)
   usePageMeta(t('contact.title'), t('contact.description'))
   const {
     register,

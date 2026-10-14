@@ -44,6 +44,7 @@ export const contactsSchema = z.object({
   phone: z.string().trim().max(50, { error: 'validation.tooLong' }),
   email: z.union([z.literal(''), z.email({ error: 'validation.email' }).max(150, { error: 'validation.tooLong' })]),
   address: z.string().trim().max(300, { error: 'validation.tooLong' }),
+  hours: z.string().trim().max(100, { error: 'validation.tooLong' }),
 })
 export type ContactsValues = z.infer<typeof contactsSchema>
 

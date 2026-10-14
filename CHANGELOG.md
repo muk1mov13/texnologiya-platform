@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
 
+### Task 2: kontaktlarda "Ish vaqti"
+- `cms/schemas.py: Contacts.hours` (≤100 belgi; JSON ustun, migratsiya shart emas). Admin "Sayt sozlamalari" formasida yangi maydon, `/contact` sahifasida ko'rsatiladi; demo ma'lumotga ham qo'shildi.
+- `types.ts`, `schema.gen.ts` (`gen:api`), i18n `adminSite.hours` (uz/ru).
+- Tekshiruv: ruff, mypy, lint, typecheck o'tdi.
+
 ### Task 1: `seed-demo` CLI
 - `app/cms/demo.py`: 6 ta demo yangilik (oxirgi 1–30 kun), 8 ta FAQ, sayt sozlamalari (kontaktlar, ijtimoiy tarmoqlar, "Biz haqimizda"). Qayta ishga tushirish xavfsiz (slug/savol bo'yicha o'tkazib yuboradi); `--force` sayt sozlamalarini almashtiradi.
 - `python -m app.cli seed-demo [--force]`; `CLAUDE.md` buyruqlar ro'yxatiga qo'shildi.

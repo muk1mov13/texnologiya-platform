@@ -116,6 +116,7 @@ DEMO_SITE: dict[str, Any] = {
         phone="+998 65 221 29 00",
         email="info@buxdpi.uz",
         address="Buxoro shahri, Piridastgir ko'chasi, 2-uy",
+        hours="Dushanba–Juma, 9:00–18:00",
     ).model_dump(),
     "socials": Socials(
         telegram="https://t.me/buxdpi_uz",

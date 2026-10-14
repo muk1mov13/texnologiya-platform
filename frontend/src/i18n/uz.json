@@ -861,6 +861,7 @@
     "phone": "Telefon",
     "email": "Email",
     "address": "Manzil",
+    "hours": "Ish vaqti",
     "about": "Biz haqimizda",
     "httpsOnly": "Havola https:// bilan boshlansin",
     "saved": "Sozlamalar saqlandi"

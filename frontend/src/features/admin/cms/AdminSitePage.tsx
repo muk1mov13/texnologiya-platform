@@ -60,6 +60,9 @@ function ContactsForm({ initial }: { initial: SiteSettings['contacts'] }) {
       <Field id="site-address" label={t('adminSite.address')} error={errors.address?.message}>
         <Input id="site-address" maxLength={300} {...register('address')} />
       </Field>
+      <Field id="site-hours" label={t('adminSite.hours')} error={errors.hours?.message}>
+        <Input id="site-hours" maxLength={100} {...register('hours')} />
+      </Field>
       <SaveButton pending={update.isPending} />
     </form>
   )
