@@ -6,14 +6,9 @@ import { buttonClasses } from '@/components/ui/button-classes'
 import { Card } from '@/components/ui/Card'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { usePageMeta } from '@/lib/usePageMeta'
+import { FeaturesSection } from './home/FeaturesSection'
 import { HeroSection } from './home/HeroSection'
 import { NewsCard } from './NewsCard'
-
-const FEATURES = [
-  { key: 'steps', icon: '🪜' },
-  { key: 'player', icon: '📖' },
-  { key: 'language', icon: '🌐' },
-] as const
 
 const LIBRARY_LINKS = [
   { tab: 'metodik', icon: '📚' },
@@ -32,18 +27,8 @@ export function HomePage() {
   return (
     <>
       <HeroSection />
+      <FeaturesSection />
       <div className="mx-auto flex max-w-6xl flex-col gap-16 px-4 py-16">
-      <section id="features" className="grid scroll-mt-24 gap-4 sm:grid-cols-3">
-        {FEATURES.map((feature) => (
-          <Card key={feature.key} className="flex flex-col gap-2">
-            <span className="text-3xl" aria-hidden="true">
-              {feature.icon}
-            </span>
-            <h2 className="text-lg font-bold">{t(`home.features.${feature.key}.title`)}</h2>
-            <p className="text-slate-600">{t(`home.features.${feature.key}.text`)}</p>
-          </Card>
-        ))}
-      </section>
 
       {news.data && news.data.items.length > 0 && (
         <section aria-labelledby="home-news" className="flex flex-col gap-5">

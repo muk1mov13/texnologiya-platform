@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 5: platforma xususiyatlari
+- `home/FeaturesSection.tsx` (`#features`): sarlavha bloki va 4 ustunli bento grid, 6 karta — 7 bosqichli mavzular (bosqichlar chiplari bilan), dars pleyeri, test/ha-yo'q/krossvord, XP va nishonlar, AI repetitor (namuna savol-javob pufakchalari bilan), ochiq kutubxona. Kartalar stagger bilan paydo bo'ladi.
+- `home/SpotlightCard.tsx`: kursorni kuzatuvchi yorug'lik dog'i, hoverda ko'tarilish va ikonka aylanishi.
+- Hero foni pastga qarab silliq so'nadi (keskin chegara yo'q). i18n: `home.featuresSection.*`, `home.features.*` (uz/ru); eski `language` kartasi chipga o'tgan.
+- Tekshiruv: lint, typecheck o'tdi; 1280px da ko'rildi.
+
 ### Redizayn Task 4: hero bo'limi
 - `features/public/home/HeroSection.tsx`: fonda suzuvchi gradient bloblar va nozik katak; pulslanuvchi badge; sarlavha so'zma-so'z (blur + yuqoriga) ochiladi, oxirgi qismi gradient matnda; "Boshlash"/"Kirish" (kirganga — "Kabinetga o'tish") tugmalari; 3 ta fakt chipi; "Pastga" ko'rsatkichi.
 - `HeroMockup.tsx` (bezak, `aria-hidden`): mavzu kartasida 7 bosqich ketma-ket belgilanadi, progress chizig'i o'sadi, atrofida "+10 XP", "Yangi nishon", "AI: savol bering" kartalari suzadi.

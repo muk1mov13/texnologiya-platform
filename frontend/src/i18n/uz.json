@@ -199,18 +199,37 @@
     },
     "start": "Boshlash",
     "continue": "Kabinetga o'tish",
+    "featuresSection": {
+      "eyebrow": "Platforma xususiyatlari",
+      "title": "O'qish, mashq va baholash — bir joyda",
+      "subtitle": "Talaba mavzuni boshidan oxirigacha o'tadi, o'qituvchi esa jarayonni kuzatib boradi"
+    },
     "features": {
       "steps": {
         "title": "7 bosqichli mavzular",
-        "text": "Takrorlashdan adabiyotlargacha — har bir mavzu bir xil, tushunarli tartibda"
+        "text": "Har bir mavzu bir xil, tushunarli tartibda: takrorlashdan adabiyotlargacha. Qaysi bosqichda qolganingiz doim ko'rinadi."
       },
       "player": {
         "title": "Qulay dars pleyeri",
         "text": "Ma'ruza va taqdimotlarni brauzerning o'zida, telefonda ham o'qing"
       },
-      "language": {
-        "title": "O'zbek va rus tillarida",
-        "text": "Interfeys tilini istalgan vaqtda almashtiring"
+      "activities": {
+        "title": "Test, ha/yo'q, krossvord",
+        "text": "Bilimni interaktiv mashqlar bilan mustahkamlang, natija darhol chiqadi"
+      },
+      "xp": {
+        "title": "XP va nishonlar",
+        "text": "Har bir bajarilgan bosqich uchun ball va yutuq nishonlari oling"
+      },
+      "tutor": {
+        "title": "AI repetitor",
+        "text": "Mavzu bo'yicha savol bering — javob dars materiallari va kutubxonadan, manbalari bilan olinadi.",
+        "ask": "Frezalash nima?",
+        "answer": "Frezalash — aylanuvchi kesuvchi asbob bilan ishlov berish usuli…"
+      },
+      "library": {
+        "title": "Ochiq kutubxona",
+        "text": "Metodik va huquqiy hujjatlar hamda kitoblar — ro'yxatdan o'tmasdan"
       }
     },
     "latestNews": "So'nggi yangiliklar",
