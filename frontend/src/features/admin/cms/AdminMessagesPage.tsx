@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { cx } from '@/lib/cx'
+import { formatDateTime } from '@/lib/format'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -47,7 +48,7 @@ function MessageCard({ message, onDelete }: { message: ContactMessage; onDelete:
         <ContactLink value={message.contact} />
         {!message.is_read && <Badge tone="brand">{t('adminMessages.new')}</Badge>}
         <span className="ml-auto text-sm text-slate-500">
-          {new Date(message.created_at).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' })}
+          {formatDateTime(message.created_at, i18n.language)}
         </span>
       </div>
       <p className="whitespace-pre-line break-words text-slate-800">{message.message}</p>

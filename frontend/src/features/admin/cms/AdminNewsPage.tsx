@@ -6,6 +6,7 @@ import { buttonClasses } from '@/components/ui/button-classes'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { cx, FOCUS_RING } from '@/lib/cx'
+import { formatDateTime } from '@/lib/format'
 import { NEWS_STATUS_TONE, newsStatus } from './newsStatus'
 
 export function AdminNewsPage() {
@@ -44,7 +45,7 @@ export function AdminNewsPage() {
                       <span className="min-w-0 flex-1 font-semibold break-words">{item.title}</span>
                       <Badge tone={NEWS_STATUS_TONE[status]}>{t(`adminNews.status.${status}`)}</Badge>
                       <span className="text-sm text-slate-500">
-                        {new Date(date).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' })}
+                        {formatDateTime(date, i18n.language)}
                       </span>
                       <span className="text-sm text-slate-500">{t('news.views', { count: item.views })}</span>
                     </Link>

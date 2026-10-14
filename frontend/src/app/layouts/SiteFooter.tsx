@@ -61,7 +61,7 @@ export function SiteFooter() {
           </div>
         )}
       </div>
-      <p className="border-t-2 border-slate-100 py-4 text-center text-sm text-slate-500">
+      <p className="border-t-2 border-slate-100 px-4 py-4 text-center text-sm text-slate-500">
         {t('footer.text', { year: new Date().getFullYear() })}
       </p>
     </footer>

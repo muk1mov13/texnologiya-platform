@@ -35,15 +35,27 @@ export function AppLayout() {
               <span className="hidden xl:inline">{user.full_name}</span>
               <span className="sr-only xl:hidden">{t('nav.profile')}</span>
             </NavLink>
-            <Button
-              variant="ghost"
-              size="sm"
-              loading={logout.isPending}
-              onClick={logout.logout}
-            >
-              {t('nav.logout')}
-            </Button>
-            <MobileMenu items={links} until="lg" />
+            {/* Telefonda "Chiqish" ☰ menyuda — header 360px ga sig'ishi uchun. */}
+            <span className="hidden sm:block">
+              <Button variant="ghost" size="sm" loading={logout.isPending} onClick={logout.logout}>
+                {t('nav.logout')}
+              </Button>
+            </span>
+            <MobileMenu
+              items={links}
+              until="lg"
+              extra={
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="sm:hidden"
+                  loading={logout.isPending}
+                  onClick={logout.logout}
+                >
+                  {t('nav.logout')}
+                </Button>
+              }
+            />
           </div>
         </div>
       </header>

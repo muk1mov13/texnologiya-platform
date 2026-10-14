@@ -6,6 +6,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 10: yakun va qo'lda tekshiruv
+- `npm run gen:api` — `schema.gen.ts` farqsiz.
+- Qo'lda tekshiruv alohida toza backend'da (`e2e/start-backend.mjs`, port 8011) va vite'da (5174, `API_PROXY_TARGET`): o'qituvchi kitob yukladi → admin faylni ochdi va tasdiqladi → mehmon katalogda ko'rdi va yuklab oldi; admin papka va hujjat qo'shdi (bo'sh bo'lmagan papkani o'chirish — `FOLDER_NOT_EMPTY` toast) → mehmon yuklab oldi; yangilik yaratildi va nashr qilindi (bosh sahifada, `<script>` chizilmaydi, title/OG to'g'ri, sitemap'da); FAQ, kontaktlar, ijtimoiy tarmoqlar (`http://` rad etiladi); mehmon RU tilida xabar yubordi → admin "Xabarlar (1)" da ko'rdi. 375px da 15 ta ilova/admin sahifasi va ochiq sahifalarda gorizontal scroll yo'q.
+- Tekshiruvda topilgan tuzatishlar: ilova header'i 360px da 27px chiqib ketardi — telefonda "Chiqish" ☰ menyuga ko'chirildi; `uz` lokalida ba'zi brauzerlar oy nomini "M10" deb chiqaradi — `formatDate`/`formatDateTime` o'zbekcha oy nomlarini qo'lda yig'adi (admin yangiliklar va xabarlar ham shundan foydalanadi); footer © qatoriga yon chekinish.
+- Kuzatuv (backend, tuzatilmadi): yangilik `excerpt` markdown/HTML belgilarini to'liq tozalamaydi (`<scriptalert(1)</script` matn sifatida description'ga tushadi — xavfsiz, lekin xunuk).
+- `CLAUDE.md`: loyiha holati (4B qurilgan) va frontend arxitekturasiga "Public site and CMS" bandi; roadmap: 4B ✅, keyingisi 4C rejasi.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 9: admin xabarlar va sayt sozlamalari
 - `AdminMessagesPage` (`/admin/messages`): "faqat o'qilmaganlar" filtri, xabar kartasi (kontakt email bo'lsa `mailto:`, telefon bo'lsa `tel:`), o'qilgan/o'qilmagan, o'chirish. Admin menyusida "Xabarlar" yonida o'qilmaganlar soni.
 - `AdminSitePage` (`/admin/site`): uchta alohida forma — kontaktlar, ijtimoiy tarmoqlar (faqat `https://`), "Biz haqimizda" (markdown + ko'rinish); har biri faqat o'z kalitini `PUT` qiladi, ochiq sayt keshi darhol yangilanadi.
