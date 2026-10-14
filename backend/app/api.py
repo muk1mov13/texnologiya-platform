@@ -14,8 +14,10 @@ from app.learning.router import router as learning_router
 from app.learning.teach_items_router import router as teach_items_router
 from app.learning.teach_materials_router import router as teach_materials_router
 from app.learning.teach_router import router as teach_router
+from app.library.admin_router import books_router as library_books_admin_router
 from app.library.admin_router import router as library_admin_router
 from app.library.public_router import router as library_public_router
+from app.library.teach_router import router as library_teach_router
 
 api_router = APIRouter(prefix="/api")
 
@@ -41,3 +43,5 @@ api_router.include_router(ai_teach_router)
 api_router.include_router(ai_admin_router)
 api_router.include_router(library_public_router)
 api_router.include_router(library_admin_router)
+api_router.include_router(library_books_admin_router)
+api_router.include_router(library_teach_router)

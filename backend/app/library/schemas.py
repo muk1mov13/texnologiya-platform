@@ -56,3 +56,39 @@ class FolderAdminOut(BaseModel):
 class DocumentUpdate(BaseModel):
     title: trimmed_str(max_length=300) | None = None  # type: ignore[valid-type]
     folder_id: DbId | None = None
+
+
+# --- kitoblar --------------------------------------------------------------------------------
+
+
+class BookOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    category: str
+    title: str
+    author: str
+    has_cover: bool
+    original_name: str
+    size: int
+    is_approved: bool
+    created_at: datetime
+
+
+class BookAdminOut(BookOut):
+    uploaded_by: int | None
+    uploader_name: str | None
+
+
+class BookUpdate(BaseModel):
+    category: trimmed_str(max_length=100) | None = None  # type: ignore[valid-type]
+    title: trimmed_str(max_length=300) | None = None  # type: ignore[valid-type]
+    author: str | None = Field(default=None, max_length=200)
+    is_approved: bool | None = None
+
+
+class BookPage(BaseModel):
+    items: list[BookOut]
+    total: int
+    page: int
+    size: int

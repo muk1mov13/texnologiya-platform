@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 2: kitoblar va tasdiqlash
+- Yangi `app/library/books.py`: yuklash (kitob 50 MB, ixtiyoriy muqova jpeg/png/webp 5 MB; muqova yaroqsiz bo'lsa asosiy fayl ham o'chiriladi), admin yuklagani darhol tasdiqlangan; ochiq katalog (faqat tasdiqlangan, kategoriya va `title`/`author` bo'yicha qidiruv — `%`/`_` ekranlanadi, sahifalash); kategoriyalar; o'qituvchi faqat o'zining tasdiqlanmagan kitobini o'chiradi (boshqaniki — 404, tasdiqlangani — 409 `BOOK_ALREADY_APPROVED`); admin ro'yxati yuklovchi ismi bilan, tahrir/tasdiqlash, muqovani almashtirish, o'chirish.
+- Router'lar: ochiq `GET /api/library/books`, `/books/categories`, `/books/{id}/file`, `/books/{id}/cover` (tasdiqlanmagani 404); `/api/teach/books` (`GET`, `POST` multipart, `DELETE`); `/api/admin/books` (`GET ?status=pending|approved`, `PATCH`, `PUT /{id}/cover`, `DELETE`).
+- `core/forms.py`: `CategoryForm`.
+- Tekshiruv: `ruff`, `mypy` toza; toza bazada 22 ta qo'lda tekshiruv (o'qituvchi → navbat → tasdiqlash → katalog, ruxsatlar, png/webp muqova) va media papkada ortiqcha fayl qolmagani.
+
 ### 4A Task 1: kutubxona papkalari va hujjatlari
 - Yangi `app/library/`: `schemas.py`, `folders.py` (daraxt ikki so'rov bilan, ichki papka boshqa bo'limda bo'lmaydi — 400 `FOLDER_SECTION_MISMATCH`, bo'sh bo'lmagan papka — 409 `FOLDER_NOT_EMPTY`), `documents.py` (`save_checked`, 50 MB, pdf/doc/docx/ppt/pptx).
 - Router'lar: ochiq `GET /api/library/folders?section=`, `GET /api/library/documents/{id}/file` (login'siz); admin `/api/admin/library/folders` (`POST`, `PATCH`, `DELETE`), `POST /folders/{id}/documents` (multipart), `PATCH` / `DELETE /documents/{id}`.

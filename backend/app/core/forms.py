@@ -15,3 +15,4 @@ def reject_blank(value: str) -> str:
 
 TitleForm = Annotated[str, Form(min_length=1, max_length=200), AfterValidator(reject_blank)]
 LongTitleForm = Annotated[str, Form(min_length=1, max_length=300), AfterValidator(reject_blank)]
+CategoryForm = Annotated[str, Form(min_length=1, max_length=100), AfterValidator(reject_blank)]
