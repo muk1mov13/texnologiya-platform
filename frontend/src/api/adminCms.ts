@@ -40,9 +40,12 @@ export const adminNewsCoverUrl = (id: number) => `/api/admin/news/${id}/cover`
 
 type Ordered = { id: number; order: number }
 
-/** Ikki qo'shni element o'rni almashadi; `order` teng bo'lsa birinchisi bittaga oshiriladi. */
-function swappedOrders(a: Ordered, b: Ordered): [number, number] {
-  return a.order === b.order ? [a.order + 1, b.order] : [b.order, a.order]
+/**
+ * Ko'rinish tartibidagi ikki qo'shni element (`upper` yuqorida) o'rni almashadi. `order` teng
+ * bo'lsa (backend keyin `id` bo'yicha tartiblaydi) yuqoridagi bittaga oshirilib pastga tushiriladi.
+ */
+function swappedOrders(upper: Ordered, lower: Ordered): [number, number] {
+  return upper.order === lower.order ? [upper.order + 1, lower.order] : [lower.order, upper.order]
 }
 
 // --- kutubxona: papkalar va hujjatlar -----------------------------------------------------

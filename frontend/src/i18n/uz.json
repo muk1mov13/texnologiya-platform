@@ -27,7 +27,9 @@
     "menuClose": "Menyuni yopish",
     "admin": "Boshqaruv",
     "adminSection": "Boshqaruv bo'limlari",
-    "myBooks": "Kitoblarim"
+    "myBooks": "Kitoblarim",
+    "adminLibrary": "Kutubxona",
+    "adminBooks": "Kitoblar"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
@@ -687,5 +689,42 @@
     "emptyText": "Yuklagan kitoblaringiz administrator tasdiqlagach hammaga ochiq bo'ladi.",
     "deleteTitle": "Kitobni o'chirish",
     "deleteText": "\"{{title}}\" kitobi o'chiriladi."
+  },
+  "adminLibrary": {
+    "title": "Kutubxona",
+    "subtitle": "Metodik va huquqiy hujjatlar papkalari. Hujjatlar saytda hammaga ochiq.",
+    "newFolder": "Papka",
+    "newSubfolder": "Ichki papka",
+    "renameFolder": "Papka nomini o'zgartirish",
+    "folderTitle": "Papka nomi",
+    "subfolder": "Papka",
+    "document": "Hujjat",
+    "addDocument": "Hujjat qo'shish",
+    "editDocument": "Hujjatni tahrirlash",
+    "documentTitle": "Hujjat nomi",
+    "folder": "Papka",
+    "moveUp": "\"{{title}}\" ni yuqoriga",
+    "moveDown": "\"{{title}}\" ni pastga",
+    "deleteFolderTitle": "Papkani o'chirish",
+    "deleteFolderText": "\"{{title}}\" papkasi o'chiriladi. Ichida papka yoki hujjat bo'lsa, avval ularni o'chiring.",
+    "deleteDocumentTitle": "Hujjatni o'chirish",
+    "deleteDocumentText": "\"{{title}}\" hujjati va uning fayli o'chiriladi."
+  },
+  "adminBooks": {
+    "title": "Kitoblar",
+    "subtitle": "O'qituvchilar yuklagan kitoblar tasdiqlangach kutubxona katalogida ochiq bo'ladi.",
+    "tab": { "pending": "Tasdiq kutayotganlar", "approved": "Tasdiqlanganlar" },
+    "empty": { "pending": "Tasdiq kutayotgan kitoblar yo'q", "approved": "Tasdiqlangan kitoblar yo'q" },
+    "uploadedBy": "Yuklagan: {{name}}",
+    "unknownUploader": "noma'lum",
+    "approve": "Tasdiqlash",
+    "unapprove": "Tasdiqni bekor qilish",
+    "approvedToast": "Kitob tasdiqlandi va katalogga qo'shildi",
+    "unapprovedToast": "Kitob katalogdan olindi",
+    "open": "Faylni ochish",
+    "editTitle": "Kitobni tahrirlash",
+    "addCover": "Muqova qo'shish",
+    "replaceCover": "Muqovani almashtirish",
+    "saved": "Kitob saqlandi"
   }
 }

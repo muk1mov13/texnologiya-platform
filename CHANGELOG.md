@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 7: admin kutubxona va kitoblar navbati
+- `AdminLibraryPage` (`/admin/library`): bo'lim tablari; papkalar daraxti — papka/ichki papka qo'shish, nomini o'zgartirish, ↑/↓ tartib (`useSwapFolders`, juftlik ko'rinish tartibida), o'chirish (`FOLDER_NOT_EMPTY` umumiy toast); hujjat qo'shish (nom fayl nomidan to'ldiriladi), tahrir (nom va boshqa papkaga ko'chirish), o'chirish. Modallar `LibraryModals.tsx` da.
+- `AdminBooksPage` (`/admin/books?status=`): tasdiq kutayotgan / tasdiqlangan tablari; har kitobda yuklovchi, hajm, sana, faylni ochish (admin endpoint, `useProtectedDownload`), tasdiqlash / tasdiqni bekor qilish, tahrir (`BookEditModal`: nom, muallif, kategoriya, muqova almashtirish), o'chirish.
+- Admin menyusiga "Sayt" guruhi (Kutubxona, Kitoblar); zod sxemalar `features/admin/cms/schemas.ts`.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 6: "Kitoblarim"
 - Yangi `MyBooksPage` (`/teach/books`, o'qituvchi va admin menyusida): kitoblar ro'yxati, holat belgisi (tasdiqlangan / tasdiq kutilmoqda), tasdiqlanmaganini o'chirish (`ConfirmDialog`), tasdiqlanganini yuklab olish.
 - `BookUploadModal`: nom, muallif, kategoriya (mavjudlari `<datalist>` da), fayl va ixtiyoriy muqova; `bookUploadSchema` (uzunliklar backend bilan bir xil); admin uchun "darhol tasdiqlanadi" eslatmasi; xato forma ichida.

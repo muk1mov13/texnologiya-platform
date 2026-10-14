@@ -56,4 +56,11 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: '/admin/ai', label: 'nav.adminAi' },
     ],
   },
+  {
+    label: 'navGroups.site',
+    items: [
+      { to: '/admin/library', label: 'nav.adminLibrary' },
+      { to: '/admin/books', label: 'nav.adminBooks' },
+    ],
+  },
 ]
