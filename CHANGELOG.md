@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 7: yangiliklar, kutubxona va AI repetitor bloklari
+- `home/NewsSection.tsx`: yorliq + sarlavha, "Barcha yangiliklar →", 3 ta `NewsCard` stagger va hover ko'tarilishi bilan; yangilik bo'lmasa bo'lim chiqmaydi.
+- `home/ExploreSection.tsx`: Kutubxona kartasi (3 bo'lim havolasi SVG ikonkalar va strelka bilan) va to'q gradient AI repetitor kartasi (suzuvchi blob, oq CTA).
+- `HomePage` endi faqat bo'limlarni yig'adi. i18n: `home.newsEyebrow`, `home.exploreLabel` (uz/ru).
+- Tekshiruv: lint, typecheck o'tdi; 1280px da ko'rildi (lokal bazada yangilik yo'q — yangiliklar bloki vizual tekshirilmadi).
+
 ### Redizayn Task 6: "Platforma qanday ishlaydi"
 - `home/HowItWorksSection.tsx` (`#how-it-works`): 4 qadam — ro'yxatdan o'tish, administrator tasdig'i, fan va mavzuni tanlash, 7 bosqich va XP. Gradient raqamli ikonkalar; ularni bog'lovchi chiziq scroll bilan to'ladi (`useScroll` + `useSpring`; `lg` da gorizontal, telefonda vertikal).
 - i18n: `home.how.*` (uz/ru).
