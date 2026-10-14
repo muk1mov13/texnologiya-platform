@@ -21,13 +21,13 @@ test('o\'qituvchi muharrir havolasini ko\'radi, admin bo\'limlarini ko\'rmaydi',
   renderRoutes(routes, { url: '/app', user: teacherUser })
   const nav = screen.getByRole('navigation')
   expect(within(nav).getByRole('link', { name: i18n.t('nav.teach') })).toBeInTheDocument()
-  expect(within(nav).queryByRole('link', { name: i18n.t('nav.adminUsers') })).not.toBeInTheDocument()
+  expect(within(nav).queryByRole('link', { name: i18n.t('nav.admin') })).not.toBeInTheDocument()
 })
 
 test('admin barcha bo\'limlarni ko\'radi', () => {
   renderRoutes(routes, { url: '/app', user: adminUser })
   const nav = screen.getByRole('navigation')
-  for (const key of ['nav.subjects', 'nav.teach', 'nav.adminUsers', 'nav.adminSubjects']) {
+  for (const key of ['nav.subjects', 'nav.teach', 'nav.admin']) {
     expect(within(nav).getByRole('link', { name: i18n.t(key) })).toBeInTheDocument()
   }
 })

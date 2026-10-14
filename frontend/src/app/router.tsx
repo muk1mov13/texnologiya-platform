@@ -26,6 +26,7 @@ import { StatsPage } from '@/features/teach/StatsPage'
 import { TeachHomePage } from '@/features/teach/TeachHomePage'
 import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
+import { AdminLayout } from './layouts/AdminLayout'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
 import { RouteError } from './RouteError'
@@ -84,9 +85,14 @@ export const routes: RouteObject[] = [
             element: <RequireAuth roles={['admin']} />,
             children: [
               { path: 'admin', element: <Navigate to="/admin/users" replace /> },
-              { path: 'admin/users', element: <AdminUsersPage /> },
-              { path: 'admin/subjects', element: <AdminSubjectsPage /> },
-              { path: 'admin/ai', element: <AdminAiPage /> },
+              {
+                element: <AdminLayout />,
+                children: [
+                  { path: 'admin/users', element: <AdminUsersPage /> },
+                  { path: 'admin/subjects', element: <AdminSubjectsPage /> },
+                  { path: 'admin/ai', element: <AdminAiPage /> },
+                ],
+              },
             ],
           },
         ],

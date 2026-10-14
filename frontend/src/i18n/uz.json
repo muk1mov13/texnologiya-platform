@@ -24,7 +24,9 @@
     "about": "Biz haqimizda",
     "contact": "Bog'lanish",
     "menuOpen": "Menyuni ochish",
-    "menuClose": "Menyuni yopish"
+    "menuClose": "Menyuni yopish",
+    "admin": "Boshqaruv",
+    "adminSection": "Boshqaruv bo'limlari"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
@@ -658,5 +660,6 @@
     "sent": "Xabaringiz yuborildi",
     "sentText": "Rahmat! Tez orada siz bilan bog'lanamiz.",
     "again": "Yana yozish"
-  }
+  },
+  "navGroups": { "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" }
 }

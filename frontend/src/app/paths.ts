@@ -35,12 +35,24 @@ export function navLinksFor(role: Role): NavItem[] {
       { to: '/teach/stats', label: 'nav.stats' },
     )
   }
-  if (role === 'admin') {
-    items.push(
-      { to: '/admin/users', label: 'nav.adminUsers' },
-      { to: '/admin/subjects', label: 'nav.adminSubjects' },
-      { to: '/admin/ai', label: 'nav.adminAi' },
-    )
-  }
+  // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminLayout` da.
+  if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin' })
   return items
 }
+
+export interface NavGroup {
+  label: string
+  items: NavItem[]
+}
+
+/** `/admin/*` ichki menyusi (`AdminLayout`). */
+export const ADMIN_NAV: NavGroup[] = [
+  { label: 'navGroups.people', items: [{ to: '/admin/users', label: 'nav.adminUsers' }] },
+  {
+    label: 'navGroups.learning',
+    items: [
+      { to: '/admin/subjects', label: 'nav.adminSubjects' },
+      { to: '/admin/ai', label: 'nav.adminAi' },
+    ],
+  },
+]

@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 5: guruhlangan admin menyusi va mobil menyu
+- `paths.ts`: admin yuqori menyuda bitta "Boshqaruv" (`/admin`) havolasini ko'radi; yangi `ADMIN_NAV` guruhlari (Foydalanuvchilar · O'quv jarayoni; "Sayt" guruhi keyingi tasklarda to'ldiriladi).
+- Yangi `AdminLayout`: `md` dan kengda chapda guruhlangan menyu, telefonda ochiladigan ro'yxat (tanlansa o'tadi); `/admin/*` marshrutlari shu layout ichida.
+- `AppLayout`: menyu `lg` dan kichikda `MobileMenu` ga (☰) yig'iladi, `overflow-x-auto` olib tashlandi — 3B'da kuzatilgan gorizontal scroll hal qilindi; profil ismi faqat `xl` dan.
+- `AppLayout.test.tsx`: admin kutilgan havolalari yangi tuzilishga moslandi (testlar ishga tushirilmadi — loyiha oxirida).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 4: FAQ, "Biz haqimizda" va bog'lanish
 - `FaqPage` (`/faq`): `<details>` akkordeon, oxirida bog'lanish sahifasiga havola.
 - `AboutPage` (`/about`): `/api/site` dagi `about` markdown sifatida; bo'sh bo'lsa `EmptyState`.

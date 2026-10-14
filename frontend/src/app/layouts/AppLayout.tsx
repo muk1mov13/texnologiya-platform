@@ -4,6 +4,7 @@ import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Button } from '@/components/ui/Button'
 import { homePathFor, navLinksFor } from '../paths'
 import { LanguageSwitch } from './LanguageSwitch'
+import { MobileMenu } from './MobileMenu'
 import { navClass } from './navClass'
 
 export function AppLayout() {
@@ -11,19 +12,17 @@ export function AppLayout() {
   const user = useCurrentUser()
   const logout = useLogoutAndRedirect()
   if (!user) return null
+  const links = navLinksFor(user.role)
 
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b-2 border-slate-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
+        <div className="relative mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <Link to={homePathFor(user)} className="text-lg font-extrabold text-brand-700">
             {t('app.name')}
           </Link>
-          <nav
-            aria-label={t('nav.main')}
-            className="order-last flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto sm:flex-1"
-          >
-            {navLinksFor(user.role).map((item) => (
+          <nav aria-label={t('nav.main')} className="hidden flex-1 gap-1 lg:flex">
+            {links.map((item) => (
               <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
                 {t(item.label)}
               </NavLink>
@@ -33,8 +32,8 @@ export function AppLayout() {
             <LanguageSwitch />
             <NavLink to="/app/profile" className={navClass} title={t('nav.profile')}>
               <span aria-hidden="true">👤 </span>
-              <span className="hidden md:inline">{user.full_name}</span>
-              <span className="sr-only md:hidden">{t('nav.profile')}</span>
+              <span className="hidden xl:inline">{user.full_name}</span>
+              <span className="sr-only xl:hidden">{t('nav.profile')}</span>
             </NavLink>
             <Button
               variant="ghost"
@@ -44,6 +43,7 @@ export function AppLayout() {
             >
               {t('nav.logout')}
             </Button>
+            <MobileMenu items={links} until="lg" />
           </div>
         </div>
       </header>
