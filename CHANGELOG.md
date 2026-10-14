@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 7: sitemap va robots
+- Yangi `app/cms/seo.py`: `sitemap_xml()` — ochiq statik sahifalar (`/`, `/news`, `/library`, `/faq`, `/about`, `/contact`) va nashr qilingan yangiliklar (`lastmod` — `updated_at`, 5000 tagacha, XML ekranlangan); `robots_txt()` — `/app`, `/teach`, `/admin`, `/api`, `/pending` yopiq, sitemap manzili. Manzillar `PUBLIC_BASE_URL` dan.
+- Ochiq `GET /api/seo/sitemap.xml` (`application/xml`), `GET /api/seo/robots.txt` (`text/plain`), OpenAPI'da ko'rinmaydi; prod'da nginx `/sitemap.xml` va `/robots.txt` ni ularga proksilaydi (4C).
+- Tekshiruv: `ruff`, `mypy` toza; qo'lda — XML parse qilinadi, qoralama yangilik sitemap'da yo'q.
+
 ### 4A Task 6: kutubxona AI indeksi
 - `doc_chunks.subject_id` nullable — migratsiya `6f7e4555d66d_doc_chunks_subject_nullable` (`existing_type` BIGINT/SQLite INTEGER; `downgrade` avval kutubxona bo'laklarini o'chiradi); `LIBRARY_SOURCES` (`document`, `book`); `ChunkRow.subject_id` ixtiyoriy.
 - `VectorStore.search(..., include_library=False)`: ikkala dialektda mavzusiz kutubxona bo'laklarini ham qamraydi (`_scope`).

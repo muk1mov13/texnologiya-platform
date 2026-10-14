@@ -5,7 +5,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request, Response
 
-from app.cms import contact, faq, news, site
+from app.cms import contact, faq, news, seo, site
 from app.cms.models import FaqItem
 from app.cms.schemas import ContactIn, FaqOut, NewsOut, NewsPage, SiteOut
 from app.core.deps import AppSettings, AppStorage, ContactLimiter, DbSession
@@ -63,3 +63,15 @@ async def contact_form(
     if not data.website:
         await contact.save_message(db, data)
     return Response(status_code=204)
+
+
+# Prod'da nginx `/sitemap.xml` va `/robots.txt` ni shu manzillarga proksilaydi (4C).
+@router.get("/seo/sitemap.xml", include_in_schema=False)
+async def sitemap(db: DbSession, settings: AppSettings) -> Response:
+    body = await seo.sitemap_xml(db, settings.public_base_url)
+    return Response(content=body, media_type="application/xml")
+
+
+@router.get("/seo/robots.txt", include_in_schema=False)
+async def robots(settings: AppSettings) -> Response:
+    return Response(content=seo.robots_txt(settings.public_base_url), media_type="text/plain")
