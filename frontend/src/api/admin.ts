@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from './client'
+import { invalidateStudentCaches } from './teach'
 import type {
   AdminUserUpdateIn,
   SubjectAdmin,
@@ -94,5 +95,32 @@ export function useSetTeachers() {
     mutationFn: ({ id, teacherIds }: { id: number; teacherIds: number[] }) =>
       apiFetch<SubjectAdmin>(`/api/admin/subjects/${id}/teachers`, { method: 'PUT', json: { teacher_ids: teacherIds } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.subjects }),
+  })
+}
+
+/** O'quv dasturi (PDF/DOC/DOCX); DOC/DOCX server so'rov ichida PDF'ga o'giradi. */
+export function useUploadSyllabus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => {
+      const body = new FormData()
+      body.append('file', file)
+      return apiFetch<SubjectAdmin>(`/api/admin/subjects/${id}/syllabus`, { method: 'PUT', body })
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.subjects })
+      invalidateStudentCaches(queryClient)
+    },
+  })
+}
+
+export function useDeleteSyllabus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiFetch<SubjectAdmin>(`/api/admin/subjects/${id}/syllabus`, { method: 'DELETE' }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.subjects })
+      invalidateStudentCaches(queryClient)
+    },
   })
 }

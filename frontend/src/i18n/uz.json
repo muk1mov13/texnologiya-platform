@@ -78,6 +78,10 @@
   },
   "errors": {
     "NETWORK": "Serverga ulanib bo'lmadi. Internet aloqasini tekshirib, qayta urinib ko'ring",
+    "SYLLABUS_NOT_FOUND": "O'quv dasturi topilmadi",
+    "CONVERSION_FAILED": "Faylni PDF'ga aylantirib bo'lmadi. Faylni tekshirib, qayta urinib ko'ring",
+    "CONVERSION_TIMEOUT": "Konvertatsiya juda uzoq davom etdi. Qayta urinib ko'ring",
+    "LIBREOFFICE_NOT_FOUND": "Serverda LibreOffice o'rnatilmagan. PDF fayl yuklang",
     "VALIDATION_ERROR": "Kiritilgan ma'lumotlar noto'g'ri",
     "NOT_FOUND": "Ma'lumot topilmadi",
     "INTERNAL_ERROR": "Serverda xato yuz berdi. Birozdan so'ng qayta urinib ko'ring",
@@ -441,7 +445,13 @@
       "noAssigned": "O'qituvchi biriktirilmagan",
       "saved": "Saqlandi",
       "deleteTitle": "Fanni o'chirish",
-      "deleteText": "«{{title}}» fani barcha mavzu va materiallari bilan o'chiriladi. Bu amalni qaytarib bo'lmaydi."
+      "deleteText": "«{{title}}» fani barcha mavzu va materiallari bilan o'chiriladi. Bu amalni qaytarib bo'lmaydi.",
+      "syllabusFile": "O'quv dasturi: {{name}}",
+      "syllabusNone": "O'quv dasturi yuklanmagan",
+      "syllabusUpload": "Dasturni yuklash",
+      "syllabusReplace": "Dasturni almashtirish",
+      "syllabusDelete": "Dasturni o'chirish",
+      "syllabusSaved": "O'quv dasturi saqlandi"
     }
   },
   "rewards": {

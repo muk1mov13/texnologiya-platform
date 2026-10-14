@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 9: admin — o'quv dasturi
+- `api/admin.ts`: `useUploadSyllabus()` (`PUT`, `FormData`), `useDeleteSyllabus()`; ikkalasi admin va talaba keshlarini yangilaydi.
+- `AdminSubjectsPage`: har fan qatorida `SyllabusControls` — dastur nomi yoki "yuklanmagan", yuklash/almashtirish (PDF/DOC/DOCX, yashirin `input`), o'chirish.
+- i18n: `admin.subjects.syllabus*`, `errors.SYLLABUS_NOT_FOUND`, `errors.CONVERSION_FAILED|CONVERSION_TIMEOUT|LIBREOFFICE_NOT_FOUND` (uz + ru).
+- Tekshiruv: typecheck, lint, build o'tdi.
+
 ### Task 8: o'qituvchi — mavzu turi
 - `TopicDetailsForm`: "Mashg'ulot turi" `Select` (`LESSON_TYPES`), `topicSchema`ga `lesson_type`. Saqlanganda talaba keshlari ham yangilanadi (mavjud `useUpdateTopic`).
 - `TeachHomePage`: ma'ruza bo'lmagan mavzular qatorida tur `Badge`i.

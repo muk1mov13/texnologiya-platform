@@ -1,12 +1,20 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAdminSubjects, useDeleteSubject, useTeachers, useUpdateSubject } from '@/api/admin'
+import {
+  useAdminSubjects,
+  useDeleteSubject,
+  useDeleteSyllabus,
+  useTeachers,
+  useUpdateSubject,
+  useUploadSyllabus,
+} from '@/api/admin'
 import type { SubjectAdmin } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
+import { pushToast } from '@/components/ui/toast-store'
 import { SubjectFormModal } from './SubjectFormModal'
 import { TeachersModal } from './TeachersModal'
 
@@ -48,6 +56,7 @@ export function AdminSubjectsPage() {
                         ? t('admin.subjects.noAssigned')
                         : subject.teacher_ids.map((id) => teacherNames.get(id) ?? `#${id}`).join(', ')}
                     </p>
+                    <SyllabusControls subject={subject} />
                   </div>
                   <Badge tone={subject.is_published ? 'green' : 'amber'}>
                     {subject.is_published ? t('common.published') : t('common.draft')}
@@ -94,6 +103,52 @@ export function AdminSubjectsPage() {
           if (toDelete) remove.mutate(toDelete.id, { onSuccess: () => setToDelete(null) })
         }}
       />
+    </div>
+  )
+}
+
+function SyllabusControls({ subject }: { subject: SubjectAdmin }) {
+  const { t } = useTranslation()
+  const upload = useUploadSyllabus()
+  const remove = useDeleteSyllabus()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const inputId = `syllabus-${subject.id}`
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-slate-600">
+        {subject.syllabus_name
+          ? t('admin.subjects.syllabusFile', { name: subject.syllabus_name })
+          : t('admin.subjects.syllabusNone')}
+      </span>
+      <label htmlFor={inputId} className="sr-only">
+        {t('admin.subjects.syllabusUpload')}
+      </label>
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="file"
+        accept=".pdf,.doc,.docx"
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          event.target.value = ''
+          if (file) {
+            upload.mutate(
+              { id: subject.id, file },
+              { onSuccess: () => pushToast('success', t('admin.subjects.syllabusSaved')) },
+            )
+          }
+        }}
+      />
+      <Button size="sm" variant="secondary" loading={upload.isPending} onClick={() => inputRef.current?.click()}>
+        {subject.syllabus_name ? t('admin.subjects.syllabusReplace') : t('admin.subjects.syllabusUpload')}
+      </Button>
+      {subject.syllabus_name && (
+        <Button size="sm" variant="ghost" loading={remove.isPending} onClick={() => remove.mutate(subject.id)}>
+          {t('admin.subjects.syllabusDelete')}
+        </Button>
+      )}
     </div>
   )
 }
