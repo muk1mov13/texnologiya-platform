@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
@@ -20,14 +20,14 @@ export function ExploreSection() {
 
   return (
     <section aria-label={t('home.exploreLabel')} className="py-20 sm:py-24">
-      <motion.div
+      <m.div
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT_ONCE}
         variants={stagger(0.12)}
         className="mx-auto grid max-w-6xl gap-5 px-4 lg:grid-cols-2"
       >
-        <motion.div
+        <m.div
           variants={fadeUp}
           className="flex flex-col gap-5 rounded-3xl border border-slate-200/80 bg-white p-7 shadow-soft sm:p-9"
         >
@@ -58,9 +58,9 @@ export function ExploreSection() {
               </Link>
             ))}
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           variants={fadeUp}
           className="relative isolate flex flex-col items-start gap-5 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-800 to-brand-950 p-7 text-white shadow-glow sm:p-9"
         >
@@ -87,8 +87,8 @@ export function ExploreSection() {
             {t(user ? 'home.tutor.open' : 'home.tutor.join')}
             <Icon name="arrowRight" className="size-4 transition-transform group-hover:translate-x-1" />
           </Link>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </section>
   )
 }

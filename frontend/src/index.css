@@ -147,3 +147,11 @@
     @apply block overflow-x-auto;
   }
 }
+
+/* Chop etishda `whileInView` hali ishlamagan (ko'rinmas) bo'limlar ham chiqsin. */
+@media print {
+  [style*="opacity: 0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

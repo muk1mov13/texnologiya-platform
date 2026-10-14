@@ -1,4 +1,4 @@
-import { motion, useMotionValueEvent, useScroll } from 'motion/react'
+import { m, useMotionValueEvent, useScroll } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useMatch } from 'react-router'
@@ -64,7 +64,7 @@ export function PublicLayout() {
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <motion.span
+                      <m.span
                         layoutId="public-nav-pill"
                         transition={SPRING}
                         aria-hidden="true"

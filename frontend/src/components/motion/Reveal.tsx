@@ -1,4 +1,4 @@
-import { motion, type HTMLMotionProps } from 'motion/react'
+import { m, type HTMLMotionProps } from 'motion/react'
 import { fadeUp, VIEWPORT_ONCE, withDelay } from '@/lib/motion'
 
 interface RevealProps extends HTMLMotionProps<'div'> {
@@ -12,7 +12,7 @@ interface RevealProps extends HTMLMotionProps<'div'> {
  */
 export function Reveal({ delay = 0, variants = fadeUp, ...rest }: RevealProps) {
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       whileInView="show"
       viewport={VIEWPORT_ONCE}

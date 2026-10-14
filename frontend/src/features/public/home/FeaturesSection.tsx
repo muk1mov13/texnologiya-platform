@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/components/icons/Icon'
 import type { IconName } from '@/components/icons/paths'
@@ -71,7 +71,7 @@ export function FeaturesSection() {
           <p className="text-lg text-slate-600">{t('home.featuresSection.subtitle')}</p>
         </Reveal>
 
-        <motion.div
+        <m.div
           initial="hidden"
           whileInView="show"
           viewport={VIEWPORT_ONCE}
@@ -88,7 +88,7 @@ export function FeaturesSection() {
               <FeatureExtra featureKey={feature.key} />
             </SpotlightCard>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

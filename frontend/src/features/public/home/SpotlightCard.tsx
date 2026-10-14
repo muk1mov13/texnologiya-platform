@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import type { MouseEvent, ReactNode } from 'react'
 import { cx } from '@/lib/cx'
 import { fadeUp } from '@/lib/motion'
@@ -17,7 +17,7 @@ export function SpotlightCard({ children, className }: SpotlightCardProps) {
   }
 
   return (
-    <motion.div
+    <m.div
       variants={fadeUp}
       onMouseMove={onMove}
       className={cx(
@@ -35,6 +35,6 @@ export function SpotlightCard({ children, className }: SpotlightCardProps) {
         }}
       />
       <div className="relative flex h-full flex-col">{children}</div>
-    </motion.div>
+    </m.div>
   )
 }

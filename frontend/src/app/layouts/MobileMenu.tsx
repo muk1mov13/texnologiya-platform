@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router'
@@ -57,7 +57,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
         )}
       >
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span
+          <m.span
             key={open ? 'close' : 'menu'}
             initial={{ opacity: 0, rotate: -90 }}
             animate={{ opacity: 1, rotate: 0 }}
@@ -65,13 +65,13 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
             transition={{ duration: 0.15 }}
           >
             <Icon name={open ? 'close' : 'menu'} />
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </button>
       <AnimatePresence>
         {open && (
           <>
-            <motion.div
+            <m.div
               key="backdrop"
               className="fixed inset-0 z-30 bg-slate-900/10"
               aria-hidden="true"
@@ -80,7 +80,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
-            <motion.div
+            <m.div
               key="panel"
               id={panelId}
               className="absolute inset-x-0 top-full z-40 origin-top border-b-2 border-slate-100 bg-white/95 px-4 pb-4 shadow-soft backdrop-blur-xl"
@@ -89,7 +89,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
               exit={{ opacity: 0, y: -8, scaleY: 0.96 }}
               transition={{ duration: 0.25, ease: EASE_OUT }}
             >
-              <motion.nav
+              <m.nav
                 aria-label={t('nav.main')}
                 className="flex flex-col gap-1 pt-2"
                 initial="hidden"
@@ -97,7 +97,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
                 transition={{ staggerChildren: 0.035 }}
               >
                 {items.map((item) => (
-                  <motion.div key={item.to} variants={ITEM_VARIANTS}>
+                  <m.div key={item.to} variants={ITEM_VARIANTS}>
                     <NavLink
                       to={item.to}
                       end={item.end}
@@ -106,15 +106,15 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
                     >
                       {t(item.label)}
                     </NavLink>
-                  </motion.div>
+                  </m.div>
                 ))}
-              </motion.nav>
+              </m.nav>
               {extra && (
                 <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-slate-100 pt-3" onClick={close}>
                   {extra}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

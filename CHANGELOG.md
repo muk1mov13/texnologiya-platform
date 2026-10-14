@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 11: sayqal va hujjatlar
+- `LazyMotion strict` (`main.tsx`): barcha komponentlar `motion.*` → `m.*`; animatsiya imkoniyatlari (`domMax`, `layoutId` uchun) alohida chunk — `lib/motionFeatures.ts`. Asosiy bundle gzip 322.5 → 302.5 KB, `motionFeatures` 28.3 KB keyin yuklanadi.
+- `index.css`: chop etishda hali ko'rinmagan (`whileInView`) bo'limlar ham chiqadi.
+- `CLAUDE.md`: frontend arxitekturasiga "Motion (public site)" bandi.
+- Tekshiruv: lint, typecheck, build o'tdi; 375/768/1280px da gorizontal scroll yo'q, scroll qilinganda barcha bo'limlar ochiladi; `prefers-reduced-motion: reduce` da kontent darhol ko'rinadi; `/faq` yangi accordion bilan ishlaydi. Vitest/E2E ishga tushirilmadi (loyiha qoidasi: testlar oxirida) — `PublicLayout.test`/FAQ testlari yangi markupga moslashtirilishi kerak bo'lishi mumkin.
+
 ### Redizayn Task 10: footer
 - `SiteFooter`: to'q fon (`slate-950`) va yuqori chetida gradient chiziq; ustunlar — `BrandLogo` + tagline + ijtimoiy tarmoqlar (SVG ikonka tugmalar, `aria-label` bilan), Bo'limlar, Kutubxona (3 bo'lim), Kontaktlar (telefon/email/manzil SVG ikonkalar bilan). Pastki qatorda © va "Yuqoriga" tugmasi (silliq scroll).
 - Avvalgi mantiq saqlandi: kontakt yoki ijtimoiy tarmoq kiritilmagan bo'lsa, ular chiqmaydi. i18n: `footer.toTop` (uz/ru).

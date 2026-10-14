@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
@@ -46,8 +46,8 @@ export function HeroSection() {
       </div>
 
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pt-14 pb-20 sm:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:pt-24 lg:pb-28">
-        <motion.div initial="hidden" animate="show" variants={stagger(0.1)} className="flex flex-col items-start gap-6">
-          <motion.span
+        <m.div initial="hidden" animate="show" variants={stagger(0.1)} className="flex flex-col items-start gap-6">
+          <m.span
             variants={fadeUp}
             className="inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-white/70 px-3 py-1 text-sm font-semibold text-brand-800 shadow-sm backdrop-blur"
           >
@@ -56,29 +56,29 @@ export function HeroSection() {
               <span className="relative inline-flex size-2 rounded-full bg-brand-500" />
             </span>
             {t('home.hero.badge')}
-          </motion.span>
+          </m.span>
 
-          <motion.h1
+          <m.h1
             variants={stagger(0.05)}
             className="text-4xl leading-[1.08] font-extrabold tracking-tight text-balance text-slate-900 sm:text-5xl lg:text-[3.4rem]"
           >
             {lead.map((word, index) => (
-              <motion.span key={`l${index}`} variants={WORD} className="mr-[0.25em] inline-block">
+              <m.span key={`l${index}`} variants={WORD} className="mr-[0.25em] inline-block">
                 {word}
-              </motion.span>
+              </m.span>
             ))}
             {accent.map((word, index) => (
-              <motion.span key={`a${index}`} variants={WORD} className="text-gradient mr-[0.25em] inline-block">
+              <m.span key={`a${index}`} variants={WORD} className="text-gradient mr-[0.25em] inline-block">
                 {word}
-              </motion.span>
+              </m.span>
             ))}
-          </motion.h1>
+          </m.h1>
 
-          <motion.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-slate-600">
+          <m.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-slate-600">
             {t('home.hero.subtitle')}
-          </motion.p>
+          </m.p>
 
-          <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+          <m.div variants={fadeUp} className="flex flex-wrap gap-3">
             {user ? (
               <Link to={homePathFor(user)} className={CTA_PRIMARY}>
                 {t('home.continue')}
@@ -95,9 +95,9 @@ export function HeroSection() {
                 </Link>
               </>
             )}
-          </motion.div>
+          </m.div>
 
-          <motion.ul variants={fadeUp} className="flex flex-wrap gap-2 pt-2">
+          <m.ul variants={fadeUp} className="flex flex-wrap gap-2 pt-2">
             {CHIPS.map((chip) => (
               <li
                 key={chip.key}
@@ -109,8 +109,8 @@ export function HeroSection() {
                 {t(`home.hero.chips.${chip.key}`)}
               </li>
             ))}
-          </motion.ul>
-        </motion.div>
+          </m.ul>
+        </m.div>
 
         <HeroMockup />
       </div>
@@ -124,7 +124,7 @@ export function HeroSection() {
       >
         {t('home.hero.scroll')}
         <span className="flex h-8 w-5 justify-center rounded-full border-2 border-current pt-1.5">
-          <motion.span
+          <m.span
             className="size-1 rounded-full bg-current"
             animate={{ y: [0, 10, 0], opacity: [1, 0.2, 1] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}

@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useNewsPage } from '@/api/cms'
@@ -38,7 +38,7 @@ export function NewsSection() {
             <Icon name="arrowRight" className="size-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>
-        <motion.div
+        <m.div
           initial="hidden"
           whileInView="show"
           viewport={VIEWPORT_ONCE}
@@ -46,15 +46,15 @@ export function NewsSection() {
           className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
           {news.data.items.map((item) => (
-            <motion.div
+            <m.div
               key={item.id}
               variants={fadeUp}
               className="flex transition duration-300 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 [&>a]:flex-1 [&>a]:shadow-soft"
             >
               <NewsCard news={item} />
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

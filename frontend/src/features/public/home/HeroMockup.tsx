@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/components/icons/Icon'
 import type { IconName } from '@/components/icons/paths'
@@ -21,7 +21,7 @@ interface FloatingCardProps {
 
 function FloatingCard({ icon, label, className, delay }: FloatingCardProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.8, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ delay, duration: 0.6, ease: EASE_OUT }}
@@ -36,7 +36,7 @@ function FloatingCard({ icon, label, className, delay }: FloatingCardProps) {
         </span>
         {label}
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -51,7 +51,7 @@ export function HeroMockup() {
   return (
     <div aria-hidden="true" className="relative mx-auto w-full max-w-md select-none lg:mx-0">
       <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-brand-300/40 via-sky-200/30 to-transparent blur-2xl" />
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 30, rotate: -2 }}
         animate={{ opacity: 1, y: 0, rotate: 0 }}
         transition={{ duration: 0.9, ease: EASE_OUT, delay: 0.2 }}
@@ -70,7 +70,7 @@ export function HeroMockup() {
         </div>
 
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-          <motion.div
+          <m.div
             className="h-full origin-left rounded-full bg-gradient-to-r from-brand-400 to-brand-700"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: ratio }}
@@ -83,7 +83,7 @@ export function HeroMockup() {
             const done = index < DONE
             const current = index === DONE
             return (
-              <motion.li
+              <m.li
                 key={step}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -95,24 +95,24 @@ export function HeroMockup() {
               >
                 <span className="relative grid size-6 shrink-0 place-items-center rounded-full border-2 border-slate-200 bg-white">
                   {done && (
-                    <motion.span
+                    <m.span
                       className="absolute inset-[-2px] grid place-items-center rounded-full bg-brand-600 text-white"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: START + index * STEP_DELAY, type: 'spring', stiffness: 500, damping: 22 }}
                     >
                       <Icon name="check" className="size-3.5" strokeWidth={3} />
-                    </motion.span>
+                    </m.span>
                   )}
                   {current && <span className="size-2 animate-pulse rounded-full bg-brand-500" />}
                 </span>
                 <span className="flex-1">{t(`steps.${step}`)}</span>
                 <span className="text-xs font-medium text-slate-400 tabular-nums">{index + 1}</span>
-              </motion.li>
+              </m.li>
             )
           })}
         </ol>
-      </motion.div>
+      </m.div>
 
       <FloatingCard icon="trophy" label={t('home.hero.mock.xp')} className="-top-5 -right-2 sm:-right-8" delay={START + DONE * STEP_DELAY} />
       <FloatingCard icon="sparkles" label={t('home.hero.mock.ai')} className="-bottom-6 -left-2 sm:-left-10" delay={1.6} />

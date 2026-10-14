@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
@@ -16,7 +16,7 @@ export function CtaSection() {
 
   return (
     <section aria-labelledby="home-cta" className="px-4 py-20 sm:py-24">
-      <motion.div
+      <m.div
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT_ONCE}
@@ -34,24 +34,24 @@ export function CtaSection() {
           <div className="absolute inset-y-0 left-0 w-1/3 animate-shine bg-gradient-to-r from-transparent via-white/15 to-transparent motion-reduce:hidden" />
         </div>
 
-        <motion.div variants={stagger(0.1, 0.15)} className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-          <motion.span
+        <m.div variants={stagger(0.1, 0.15)} className="mx-auto flex max-w-2xl flex-col items-center gap-6">
+          <m.span
             variants={fadeUp}
             className="grid size-14 place-items-center rounded-2xl bg-white/10 text-brand-100 ring-1 ring-white/20 backdrop-blur"
           >
             <Icon name="sparkles" className="size-7" />
-          </motion.span>
-          <motion.h2
+          </m.span>
+          <m.h2
             variants={fadeUp}
             id="home-cta"
             className="text-3xl font-extrabold tracking-tight text-balance sm:text-5xl"
           >
             {t('home.cta.title')}
-          </motion.h2>
-          <motion.p variants={fadeUp} className="text-lg text-balance text-brand-100">
+          </m.h2>
+          <m.p variants={fadeUp} className="text-lg text-balance text-brand-100">
             {t('home.cta.text')}
-          </motion.p>
-          <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-3 pt-2">
+          </m.p>
+          <m.div variants={fadeUp} className="flex flex-wrap justify-center gap-3 pt-2">
             <Link
               to={user ? homePathFor(user) : '/register'}
               className={cx(
@@ -73,9 +73,9 @@ export function CtaSection() {
             >
               {t('home.cta.contact')}
             </Link>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </m.div>
+        </m.div>
+      </m.div>
     </section>
   )
 }

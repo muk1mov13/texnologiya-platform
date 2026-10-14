@@ -1,4 +1,4 @@
-import { motion, useScroll, useSpring } from 'motion/react'
+import { m, useScroll, useSpring } from 'motion/react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/components/icons/Icon'
@@ -36,7 +36,7 @@ export function HowItWorksSection() {
           <p className="text-lg text-slate-600">{t('home.how.subtitle')}</p>
         </Reveal>
 
-        <motion.ol
+        <m.ol
           ref={listRef}
           initial="hidden"
           whileInView="show"
@@ -46,14 +46,14 @@ export function HowItWorksSection() {
         >
           {/* Bog'lovchi chiziq: kulrang asos ustida scroll bilan to'ladigan gradient. */}
           <div aria-hidden="true" className="absolute top-7 bottom-7 left-7 w-0.5 bg-slate-200 lg:hidden">
-            <motion.div style={{ scaleY: progress }} className="size-full origin-top bg-gradient-to-b from-brand-400 to-brand-700" />
+            <m.div style={{ scaleY: progress }} className="size-full origin-top bg-gradient-to-b from-brand-400 to-brand-700" />
           </div>
           <div aria-hidden="true" className="absolute top-7 right-[12.5%] left-[12.5%] hidden h-0.5 bg-slate-200 lg:block">
-            <motion.div style={{ scaleX: progress }} className="size-full origin-left bg-gradient-to-r from-brand-400 to-brand-700" />
+            <m.div style={{ scaleX: progress }} className="size-full origin-left bg-gradient-to-r from-brand-400 to-brand-700" />
           </div>
 
           {STEPS.map((step, index) => (
-            <motion.li
+            <m.li
               key={step.key}
               variants={fadeUp}
               className="relative flex gap-5 lg:flex-col lg:items-center lg:gap-0 lg:text-center"
@@ -68,9 +68,9 @@ export function HowItWorksSection() {
                 <h3 className="text-lg font-bold text-slate-900">{t(`home.how.steps.${step.key}.title`)}</h3>
                 <p className="leading-relaxed text-slate-600">{t(`home.how.steps.${step.key}.text`)}</p>
               </div>
-            </motion.li>
+            </m.li>
           ))}
-        </motion.ol>
+        </m.ol>
       </div>
     </section>
   )

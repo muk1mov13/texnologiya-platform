@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { useId, useState } from 'react'
 import type { FaqItem } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
@@ -30,7 +30,7 @@ function FaqRow({ item }: { item: FaqItem }) {
           )}
         >
           <span className="flex-1">{item.question}</span>
-          <motion.span
+          <m.span
             aria-hidden="true"
             animate={{ rotate: open ? 45 : 0 }}
             transition={{ duration: 0.25, ease: EASE_OUT }}
@@ -40,12 +40,12 @@ function FaqRow({ item }: { item: FaqItem }) {
             )}
           >
             <Icon name="plus" className="size-4" strokeWidth={2.4} />
-          </motion.span>
+          </m.span>
         </button>
       </h3>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <m.div
             id={panelId}
             role="region"
             aria-labelledby={buttonId}
@@ -56,7 +56,7 @@ function FaqRow({ item }: { item: FaqItem }) {
             className="overflow-hidden"
           >
             <p className="px-5 pb-5 leading-relaxed whitespace-pre-line text-slate-600 sm:px-6">{item.answer}</p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
