@@ -42,7 +42,11 @@
     "sections": "Bo'limlar",
     "contacts": "Kontaktlar",
     "toTop": "Yuqoriga",
-    "socials": "Ijtimoiy tarmoqlar"
+    "socials": "Ijtimoiy tarmoqlar",
+    "platform": "Platforma",
+    "latestNews": "So'nggi yangiliklar",
+    "map": "Xaritada ko'rish",
+    "sitemap": "Sayt xaritasi"
   },
   "common": {
     "loading": "Yuklanmoqda",

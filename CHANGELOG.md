@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
 
+### Task 3: footer boyitildi
+- `SiteFooter`: 5 ustun — brend + ijtimoiy tarmoqlar; Bo'limlar; Platforma (Kirish/Ro'yxatdan o'tish yoki Kabinet, kutubxona bo'limlari); So'nggi yangiliklar (3 ta, sana bilan; `NewsSection` bilan umumiy kesh); Kontaktlar (telefon, email, ish vaqti, manzil + "Xaritada ko'rish"). Pastki qatorda FAQ, Bog'lanish, Sayt xaritasi havolalari va "Yuqoriga".
+- Ranglar `THEME` tokenlariga ajratildi (keyingi vazifada variantlar uchun). Ikonkalar: `clock`, `externalLink`. i18n: `footer.platform|latestNews|map|sitemap` (uz/ru).
+- Tekshiruv: lint, typecheck o'tdi.
+
 ### Task 2: kontaktlarda "Ish vaqti"
 - `cms/schemas.py: Contacts.hours` (≤100 belgi; JSON ustun, migratsiya shart emas). Admin "Sayt sozlamalari" formasida yangi maydon, `/contact` sahifasida ko'rsatiladi; demo ma'lumotga ham qo'shildi.
 - `types.ts`, `schema.gen.ts` (`gen:api`), i18n `adminSite.hours` (uz/ru).
