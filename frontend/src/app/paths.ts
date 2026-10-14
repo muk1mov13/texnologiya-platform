@@ -13,6 +13,16 @@ export interface NavItem {
   end?: boolean
 }
 
+/** Ochiq sayt menyusi (yo'llar backend `seo.py: STATIC_PATHS` bilan mos). */
+export const PUBLIC_NAV: NavItem[] = [
+  { to: '/', label: 'nav.home', end: true },
+  { to: '/news', label: 'nav.news' },
+  { to: '/library', label: 'nav.library' },
+  { to: '/faq', label: 'nav.faq' },
+  { to: '/about', label: 'nav.about' },
+  { to: '/contact', label: 'nav.contact' },
+]
+
 export function navLinksFor(role: Role): NavItem[] {
   const items: NavItem[] = [{ to: '/app', label: 'nav.subjects', end: true }]
   // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.

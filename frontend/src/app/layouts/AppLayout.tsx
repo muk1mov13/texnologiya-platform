@@ -2,15 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet } from 'react-router'
 import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Button } from '@/components/ui/Button'
-import { cx } from '@/lib/cx'
 import { homePathFor, navLinksFor } from '../paths'
 import { LanguageSwitch } from './LanguageSwitch'
-
-const navClass = ({ isActive }: { isActive: boolean }) =>
-  cx(
-    'rounded-xl px-3 py-1.5 text-sm font-semibold whitespace-nowrap',
-    isActive ? 'bg-brand-100 text-brand-900' : 'text-slate-600 hover:bg-slate-100',
-  )
+import { navClass } from './navClass'
 
 export function AppLayout() {
   const { t } = useTranslation()

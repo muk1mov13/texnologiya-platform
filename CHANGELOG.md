@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 1: ochiq layout, markdown va sahifa meta'lari
+- Yangi bog'liqlik `react-markdown@10.1.0`; `components/ui/Markdown.tsx` — xom HTML chizilmaydi (`skipHtml`), tashqi havolalar `noopener` bilan yangi oynada; uslub `index.css` dagi `.md`.
+- `lib/usePageMeta.ts`: `document.title`, description va OG teglari, sahifadan chiqilganda sukut qiymatlari; `index.html` ga sukut description. `lib/format.ts` (`formatSize`, `formatDate`), `components/ui/Pagination.tsx`.
+- `PublicLayout`: menyu (Bosh sahifa, Yangiliklar, Kutubxona, Savol-javob, Biz haqimizda, Bog'lanish — `paths.ts: PUBLIC_NAV`), `lg` dan kichikda `MobileMenu` (☰, Escape va tashqarini bosish bilan yopiladi), yangi `SiteFooter` (kontaktlar va ijtimoiy tarmoqlar `/api/site` dan). `navClass` umumiy faylga chiqarildi.
+- `src/test/server.ts`: `/api/site` va `/api/news` uchun standart bo'sh javoblar (mavjud testlar yangi so'rovdan yiqilmasin).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 0: API qatlami
 - Backend: `GET /api/admin/books/{id}/file` (admin tasdiqlashdan oldin kutilayotgan kitob faylini ko'radi) va `GET /api/admin/news/{id}/cover` (qoralama yangilik muqovasi); `gen:api`.
 - `types.ts`: kutubxona (`FolderNode`, `LibraryDocument`, `Book`, `BookAdmin`, `BookPage` ...) va CMS (`NewsCard`/`NewsDetail`/`NewsAdmin`, `FaqItem`, `SiteSettings`, `ContactIn`, `ContactMessage` ...) tiplari; `types.contract.ts` da ichma-ich sxemalar (`FolderOut`, `SiteOut`) alohida tekshiriladi.

@@ -16,10 +16,24 @@
     "cabinet": "Kabinet",
     "language": "Interfeys tili",
     "tutor": "AI repetitor",
-    "adminAi": "AI sozlamalari"
+    "adminAi": "AI sozlamalari",
+    "home": "Bosh sahifa",
+    "news": "Yangiliklar",
+    "library": "Kutubxona",
+    "faq": "Savol-javob",
+    "about": "Biz haqimizda",
+    "contact": "Bog'lanish",
+    "menuOpen": "Menyuni ochish",
+    "menuClose": "Menyuni yopish"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
-  "footer": { "text": "© {{year}} Buxoro davlat pedagogika instituti · Texnologik ta'lim" },
+  "footer": {
+    "text": "© {{year}} Buxoro davlat pedagogika instituti · Texnologik ta'lim",
+    "tagline": "Bo'lajak texnologiya o'qituvchilari uchun metodik platforma",
+    "sections": "Bo'limlar",
+    "contacts": "Kontaktlar",
+    "socials": "Ijtimoiy tarmoqlar"
+  },
   "common": {
     "loading": "Yuklanmoqda",
     "close": "Yopish",
@@ -582,5 +596,11 @@
     "reindexAllText": "Barcha materiallar qayta indekslanadi; bu provayder limitini sarflaydi va vaqt oladi.",
     "queued": "Navbatga qo'yildi",
     "privacy": "AI'ga ism, email, telefon va fayl nomlari yuborilmaydi. Dars materiallari, savollar va talaba javoblari matni tashqi provayderga (Google Gemini, Groq) yuboriladi."
+  },
+  "socials": { "telegram": "Telegram", "instagram": "Instagram", "facebook": "Facebook", "youtube": "YouTube" },
+  "pagination": { "label": "Sahifalar", "prev": "Oldingi", "next": "Keyingi", "status": "{{page}} / {{pages}}" },
+  "meta": {
+    "siteTitle": "Texnologiya platformasi",
+    "description": "Buxoro davlat pedagogika instituti texnologik ta'lim yo'nalishi uchun metodik platforma: darslar, kutubxona, yangiliklar."
   }
 }

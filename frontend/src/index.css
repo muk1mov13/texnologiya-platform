@@ -34,3 +34,55 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* Markdown matni (components/ui/Markdown.tsx): yangiliklar, "Biz haqimizda". */
+@layer components {
+  .md {
+    @apply leading-relaxed text-slate-800;
+  }
+  .md > * + * {
+    @apply mt-4;
+  }
+  .md h1 {
+    @apply text-2xl font-extrabold;
+  }
+  .md h2 {
+    @apply mt-8 text-xl font-bold;
+  }
+  .md h3 {
+    @apply mt-6 text-lg font-bold;
+  }
+  .md a {
+    @apply font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900;
+  }
+  .md ul {
+    @apply list-disc pl-6;
+  }
+  .md ol {
+    @apply list-decimal pl-6;
+  }
+  .md li + li {
+    @apply mt-1;
+  }
+  .md blockquote {
+    @apply border-l-4 border-brand-200 pl-4 text-slate-600 italic;
+  }
+  .md code {
+    @apply rounded bg-slate-100 px-1 py-0.5 text-sm;
+  }
+  .md pre {
+    @apply overflow-x-auto rounded-xl bg-slate-100 p-4;
+  }
+  .md pre code {
+    @apply bg-transparent p-0;
+  }
+  .md img {
+    @apply max-w-full rounded-xl;
+  }
+  .md hr {
+    @apply border-slate-200;
+  }
+  .md table {
+    @apply block overflow-x-auto;
+  }
+}
