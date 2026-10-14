@@ -1,9 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+import { useMessages } from '@/api/adminCms'
+import { Badge } from '@/components/ui/Badge'
 import { Select } from '@/components/ui/Field'
 import { cx } from '@/lib/cx'
 import { ADMIN_NAV } from '../paths'
 import { navClass } from './navClass'
+
+const MESSAGES_PATH = '/admin/messages'
 
 /**
  * `/admin/*` sahifalari: `md` dan kengda chapda guruhlangan menyu, telefonda ochiladigan ro'yxat
@@ -13,6 +17,9 @@ export function AdminLayout() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  // O'qilmagan bog'lanish xabarlari soni "Xabarlar" yonida ko'rsatiladi.
+  const unread = useMessages(true).data?.length ?? 0
+  const countFor = (to: string) => (to === MESSAGES_PATH ? unread : 0)
   const current = ADMIN_NAV.flatMap((group) => group.items).find(
     (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
   )
@@ -30,6 +37,7 @@ export function AdminLayout() {
               {group.items.map((item) => (
                 <option key={item.to} value={item.to}>
                   {t(item.label)}
+                  {countFor(item.to) > 0 ? ` (${countFor(item.to)})` : ''}
                 </option>
               ))}
             </optgroup>
@@ -41,8 +49,18 @@ export function AdminLayout() {
           <div key={group.label} className="flex flex-col gap-1">
             <h2 className="px-3 text-xs font-bold tracking-wide text-slate-500 uppercase">{t(group.label)}</h2>
             {group.items.map((item) => (
-              <NavLink key={item.to} to={item.to} className={(state) => cx(navClass(state), 'whitespace-normal')}>
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={(state) => cx(navClass(state), 'flex items-center justify-between gap-2 whitespace-normal')}
+              >
                 {t(item.label)}
+                {countFor(item.to) > 0 && (
+                  <Badge tone="brand">
+                    {countFor(item.to)}
+                    <span className="sr-only"> {t('adminMessages.unreadCount')}</span>
+                  </Badge>
+                )}
               </NavLink>
             ))}
           </div>

@@ -31,7 +31,9 @@
     "adminLibrary": "Kutubxona",
     "adminBooks": "Kitoblar",
     "adminNews": "Yangiliklar",
-    "adminFaq": "Savol-javob"
+    "adminFaq": "Savol-javob",
+    "adminMessages": "Xabarlar",
+    "adminSite": "Sayt sozlamalari"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
@@ -766,5 +768,29 @@
     "publishedLabel": "Saytda ko'rsatish",
     "deleteTitle": "Savolni o'chirish",
     "deleteText": "\"{{title}}\" savoli o'chiriladi."
+  },
+  "adminMessages": {
+    "title": "Xabarlar",
+    "subtitle": "Saytdagi bog'lanish formasi orqali kelgan xabarlar.",
+    "unreadOnly": "Faqat o'qilmaganlar",
+    "unreadCount": "ta o'qilmagan",
+    "new": "Yangi",
+    "markRead": "O'qildi deb belgilash",
+    "markUnread": "O'qilmagan deb belgilash",
+    "empty": "Hozircha xabarlar yo'q",
+    "noUnread": "O'qilmagan xabarlar yo'q",
+    "deleteTitle": "Xabarni o'chirish",
+    "deleteText": "{{name}} yuborgan xabar o'chiriladi."
+  },
+  "adminSite": {
+    "title": "Sayt sozlamalari",
+    "subtitle": "Footer va \"Bog'lanish\" sahifasidagi kontaktlar, ijtimoiy tarmoqlar va \"Biz haqimizda\" matni.",
+    "contacts": "Kontaktlar",
+    "phone": "Telefon",
+    "email": "Email",
+    "address": "Manzil",
+    "about": "Biz haqimizda",
+    "httpsOnly": "Havola https:// bilan boshlansin",
+    "saved": "Sozlamalar saqlandi"
   }
 }

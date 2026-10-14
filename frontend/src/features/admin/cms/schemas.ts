@@ -38,3 +38,29 @@ export const faqSchema = z.object({
   is_published: z.boolean(),
 })
 export type FaqValues = z.infer<typeof faqSchema>
+
+// Uzunliklar backend `Contacts` / `Socials` / `SiteUpdate` bilan bir xil.
+export const contactsSchema = z.object({
+  phone: z.string().trim().max(50, { error: 'validation.tooLong' }),
+  email: z.union([z.literal(''), z.email({ error: 'validation.email' }).max(150, { error: 'validation.tooLong' })]),
+  address: z.string().trim().max(300, { error: 'validation.tooLong' }),
+})
+export type ContactsValues = z.infer<typeof contactsSchema>
+
+// Havola saytda <a href> bo'ladi: backend faqat https:// qabul qiladi.
+const socialLink = z
+  .string()
+  .trim()
+  .max(300, { error: 'validation.tooLong' })
+  .refine((value) => value === '' || value.startsWith('https://'), { error: 'adminSite.httpsOnly' })
+
+export const socialsSchema = z.object({
+  telegram: socialLink,
+  instagram: socialLink,
+  facebook: socialLink,
+  youtube: socialLink,
+})
+export type SocialsValues = z.infer<typeof socialsSchema>
+
+export const aboutSchema = z.object({ about: z.string().max(20000, { error: 'validation.tooLong' }) })
+export type AboutValues = z.infer<typeof aboutSchema>

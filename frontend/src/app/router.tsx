@@ -5,7 +5,9 @@ import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { AdminBooksPage } from '@/features/admin/cms/AdminBooksPage'
 import { AdminFaqPage } from '@/features/admin/cms/AdminFaqPage'
 import { AdminLibraryPage } from '@/features/admin/cms/AdminLibraryPage'
+import { AdminMessagesPage } from '@/features/admin/cms/AdminMessagesPage'
 import { AdminNewsPage } from '@/features/admin/cms/AdminNewsPage'
+import { AdminSitePage } from '@/features/admin/cms/AdminSitePage'
 import { NewsEditorPage } from '@/features/admin/cms/NewsEditorPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { AboutPage } from '@/features/public/AboutPage'
@@ -103,6 +105,8 @@ export const routes: RouteObject[] = [
                   { path: 'admin/news', element: <AdminNewsPage /> },
                   { path: 'admin/news/:newsId', element: <NewsEditorPage /> },
                   { path: 'admin/faq', element: <AdminFaqPage /> },
+                  { path: 'admin/messages', element: <AdminMessagesPage /> },
+                  { path: 'admin/site', element: <AdminSitePage /> },
                 ],
               },
             ],

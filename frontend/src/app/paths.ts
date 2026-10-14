@@ -63,6 +63,8 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: '/admin/books', label: 'nav.adminBooks' },
       { to: '/admin/news', label: 'nav.adminNews' },
       { to: '/admin/faq', label: 'nav.adminFaq' },
+      { to: '/admin/messages', label: 'nav.adminMessages' },
+      { to: '/admin/site', label: 'nav.adminSite' },
     ],
   },
 ]

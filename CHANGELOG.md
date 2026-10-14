@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 9: admin xabarlar va sayt sozlamalari
+- `AdminMessagesPage` (`/admin/messages`): "faqat o'qilmaganlar" filtri, xabar kartasi (kontakt email bo'lsa `mailto:`, telefon bo'lsa `tel:`), o'qilgan/o'qilmagan, o'chirish. Admin menyusida "Xabarlar" yonida o'qilmaganlar soni.
+- `AdminSitePage` (`/admin/site`): uchta alohida forma — kontaktlar, ijtimoiy tarmoqlar (faqat `https://`), "Biz haqimizda" (markdown + ko'rinish); har biri faqat o'z kalitini `PUT` qiladi, ochiq sayt keshi darhol yangilanadi.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 8: admin yangiliklar va FAQ
 - `AdminNewsPage` (`/admin/news`): ro'yxat — holat belgisi (qoralama / rejalashtirilgan / nashr qilingan, `newsStatus.ts`), sana, ko'rishlar.
 - `NewsEditorPage` (`/admin/news/new`, `/admin/news/:id`): sarlavha, slug (bo'sh — avtomatik), markdown matn "Yozish / Ko'rinish" tablari bilan, nashr vaqti (`datetime-local`), "Hozir nashr qilish", "Nashrdan olish" (`published_at: null`), saytda ko'rish; yaratilgach tahrir sahifasiga o'tadi. Muqova faqat saqlangan yangilikka, ko'rinishi admin endpoint'dan blob URL bilan (qoralama uchun ham). `NEWS_SLUG_TAKEN` slug maydoni ostida. O'chirish tasdiq bilan.
