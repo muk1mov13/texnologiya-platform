@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 10: footer
+- `SiteFooter`: to'q fon (`slate-950`) va yuqori chetida gradient chiziq; ustunlar — `BrandLogo` + tagline + ijtimoiy tarmoqlar (SVG ikonka tugmalar, `aria-label` bilan), Bo'limlar, Kutubxona (3 bo'lim), Kontaktlar (telefon/email/manzil SVG ikonkalar bilan). Pastki qatorda © va "Yuqoriga" tugmasi (silliq scroll).
+- Avvalgi mantiq saqlandi: kontakt yoki ijtimoiy tarmoq kiritilmagan bo'lsa, ular chiqmaydi. i18n: `footer.toTop` (uz/ru).
+- Tekshiruv: lint, typecheck o'tdi; 1280px va 375px da `/api/site` mock bilan ko'rildi, gorizontal scroll yo'q.
+
 ### Redizayn Task 9: "Ta'limingizni yangi bosqichga olib chiqmoqchimisiz?"
 - `home/CtaSection.tsx`: to'q teal gradient panel (ko'rinishga kirganda kattalashib ochiladi), ichida suzuvchi bloblar, katak naqsh va ustidan o'tib turadigan yaltiroq chiziq (`animate-shine`, reduced-motion'da yashirin). "Boshlash" (`/register`, kirganga — kabinet) va "Bog'lanish" (`/contact`) tugmalari.
 - i18n: `home.cta.*` (uz/ru).
