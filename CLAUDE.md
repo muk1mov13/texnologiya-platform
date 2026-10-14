@@ -22,6 +22,7 @@ uv run python -m app.cli create-admin --email admin@example.uz --name "Administr
 uv run uvicorn app.main:create_app --factory --reload   # API docs: http://localhost:8000/api/docs (disabled when ENV=prod)
 uv run python -m app.cli weekly-report [--week-start YYYY-MM-DD] [--subject ID]   # weekly AI report (default: last Mon–Sun)
 uv run python -m app.cli seed-demo [--force]   # demo news, FAQ and site settings for the public site (idempotent)
+uv run python -m app.cli import-resources --path "../resource/Platforma materiallari" [--dry-run] [--force]   # import the ready-made course files (needs LibreOffice unless --dry-run)
 
 uv run pytest -q                          # all tests
 uv run pytest tests/test_materials.py -q  # one file
@@ -65,6 +66,8 @@ Local development needs no Docker, PostgreSQL or Redis. PPT/DOC → PDF conversi
 - `materials.py` and `convert.py`: the upload pipeline. Files are saved through `Storage` (UUID names, path-escape guard, size limit) and then checked against magic bytes. A PDF is marked `ready` right away. Other formats are enqueued as the `convert_material` job (LibreOffice → PyMuPDF page count, up to 3 attempts). The job uses short-lived DB sessions and re-checks the status before writing the result, so concurrent deletes are safe.
 - `topic_items.py`: glossary and literature items.
 - `progress.py`, `content.py` and `resume.py`: the student-facing views, step completion and the "continue where you left off" feature.
+- `syllabus.py`: the subject's curriculum (`Subject.syllabus_pdf`/`syllabus_name`), stored only as PDF; DOC/DOCX is converted inside the request.
+- `resource_parse.py` and `resource_import.py`: the `import-resources` CLI. `resource/` (gitignored) holds `<subject>/<N section>/<topic folder>/<N) file>`; the section name gives `Topic.lesson_type` (`lecture|practical|seminar|lab`), a `dastur` folder holds the curriculum. Files are identified by their `N)` prefix: 1 crossword (→ `review`), 2 lecture text (→ `lecture` material + topic title), 3 quiz with a `Javoblar:` key (→ `practice`), 4 task, 5 glossary, 6 literature, 7 game slides (→ `presentation`). Materials are converted one by one (no job queue); topics are matched by (subject, lesson_type, title), so re-running skips them unless `--force`.
 
 `app/assessment/` (phase 2) follows the same split:
 - `activities.py`: quiz, yes/no and crossword editing. An activity is saved whole: its items are replaced and the crossword grid is rebuilt by `crossword.py`, which holds pure, deterministic functions.

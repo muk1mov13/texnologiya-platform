@@ -8,6 +8,9 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 6: CLAUDE.md
+- Commands: `import-resources`; Architecture (backend): `syllabus.py`, `resource_parse.py`/`resource_import.py` va `resource/` tuzilmasi.
+
 ### Task 5: `import-resources` buyrug'i
 - `app/learning/resource_import.py` + `python -m app.cli import-resources --path <papka> [--force] [--dry-run]`. Fan slug bo'yicha, mavzu (fan, `lesson_type`, sarlavha) bo'yicha topiladi: mavjudi o'tkazib yuboriladi, `--force` — o'chirib qayta import. Hammasi nashr qilinadi.
 - Mavzu: ma'ruza matni → `lecture`, o'yin → `presentation` materiali (navbatsiz, ketma-ket `convert_material_job` — bir vaqtda o'nlab LibreOffice jarayoni ishga tushmaydi), krossvord → `review`, test → `practice` (joylab bo'lmagan krossvord so'zlari tashlanib qayta uriniladi), topshiriq (`both`, 10 ball), glossariy, adabiyotlar; so'ng AI indekslari (xatosi importni to'xtatmaydi).
