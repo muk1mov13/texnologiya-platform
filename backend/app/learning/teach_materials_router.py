@@ -1,26 +1,14 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Form, Response, UploadFile
-from pydantic import AfterValidator
+from fastapi import APIRouter, Response, UploadFile
 
 from app.auth.deps import StaffUser
 from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
+from app.core.forms import TitleForm
 from app.core.types import DbIdPath
 from app.learning import editing, materials
 from app.learning.models import Material
 from app.learning.schemas import MaterialOut
 
 router = APIRouter(prefix="/teach", tags=["teach"])
-
-
-def _reject_blank(value: str) -> str:
-    stripped = value.strip()
-    if not stripped:
-        raise ValueError("Bo'sh bo'lishi mumkin emas")
-    return stripped
-
-
-TitleForm = Annotated[str, Form(min_length=1, max_length=200), AfterValidator(_reject_blank)]
 
 
 @router.post("/steps/{step_id}/materials", response_model=MaterialOut, status_code=201)

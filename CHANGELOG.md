@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 1: kutubxona papkalari va hujjatlari
+- Yangi `app/library/`: `schemas.py`, `folders.py` (daraxt ikki so'rov bilan, ichki papka boshqa bo'limda bo'lmaydi — 400 `FOLDER_SECTION_MISMATCH`, bo'sh bo'lmagan papka — 409 `FOLDER_NOT_EMPTY`), `documents.py` (`save_checked`, 50 MB, pdf/doc/docx/ppt/pptx).
+- Router'lar: ochiq `GET /api/library/folders?section=`, `GET /api/library/documents/{id}/file` (login'siz); admin `/api/admin/library/folders` (`POST`, `PATCH`, `DELETE`), `POST /folders/{id}/documents` (multipart), `PATCH` / `DELETE /documents/{id}`.
+- `TitleForm` `learning/teach_materials_router.py` dan `app/core/forms.py` ga ko'chdi (+ `LongTitleForm`), xatti-harakat o'zgarmagan.
+- Rejadan farq: hujjatni AI indeksiga yuborish va bo'laklarini o'chirish to'liq Task 6 ga qoldirildi (hozir `doc_chunks.subject_id` NOT NULL va job yo'q).
+- Tekshiruv: `ruff`, `mypy` toza; toza bazada 15 ta qo'lda tekshiruv (httpx) — hammasi kutilgandek.
+
 ### 4A Task 0: kutubxona va CMS modellari, migratsiya
 - Yangi `app/library/models.py`: `Folder` (`parent_id` o'z-o'ziga, `section` — `metodik|huquqiy`), `Document`, `Book` (`is_approved`, `uploaded_by`, ixtiyoriy muqova).
 - Yangi `app/cms/models.py`: `News` (unikal `slug`, `published_at` NULL — qoralama, `views`), `FaqItem`, `ContactMessage`, `SiteSetting` (kalit → JSON).
