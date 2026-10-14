@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     media_accel_redirect: bool = False
     max_material_mb: int = 50
     max_submission_mb: int = 20
+    max_library_mb: int = 50
+    max_cover_mb: int = 5
+    contact_rate_limit: int = 5
+    contact_rate_window_seconds: int = 3600
+    # Sitemap va robots.txt dagi to'liq manzillar uchun (prod'da haqiqiy domen).
+    public_base_url: str = "http://localhost:5173"
     login_rate_limit: int = 10
     login_rate_window_seconds: int = 900
     soffice_path: str = "soffice"

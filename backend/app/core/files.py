@@ -3,10 +3,11 @@
 import mimetypes
 from pathlib import Path
 
-from fastapi import Response
+from fastapi import Response, UploadFile
 from fastapi.responses import FileResponse
 
 from app.core.config import Settings
+from app.core.errors import AppError
 from app.core.storage import Storage
 
 # Kengaytma mos kelsa ham, fayl mazmuni boshqa formatda bo'lishi mumkin (masalan
@@ -24,13 +25,33 @@ FILE_SIGNATURES: dict[str, tuple[bytes, ...]] = {
 }
 
 
+ALLOWED_DOC_EXT = frozenset({".pdf", ".doc", ".docx", ".ppt", ".pptx"})
+ALLOWED_IMAGE_EXT = frozenset({".jpg", ".jpeg", ".png", ".webp"})
+
+
 def signature_matches(path: Path, ext: str) -> bool:
+    with path.open("rb") as fh:
+        header = fh.read(12)
+    if ext == ".webp":  # RIFF....WEBP: imzo 8-baytdan keyin davom etadi
+        return header[:4] == b"RIFF" and header[8:12] == b"WEBP"
     signatures = FILE_SIGNATURES.get(ext)
     if not signatures:
         return True
-    with path.open("rb") as fh:
-        header = fh.read(8)
     return any(header.startswith(signature) for signature in signatures)
+
+
+async def save_checked(
+    storage: Storage, upload: UploadFile, subdir: str, *, allowed_ext: frozenset[str], max_mb: int
+) -> tuple[str, str, int]:
+    """Saqlaydi va magic bytes'ni tekshiradi; mos kelmasa faylni o'chirib 400. (rel, nom, hajm)."""
+    rel, original_name = await storage.save_upload(
+        upload, subdir, allowed_ext=allowed_ext, max_bytes=max_mb * 1024 * 1024
+    )
+    path = storage.path(rel)
+    if not signature_matches(path, Path(rel).suffix.lower()):
+        storage.delete(rel)
+        raise AppError(400, "UNSUPPORTED_FILE_TYPE", "Fayl mazmuni e'lon qilingan turga mos emas")
+    return rel, original_name, path.stat().st_size
 
 
 def file_response(settings: Settings, storage: Storage, rel: str, filename: str) -> Response:

@@ -6,6 +6,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 0: kutubxona va CMS modellari, migratsiya
+- Yangi `app/library/models.py`: `Folder` (`parent_id` o'z-o'ziga, `section` — `metodik|huquqiy`), `Document`, `Book` (`is_approved`, `uploaded_by`, ixtiyoriy muqova).
+- Yangi `app/cms/models.py`: `News` (unikal `slug`, `published_at` NULL — qoralama, `views`), `FaqItem`, `ContactMessage`, `SiteSetting` (kalit → JSON).
+- Migratsiya `8203a48f665c_library_and_cms_tables` (7 jadval); `models_registry` ga importlar.
+- `core/config.py`: `max_library_mb`, `max_cover_mb`, `contact_rate_limit` (5) / `contact_rate_window_seconds` (3600), `public_base_url`; `.env.example` ga `PUBLIC_BASE_URL`.
+- `core/files.py`: webp imzosi (`RIFF....WEBP`), `ALLOWED_DOC_EXT`, `ALLOWED_IMAGE_EXT`, `save_checked()` (saqlash + magic bytes + hajm).
+- `app.state.contact_limiter` va `ContactLimiter` alias.
+- Tekshiruv: `alembic upgrade head` + `alembic check` (vaqtinchalik baza), `ruff format --check`, `ruff check`, `mypy app` toza; ilova yig'iladi.
+
 ### 4A (backend) rejasi
 - Yangi `docs/superpowers/plans/2026-10-14-phase-4a-backend.md`: Task 0 — sozlamalar, webp imzosi, `save_checked()`, `library`/`cms` modellari va migratsiya, `contact_limiter`; 1 — papkalar va hujjatlar; 2 — kitoblar va tasdiqlash; 3 — yangiliklar; 4 — FAQ va sayt sozlamalari; 5 — bog'lanish formasi (rate limit, honeypot) va admin xabarlar; 6 — kutubxona AI indeksi (`doc_chunks.subject_id` nullable, qidiruv va manbalar); 7 — `sitemap.xml`/`robots.txt`; 8 — `gen:api`, xato matnlari, hujjatlar.
 - Mini-spec'dan aniqliklar: `FOLDER_SECTION_MISMATCH` (400) qo'shiladi, sozlamalarda noma'lum kalit `VALIDATION_ERROR` bilan (`SETTING_UNKNOWN` o'rniga).
