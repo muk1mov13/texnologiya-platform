@@ -9,6 +9,7 @@ from app.assessment.teach_router import router as assessment_teach_router
 from app.auth.admin_router import router as admin_users_router
 from app.auth.router import router as auth_router
 from app.cms.admin_router import faq_router as cms_faq_admin_router
+from app.cms.admin_router import messages_router as cms_messages_admin_router
 from app.cms.admin_router import news_router as cms_news_admin_router
 from app.cms.admin_router import site_router as cms_site_admin_router
 from app.cms.public_router import router as cms_public_router
@@ -53,3 +54,4 @@ api_router.include_router(cms_public_router)
 api_router.include_router(cms_news_admin_router)
 api_router.include_router(cms_faq_admin_router)
 api_router.include_router(cms_site_admin_router)
+api_router.include_router(cms_messages_admin_router)

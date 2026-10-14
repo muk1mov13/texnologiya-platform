@@ -116,3 +116,29 @@ class SiteUpdate(BaseModel):
     contacts: Contacts | None = None
     socials: Socials | None = None
     about: str | None = Field(default=None, max_length=20000)
+
+
+# --- bog'lanish ------------------------------------------------------------------------------
+
+
+class ContactIn(BaseModel):
+    name: trimmed_str(max_length=150)  # type: ignore[valid-type]
+    contact: trimmed_str(max_length=150)  # type: ignore[valid-type]
+    message: trimmed_str(max_length=5000)  # type: ignore[valid-type]
+    # Honeypot: forma uni ko'rsatmaydi, odam to'ldirmaydi; bot to'ldirsa xabar jim tashlanadi.
+    website: str = Field(default="", max_length=200)
+
+
+class MessageOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    contact: str
+    message: str
+    is_read: bool
+    created_at: datetime
+
+
+class MessageUpdate(BaseModel):
+    is_read: bool

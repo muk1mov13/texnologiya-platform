@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Response, UploadFile
+from typing import Annotated
+
+from fastapi import APIRouter, Query, Response, UploadFile
 
 from app.auth.deps import AdminUser
-from app.cms import faq, news, site
-from app.cms.models import FaqItem
+from app.cms import contact, faq, news, site
+from app.cms.models import ContactMessage, FaqItem
 from app.cms.schemas import (
     FaqIn,
     FaqOut,
     FaqUpdate,
+    MessageOut,
+    MessageUpdate,
     NewsAdminOut,
     NewsIn,
     NewsUpdate,
@@ -19,6 +23,7 @@ from app.core.types import DbIdPath
 news_router = APIRouter(prefix="/admin/news", tags=["admin-cms"])
 faq_router = APIRouter(prefix="/admin/faq", tags=["admin-cms"])
 site_router = APIRouter(prefix="/admin/site", tags=["admin-cms"])
+messages_router = APIRouter(prefix="/admin/messages", tags=["admin-cms"])
 
 
 @news_router.get("", response_model=list[NewsAdminOut])
@@ -103,3 +108,26 @@ async def get_site(admin: AdminUser, db: DbSession) -> SiteOut:
 @site_router.put("", response_model=SiteOut)
 async def update_site(data: SiteUpdate, admin: AdminUser, db: DbSession) -> SiteOut:
     return await site.update_site(db, data)
+
+
+# --- bog'lanish xabarlari --------------------------------------------------------------------
+
+
+@messages_router.get("", response_model=list[MessageOut])
+async def list_messages(
+    admin: AdminUser, db: DbSession, unread: Annotated[bool, Query()] = False
+) -> list[ContactMessage]:
+    return await contact.admin_list(db, unread_only=unread)
+
+
+@messages_router.patch("/{message_id}", response_model=MessageOut)
+async def update_message(
+    message_id: DbIdPath, data: MessageUpdate, admin: AdminUser, db: DbSession
+) -> ContactMessage:
+    return await contact.update_message(db, await contact.get_message(db, message_id), data)
+
+
+@messages_router.delete("/{message_id}", status_code=204)
+async def delete_message(message_id: DbIdPath, admin: AdminUser, db: DbSession) -> Response:
+    await contact.delete_message(db, await contact.get_message(db, message_id))
+    return Response(status_code=204)

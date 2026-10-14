@@ -6,6 +6,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 5: bog'lanish formasi va admin xabarlar
+- Yangi `app/cms/contact.py`; ochiq `POST /api/contact` (204): IP bo'yicha `contact_limiter` (soatiga 5 ta, oshsa 429 `CONTACT_RATE_LIMITED`; honeypot yuborishlari ham sanaladi), honeypot `website` maydoni to'ldirilsa xabar jim tashlanadi, bo'sh maydonlar 422.
+- Admin `/api/admin/messages`: `GET ?unread=` (yangidan eskiga, 200 ta), `PATCH /{id}` (`is_read`), `DELETE /{id}` (404 `MESSAGE_NOT_FOUND`).
+- Tekshiruv: `ruff`, `mypy` toza; toza bazada qo'lda tekshiruv — hammasi kutilgandek.
+
 ### 4A Task 4: FAQ va sayt sozlamalari
 - Yangi `app/cms/faq.py`: ochiq ro'yxat (faqat nashr qilingan, `order` bo'yicha), admin CRUD (404 `FAQ_NOT_FOUND`).
 - Yangi `app/cms/site.py`: `contacts`, `socials`, `about` kalitlari (`site_settings`); `PUT` faqat yuborilgan bo'limlarni almashtiradi; noma'lum kalit — 422 (`extra="forbid"`, mini-spec'dagi `SETTING_UNKNOWN` o'rniga); ijtimoiy havolalar faqat `https://` (`javascript:` kabi sxemalar rad etiladi).
