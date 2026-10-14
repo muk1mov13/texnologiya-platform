@@ -257,6 +257,12 @@
     },
     "newsEyebrow": "Yangiliklar",
     "exploreLabel": "Kutubxona va AI repetitor",
+    "faq": {
+      "eyebrow": "Savol-javob",
+      "title": "Tez-tez so'raladigan savollar",
+      "subtitle": "Platforma, ro'yxatdan o'tish va o'qish jarayoni haqida qisqa javoblar",
+      "all": "Barcha savollar"
+    },
     "latestNews": "So'nggi yangiliklar",
     "allNews": "Barcha yangiliklar",
     "library": {

@@ -1,5 +1,6 @@
 import { usePageMeta } from '@/lib/usePageMeta'
 import { ExploreSection } from './home/ExploreSection'
+import { FaqSection } from './home/FaqSection'
 import { FeaturesSection } from './home/FeaturesSection'
 import { HeroSection } from './home/HeroSection'
 import { HowItWorksSection } from './home/HowItWorksSection'
@@ -15,6 +16,7 @@ export function HomePage() {
       <HowItWorksSection />
       <NewsSection />
       <ExploreSection />
+      <FaqSection />
     </>
   )
 }
