@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 4: hero bo'limi
+- `features/public/home/HeroSection.tsx`: fonda suzuvchi gradient bloblar va nozik katak; pulslanuvchi badge; sarlavha so'zma-so'z (blur + yuqoriga) ochiladi, oxirgi qismi gradient matnda; "Boshlash"/"Kirish" (kirganga — "Kabinetga o'tish") tugmalari; 3 ta fakt chipi; "Pastga" ko'rsatkichi.
+- `HeroMockup.tsx` (bezak, `aria-hidden`): mavzu kartasida 7 bosqich ketma-ket belgilanadi, progress chizig'i o'sadi, atrofida "+10 XP", "Yangi nishon", "AI: savol bering" kartalari suzadi.
+- `home/styles.ts`: bosh sahifa CTA va sarlavha klasslari. i18n: `home.hero.*` (uz/ru), eski `home.badge/title/subtitle` o'chirildi.
+- Tekshiruv: lint, typecheck, build o'tdi; 1280px va 360px da ko'rildi, gorizontal scroll yo'q. Bundle: gzip 270.6 → 322.5 KB (`motion`).
+
 ### Redizayn Task 3: bosh sahifa uchun to'liq kenglik
 - `PublicLayout`: `/` da `main` konteynersiz (`useMatch`), bosh sahifa bo'limlari to'liq kenglikdagi fon oladi va konteynerni o'zi qo'yadi. Boshqa ochiq sahifalar o'zgarmadi.
 - Tekshiruv: lint, typecheck o'tdi.

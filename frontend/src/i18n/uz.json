@@ -178,9 +178,25 @@
     "reload": "Sahifani qayta yuklash"
   },
   "home": {
-    "badge": "BuxDPI · Texnologik ta'lim",
-    "title": "Bo'lajak texnologiya o'qituvchilari uchun metodik platforma",
-    "subtitle": "Ma'ruzalar, taqdimotlar, glossariy va adabiyotlar — har bir mavzu 7 bosqichli aniq yo'l sifatida",
+    "hero": {
+      "badge": "BuxDPI · Texnologik ta'lim",
+      "title": "Bo'lajak texnologiya o'qituvchilari uchun",
+      "accent": "metodik platforma",
+      "subtitle": "Ma'ruzalar, taqdimotlar, testlar, glossariy va adabiyotlar — har bir mavzu 7 bosqichli aniq yo'l. Yonida esa savollaringizga javob beradigan AI repetitor.",
+      "scroll": "Pastga",
+      "chips": {
+        "steps": "7 bosqichli mavzular",
+        "ai": "AI repetitor",
+        "languages": "O'zbek va rus tillarida"
+      },
+      "mock": {
+        "subject": "Texnologiya",
+        "topic": "Yog'ochga ishlov berish asoslari",
+        "xp": "+10 XP",
+        "ai": "AI: savol bering",
+        "badge": "Yangi nishon"
+      }
+    },
     "start": "Boshlash",
     "continue": "Kabinetga o'tish",
     "features": {
