@@ -395,6 +395,24 @@ export interface paths {
         patch: operations["update_subject_api_admin_subjects__subject_id__patch"];
         trace?: never;
     };
+    "/api/admin/subjects/{subject_id}/syllabus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload Syllabus */
+        put: operations["upload_syllabus_api_admin_subjects__subject_id__syllabus_put"];
+        post?: never;
+        /** Delete Syllabus */
+        delete: operations["delete_syllabus_api_admin_subjects__subject_id__syllabus_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/subjects/{subject_id}/teachers": {
         parameters: {
             query?: never;
@@ -1018,6 +1036,23 @@ export interface paths {
         };
         /** Get Subject */
         get: operations["get_subject_api_subjects__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subjects/{slug}/syllabus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Syllabus */
+        get: operations["get_syllabus_api_subjects__slug__syllabus_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1903,6 +1938,11 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** Body_upload_syllabus_api_admin_subjects__subject_id__syllabus_put */
+        Body_upload_syllabus_api_admin_subjects__subject_id__syllabus_put: {
+            /** File */
+            file: string;
+        };
         /** BookAdminOut */
         BookAdminOut: {
             /** Author */
@@ -2364,6 +2404,12 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * LessonType
+         * @description Mashg'ulot turi: fan sahifasida mavzular shu bo'yicha guruhlanadi.
+         * @enum {string}
+         */
+        LessonType: "lecture" | "practical" | "seminar" | "lab";
         /**
          * LibrarySection
          * @enum {string}
@@ -2869,6 +2915,8 @@ export interface components {
             order: number;
             /** Slug */
             slug: string;
+            /** Syllabus Name */
+            syllabus_name: string | null;
             /**
              * Teacher Ids
              * @default []
@@ -2925,6 +2973,8 @@ export interface components {
             id: number;
             /** Slug */
             slug: string;
+            /** Syllabus Name */
+            syllabus_name: string | null;
             /** Title */
             title: string;
             /** Topics */
@@ -3212,6 +3262,7 @@ export interface components {
             id: number;
             /** Is Published */
             is_published: boolean;
+            lesson_type: components["schemas"]["LessonType"];
             /** Order */
             order: number;
             /** Title */
@@ -3242,6 +3293,7 @@ export interface components {
         TopicCard: {
             /** Id */
             id: number;
+            lesson_type: components["schemas"]["LessonType"];
             /** Order */
             order: number;
             progress: components["schemas"]["ProgressOut"];
@@ -3257,6 +3309,8 @@ export interface components {
              * @default false
              */
             is_published?: boolean;
+            /** @default lecture */
+            lesson_type?: components["schemas"]["LessonType"];
             /**
              * Summary
              * @default
@@ -3269,6 +3323,7 @@ export interface components {
         TopicDetailOut: {
             /** Id */
             id: number;
+            lesson_type: components["schemas"]["LessonType"];
             progress: components["schemas"]["ProgressOut"];
             /** Steps */
             steps: components["schemas"]["StepBrief"][];
@@ -3286,6 +3341,7 @@ export interface components {
             id: number;
             /** Is Published */
             is_published: boolean;
+            lesson_type: components["schemas"]["LessonType"];
             /** Literature */
             literature: components["schemas"]["LiteratureOut"][];
             /** Order */
@@ -3334,6 +3390,7 @@ export interface components {
         TopicUpdate: {
             /** Is Published */
             is_published?: boolean | null;
+            lesson_type?: components["schemas"]["LessonType"] | null;
             /** Summary */
             summary?: string | null;
             /** Title */
@@ -4529,6 +4586,72 @@ export interface operations {
             };
         };
     };
+    upload_syllabus_api_admin_subjects__subject_id__syllabus_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subject_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_syllabus_api_admin_subjects__subject_id__syllabus_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_syllabus_api_admin_subjects__subject_id__syllabus_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subject_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     set_teachers_api_admin_subjects__subject_id__teachers_put: {
         parameters: {
             query?: never;
@@ -5603,6 +5726,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SubjectDetailOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_syllabus_api_subjects__slug__syllabus_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

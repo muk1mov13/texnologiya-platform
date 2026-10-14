@@ -25,6 +25,7 @@ function editorTopic(lectureMaterials: Material[] = []): TopicEditor {
   return {
     id: 10,
     subject_id: 1,
+    lesson_type: 'lecture',
     title: 'Kasb tanlash asoslari',
     summary: 'Qisqacha',
     order: 1,

@@ -14,8 +14,8 @@ const subjects: TeachSubject[] = [
     slug: 'kasb',
     is_published: true,
     topics: [
-      { id: 10, title: 'Birinchi mavzu', order: 1, is_published: true },
-      { id: 11, title: 'Ikkinchi mavzu', order: 2, is_published: false },
+      { id: 10, title: 'Birinchi mavzu', order: 1, lesson_type: 'lecture', is_published: true },
+      { id: 11, title: 'Ikkinchi mavzu', order: 2, lesson_type: 'lecture', is_published: false },
     ],
   },
 ]
@@ -38,7 +38,7 @@ function threeTopicSubjects(ids: number[]): TeachSubject[] {
       title: "Kasb ta'limi metodikasi",
       slug: 'kasb',
       is_published: true,
-      topics: ids.map((id, index) => ({ id, order: index + 1, ...byId[id] })),
+      topics: ids.map((id, index) => ({ id, order: index + 1, lesson_type: 'lecture' as const, ...byId[id] })),
     },
   ]
 }

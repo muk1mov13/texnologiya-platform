@@ -18,9 +18,10 @@ export const subjectDetail: SubjectDetail = {
   slug: 'kasb-talimi-metodikasi',
   description: 'Metodika asoslari',
   cover: null,
+  syllabus_name: null,
   topics: [
-    { id: 10, title: 'Kasb tanlash asoslari', summary: '', order: 1, progress: { completed: 1, total: 2 } },
-    { id: 11, title: 'Mehnat xavfsizligi', summary: '', order: 2, progress: { completed: 0, total: 0 } },
+    { id: 10, title: 'Kasb tanlash asoslari', summary: '', order: 1, lesson_type: 'lecture', progress: { completed: 1, total: 2 } },
+    { id: 11, title: 'Mehnat xavfsizligi', summary: '', order: 2, lesson_type: 'lecture', progress: { completed: 0, total: 0 } },
   ],
 }
 
@@ -29,6 +30,7 @@ export function topicDetail(overrides: Partial<TopicDetail> = {}): TopicDetail {
     id: 10,
     title: 'Kasb tanlash asoslari',
     summary: '',
+    lesson_type: 'lecture',
     subject: { id: 1, title: "Kasb ta'limi metodikasi", slug: 'kasb-talimi-metodikasi' },
     progress: { completed: 1, total: 2 },
     steps: [

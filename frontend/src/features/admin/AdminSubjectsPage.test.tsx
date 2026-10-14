@@ -13,6 +13,7 @@ const subject: SubjectAdmin = {
   slug: 'kasb-talimi-metodikasi',
   description: '',
   cover: null,
+  syllabus_name: null,
   order: 0,
   is_published: false,
   teacher_ids: [],

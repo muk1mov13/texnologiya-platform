@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 3: frontend API turlari
+- `npm run gen:api` — `schema.gen.ts` yangilandi; `types.ts`: `LessonType`, `lesson_type` (`TopicCard`, `TopicDetail`, `TopicEditor`, `TeachTopicBrief`, `TopicCreate`), `syllabus_name` (`SubjectDetail`, `SubjectAdmin`).
+- Test fixture'lari yangi maydonlar bilan to'ldirildi (faqat typecheck uchun; testlar ishga tushirilmadi).
+- Tekshiruv: typecheck, lint o'tdi.
+
 ### Task 2: fanning o'quv dasturi (`Subject.syllabus`)
 - `Subject.syllabus_pdf`, `syllabus_name` (migratsiya `f2dac920e580`); `SubjectAdminOut` va `SubjectDetailOut` da `syllabus_name` (null — dastur yo'q).
 - `app/learning/syllabus.py`: PDF/DOC/DOCX qabul qilinadi, DOC/DOCX so'rov ichida PDF'ga o'giriladi (rejadan farqi: fon ishi va `processing` holati yo'q, faqat PDF saqlanadi). `attach_syllabus()` diskdagi fayl bilan ham ishlaydi (import uchun).

@@ -6,6 +6,7 @@ export type Locale = 'uz' | 'ru'
 export type StepKind = 'review' | 'lecture' | 'presentation' | 'practice' | 'task' | 'glossary' | 'literature'
 export type MaterialStatus = 'processing' | 'ready' | 'failed'
 export type ProgressStatus = 'in_progress' | 'completed'
+export type LessonType = 'lecture' | 'practical' | 'seminar' | 'lab'
 
 export interface ApiErrorBody {
   code: string
@@ -84,6 +85,7 @@ export interface TopicCard {
   title: string
   summary: string
   order: number
+  lesson_type: LessonType
   progress: Progress
 }
 
@@ -93,6 +95,7 @@ export interface SubjectDetail {
   slug: string
   description: string
   cover: string | null
+  syllabus_name: string | null
   topics: TopicCard[]
 }
 
@@ -108,6 +111,7 @@ export interface TopicDetail {
   id: number
   title: string
   summary: string
+  lesson_type: LessonType
   subject: { id: number; title: string; slug: string }
   steps: StepBrief[]
   progress: Progress
@@ -253,6 +257,7 @@ export interface TopicEditor {
   title: string
   summary: string
   order: number
+  lesson_type: LessonType
   is_published: boolean
   steps: StepEditor[]
   glossary: GlossaryTerm[]
@@ -263,6 +268,7 @@ export interface TeachTopicBrief {
   id: number
   title: string
   order: number
+  lesson_type: LessonType
   is_published: boolean
 }
 
@@ -277,6 +283,7 @@ export interface TeachSubject {
 export interface TopicCreate {
   title: string
   summary?: string
+  lesson_type?: LessonType
   is_published?: boolean
 }
 
@@ -301,6 +308,7 @@ export interface SubjectAdmin {
   slug: string
   description: string
   cover: string | null
+  syllabus_name: string | null
   order: number
   is_published: boolean
   teacher_ids: number[]

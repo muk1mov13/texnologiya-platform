@@ -31,6 +31,7 @@ function topicWith(statuses: Array<'processing' | 'ready' | 'failed'>): TopicEdi
   return {
     id: 1,
     subject_id: 1,
+    lesson_type: 'lecture',
     title: 'Mavzu',
     summary: '',
     order: 1,
@@ -125,6 +126,7 @@ test('useCreateTopic: muharrir keshini darhol to\'ldiradi', async () => {
   const created: TopicEditor = {
     id: 12,
     subject_id: 1,
+    lesson_type: 'lecture',
     title: 'Uchinchi',
     summary: '',
     order: 3,
