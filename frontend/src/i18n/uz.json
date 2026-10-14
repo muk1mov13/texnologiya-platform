@@ -616,7 +616,19 @@
     "description": "Buxoro davlat pedagogika instituti texnologik ta'lim yo'nalishi uchun metodik platforma: darslar, kutubxona, yangiliklar."
   },
   "library": {
-    "tabs": { "metodik": "Metodik hujjatlar", "huquqiy": "Huquqiy hujjatlar", "books": "Kitoblar" }
+    "tabs": { "metodik": "Metodik hujjatlar", "huquqiy": "Huquqiy hujjatlar", "books": "Kitoblar" },
+    "title": "Kutubxona",
+    "description": "Metodik va huquqiy hujjatlar, o'quv kitoblari — ochiq, ro'yxatdan o'tmasdan yuklab olish mumkin.",
+    "download": "Yuklab olish",
+    "docCount": "{{count}} ta hujjat",
+    "emptyFolder": "Papka bo'sh",
+    "empty": "Bu bo'limda hozircha hujjatlar yo'q",
+    "search": "Kitob qidirish",
+    "searchPlaceholder": "Nomi yoki muallifi bo'yicha qidirish…",
+    "category": "Kategoriya",
+    "allCategories": "Barcha kategoriyalar",
+    "noBooks": "Hozircha kitoblar yo'q",
+    "noBooksFound": "Hech narsa topilmadi"
   },
   "news": {
     "title": "Yangiliklar",

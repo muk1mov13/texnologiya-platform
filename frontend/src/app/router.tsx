@@ -4,6 +4,7 @@ import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { HomePage } from '@/features/public/HomePage'
+import { LibraryPage } from '@/features/public/LibraryPage'
 import { LoginPage } from '@/features/public/LoginPage'
 import { NewsListPage } from '@/features/public/NewsListPage'
 import { NewsPage } from '@/features/public/NewsPage'
@@ -38,6 +39,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: 'news', element: <NewsListPage /> },
       { path: 'news/:slug', element: <NewsPage /> },
+      { path: 'library', element: <LibraryPage /> },
       { path: 'pending', element: <PendingPage /> },
       {
         element: <RedirectIfAuthed />,

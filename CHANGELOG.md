@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 3: ochiq kutubxona
+- `LibraryPage` (`/library?tab=metodik|huquqiy|books`): bo'lim tablari URL'da.
+- `FolderTree`: rekursiv `<details>` daraxt (yuqori papkalar ochiq), har papkada hujjatlar soni, hujjat qatorida turi, hajmi va to'g'ridan-to'g'ri yuklab olish havolasi (ochiq endpoint).
+- `BookCatalog`: qidiruv (300 ms kechikish bilan), kategoriya filtri va sahifa URL'da; kitob kartasida muqova yoki belgi, muallif, kategoriya, hajm, yuklab olish.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 2: bosh sahifa va yangiliklar
 - `HomePage` yakuniy dizayni: hero, imkoniyatlar, so'nggi 3 yangilik (bo'lmasa blok yashirinadi), kutubxona bloki (metodik / huquqiy / kitoblar havolalari), AI repetitor bloki (kirgan foydalanuvchiga `/app/tutor`, mehmonga ro'yxatdan o'tish).
 - Yangi `NewsCard`, `NewsListPage` (`/news?page=`, sahifalash) va `NewsPage` (`/news/:slug`: muqova, sana, ko'rishlar, markdown, `usePageMeta` bilan title/description/OG rasm).
