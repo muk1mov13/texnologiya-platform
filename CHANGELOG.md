@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 2: bosh sahifa va yangiliklar
+- `HomePage` yakuniy dizayni: hero, imkoniyatlar, so'nggi 3 yangilik (bo'lmasa blok yashirinadi), kutubxona bloki (metodik / huquqiy / kitoblar havolalari), AI repetitor bloki (kirgan foydalanuvchiga `/app/tutor`, mehmonga ro'yxatdan o'tish).
+- Yangi `NewsCard`, `NewsListPage` (`/news?page=`, sahifalash) va `NewsPage` (`/news/:slug`: muqova, sana, ko'rishlar, markdown, `usePageMeta` bilan title/description/OG rasm).
+- `useNews`: `staleTime: Infinity`, oynaga qaytganda qayta so'ralmaydi (har so'rov `views` ni oshiradi).
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 1: ochiq layout, markdown va sahifa meta'lari
 - Yangi bog'liqlik `react-markdown@10.1.0`; `components/ui/Markdown.tsx` — xom HTML chizilmaydi (`skipHtml`), tashqi havolalar `noopener` bilan yangi oynada; uslub `index.css` dagi `.md`.
 - `lib/usePageMeta.ts`: `document.title`, description va OG teglari, sahifadan chiqilganda sukut qiymatlari; `index.html` ga sukut description. `lib/format.ts` (`formatSize`, `formatDate`), `components/ui/Pagination.tsx`.

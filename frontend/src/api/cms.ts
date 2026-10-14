@@ -28,6 +28,9 @@ export function useNews(slug: string) {
   return useQuery({
     queryKey: cmsKeys.news(slug),
     queryFn: ({ signal }) => apiFetch<NewsDetail>(`/api/news/${encodeURIComponent(slug)}`, { signal }),
+    // Har so'rov `views` ni oshiradi — oynaga qaytish kabi fon qayta so'rovlari hisobni buzmasin.
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   })
 }
 

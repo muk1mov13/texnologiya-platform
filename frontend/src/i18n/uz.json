@@ -187,6 +187,18 @@
         "title": "O'zbek va rus tillarida",
         "text": "Interfeys tilini istalgan vaqtda almashtiring"
       }
+    },
+    "latestNews": "So'nggi yangiliklar",
+    "allNews": "Barcha yangiliklar",
+    "library": {
+      "title": "Kutubxona",
+      "text": "Metodik va huquqiy hujjatlar hamda kitoblar — ro'yxatdan o'tmasdan ochiq."
+    },
+    "tutor": {
+      "title": "AI repetitor",
+      "text": "Mavzu bo'yicha savol bering — javob dars materiallari va kutubxonadan, manbalari bilan olinadi.",
+      "open": "Repetitorni ochish",
+      "join": "Ro'yxatdan o'tib foydalanish"
     }
   },
   "auth": {
@@ -602,5 +614,15 @@
   "meta": {
     "siteTitle": "Texnologiya platformasi",
     "description": "Buxoro davlat pedagogika instituti texnologik ta'lim yo'nalishi uchun metodik platforma: darslar, kutubxona, yangiliklar."
+  },
+  "library": {
+    "tabs": { "metodik": "Metodik hujjatlar", "huquqiy": "Huquqiy hujjatlar", "books": "Kitoblar" }
+  },
+  "news": {
+    "title": "Yangiliklar",
+    "description": "Institut va texnologik ta'lim yo'nalishi yangiliklari.",
+    "empty": "Hozircha yangiliklar yo'q",
+    "all": "Barcha yangiliklar",
+    "views": "Ko'rishlar: {{count}}"
   }
 }
