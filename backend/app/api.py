@@ -8,6 +8,8 @@ from app.assessment.router import router as assessment_router
 from app.assessment.teach_router import router as assessment_teach_router
 from app.auth.admin_router import router as admin_users_router
 from app.auth.router import router as auth_router
+from app.cms.admin_router import news_router as cms_news_admin_router
+from app.cms.public_router import router as cms_public_router
 from app.learning.admin_router import router as admin_subjects_router
 from app.learning.progress_router import router as progress_router
 from app.learning.router import router as learning_router
@@ -45,3 +47,5 @@ api_router.include_router(library_public_router)
 api_router.include_router(library_admin_router)
 api_router.include_router(library_books_admin_router)
 api_router.include_router(library_teach_router)
+api_router.include_router(cms_public_router)
+api_router.include_router(cms_news_admin_router)

@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 3: yangiliklar
+- Yangi `app/cms/news.py` va `cms/schemas.py` (yangiliklar qismi): slug sarlavhadan avtomatik (band bo'lsa `-2`, `-3`…), qo'lda berilgani band bo'lsa 409 `NEWS_SLUG_TAKEN`; markdown matndan `excerpt` (200 belgi, belgilarisiz); `published_at` NULL — qoralama, kelajakdagi sana — rejalashtirilgan; `PATCH` da aniq `null` — nashrdan olish; muqova (jpeg/png/webp, 5 MB).
+- Ochiq `GET /api/news?page=&size=`, `GET /api/news/{slug}` (har ochilishda `views` atomar +1, `updated_at` o'zgarmaydi), `GET /api/news/{id}/cover` (faqat nashr qilingan); admin `/api/admin/news` (`GET`, `POST`, `GET /{id}`, `PATCH`, `PUT /{id}/cover`, `DELETE`).
+- Qo'lda tekshiruvda topilib tuzatilgan: ORM `UPDATE` (`synchronize_session`) xotiradagi obyektni ham oshirgani uchun birinchi ko'rishda `views` 2 qaytardi — `synchronize_session=False`.
+- Tekshiruv: `ruff`, `mypy` toza; toza bazada 19 ta tekshiruv — hammasi kutilgandek.
+
 ### 4A Task 2: kitoblar va tasdiqlash
 - Yangi `app/library/books.py`: yuklash (kitob 50 MB, ixtiyoriy muqova jpeg/png/webp 5 MB; muqova yaroqsiz bo'lsa asosiy fayl ham o'chiriladi), admin yuklagani darhol tasdiqlangan; ochiq katalog (faqat tasdiqlangan, kategoriya va `title`/`author` bo'yicha qidiruv — `%`/`_` ekranlanadi, sahifalash); kategoriyalar; o'qituvchi faqat o'zining tasdiqlanmagan kitobini o'chiradi (boshqaniki — 404, tasdiqlangani — 409 `BOOK_ALREADY_APPROVED`); admin ro'yxati yuklovchi ismi bilan, tahrir/tasdiqlash, muqovani almashtirish, o'chirish.
 - Router'lar: ochiq `GET /api/library/books`, `/books/categories`, `/books/{id}/file`, `/books/{id}/cover` (tasdiqlanmagani 404); `/api/teach/books` (`GET`, `POST` multipart, `DELETE`); `/api/admin/books` (`GET ?status=pending|approved`, `PATCH`, `PUT /{id}/cover`, `DELETE`).
