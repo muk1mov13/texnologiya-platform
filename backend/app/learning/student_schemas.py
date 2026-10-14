@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from app.assessment.view_schemas import ActivityView, SubmissionView, TaskView
 from app.gamification.schemas import ProfileOut, RewardsOut
-from app.learning.models import ProgressStatus, StepKind
+from app.learning.models import LessonType, ProgressStatus, StepKind
 from app.learning.schemas import GlossaryOut, LiteratureOut
 
 
@@ -26,6 +26,7 @@ class TopicCard(BaseModel):
     title: str
     summary: str
     order: int
+    lesson_type: LessonType
     progress: ProgressOut
 
 
@@ -60,6 +61,7 @@ class TopicDetailOut(BaseModel):
     id: int
     title: str
     summary: str
+    lesson_type: LessonType
     subject: SubjectRef
     steps: list[StepBrief]
     progress: ProgressOut

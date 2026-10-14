@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — `resource/` materiallarini import qilish
+
+Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
+
+### Task 1: mavzu turi (`lesson_type`)
+- `Topic.lesson_type` (`LessonType`: `lecture`, `practical`, `seminar`, `lab`; standart `lecture`), migratsiya `6771fa5f102b`.
+- `TopicCreate/Update`, `TopicEditorOut`, `TeachTopicBrief`, `TopicCard`, `TopicDetailOut` maydonni qabul qiladi/qaytaradi.
+- Tekshiruv: `alembic upgrade head`, `alembic check`, ruff, mypy o'tdi.
+
 ## 2026-10-14 — Landing: zebra fonlar, footer chegarasidagi CTA
 
 Reja: `~/.claude/plans/landing-pageni-sectionlarini-zebra-zippy-spark.md`.

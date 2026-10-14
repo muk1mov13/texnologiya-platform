@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.types import DbId, Order31, trimmed_str
-from app.learning.models import MaterialStatus, StepKind
+from app.learning.models import LessonType, MaterialStatus, StepKind
 
 SLUG_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
 URL_PATTERN = r"^https?://\S+$"
@@ -43,12 +43,14 @@ class TeachersIn(BaseModel):
 class TopicCreate(BaseModel):
     title: trimmed_str(min_length=2, max_length=200)  # type: ignore[valid-type]
     summary: str = Field(default="", max_length=5000)
+    lesson_type: LessonType = LessonType.lecture
     is_published: bool = False
 
 
 class TopicUpdate(BaseModel):
     title: trimmed_str(min_length=2, max_length=200) | None = None  # type: ignore[valid-type]
     summary: str | None = Field(default=None, max_length=5000)
+    lesson_type: LessonType | None = None
     is_published: bool | None = None
 
 
@@ -125,6 +127,7 @@ class TopicEditorOut(BaseModel):
     title: str
     summary: str
     order: int
+    lesson_type: LessonType
     is_published: bool
     steps: list[StepEditorOut]
     glossary: list[GlossaryOut]
@@ -137,6 +140,7 @@ class TeachTopicBrief(BaseModel):
     id: int
     title: str
     order: int
+    lesson_type: LessonType
     is_published: bool
 
 

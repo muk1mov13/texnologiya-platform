@@ -266,6 +266,7 @@ async def create_topic(db: AsyncSession, subject_id: int, data: TopicCreate) -> 
         order=(current_max or 0) + 1,
         title=data.title.strip(),
         summary=data.summary,
+        lesson_type=data.lesson_type,
         is_published=data.is_published,
     )
     db.add(topic)
@@ -357,6 +358,7 @@ async def topic_editor_view(db: AsyncSession, topic: Topic) -> TopicEditorOut:
         title=topic.title,
         summary=topic.summary,
         order=topic.order,
+        lesson_type=topic.lesson_type,
         is_published=topic.is_published,
         steps=[
             StepEditorOut(id=s.id, kind=s.kind, order=s.order, materials=materials_by_step[s.id])

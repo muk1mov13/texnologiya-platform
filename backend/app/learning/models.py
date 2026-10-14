@@ -35,6 +35,15 @@ SELF_COMPLETE_STEP_KINDS = frozenset(
 )
 
 
+class LessonType(StrEnum):
+    """Mashg'ulot turi: fan sahifasida mavzular shu bo'yicha guruhlanadi."""
+
+    lecture = "lecture"
+    practical = "practical"
+    seminar = "seminar"
+    lab = "lab"
+
+
 class MaterialStatus(StrEnum):
     processing = "processing"
     ready = "ready"
@@ -74,6 +83,9 @@ class Topic(IdMixin, CreatedAtMixin, Base):
     order: Mapped[int] = mapped_column(Integer, default=0)
     title: Mapped[str] = mapped_column(String(200))
     summary: Mapped[str] = mapped_column(Text, default="")
+    lesson_type: Mapped[LessonType] = mapped_column(
+        str_enum(LessonType), default=LessonType.lecture, server_default=LessonType.lecture.value
+    )
     is_published: Mapped[bool] = mapped_column(Boolean, default=False)
 
 

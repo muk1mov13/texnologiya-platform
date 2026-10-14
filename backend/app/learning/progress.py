@@ -123,6 +123,7 @@ async def subject_detail(db: AsyncSession, user: User, slug: str) -> SubjectDeta
                 title=topic.title,
                 summary=topic.summary,
                 order=topic.order,
+                lesson_type=topic.lesson_type,
                 progress=ProgressOut(completed=done, total=total),
             )
         )
@@ -145,6 +146,7 @@ async def topic_detail(db: AsyncSession, user: User, topic_id: int) -> TopicDeta
         id=topic.id,
         title=topic.title,
         summary=topic.summary,
+        lesson_type=topic.lesson_type,
         subject=SubjectRef(id=subject.id, title=subject.title, slug=subject.slug),
         steps=[
             StepBrief(
