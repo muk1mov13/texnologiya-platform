@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — Landing: zebra fonlar, footer chegarasidagi CTA
+
+Reja: `~/.claude/plans/landing-pageni-sectionlarini-zebra-zippy-spark.md`.
+
+### Task 1: och zebra fonlari
+- Bosh sahifa bo'limlari endi body rangiga tayanmaydi: Hero `bg-white` (pastki so'nish ham oqqa), Features va Explore `bg-brand-50/60` (tepada `via-brand-100` hairline), News `bg-white` va o'z pastki bo'shlig'i bilan (`py-20 sm:py-24`), FAQ oq.
+- Tekshiruv: lint, typecheck o'tdi.
+
 ## 2026-10-14 — Landing: demo kontent, boyitilgan footer, footer ranglari
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.

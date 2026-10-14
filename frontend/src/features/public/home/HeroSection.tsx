@@ -29,10 +29,10 @@ export function HeroSection() {
   const accent = t('home.hero.accent').split(' ')
 
   return (
-    <section className="relative isolate overflow-hidden">
+    <section className="relative isolate overflow-hidden bg-white">
       {/* Fon: suzuvchi gradient bloblar va nozik katak. */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black_75%,transparent)]">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/80 via-white to-slate-50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/80 via-white to-white" />
         <div className="absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" />
         <div className="absolute -top-32 -left-24 size-[28rem] animate-blob rounded-full bg-brand-300/40 blur-3xl motion-reduce:animate-none" />
         <div

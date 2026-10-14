@@ -19,7 +19,8 @@ export function ExploreSection() {
   const user = useCurrentUser()
 
   return (
-    <section aria-label={t('home.exploreLabel')} className="py-20 sm:py-24">
+    <section aria-label={t('home.exploreLabel')} className="relative bg-brand-50/60 py-20 sm:py-24">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-100 to-transparent" />
       <m.div
         initial="hidden"
         whileInView="show"

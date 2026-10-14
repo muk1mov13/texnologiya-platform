@@ -61,7 +61,8 @@ function FeatureExtra({ featureKey }: { featureKey: string }) {
 export function FeaturesSection() {
   const { t } = useTranslation()
   return (
-    <section id="features" aria-labelledby="home-features" className="scroll-mt-24 py-20 sm:py-28">
+    <section id="features" aria-labelledby="home-features" className="relative scroll-mt-24 bg-brand-50/60 py-20 sm:py-28">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-100 to-transparent" />
       <div className="mx-auto max-w-6xl px-4">
         <Reveal className="mx-auto mb-12 flex max-w-2xl flex-col items-center gap-4 text-center">
           <span className={EYEBROW}>{t('home.featuresSection.eyebrow')}</span>

@@ -18,7 +18,7 @@ export function NewsSection() {
   if (!news.data || news.data.items.length === 0) return null
 
   return (
-    <section aria-labelledby="home-news" className="pt-20 sm:pt-24">
+    <section aria-labelledby="home-news" className="bg-white py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col items-start gap-3">
