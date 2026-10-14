@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query'
+import { MotionConfig } from 'motion/react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router/dom'
@@ -16,11 +17,14 @@ const router = createAppRouter()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <SessionGate>
-        <RouterProvider router={router} />
-      </SessionGate>
-      <Toaster />
-    </QueryClientProvider>
+    {/* Tizimda "kamroq harakat" yoqilgan bo'lsa, `motion` transform animatsiyalarini o'chiradi. */}
+    <MotionConfig reducedMotion="user">
+      <QueryClientProvider client={queryClient}>
+        <SessionGate>
+          <RouterProvider router={router} />
+        </SessionGate>
+        <Toaster />
+      </QueryClientProvider>
+    </MotionConfig>
   </StrictMode>,
 )

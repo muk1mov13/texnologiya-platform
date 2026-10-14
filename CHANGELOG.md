@@ -4,6 +4,19 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — Bosh sahifa redizayni (premium, animatsiyali UI)
+
+intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
+
+### Redizayn Task 1: animatsiya poydevori
+- `motion` 14.2.0 paketi; butun ilova `MotionConfig reducedMotion="user"` ichida (`main.tsx`).
+- `index.css`: `brand-300/400/800/950` ranglari, `shadow-glow`/`shadow-soft`, `blob-float`/`shine`/`float-y` keyframes, `bg-grid` va `text-gradient` utility'lari.
+- `lib/motion.ts` (`fadeUp`, `scaleIn`, `stagger`, `withDelay`, `VIEWPORT_ONCE`), `components/motion/Reveal.tsx` (ekranga kirganda paydo bo'lish).
+- `components/icons/` — inline SVG ikonkalar (`Icon name=...`), emoji o'rniga.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
+---
+
 ## 2026-10-14 — 4B (frontend)
 
 ### 4B Task 10: yakun va qo'lda tekshiruv
