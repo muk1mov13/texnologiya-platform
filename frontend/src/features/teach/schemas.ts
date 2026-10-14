@@ -32,3 +32,12 @@ export const literatureSchema = z.object({
 })
 
 export type LiteratureValues = z.infer<typeof literatureSchema>
+
+// Uzunliklar backend `CategoryForm` / `LongTitleForm` / `author` bilan bir xil.
+export const bookUploadSchema = z.object({
+  category: z.string().trim().min(1, { error: 'validation.required' }).max(100, { error: 'validation.tooLong' }),
+  title: z.string().trim().min(1, { error: 'validation.required' }).max(300, { error: 'validation.tooLong' }),
+  author: z.string().trim().max(200, { error: 'validation.tooLong' }),
+})
+
+export type BookUploadValues = z.infer<typeof bookUploadSchema>

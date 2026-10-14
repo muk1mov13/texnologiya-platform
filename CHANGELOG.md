@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 6: "Kitoblarim"
+- Yangi `MyBooksPage` (`/teach/books`, o'qituvchi va admin menyusida): kitoblar ro'yxati, holat belgisi (tasdiqlangan / tasdiq kutilmoqda), tasdiqlanmaganini o'chirish (`ConfirmDialog`), tasdiqlanganini yuklab olish.
+- `BookUploadModal`: nom, muallif, kategoriya (mavjudlari `<datalist>` da), fayl va ixtiyoriy muqova; `bookUploadSchema` (uzunliklar backend bilan bir xil); admin uchun "darhol tasdiqlanadi" eslatmasi; xato forma ichida.
+- `lib/files.ts`: `DOC_ACCEPT`, `IMAGE_ACCEPT`, `FILE_INPUT_CLASS`.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 5: guruhlangan admin menyusi va mobil menyu
 - `paths.ts`: admin yuqori menyuda bitta "Boshqaruv" (`/admin`) havolasini ko'radi; yangi `ADMIN_NAV` guruhlari (Foydalanuvchilar · O'quv jarayoni; "Sayt" guruhi keyingi tasklarda to'ldiriladi).
 - Yangi `AdminLayout`: `md` dan kengda chapda guruhlangan menyu, telefonda ochiladigan ro'yxat (tanlansa o'tadi); `/admin/*` marshrutlari shu layout ichida.

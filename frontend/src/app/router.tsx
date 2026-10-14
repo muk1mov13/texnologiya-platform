@@ -20,6 +20,7 @@ import { ResultsPage } from '@/features/student/ResultsPage'
 import { SubjectPage } from '@/features/student/SubjectPage'
 import { SubjectsPage } from '@/features/student/SubjectsPage'
 import { TutorPage } from '@/features/student/TutorPage'
+import { MyBooksPage } from '@/features/teach/MyBooksPage'
 import { ReviewDetailPage } from '@/features/teach/ReviewDetailPage'
 import { ReviewQueuePage } from '@/features/teach/ReviewQueuePage'
 import { StatsPage } from '@/features/teach/StatsPage'
@@ -79,6 +80,7 @@ export const routes: RouteObject[] = [
               { path: 'teach/review', element: <ReviewQueuePage /> },
               { path: 'teach/review/:submissionId', element: <ReviewDetailPage /> },
               { path: 'teach/stats', element: <StatsPage /> },
+              { path: 'teach/books', element: <MyBooksPage /> },
             ],
           },
           {

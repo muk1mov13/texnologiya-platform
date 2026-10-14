@@ -26,7 +26,8 @@
     "menuOpen": "Menyuni ochish",
     "menuClose": "Menyuni yopish",
     "admin": "Boshqaruv",
-    "adminSection": "Boshqaruv bo'limlari"
+    "adminSection": "Boshqaruv bo'limlari",
+    "myBooks": "Kitoblarim"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
@@ -661,5 +662,30 @@
     "sentText": "Rahmat! Tez orada siz bilan bog'lanamiz.",
     "again": "Yana yozish"
   },
-  "navGroups": { "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" }
+  "navGroups": { "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" },
+  "myBooks": {
+    "title": "Kitoblarim",
+    "subtitle": "Kutubxonaga yuklagan kitoblaringiz va ularning holati",
+    "upload": "Kitob yuklash",
+    "uploadTitle": "Kitob yuklash",
+    "teacherNotice": "Kitob administrator tasdiqlagach kutubxona katalogida paydo bo'ladi.",
+    "adminNotice": "Siz administratorsiz: kitob darhol tasdiqlanadi va katalogda ko'rinadi.",
+    "titleLabel": "Kitob nomi",
+    "authorLabel": "Muallif",
+    "categoryLabel": "Kategoriya",
+    "categoryHint": "Mavjudidan tanlang yoki yangisini yozing",
+    "fileLabel": "Fayl",
+    "fileHint": "PDF, DOC, DOCX, PPT yoki PPTX · 50 MB gacha",
+    "fileRequired": "Faylni tanlang",
+    "coverLabel": "Muqova (ixtiyoriy)",
+    "coverHint": "JPG, PNG yoki WEBP · 5 MB gacha",
+    "uploadedPending": "Kitob yuklandi va tasdiq kutmoqda",
+    "uploadedApproved": "Kitob yuklandi va katalogga qo'shildi",
+    "approved": "Tasdiqlangan",
+    "pending": "Tasdiq kutilmoqda",
+    "empty": "Hali kitob yuklamagansiz",
+    "emptyText": "Yuklagan kitoblaringiz administrator tasdiqlagach hammaga ochiq bo'ladi.",
+    "deleteTitle": "Kitobni o'chirish",
+    "deleteText": "\"{{title}}\" kitobi o'chiriladi."
+  }
 }
