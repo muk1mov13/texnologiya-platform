@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 2: navbar
+- `PublicLayout` header'i: shaffof glass fon, scroll boshlanganda (`useScroll`) soya va kichikroq balandlik; faol menyu bandi ostida siljiydigan "pill" (`layoutId`); "Ro'yxatdan o'tish"/"Kabinet" — gradient tugma.
+- Yangi `BrandLogo` (gradient "T" belgisi + nom), footer'da ham ishlatiladi.
+- `MobileMenu`: ☰/✕ SVG ikonka aylanib almashadi, panel va fon `AnimatePresence` bilan ochiladi/yopiladi, bandlar stagger bilan. API o'zgarmadi (`AppLayout` ham ishlatadi).
+- Tekshiruv: lint, typecheck o'tdi.
+
 ### Redizayn Task 1: animatsiya poydevori
 - `motion` 14.2.0 paketi; butun ilova `MotionConfig reducedMotion="user"` ichida (`main.tsx`).
 - `index.css`: `brand-300/400/800/950` ranglari, `shadow-glow`/`shadow-soft`, `blob-float`/`shine`/`float-y` keyframes, `bg-grid` va `text-gradient` utility'lari.

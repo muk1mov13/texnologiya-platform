@@ -1,7 +1,10 @@
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router'
+import { Icon } from '@/components/icons/Icon'
 import { cx, FOCUS_RING } from '@/lib/cx'
+import { EASE_OUT } from '@/lib/motion'
 import type { NavItem } from '../paths'
 import { navClass } from './navClass'
 
@@ -14,6 +17,11 @@ interface MobileMenuProps {
 }
 
 const HIDE_FROM = { md: 'md:hidden', lg: 'lg:hidden' } as const
+
+const ITEM_VARIANTS = {
+  hidden: { opacity: 0, x: -8 },
+  show: { opacity: 1, x: 0 },
+}
 
 /**
  * `until` dan kichik ekranda menyu: ☰ tugma va header ostida ochiladigan panel. Header `relative`
@@ -43,38 +51,73 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
         aria-controls={panelId}
         aria-label={t(open ? 'nav.menuClose' : 'nav.menuOpen')}
         onClick={() => setOpen((value) => !value)}
-        className={cx('rounded-xl border-2 border-slate-200 px-2.5 py-1 text-lg leading-none', FOCUS_RING)}
+        className={cx(
+          'grid size-9 place-items-center rounded-xl border-2 border-slate-200 bg-white/70 text-slate-700',
+          FOCUS_RING,
+        )}
       >
-        <span aria-hidden="true">{open ? '✕' : '☰'}</span>
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-30" aria-hidden="true" onClick={close} />
-          <div
-            id={panelId}
-            className="absolute inset-x-0 top-full z-40 border-b-2 border-slate-100 bg-white px-4 pb-4 shadow-lg"
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={open ? 'close' : 'menu'}
+            initial={{ opacity: 0, rotate: -90 }}
+            animate={{ opacity: 1, rotate: 0 }}
+            exit={{ opacity: 0, rotate: 90 }}
+            transition={{ duration: 0.15 }}
           >
-            <nav aria-label={t('nav.main')} className="flex flex-col gap-1 pt-2">
-              {items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  onClick={close}
-                  className={(state) => cx(navClass(state), 'py-2.5 text-base')}
-                >
-                  {t(item.label)}
-                </NavLink>
-              ))}
-            </nav>
-            {extra && (
-              <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-slate-100 pt-3" onClick={close}>
-                {extra}
-              </div>
-            )}
-          </div>
-        </>
-      )}
+            <Icon name={open ? 'close' : 'menu'} />
+          </motion.span>
+        </AnimatePresence>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              key="backdrop"
+              className="fixed inset-0 z-30 bg-slate-900/10"
+              aria-hidden="true"
+              onClick={close}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div
+              key="panel"
+              id={panelId}
+              className="absolute inset-x-0 top-full z-40 origin-top border-b-2 border-slate-100 bg-white/95 px-4 pb-4 shadow-soft backdrop-blur-xl"
+              initial={{ opacity: 0, y: -8, scaleY: 0.96 }}
+              animate={{ opacity: 1, y: 0, scaleY: 1 }}
+              exit={{ opacity: 0, y: -8, scaleY: 0.96 }}
+              transition={{ duration: 0.25, ease: EASE_OUT }}
+            >
+              <motion.nav
+                aria-label={t('nav.main')}
+                className="flex flex-col gap-1 pt-2"
+                initial="hidden"
+                animate="show"
+                transition={{ staggerChildren: 0.035 }}
+              >
+                {items.map((item) => (
+                  <motion.div key={item.to} variants={ITEM_VARIANTS}>
+                    <NavLink
+                      to={item.to}
+                      end={item.end}
+                      onClick={close}
+                      className={(state) => cx(navClass(state), 'block py-2.5 text-base')}
+                    >
+                      {t(item.label)}
+                    </NavLink>
+                  </motion.div>
+                ))}
+              </motion.nav>
+              {extra && (
+                <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-slate-100 pt-3" onClick={close}>
+                  {extra}
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
