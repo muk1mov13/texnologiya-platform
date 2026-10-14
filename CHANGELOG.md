@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 intertalim.uz tuzilmasi asosida ochiq sayt bo'limlari (navbar, hero, xususiyatlar, "qanday ishlaydi", FAQ, CTA, footer) qayta chiziladi. Reja: `~/.claude/plans/serene-puzzling-fox.md`.
 
+### Redizayn Task 3: bosh sahifa uchun to'liq kenglik
+- `PublicLayout`: `/` da `main` konteynersiz (`useMatch`), bosh sahifa bo'limlari to'liq kenglikdagi fon oladi va konteynerni o'zi qo'yadi. Boshqa ochiq sahifalar o'zgarmadi.
+- Tekshiruv: lint, typecheck o'tdi.
+
 ### Redizayn Task 2: navbar
 - `PublicLayout` header'i: shaffof glass fon, scroll boshlanganda (`useScroll`) soya va kichikroq balandlik; faol menyu bandi ostida siljiydigan "pill" (`layoutId`); "Ro'yxatdan o'tish"/"Kabinet" — gradient tugma.
 - Yangi `BrandLogo` (gradient "T" belgisi + nom), footer'da ham ishlatiladi.

@@ -1,7 +1,7 @@
 import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useMatch } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { cx, FOCUS_RING } from '@/lib/cx'
@@ -24,6 +24,8 @@ const CTA_CLASS = cx(
 export function PublicLayout() {
   const { t } = useTranslation()
   const user = useCurrentUser()
+  // Bosh sahifa bo'limlari to'liq kenglikdagi fonga ega, konteynerni har bo'lim o'zi qo'yadi.
+  const isHome = useMatch({ path: '/', end: true }) !== null
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
   useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > SCROLLED_AT))
@@ -108,7 +110,7 @@ export function PublicLayout() {
           />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main className={cx('w-full flex-1', !isHome && 'mx-auto max-w-6xl px-4 py-8')}>
         <Outlet />
       </main>
       <SiteFooter />

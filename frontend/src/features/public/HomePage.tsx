@@ -30,7 +30,7 @@ export function HomePage() {
   usePageMeta('')
 
   return (
-    <div className="flex flex-col gap-16">
+    <div className="mx-auto flex max-w-6xl flex-col gap-16 px-4 py-8">
       <section className="flex flex-col items-start gap-5 rounded-3xl bg-brand-50 px-6 py-12 sm:px-12 sm:py-16">
         <span className="rounded-full bg-brand-100 px-3 py-1 text-sm font-semibold text-brand-900">
           {t('home.badge')}
