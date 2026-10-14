@@ -636,5 +636,27 @@
     "empty": "Hozircha yangiliklar yo'q",
     "all": "Barcha yangiliklar",
     "views": "Ko'rishlar: {{count}}"
+  },
+  "faq": {
+    "title": "Savol-javob",
+    "description": "Platforma va o'qish jarayoni bo'yicha ko'p beriladigan savollar.",
+    "empty": "Hozircha savollar yo'q",
+    "more": "Javob topmadingizmi?",
+    "contactLink": "Bizga yozing"
+  },
+  "about": { "title": "Biz haqimizda", "empty": "Ma'lumot hozircha kiritilmagan" },
+  "contact": {
+    "title": "Bog'lanish",
+    "description": "Savol yoki taklifingizni yozing — javobni ko'rsatgan email yoki telefoningizga beramiz.",
+    "info": "Kontaktlar",
+    "name": "Ismingiz",
+    "contact": "Email yoki telefon",
+    "contactHint": "Javob shu manzilga beriladi",
+    "message": "Xabar",
+    "website": "Veb-sayt",
+    "submit": "Yuborish",
+    "sent": "Xabaringiz yuborildi",
+    "sentText": "Rahmat! Tez orada siz bilan bog'lanamiz.",
+    "again": "Yana yozish"
   }
 }

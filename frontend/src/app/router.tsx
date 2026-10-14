@@ -3,6 +3,9 @@ import { AdminAiPage } from '@/features/admin/AdminAiPage'
 import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
+import { AboutPage } from '@/features/public/AboutPage'
+import { ContactPage } from '@/features/public/ContactPage'
+import { FaqPage } from '@/features/public/FaqPage'
 import { HomePage } from '@/features/public/HomePage'
 import { LibraryPage } from '@/features/public/LibraryPage'
 import { LoginPage } from '@/features/public/LoginPage'
@@ -40,6 +43,9 @@ export const routes: RouteObject[] = [
       { path: 'news', element: <NewsListPage /> },
       { path: 'news/:slug', element: <NewsPage /> },
       { path: 'library', element: <LibraryPage /> },
+      { path: 'faq', element: <FaqPage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'contact', element: <ContactPage /> },
       { path: 'pending', element: <PendingPage /> },
       {
         element: <RedirectIfAuthed />,

@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 4: FAQ, "Biz haqimizda" va bog'lanish
+- `FaqPage` (`/faq`): `<details>` akkordeon, oxirida bog'lanish sahifasiga havola.
+- `AboutPage` (`/about`): `/api/site` dagi `about` markdown sifatida; bo'sh bo'lsa `EmptyState`.
+- `ContactPage` (`/contact`): kontaktlar kartasi (bo'lsa) va forma (`contactSchema` — uzunliklar backend `ContactIn` bilan bir xil), ko'rinmas honeypot `website`, yuborilgach tasdiq kartasi va "Yana yozish"; `CONTACT_RATE_LIMITED` forma ichida.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 3: ochiq kutubxona
 - `LibraryPage` (`/library?tab=metodik|huquqiy|books`): bo'lim tablari URL'da.
 - `FolderTree`: rekursiv `<details>` daraxt (yuqori papkalar ochiq), har papkada hujjatlar soni, hujjat qatorida turi, hajmi va to'g'ridan-to'g'ri yuklab olish havolasi (ochiq endpoint).

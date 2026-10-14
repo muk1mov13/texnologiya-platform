@@ -25,3 +25,13 @@ export const registerSchema = z
   })
 
 export type RegisterValues = z.infer<typeof registerSchema>
+
+// Uzunliklar backend `ContactIn` bilan bir xil.
+export const contactSchema = z.object({
+  name: z.string().trim().min(1, { error: 'validation.required' }).max(150, { error: 'validation.tooLong' }),
+  contact: z.string().trim().min(3, { error: 'validation.required' }).max(150, { error: 'validation.tooLong' }),
+  message: z.string().trim().min(1, { error: 'validation.required' }).max(5000, { error: 'validation.tooLong' }),
+  website: z.string().max(200),
+})
+
+export type ContactValues = z.infer<typeof contactSchema>
