@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
 
+### Task 5: footer rangi — A (chuqur teal)
+- `SiteFooter`: `FOOTER_THEME = 'a'` doimiy; B va C `THEMES` ichida zaxira sifatida qoldi (almashtirish — bitta konstanta). Vaqtinchalik `?footer=` switch o'chirildi.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### Task 4: footer rang variantlari (vaqtinchalik)
 - `SiteFooter`: `THEMES` — A (chuqur teal `brand-950` + nur, CTA panelining davomi), B (yorug' oq→`brand-50` gradient, katak naqsh), C (teal→slate→sky gradient, bloblar). `?footer=a|b|c` bilan almashtiriladi, standart — A. Tanlovdan keyin bittasi qoladi, switch o'chiriladi.
 - Tekshiruv: lint, typecheck o'tdi; `seed-demo` ma'lumoti bilan `/` da yangiliklar, FAQ va footer ko'rindi; 1280px da uchala variant, 375px da C — gorizontal scroll yo'q.

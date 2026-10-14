@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router'
+import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
 import { useNewsPage, useSite } from '@/api/cms'
 import type { SiteSocials } from '@/api/types'
@@ -32,11 +32,13 @@ interface FooterTheme {
 
 const DARK_FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
 
-/**
- * Footer rang variantlari (VAQTINCHALIK: `?footer=a|b|c` bilan solishtirish uchun;
- * tanlov qilingach bittasi qoladi). Standart — `a`.
- */
-const THEMES: Record<'a' | 'b' | 'c', FooterTheme> = {
+type FooterThemeKey = 'a' | 'b' | 'c'
+
+/** Footer rangini almashtirish uchun shu qiymatni o'zgartiring (`THEMES` dagi variantlar). */
+const FOOTER_THEME: FooterThemeKey = 'a'
+
+/** Footer rang variantlari; amalda `FOOTER_THEME` tanlagani ishlatiladi, qolganlari zaxira. */
+const THEMES: Record<FooterThemeKey, FooterTheme> = {
   // A — chuqur teal: CTA panelining davomi, bir rang oilasi.
   a: {
     root: 'bg-brand-950 text-brand-50',
@@ -100,12 +102,6 @@ const THEMES: Record<'a' | 'b' | 'c', FooterTheme> = {
   },
 }
 
-function useFooterTheme(): FooterTheme {
-  const [params] = useSearchParams()
-  const key = params.get('footer')
-  return key === 'b' || key === 'c' ? THEMES[key] : THEMES.a
-}
-
 function Column({ title, theme, children }: { title: string; theme: FooterTheme; children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-3">
@@ -121,7 +117,7 @@ function Column({ title, theme, children }: { title: string; theme: FooterTheme;
  */
 export function SiteFooter() {
   const { t, i18n } = useTranslation()
-  const theme = useFooterTheme()
+  const theme = THEMES[FOOTER_THEME]
   const user = useCurrentUser()
   const { data: site } = useSite()
   const news = useNewsPage(1, LATEST_NEWS).data?.items ?? []
