@@ -13,9 +13,8 @@ export interface NavItem {
   end?: boolean
 }
 
-/** Ochiq sayt menyusi (yo'llar backend `seo.py: STATIC_PATHS` bilan mos). */
+/** Ochiq sayt menyusi (yo'llar backend `seo.py: STATIC_PATHS` bilan mos). Bosh sahifaga — logo orqali. */
 export const PUBLIC_NAV: NavItem[] = [
-  { to: '/', label: 'nav.home', end: true },
   { to: '/news', label: 'nav.news' },
   { to: '/library', label: 'nav.library' },
   { to: '/faq', label: 'nav.faq' },

@@ -162,7 +162,7 @@ export function SiteFooter() {
 
         <nav aria-label={t('footer.sections')}>
           <Column theme={theme} title={t('footer.sections')}>
-            {PUBLIC_NAV.slice(1).map((item) => (
+            {PUBLIC_NAV.map((item) => (
               <Link key={item.to} to={item.to} className={link}>
                 {t(item.label)}
               </Link>

@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/demo-news-bilan-tez-jazzy-sunrise.md`.
 
+### Menyudan "Bosh sahifa" olib tashlandi
+- `paths.ts: PUBLIC_NAV` dan `/` bandi o'chirildi (bosh sahifaga logo orqali o'tiladi) — header, mobil menyu va footerdagi "Bo'limlar" ustuniga taalluqli; i18n `nav.home` (uz/ru) o'chirildi.
+- Tekshiruv: lint, typecheck o'tdi; 1280px da menyu ko'rildi.
+
 ### Task 5: footer rangi — A (chuqur teal)
 - `SiteFooter`: `FOOTER_THEME = 'a'` doimiy; B va C `THEMES` ichida zaxira sifatida qoldi (almashtirish — bitta konstanta). Vaqtinchalik `?footer=` switch o'chirildi.
 - Tekshiruv: lint, typecheck, build o'tdi.
