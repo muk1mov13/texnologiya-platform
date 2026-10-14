@@ -29,7 +29,9 @@
     "adminSection": "Boshqaruv bo'limlari",
     "myBooks": "Kitoblarim",
     "adminLibrary": "Kutubxona",
-    "adminBooks": "Kitoblar"
+    "adminBooks": "Kitoblar",
+    "adminNews": "Yangiliklar",
+    "adminFaq": "Savol-javob"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
@@ -726,5 +728,43 @@
     "addCover": "Muqova qo'shish",
     "replaceCover": "Muqovani almashtirish",
     "saved": "Kitob saqlandi"
+  },
+  "adminNews": {
+    "title": "Yangiliklar",
+    "subtitle": "Saytdagi yangiliklar: qoralama, rejalashtirilgan va nashr qilingan.",
+    "new": "Yangi yangilik",
+    "editTitle": "Yangilikni tahrirlash",
+    "status": { "draft": "Qoralama", "scheduled": "Rejalashtirilgan", "published": "Nashr qilingan" },
+    "titleLabel": "Sarlavha",
+    "slugLabel": "Manzil (slug)",
+    "slugHint": "Bo'sh qoldirilsa sarlavhadan avtomatik yaratiladi",
+    "bodyLabel": "Matn",
+    "bodyHint": "Markdown: **qalin**, *kursiv*, ## sarlavha, - ro'yxat, [havola](https://...)",
+    "write": "Yozish",
+    "preview": "Ko'rinish",
+    "previewEmpty": "Matn hali yozilmagan",
+    "publishedAt": "Nashr vaqti",
+    "publishedAtHint": "Bo'sh — qoralama; kelajakdagi vaqt — o'sha vaqtda chiqadi",
+    "publishNow": "Hozir nashr qilish",
+    "unpublish": "Nashrdan olish",
+    "view": "Saytda ko'rish",
+    "saved": "Yangilik saqlandi",
+    "cover": "Muqova",
+    "noCover": "Muqova yo'q",
+    "coverSaved": "Muqova saqlandi",
+    "delete": "Yangilikni o'chirish",
+    "deleteTitle": "Yangilikni o'chirish",
+    "deleteText": "\"{{title}}\" yangiligi va muqovasi o'chiriladi."
+  },
+  "adminFaq": {
+    "title": "Savol-javob",
+    "subtitle": "Saytdagi ko'p beriladigan savollar. Tartibni strelkalar bilan o'zgartiring.",
+    "new": "Yangi savol",
+    "editTitle": "Savolni tahrirlash",
+    "question": "Savol",
+    "answer": "Javob",
+    "publishedLabel": "Saytda ko'rsatish",
+    "deleteTitle": "Savolni o'chirish",
+    "deleteText": "\"{{title}}\" savoli o'chiriladi."
   }
 }

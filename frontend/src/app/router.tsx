@@ -3,7 +3,10 @@ import { AdminAiPage } from '@/features/admin/AdminAiPage'
 import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { AdminBooksPage } from '@/features/admin/cms/AdminBooksPage'
+import { AdminFaqPage } from '@/features/admin/cms/AdminFaqPage'
 import { AdminLibraryPage } from '@/features/admin/cms/AdminLibraryPage'
+import { AdminNewsPage } from '@/features/admin/cms/AdminNewsPage'
+import { NewsEditorPage } from '@/features/admin/cms/NewsEditorPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { AboutPage } from '@/features/public/AboutPage'
 import { ContactPage } from '@/features/public/ContactPage'
@@ -97,6 +100,9 @@ export const routes: RouteObject[] = [
                   { path: 'admin/ai', element: <AdminAiPage /> },
                   { path: 'admin/library', element: <AdminLibraryPage /> },
                   { path: 'admin/books', element: <AdminBooksPage /> },
+                  { path: 'admin/news', element: <AdminNewsPage /> },
+                  { path: 'admin/news/:newsId', element: <NewsEditorPage /> },
+                  { path: 'admin/faq', element: <AdminFaqPage /> },
                 ],
               },
             ],

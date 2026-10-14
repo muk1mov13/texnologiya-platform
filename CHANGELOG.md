@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 4B (frontend)
 
+### 4B Task 8: admin yangiliklar va FAQ
+- `AdminNewsPage` (`/admin/news`): ro'yxat — holat belgisi (qoralama / rejalashtirilgan / nashr qilingan, `newsStatus.ts`), sana, ko'rishlar.
+- `NewsEditorPage` (`/admin/news/new`, `/admin/news/:id`): sarlavha, slug (bo'sh — avtomatik), markdown matn "Yozish / Ko'rinish" tablari bilan, nashr vaqti (`datetime-local`), "Hozir nashr qilish", "Nashrdan olish" (`published_at: null`), saytda ko'rish; yaratilgach tahrir sahifasiga o'tadi. Muqova faqat saqlangan yangilikka, ko'rinishi admin endpoint'dan blob URL bilan (qoralama uchun ham). `NEWS_SLUG_TAKEN` slug maydoni ostida. O'chirish tasdiq bilan.
+- `AdminFaqPage` (`/admin/faq`): ↑/↓ tartib, "Nashr qilingan" checkbox, qo'shish/tahrir modali, o'chirish.
+- Admin menyusidagi "Sayt" guruhiga Yangiliklar va Savol-javob qo'shildi.
+- Tekshiruv: lint, typecheck, build o'tdi.
+
 ### 4B Task 7: admin kutubxona va kitoblar navbati
 - `AdminLibraryPage` (`/admin/library`): bo'lim tablari; papkalar daraxti — papka/ichki papka qo'shish, nomini o'zgartirish, ↑/↓ tartib (`useSwapFolders`, juftlik ko'rinish tartibida), o'chirish (`FOLDER_NOT_EMPTY` umumiy toast); hujjat qo'shish (nom fayl nomidan to'ldiriladi), tahrir (nom va boshqa papkaga ko'chirish), o'chirish. Modallar `LibraryModals.tsx` da.
 - `AdminBooksPage` (`/admin/books?status=`): tasdiq kutayotgan / tasdiqlangan tablari; har kitobda yuklovchi, hajm, sana, faylni ochish (admin endpoint, `useProtectedDownload`), tasdiqlash / tasdiqni bekor qilish, tahrir (`BookEditModal`: nom, muallif, kategoriya, muqova almashtirish), o'chirish.
