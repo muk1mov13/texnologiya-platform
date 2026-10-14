@@ -258,4 +258,5 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 7. ✅ 4-bosqich mini-spec'i yozildi (2026-10-14).
 8. ✅ 4A (backend) rejasi yozildi: `docs/superpowers/plans/2026-10-14-phase-4a-backend.md` (Task 0–8, 3 batch).
 9. ✅ 4A (backend) qurildi (2026-10-14): kutubxona, CMS, kutubxona AI indeksi, sitemap/robots. Testlar loyiha oxirida; kod `ruff`, `mypy`, `alembic check` va toza bazada qo'lda tekshiruvdan o'tgan.
-10. Keyingisi: 4B (frontend: ochiq sayt va admin CMS) rejasi `docs/superpowers/plans/`.
+10. ✅ 4B (frontend) rejasi yozildi: `docs/superpowers/plans/2026-10-14-phase-4b-frontend.md` (Task 0–10, 4 batch).
+11. Keyingisi: 4B Batch 1 (Task 0–2).

@@ -6,6 +6,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4B (frontend) rejasi
+- Yangi `docs/superpowers/plans/2026-10-14-phase-4b-frontend.md`: Task 0 — admin kitob fayli va qoralama yangilik muqovasi endpoint'lari, tiplar/kontrakt, `library.ts`/`cms.ts`/`adminCms.ts`; 1 — ochiq layout, mobil menyu, footer, `Markdown` (`react-markdown`), `usePageMeta`; 2 — bosh sahifa va yangiliklar; 3 — ochiq kutubxona; 4 — FAQ, biz haqimizda, bog'lanish; 5 — guruhlangan admin nav'i (`AdminLayout`); 6 — "Kitoblarim"; 7 — admin kutubxona va kitoblar navbati; 8 — admin yangiliklar va FAQ; 9 — xabarlar va sayt sozlamalari; 10 — yakun.
+- Roadmap: keyingisi 4B Batch 1.
+
 ### 4A Task 8: API sxemasi, xato matnlari va hujjatlar
 - `npm run gen:api` — `schema.gen.ts` ga kutubxona va CMS endpoint'lari (diff katta, chunki yangi yo'llar alifbo tartibida o'rtaga tushgan).
 - Tuzatish: CMS'dagi `MessageOut`/`MessageUpdate` AI'dagi `MessageOut` bilan to'qnashib, OpenAPI'da `app__...` nomlarga aylangan va 3B tip kontraktini buzgan edi — `ContactMessageOut`/`ContactMessageUpdate` ga qayta nomlandi.
