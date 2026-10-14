@@ -82,6 +82,35 @@ def _seed_demo(args: argparse.Namespace) -> int:
     return 0
 
 
+def _import_resources(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from app.learning.resource_import import import_resources
+
+    root = Path(args.path)
+    if not root.is_dir():
+        print(f"Xato: papka topilmadi: {root}", file=sys.stderr)
+        return 1
+    try:
+        report = asyncio.run(
+            import_resources(get_settings(), root, force=args.force, dry_run=args.dry_run)
+        )
+    except ValueError as exc:
+        print(f"Xato: {exc}", file=sys.stderr)
+        return 1
+    for warning in report.warnings:
+        print(f"! {warning}", file=sys.stderr)
+    skipped = f", o'tkazib yuborildi: {report.topics_skipped}" if report.topics_skipped else ""
+    print(
+        f"Fanlar: {report.subjects}, mavzular: {report.topics_created}{skipped}, "
+        f"materiallar: {report.materials} (xato: {report.materials_failed}), "
+        f"testlar: {report.quizzes}, krossvordlar: {report.crosswords}, "
+        f"topshiriqlar: {report.tasks}, atamalar: {report.glossary}, "
+        f"adabiyotlar: {report.literature}, o'quv dasturlari: {report.syllabi}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -102,12 +131,26 @@ def main(argv: list[str] | None = None) -> int:
     seed.add_argument(
         "--force", action="store_true", help="Mavjud sayt sozlamalarini ham demo bilan almashtirish"
     )
+    resources = commands.add_parser(
+        "import-resources", help="resource/ papkasidagi fan materiallarini bazaga import qilish"
+    )
+    resources.add_argument(
+        "--path", required=True, help="Masalan: ../resource/Platforma materiallari"
+    )
+    resources.add_argument(
+        "--force", action="store_true", help="Mavjud mavzular va dasturni qaytadan import qilish"
+    )
+    resources.add_argument(
+        "--dry-run", action="store_true", help="Bazaga yozmasdan faqat o'qish hisobotini ko'rsatish"
+    )
     args = parser.parse_args(argv)
 
     if args.command == "weekly-report":
         return _weekly_report(args)
     if args.command == "seed-demo":
         return _seed_demo(args)
+    if args.command == "import-resources":
+        return _import_resources(args)
 
     try:
         email = _resolve_email(args)

@@ -12,7 +12,7 @@ class ConversionError(Exception):
         self.code = code
 
 
-def _resolve_soffice(soffice: str) -> str | None:
+def resolve_soffice(soffice: str) -> str | None:
     found = shutil.which(soffice)
     if found:
         return found
@@ -39,7 +39,7 @@ async def convert_to(
     timeout: int,  # noqa: ASYNC109 (subprocess uchun, asyncio scope emas)
 ) -> Path:
     """LibreOffice (headless) yordamida faylni `fmt` formatiga (pdf, docx, ...) aylantiradi."""
-    executable = _resolve_soffice(soffice)
+    executable = resolve_soffice(soffice)
     if executable is None:
         raise ConversionError("LIBREOFFICE_NOT_FOUND")
     # Har bir konvertatsiya o'ziga xos profil bilan ishga tushadi: parallel yoki

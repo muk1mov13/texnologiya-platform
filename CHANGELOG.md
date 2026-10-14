@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 5: `import-resources` buyrug'i
+- `app/learning/resource_import.py` + `python -m app.cli import-resources --path <papka> [--force] [--dry-run]`. Fan slug bo'yicha, mavzu (fan, `lesson_type`, sarlavha) bo'yicha topiladi: mavjudi o'tkazib yuboriladi, `--force` — o'chirib qayta import. Hammasi nashr qilinadi.
+- Mavzu: ma'ruza matni → `lecture`, o'yin → `presentation` materiali (navbatsiz, ketma-ket `convert_material_job` — bir vaqtda o'nlab LibreOffice jarayoni ishga tushmaydi), krossvord → `review`, test → `practice` (joylab bo'lmagan krossvord so'zlari tashlanib qayta uriniladi), topshiriq (`both`, 10 ball), glossariy, adabiyotlar; so'ng AI indekslari (xatosi importni to'xtatmaydi).
+- O'quv dasturi: `Subject.syllabus` + kutubxona `metodik` bo'limida "O'quv dasturlari" papkasiga hujjat.
+- LibreOffice topilmasa haqiqiy import to'xtaydi (`--dry-run` ishlaydi). `convert._resolve_soffice` → `resolve_soffice`.
+- Tekshiruv: ruff, mypy o'tdi. `--dry-run`: 2 fan, 60 mavzu (Biologiya to'liq; Fiziologiya `.doc` — LibreOffice yo'q). Vaqtinchalik bazada Biologiya importi: 30 mavzu, 30 test, 30 krossvord, 30 topshiriq, 300 atama, 150 adabiyot; ikkinchi ishga tushirishda 30 tasi o'tkazib yuborildi.
+
 ### Task 4: `resource/` parserlari
 - `app/learning/resource_parse.py`: `scan()` — fan → bo'lim (kalit so'z bo'yicha `lesson_type`, `dastur` papkasi → o'quv dasturi) → mavzu papkalari (raqam bo'yicha; fayllar `N)` prefiksi bilan aniqlanadi, bitta ichki papka ham o'qiladi). Parserlar: `parse_title` (KATTA harfli sarlavha → oddiy), `parse_quiz` (`Javoblar:` kaliti), `parse_crossword` (`N. (H): savol` + `N. So'z`, yaroqsiz/takror so'zlar tashlanadi), `parse_glossary`, `parse_literature` (muallif, yil, URL), `parse_task`. `.doc` avval LibreOffice bilan `.docx`ga o'giriladi.
 - `convert.py`: umumiy `convert_to(source, out_dir, fmt)`; `convert_to_pdf` uni chaqiradi.
