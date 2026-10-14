@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/landing-pageni-sectionlarini-zebra-zippy-spark.md`.
 
+### Task 2: "Qanday ishlaydi" — to'q bo'lim
+- `HowItWorksSection`: fon `brand-950` (footer rangi). Bezak footer'ning A temasidan: tepada nur, xira katak, tepa va pastda yorug' hairline. Matnlar `text-white` / `text-brand-100/75`, bog'lovchi chiziq asosi `bg-white/15`, to'lish `brand-300→500`, ikonka halqasi `ring-brand-950`.
+- `styles.ts`: `EYEBROW_DARK`, `SECTION_TITLE_DARK`.
+- Tekshiruv: lint, typecheck o'tdi.
+
 ### Task 1: och zebra fonlari
 - Bosh sahifa bo'limlari endi body rangiga tayanmaydi: Hero `bg-white` (pastki so'nish ham oqqa), Features va Explore `bg-brand-50/60` (tepada `via-brand-100` hairline), News `bg-white` va o'z pastki bo'shlig'i bilan (`py-20 sm:py-24`), FAQ oq.
 - Tekshiruv: lint, typecheck o'tdi.
