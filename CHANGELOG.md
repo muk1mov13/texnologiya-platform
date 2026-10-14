@@ -6,6 +6,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4-bosqich mini-spec'i
+- Push: `a1cd33e..a268662`, so'ng CI tuzatishi `0f19675`; CI uchala job bilan yashil.
+- Yangi `docs/superpowers/specs/2026-10-14-phase-4-design.md`: kutubxona (papkalar, hujjatlar, kitoblar), CMS (yangiliklar, FAQ, bog'lanish, sayt sozlamalari), ochiq sayt, SEO va deploy.
+- Foydalanuvchi qarorlari: server/domen hali yo'q — deploy fayllari CI'da tekshiriladi; kitoblarni o'qituvchi va admin yuklaydi, admin tasdiqlaydi; SEO prerender'siz (sitemap/robots backend'da); tartib 4A → 4B → 4C.
+- Kutubxona PDF'lari AI indeksiga qo'shiladi: `doc_chunks.subject_id` nullable bo'ladi, qidiruv kutubxona manbalarini qamraydi.
+- Roadmap: 4-bosqich — mini-spec yozildi; keyingisi 4A rejasi.
+
 ### CI tuzatish: `useMediaQuery` jsdom'da
 - Push (`a1cd33e..a268662`) dan keyin CI `frontend` jobi yiqildi: `PlayerPage.test.tsx` dagi 14 test — `TypeError: window.matchMedia is not a function`. Sabab: `TutorDock` AI o'chiq bo'lsa ham `useMediaQuery` ni chaqiradi, jsdom'da esa `matchMedia` yo'q.
 - `lib/useMediaQuery.ts`: `matchMedia` bo'lmagan muhitda `false` qaytaradi va obuna bo'lmaydi.

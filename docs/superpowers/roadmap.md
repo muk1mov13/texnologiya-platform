@@ -196,7 +196,13 @@ Mini-spec: `docs/superpowers/specs/2026-10-13-phase-3-ai-design.md` (2026-10-13)
 
 ---
 
-## 4-bosqich: Kutubxona, ochiq sayt va production deploy
+## 4-bosqich: Kutubxona, ochiq sayt va production deploy — 🟡 mini-spec yozildi
+
+Mini-spec: `docs/superpowers/specs/2026-10-14-phase-4-design.md` (2026-10-14). Hal qilingan masalalar:
+- **deploy:** server va domen hali yo'q — `deploy/` fayllari yoziladi va CI'da tekshiriladi, real ishga tushirish keyin;
+- **kitoblar:** o'qituvchi va admin yuklaydi, o'qituvchiniki admin tasdiqlagach ochiq;
+- **SEO:** prerender yo'q, meta JS orqali, backend `sitemap.xml` / `robots.txt`;
+- **bo'linish va tartib:** 4A backend → 4B frontend → 4C deploy.
 
 **Backend:**
 - `library` moduli: `folders` (metodik va huquqiy) va `documents`; `books` (tasdiqlash bilan).
@@ -249,4 +255,5 @@ Spec'da deploy 4-bosqichga qo'yilgan. Lekin 1B tugagach, oddiy staging serverga 
 4. ✅ 3-bosqich (AI) mini-spec'i yozildi.
 5. ✅ 3A (backend) qurildi va Task 14 qo'lda tekshiruvi o'tdi (2026-10-13). Groq zaxira provayderi qo'shildi. Ochiq kuzatuv: `hint` rejimida model ba'zan javob elementlarini qavs ichida sanaydi (prompt kuchaytirilgan, to'liq kafolat yo'q).
 6. ✅ 3B (frontend) qurildi va brauzerda qo'lda tekshirildi (2026-10-14).
-7. Keyingisi: 4-bosqich (kutubxona, CMS, ochiq sayt, deploy) mini-spec'i.
+7. ✅ 4-bosqich mini-spec'i yozildi (2026-10-14).
+8. Keyingisi: 4A (backend: kutubxona, CMS, AI indeksi, SEO) rejasi `docs/superpowers/plans/2026-10-14-phase-4a-backend.md`.
