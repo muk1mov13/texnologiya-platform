@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query, Response, UploadFile
 
 from app.auth.deps import AdminUser
 from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
+from app.core.files import file_response
 from app.core.forms import LongTitleForm
 from app.core.types import DbIdPath
 from app.library import books, documents, folders
@@ -88,6 +89,15 @@ async def list_books(
     status: Annotated[Literal["pending", "approved"], Query()] = "pending",
 ) -> list[BookAdminOut]:
     return await books.admin_list(db, status)
+
+
+@books_router.get("/{book_id}/file", response_class=Response)
+async def book_file(
+    book_id: DbIdPath, admin: AdminUser, db: DbSession, settings: AppSettings, storage: AppStorage
+) -> Response:
+    """Tasdiqlanmagan kitob ham: admin tasdiqlashdan oldin faylni ko'radi."""
+    book = await books.get_book(db, book_id)
+    return file_response(settings, storage, book.file, book.original_name)
 
 
 @books_router.patch("/{book_id}", response_model=BookAdminOut)

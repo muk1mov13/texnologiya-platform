@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Response, UploadFile
@@ -18,6 +19,8 @@ from app.cms.schemas import (
     SiteUpdate,
 )
 from app.core.deps import AppSettings, AppStorage, DbSession
+from app.core.errors import AppError
+from app.core.files import file_response
 from app.core.types import DbIdPath
 
 news_router = APIRouter(prefix="/admin/news", tags=["admin-cms"])
@@ -47,6 +50,17 @@ async def update_news(
 ) -> NewsAdminOut:
     item = await news.update_news(db, await news.get_news(db, news_id), data)
     return news.admin_out(item)
+
+
+@news_router.get("/{news_id}/cover", response_class=Response)
+async def get_cover(
+    news_id: DbIdPath, admin: AdminUser, db: DbSession, settings: AppSettings, storage: AppStorage
+) -> Response:
+    """Qoralama yangilik muqovasi ham (ochiq endpoint faqat nashr qilinganni beradi)."""
+    item = await news.get_news(db, news_id)
+    if item.cover is None:
+        raise AppError(404, "NEWS_NOT_FOUND", "Yangilik muqovasi yo'q")
+    return file_response(settings, storage, item.cover, f"cover{Path(item.cover).suffix}")
 
 
 @news_router.put("/{news_id}/cover", response_model=NewsAdminOut)

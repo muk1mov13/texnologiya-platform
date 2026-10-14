@@ -80,6 +80,22 @@ export type ResponseContract = [
   Check<Receives<T.AiSettingsView, S['AiSettingsOut']>>,
   Check<Receives<T.AiUsageDay, S['AiUsageDay']>>,
   Check<Receives<T.AiUsageStats, S['AiUsageOut']>>,
+  // Ichma-ich sxemalar alohida tekshiriladi: `Required` faqat yuqori darajaga ta'sir qiladi.
+  Check<Receives<T.LibraryDocument, S['DocumentOut']>>,
+  Check<Receives<Omit<T.FolderNode, 'documents' | 'children'>, Omit<S['FolderOut'], 'documents' | 'children'>>>,
+  Check<Receives<T.FolderAdmin, S['FolderAdminOut']>>,
+  Check<Receives<T.Book, S['BookOut']>>,
+  Check<Receives<T.BookAdmin, S['BookAdminOut']>>,
+  Check<Receives<T.BookPage, S['BookPage']>>,
+  Check<Receives<T.NewsCard, S['NewsCard']>>,
+  Check<Receives<T.NewsDetail, S['NewsOut']>>,
+  Check<Receives<T.NewsAdmin, S['NewsAdminOut']>>,
+  Check<Receives<T.NewsPage, S['NewsPage']>>,
+  Check<Receives<T.FaqItem, S['FaqOut']>>,
+  Check<Receives<T.SiteContacts, S['Contacts']>>,
+  Check<Receives<T.SiteSocials, S['Socials']>>,
+  Check<Receives<Omit<T.SiteSettings, 'contacts' | 'socials'>, Omit<S['SiteOut'], 'contacts' | 'socials'>>>,
+  Check<Receives<T.ContactMessage, S['ContactMessageOut']>>,
 ]
 
 export type RequestContract = [
@@ -109,4 +125,15 @@ export type RequestContract = [
   Check<Sends<T.DraftUpdateIn, S['DraftUpdateIn']>>,
   Check<Sends<T.AiSettingsUpdate, S['AiSettingsUpdate']>>,
   Check<Sends<T.ReindexIn, S['ReindexIn']>>,
+  Check<Sends<T.FolderIn, S['FolderIn']>>,
+  Check<Sends<T.FolderUpdate, S['FolderUpdate']>>,
+  Check<Sends<T.DocumentUpdate, S['DocumentUpdate']>>,
+  Check<Sends<T.BookUpdate, S['BookUpdate']>>,
+  Check<Sends<T.NewsIn, S['NewsIn']>>,
+  Check<Sends<T.NewsUpdate, S['NewsUpdate']>>,
+  Check<Sends<T.FaqIn, S['FaqIn']>>,
+  Check<Sends<T.FaqUpdate, S['FaqUpdate']>>,
+  Check<Sends<T.SiteUpdate, S['SiteUpdate']>>,
+  Check<Sends<T.ContactIn, S['ContactIn']>>,
+  Check<Sends<T.ContactMessageUpdate, S['ContactMessageUpdate']>>,
 ]

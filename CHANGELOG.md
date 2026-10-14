@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-14 — 4B (frontend)
+
+### 4B Task 0: API qatlami
+- Backend: `GET /api/admin/books/{id}/file` (admin tasdiqlashdan oldin kutilayotgan kitob faylini ko'radi) va `GET /api/admin/news/{id}/cover` (qoralama yangilik muqovasi); `gen:api`.
+- `types.ts`: kutubxona (`FolderNode`, `LibraryDocument`, `Book`, `BookAdmin`, `BookPage` ...) va CMS (`NewsCard`/`NewsDetail`/`NewsAdmin`, `FaqItem`, `SiteSettings`, `ContactIn`, `ContactMessage` ...) tiplari; `types.contract.ts` da ichma-ich sxemalar (`FolderOut`, `SiteOut`) alohida tekshiriladi.
+- Yangi hook'lar: `api/library.ts` (ochiq daraxt, katalog, kategoriyalar, "Kitoblarim"), `api/cms.ts` (yangiliklar, FAQ, sayt, bog'lanish), `api/adminCms.ts` (papka/hujjat, kitoblar, yangiliklar, FAQ, xabarlar, sozlamalar; tartib almashtirish). Admin o'zgarishlari ochiq keshlarni ham yangilaydi.
+- Tekshiruv: backend `ruff`, `mypy` toza; frontend lint, typecheck, build o'tdi.
+
 ## 2026-10-14 — 3B yakuni
 
 ### 4B (frontend) rejasi

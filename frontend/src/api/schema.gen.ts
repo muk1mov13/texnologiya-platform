@@ -122,6 +122,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/books/{book_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Book File
+         * @description Tasdiqlanmagan kitob ham: admin tasdiqlashdan oldin faylni ko'radi.
+         */
+        get: operations["book_file_api_admin_books__book_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/faq": {
         parameters: {
             query?: never;
@@ -307,7 +327,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Cover
+         * @description Qoralama yangilik muqovasi ham (ochiq endpoint faqat nashr qilinganni beradi).
+         */
+        get: operations["get_cover_api_admin_news__news_id__cover_get"];
         /** Set Cover */
         put: operations["set_cover_api_admin_news__news_id__cover_put"];
         post?: never;
@@ -3681,6 +3705,35 @@ export interface operations {
             };
         };
     };
+    book_file_api_admin_books__book_id__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                book_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_faq_api_admin_faq_get: {
         parameters: {
             query?: never;
@@ -4225,6 +4278,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NewsAdminOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_cover_api_admin_news__news_id__cover_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                news_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

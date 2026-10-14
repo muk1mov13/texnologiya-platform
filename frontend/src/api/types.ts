@@ -677,3 +677,195 @@ export interface AiUsageStats {
 export interface ReindexIn {
   all?: boolean
 }
+
+// --- Kutubxona (4-bosqich) ----------------------------------------------------------------
+
+export type LibrarySection = 'metodik' | 'huquqiy'
+
+export interface LibraryDocument {
+  id: number
+  folder_id: number
+  title: string
+  original_name: string
+  size: number
+  created_at: string
+}
+
+/** Ochiq daraxt tuguni: ichki papkalar va hujjatlar bilan. */
+export interface FolderNode {
+  id: number
+  parent_id: number | null
+  section: LibrarySection
+  title: string
+  order: number
+  documents: LibraryDocument[]
+  children: FolderNode[]
+}
+
+export interface FolderAdmin {
+  id: number
+  parent_id: number | null
+  section: LibrarySection
+  title: string
+  order: number
+}
+
+export interface FolderIn {
+  section: LibrarySection
+  parent_id?: number | null
+  title: string
+  order?: number
+}
+
+export interface FolderUpdate {
+  title?: string | null
+  order?: number | null
+}
+
+export interface DocumentUpdate {
+  title?: string | null
+  folder_id?: number | null
+}
+
+export interface Book {
+  id: number
+  category: string
+  title: string
+  author: string
+  has_cover: boolean
+  original_name: string
+  size: number
+  is_approved: boolean
+  created_at: string
+}
+
+export interface BookAdmin extends Book {
+  uploaded_by: number | null
+  uploader_name: string | null
+}
+
+export interface BookUpdate {
+  category?: string | null
+  title?: string | null
+  author?: string | null
+  is_approved?: boolean | null
+}
+
+export interface BookPage {
+  items: Book[]
+  total: number
+  page: number
+  size: number
+}
+
+// --- CMS (4-bosqich) ----------------------------------------------------------------------
+
+export interface NewsCard {
+  id: number
+  title: string
+  slug: string
+  excerpt: string
+  has_cover: boolean
+  published_at: string | null
+  views: number
+}
+
+export interface NewsDetail extends NewsCard {
+  body: string
+}
+
+export interface NewsAdmin extends NewsDetail {
+  created_at: string
+  updated_at: string
+}
+
+export interface NewsPage {
+  items: NewsCard[]
+  total: number
+  page: number
+  size: number
+}
+
+export interface NewsIn {
+  title: string
+  slug?: string | null
+  body?: string
+  published_at?: string | null
+}
+
+/** `published_at: null` aniq yuborilsa — yangilik nashrdan olinadi. */
+export interface NewsUpdate {
+  title?: string | null
+  slug?: string | null
+  body?: string | null
+  published_at?: string | null
+}
+
+export interface FaqItem {
+  id: number
+  question: string
+  answer: string
+  order: number
+  is_published: boolean
+}
+
+export interface FaqIn {
+  question: string
+  answer: string
+  order?: number
+  is_published?: boolean
+}
+
+export interface FaqUpdate {
+  question?: string | null
+  answer?: string | null
+  order?: number | null
+  is_published?: boolean | null
+}
+
+export interface SiteContacts {
+  phone: string
+  email: string
+  address: string
+}
+
+export interface SiteSocials {
+  telegram: string
+  instagram: string
+  facebook: string
+  youtube: string
+}
+
+export interface SiteSettings {
+  contacts: SiteContacts
+  socials: SiteSocials
+  about: string
+}
+
+/** Faqat yuborilgan bo'limlar almashtiriladi. */
+export interface SiteUpdate {
+  contacts?: SiteContacts | null
+  socials?: SiteSocials | null
+  about?: string | null
+}
+
+export interface ContactIn {
+  name: string
+  contact: string
+  message: string
+  /** Honeypot: odam to'ldirmaydi. */
+  website?: string
+}
+
+export interface ContactMessage {
+  id: number
+  name: string
+  contact: string
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
+export interface ContactMessageUpdate {
+  is_read: boolean
+}
