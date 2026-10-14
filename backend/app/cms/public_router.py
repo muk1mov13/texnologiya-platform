@@ -5,8 +5,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Response
 
-from app.cms import news
-from app.cms.schemas import NewsOut, NewsPage
+from app.cms import faq, news, site
+from app.cms.models import FaqItem
+from app.cms.schemas import FaqOut, NewsOut, NewsPage, SiteOut
 from app.core.deps import AppSettings, AppStorage, DbSession
 from app.core.files import file_response
 from app.core.types import DbIdPath
@@ -34,3 +35,13 @@ async def news_cover(
 ) -> Response:
     rel = await news.public_cover(db, news_id)
     return file_response(settings, storage, rel, f"cover{Path(rel).suffix}")
+
+
+@router.get("/faq", response_model=list[FaqOut])
+async def faq_list(db: DbSession) -> list[FaqItem]:
+    return await faq.public_list(db)
+
+
+@router.get("/site", response_model=SiteOut)
+async def site_settings(db: DbSession) -> SiteOut:
+    return await site.get_site(db)

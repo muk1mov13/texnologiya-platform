@@ -6,6 +6,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ## 2026-10-14 — 3B yakuni
 
+### 4A Task 4: FAQ va sayt sozlamalari
+- Yangi `app/cms/faq.py`: ochiq ro'yxat (faqat nashr qilingan, `order` bo'yicha), admin CRUD (404 `FAQ_NOT_FOUND`).
+- Yangi `app/cms/site.py`: `contacts`, `socials`, `about` kalitlari (`site_settings`); `PUT` faqat yuborilgan bo'limlarni almashtiradi; noma'lum kalit — 422 (`extra="forbid"`, mini-spec'dagi `SETTING_UNKNOWN` o'rniga); ijtimoiy havolalar faqat `https://` (`javascript:` kabi sxemalar rad etiladi).
+- Router'lar: ochiq `GET /api/faq`, `GET /api/site`; admin `/api/admin/faq` (`GET`, `POST`, `PATCH`, `DELETE`), `GET` / `PUT /api/admin/site`.
+- Tekshiruv: `ruff`, `mypy` toza; toza bazada qo'lda tekshiruv — hammasi kutilgandek.
+
 ### 4A Task 3: yangiliklar
 - Yangi `app/cms/news.py` va `cms/schemas.py` (yangiliklar qismi): slug sarlavhadan avtomatik (band bo'lsa `-2`, `-3`…), qo'lda berilgani band bo'lsa 409 `NEWS_SLUG_TAKEN`; markdown matndan `excerpt` (200 belgi, belgilarisiz); `published_at` NULL — qoralama, kelajakdagi sana — rejalashtirilgan; `PATCH` da aniq `null` — nashrdan olish; muqova (jpeg/png/webp, 5 MB).
 - Ochiq `GET /api/news?page=&size=`, `GET /api/news/{slug}` (har ochilishda `views` atomar +1, `updated_at` o'zgarmaydi), `GET /api/news/{id}/cover` (faqat nashr qilingan); admin `/api/admin/news` (`GET`, `POST`, `GET /{id}`, `PATCH`, `PUT /{id}/cover`, `DELETE`).
