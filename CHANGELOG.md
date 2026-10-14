@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.
 
+### Task 7: talaba fan sahifasi — mashg'ulot turlari va o'quv dasturi
+- `SubjectPage`: mavzular `lesson_type` bo'yicha guruhlanadi (Ma'ruzalar → Amaliy → Seminar → Laboratoriya, har biri `h2` bilan); bitta tur bo'lsa sarlavhasiz, avvalgidek. Karta `TopicPath` komponentiga ajratildi, yorliq turga qarab (`student.topicLabel.*`: "1-ma'ruza", "2-seminar"...; avvalgi "1-mavzu" o'rniga).
+- `syllabus_name` bo'lsa "O'quv dasturi" tugmasi (`useProtectedDownload`, `/api/subjects/{slug}/syllabus`).
+- `lib/lessonType.ts: LESSON_TYPES`; i18n: `lessonType.*`, `student.syllabus`, `student.lessonGroups.*`, `student.topicLabel.*` (uz + ru).
+- Tekshiruv: typecheck, lint o'tdi. `SubjectPage.test.tsx` "1-mavzu" yorlig'iga tayansa, testlar ishga tushirilganda yangilanadi.
+
 ### Task 6: CLAUDE.md
 - Commands: `import-resources`; Architecture (backend): `syllabus.py`, `resource_parse.py`/`resource_import.py` va `resource/` tuzilmasi.
 

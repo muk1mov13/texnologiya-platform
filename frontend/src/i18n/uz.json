@@ -161,6 +161,7 @@
     "INTERRUPTED": "Server qayta ishga tushgani uchun konvertatsiya to'xtadi. Qayta urinib ko'ring",
     "INVALID_PDF": "Natijaviy PDF buzilgan. Asl faylni tekshiring"
   },
+  "lessonType": { "lecture": "Ma'ruza", "practical": "Amaliy", "seminar": "Seminar", "lab": "Laboratoriya" },
   "roles": { "student": "Talaba", "teacher": "O'qituvchi", "admin": "Administrator" },
   "steps": {
     "review": "Takrorlash",
@@ -313,7 +314,20 @@
     "allSubjects": "Barcha fanlar",
     "noTopics": "Bu fanda hali mavzular yo'q",
     "topicNumber": "{{number}}-mavzu",
-    "topicDone": "Tugatilgan"
+    "topicDone": "Tugatilgan",
+    "syllabus": "O'quv dasturi",
+    "lessonGroups": {
+      "lecture": "Ma'ruzalar",
+      "practical": "Amaliy mashg'ulotlar",
+      "seminar": "Seminar mashg'ulotlari",
+      "lab": "Laboratoriya ishlari"
+    },
+    "topicLabel": {
+      "lecture": "{{number}}-ma'ruza",
+      "practical": "{{number}}-amaliy mashg'ulot",
+      "seminar": "{{number}}-seminar",
+      "lab": "{{number}}-laboratoriya ishi"
+    }
   },
   "player": {
     "steps": "Mavzu bosqichlari",

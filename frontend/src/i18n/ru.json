@@ -161,6 +161,7 @@
     "INTERRUPTED": "Преобразование прервано перезапуском сервера. Попробуйте снова",
     "INVALID_PDF": "Полученный PDF повреждён. Проверьте исходный файл"
   },
+  "lessonType": { "lecture": "Лекция", "practical": "Практика", "seminar": "Семинар", "lab": "Лаборатория" },
   "roles": { "student": "Студент", "teacher": "Преподаватель", "admin": "Администратор" },
   "steps": {
     "review": "Повторение",
@@ -313,7 +314,20 @@
     "allSubjects": "Все предметы",
     "noTopics": "В этом предмете пока нет тем",
     "topicNumber": "Тема {{number}}",
-    "topicDone": "Пройдено"
+    "topicDone": "Пройдено",
+    "syllabus": "Учебная программа",
+    "lessonGroups": {
+      "lecture": "Лекции",
+      "practical": "Практические занятия",
+      "seminar": "Семинарские занятия",
+      "lab": "Лабораторные работы"
+    },
+    "topicLabel": {
+      "lecture": "Лекция {{number}}",
+      "practical": "Практическое занятие {{number}}",
+      "seminar": "Семинар {{number}}",
+      "lab": "Лабораторная работа {{number}}"
+    }
   },
   "player": {
     "steps": "Этапы темы",
