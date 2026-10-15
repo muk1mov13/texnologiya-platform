@@ -840,6 +840,8 @@
   },
   "library": {
     "tabs": { "metodik": "Metodik hujjatlar", "huquqiy": "Huquqiy hujjatlar", "books": "Kitoblar" },
+    "tabHints": { "metodik": "Uslubiy qo'llanmalar va ishlanmalar", "huquqiy": "Qonunlar, standartlar, qarorlar", "books": "O'quv adabiyotlari katalogi" },
+    "eyebrow": "Ochiq kutubxona",
     "title": "Kutubxona",
     "description": "Metodik va huquqiy hujjatlar, o'quv kitoblari — ochiq, ro'yxatdan o'tmasdan yuklab olish mumkin.",
     "download": "Yuklab olish",

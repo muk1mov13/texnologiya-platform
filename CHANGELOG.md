@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Kutubxona sahifasi va papkalar daraxti yangi dizaynda
+
+- `LibraryPage.tsx`: `PageHero`; oddiy tablar o'rniga hero ichida 3 ta bo'lim kartasi (ikonka + izoh, tanlangani brand gradientda, `layoutId` bilan siljiydi). `tablist`/`tab` semantikasi va strelka bilan almashtirish saqlandi.
+- `FolderTree.tsx`: har bir yuqori papka alohida karta (gradient papka ikonkasi, hujjatlar soni, aylanadigan chevron); hujjat qatorida fayl turi "varaq" belgisi, hajm va `download` ikonkali tugma (telefonda faqat ikonka); yuklanishda skelet. `<details>` saqlandi.
+- i18n (uz + ru): `library.eyebrow`, `library.tabHints.*`.
+- Tekshiruv: lint, typecheck; brauzerda 1280px.
+
 ## 2026-10-15 — Yangilik sahifasi yangi dizaynda
 
 - `NewsPage.tsx`: "orqaga" chip (`BACK_LINK`), ikonli yorliq, katta sarlavha, sana va ko'rishlar soni ikonkalar bilan; muqova `rounded-3xl` + yumshoq soya; matn o'qish uchun qulay kenglikda (`68ch`, katta qator oralig'i); yuklanishda maqola shaklidagi skelet; pastda "Boshqa yangiliklar" paneli.
