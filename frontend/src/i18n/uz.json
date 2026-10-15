@@ -38,7 +38,7 @@
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
   "footer": {
-    "text": "© {{year}} Buxoro davlat pedagogika instituti · Texnologik ta'lim",
+    "text": "© {{year}} Buxoro davlat pedagogika instituti · Biologiya ta'limi",
     "tagline": "Bo'lajak biologiya o'qituvchilari uchun metodik platforma",
     "sections": "Bo'limlar",
     "contacts": "Kontaktlar",
@@ -321,7 +321,7 @@
       "loginTitle": "Qaytganingizdan xursandmiz",
       "loginText": "Qolgan joyingizdan davom eting: darslar, topshiriqlar va natijalaringiz sizni kutmoqda.",
       "registerTitle": "O'rganishni bugun boshlang",
-      "registerText": "Texnologik ta'lim fanlari bo'yicha zamonaviy, bosqichma-bosqich o'quv platformasi.",
+      "registerText": "Biologiya ta'limi fanlari bo'yicha zamonaviy, bosqichma-bosqich o'quv platformasi.",
       "perks": {
         "steps": {
           "title": "7 bosqichli mavzular",
@@ -336,7 +336,7 @@
           "text": "Har bir qadamingiz uchun mukofot oling"
         }
       },
-      "institute": "Buxoro davlat pedagogika instituti · Texnologik ta'lim"
+      "institute": "Buxoro davlat pedagogika instituti · Biologiya ta'limi"
     },
     "showPassword": "Parolni ko'rsatish",
     "hidePassword": "Parolni yashirish",
@@ -855,7 +855,7 @@
   },
   "news": {
     "title": "Yangiliklar",
-    "description": "Institut va texnologik ta'lim yo'nalishi yangiliklari.",
+    "description": "Institut va biologiya ta'limi yo'nalishi yangiliklari.",
     "empty": "Hozircha yangiliklar yo'q",
     "all": "Barcha yangiliklar",
     "views": "Ko'rishlar: {{count}}"

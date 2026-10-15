@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Qolgan "texnologik ta'lim" matnlari biologiyaga
+
+- `i18n/uz.json`, `ru.json`: footer mualliflik qatori, ro'yxatdan o'tish paneli matni (`auth.aside.registerText`, `institute`) va yangiliklar sahifasi tavsifi "Biologiya ta'limi" ga o'tkazildi. Endi tarjimalarda "texnologik ta'lim" qolmadi.
+
 ## 2026-10-15 — Sayt sarlavhasi va mikroskop favicon
 
 - `index.html`: tab sarlavhasi "Texnologiya platformasi" o'rniga "EDU — Biologiya ta'limi metodik platformasi", meta tavsif biologiyaga; favicon ulandi.
