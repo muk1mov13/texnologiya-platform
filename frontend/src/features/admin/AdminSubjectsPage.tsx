@@ -8,13 +8,17 @@ import {
   useUploadSyllabus,
 } from '@/api/admin'
 import type { SubjectAdmin } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { pushToast } from '@/components/ui/toast-store'
+import { cx } from '@/lib/cx'
 import { SubjectFormModal } from './SubjectFormModal'
+import { ListSkeleton } from './ui/ListSkeleton'
+import { PageHeader } from './ui/PageHeader'
 
 export function AdminSubjectsPage() {
   const { t } = useTranslation()
@@ -25,44 +29,70 @@ export function AdminSubjectsPage() {
   const [toDelete, setToDelete] = useState<SubjectAdmin | null>(null)
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{t('admin.subjects.title')}</h1>
-        <Button onClick={() => setEditing('new')}>{t('admin.subjects.new')}</Button>
-      </div>
-      <QueryState query={subjects}>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        icon="layers"
+        eyebrow={t('navGroups.learning')}
+        title={t('admin.subjects.title')}
+        subtitle={t('admin.subjects.subtitle')}
+        actions={
+          <Button onClick={() => setEditing('new')}>
+            <Icon name="plus" className="size-4" />
+            {t('admin.subjects.new')}
+          </Button>
+        }
+      />
+      <QueryState query={subjects} loading={<ListSkeleton rows={3} />}>
         {(list) =>
           list.length === 0 ? (
-            <EmptyState icon="📚" title={t('admin.subjects.empty')} />
+            <EmptyState icon="layers" title={t('admin.subjects.empty')} />
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="grid gap-4 lg:grid-cols-2">
               {list.map((subject) => (
                 <li
                   key={subject.id}
                   aria-label={subject.title}
-                  className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4"
+                  className="flex flex-col rounded-3xl bg-white shadow-soft ring-1 ring-slate-200/70 transition hover:ring-brand-200 motion-reduce:transition-none"
                 >
-                  <div className="min-w-48 flex-1">
-                    <p className="font-semibold">{subject.title}</p>
-                    <p className="font-mono text-xs text-slate-500">{subject.slug}</p>
+                  <div className="flex items-start gap-4 p-5 sm:p-6">
+                    <span
+                      aria-hidden="true"
+                      className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-800 text-sm font-extrabold text-white tabular-nums shadow-glow-sm"
+                    >
+                      {subject.order}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="font-bold tracking-tight break-words text-slate-900">{subject.title}</p>
+                        <Badge dot tone={subject.is_published ? 'green' : 'amber'}>
+                          {subject.is_published ? t('common.published') : t('common.draft')}
+                        </Badge>
+                      </div>
+                      <p className="mt-0.5 font-mono text-xs text-slate-500">/{subject.slug}</p>
+                      {subject.description && (
+                        <p className="mt-2 line-clamp-2 text-sm text-pretty text-slate-600">{subject.description}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mx-5 rounded-2xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-200/60 sm:mx-6">
                     <SyllabusControls subject={subject} />
                   </div>
-                  <Badge tone={subject.is_published ? 'green' : 'amber'}>
-                    {subject.is_published ? t('common.published') : t('common.draft')}
-                  </Badge>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="mt-auto flex flex-wrap items-center gap-2 p-5 pt-4 sm:px-6">
                     <Button
                       size="sm"
                       variant="secondary"
                       loading={update.isPending && update.variables?.id === subject.id}
                       onClick={() => update.mutate({ id: subject.id, data: { is_published: !subject.is_published } })}
                     >
+                      <Icon name={subject.is_published ? 'eyeOff' : 'eye'} className="size-4" />
                       {subject.is_published ? t('admin.subjects.unpublish') : t('admin.subjects.publish')}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditing(subject)}>
+                      <Icon name="pencil" className="size-4" />
                       {t('common.edit')}
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setToDelete(subject)}>
+                    <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setToDelete(subject)}>
+                      <Icon name="trash" className="size-4" />
                       {t('common.delete')}
                     </Button>
                   </div>
@@ -100,11 +130,14 @@ function SyllabusControls({ subject }: { subject: SubjectAdmin }) {
   const inputId = `syllabus-${subject.id}`
 
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-      <span className="text-slate-600">
-        {subject.syllabus_name
-          ? t('admin.subjects.syllabusFile', { name: subject.syllabus_name })
-          : t('admin.subjects.syllabusNone')}
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="flex min-w-0 flex-1 items-center gap-2 text-slate-600">
+        <Icon name="pdf" className={cx('size-4 shrink-0', subject.syllabus_name ? 'text-brand-600' : 'text-slate-400')} />
+        <span className="min-w-0 truncate">
+          {subject.syllabus_name
+            ? t('admin.subjects.syllabusFile', { name: subject.syllabus_name })
+            : t('admin.subjects.syllabusNone')}
+        </span>
       </span>
       <label htmlFor={inputId} className="sr-only">
         {t('admin.subjects.syllabusUpload')}

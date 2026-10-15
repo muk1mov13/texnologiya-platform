@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: fanlar va AI sozlamalari (6/9)
+
+- `AdminSubjectsPage`: `PageHeader` ("Yangi fan" tugmasi bilan), fanlar `lg` da ikki ustunli kartalar to'rida — tartib raqami belgisi, slug, tavsif (2 qator), nuqtali nashr holati, o'quv dasturi alohida blokda PDF ikonkasi bilan, amallar ikonkali. Yuklanishda skelet.
+- `AdminAiPage`: sozlamalar va indeks yonma-yon (`lg`), provayder/modellar kichik kartalarda, maxfiylik eslatmasi emoji o'rniga ikonka bilan. Sarf bo'limi: ko'rsatkichlar (so'rovlar, indeksdagi va eskirgan bo'laklar), jadval yopishqoq sarlavha, `tabular-nums` va `formatDate` bilan.
+- `SubjectFormModal` o'zgarmadi (umumiy `Modal` allaqachon yangi uslubda). i18n: `admin.subjects.subtitle`, `adminAi.subtitle/chunksLabel/staleLabel` qo'shildi, ishlatilmay qolgan `adminAi.chunks/stale` o'chirildi (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: foydalanuvchilar (5/9)
 
 - `AdminUsersPage`: `PageHeader`, bir qatorda segment filtr (`Tabs pill`) va ikonkali qidiruv, `DataList` qatorlari Avatar, email/telefon ikonkalari va nuqtali holat belgisi bilan; yuklanishda skelet, bo'sh holatda SVG ikonka.

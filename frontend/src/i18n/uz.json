@@ -486,6 +486,7 @@
     },
     "subjects": {
       "title": "Fanlarni boshqarish",
+      "subtitle": "Fanlar tartibi, nashr holati va o'quv dasturlari",
       "new": "Yangi fan",
       "newTitle": "Yangi fan yaratish",
       "editTitle": "Fanni tahrirlash",
@@ -758,6 +759,9 @@
     "title": "Haftalik AI tahlili ({{from}} – {{to}})"
   },
   "adminAi": {
+    "subtitle": "Repetitor, kunlik limit, sarf statistikasi va qidiruv indeksi",
+    "chunksLabel": "Indekslangan bo'laklar",
+    "staleLabel": "Eskirgan bo'laklar",
     "title": "AI sozlamalari",
     "settings": "Sozlamalar",
     "notConfigured": "AI kaliti sozlanmagan (GEMINI_API_KEY). AI funksiyalari ishlamaydi.",
@@ -776,8 +780,6 @@
     "requests": "So'rovlar",
     "users": "Foydalanuvchilar",
     "noUsage": "Bu davrda so'rovlar yo'q",
-    "chunks": "Indeksdagi bo'laklar: {{chunks}}",
-    "stale": "Eskirgan bo'laklar: {{count}} — indeksni qayta quring",
     "index": "Indeks",
     "reindexText": "Embedding modeli o'zgarsa yoki qidiruv yomonlashsa, indeksni qayta quring.",
     "reindexStale": "Eskirganlarini qayta qurish",
