@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Foydalanuvchi o'z rasmini yuklay oladi; rasm bo'lmasa har kimga o'ziga xos standart avatar chiziladi. Profil kartasi va maydonlari tuzatildi.
 
+### Task 2: avatar komponenti va hook'lar
+- `components/ui/Avatar.tsx`: yuklangan rasm (`object-cover`, yuklanmasa standartga qaytadi) yoki o'ziga xos standart avatar — `lib/avatar.ts` foydalanuvchi ID'sidan (FNV-1a hash) 10 ta rang juftligidan birini, 4 ta naqshdan birini (`orbs`, `waves`, `grid`, `rays`) va burilishni tanlaydi, ustida bosh harflar.
+- `api/auth.ts`: `useUploadAvatar` (`PUT /api/me/avatar`, FormData), `useDeleteAvatar`; javob sessiyaga yoziladi.
+- `AppLayout` header'idagi avatar endi `Avatar`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 1: backend — profil rasmi
 - `users.avatar` (storage'dagi nisbiy yo'l, NULL — standart avatar) va migratsiya `53dd6bb26442`; `User.avatar_url` (`/api/avatars/<uuid>.<ext>`), `UserOut.avatar_url`.
 - `PUT /api/me/avatar` (multipart `file`; JPG/PNG/WEBP, magic bytes, `MAX_AVATAR_MB`=2) — eski fayl commit'dan keyin o'chiriladi; `DELETE /api/me/avatar`; ochiq `GET /api/avatars/{name}` (nom UUID formatida tekshiriladi va bazada bo'lishi shart, `Cache-Control: immutable`).

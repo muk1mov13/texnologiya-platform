@@ -4,9 +4,9 @@ import { Link, NavLink, Outlet } from 'react-router'
 import { useDashboard } from '@/api/assessment'
 import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Icon } from '@/components/icons/Icon'
+import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { cx, FOCUS_RING } from '@/lib/cx'
-import { initials } from '@/lib/initials'
 import { SPRING } from '@/lib/motion'
 import { homePathFor, navLinksFor } from '../paths'
 import { LanguageSwitch } from './LanguageSwitch'
@@ -85,12 +85,7 @@ export function AppLayout() {
                 )
               }
             >
-              <span
-                aria-hidden="true"
-                className="grid size-8 place-items-center rounded-[0.65rem] bg-gradient-to-br from-brand-100 to-brand-200 text-xs font-extrabold text-brand-900 ring-1 ring-brand-300/50"
-              >
-                {initials(user.full_name)}
-              </span>
+              <Avatar user={user} className="size-8 rounded-[0.65rem] ring-1 ring-slate-900/5" />
               <span className="hidden max-w-40 truncate xl:inline">{user.full_name}</span>
               <span className="sr-only xl:hidden">{t('nav.profile')}</span>
             </NavLink>

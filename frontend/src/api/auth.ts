@@ -149,6 +149,28 @@ export function useUpdateMe(options: { silent?: boolean } = {}) {
   })
 }
 
+/** Profil rasmini yuklaydi/almashtiradi; javobdagi foydalanuvchi sessiyaga yoziladi. */
+export function useUploadAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (file: File) => {
+      const body = new FormData()
+      body.append('file', file)
+      return apiFetch<User>('/api/me/avatar', { method: 'PUT', body })
+    },
+    onSuccess: (user) => queryClient.setQueryData(sessionKey, user),
+  })
+}
+
+/** Profil rasmini o'chiradi — standart avatar qaytadi. */
+export function useDeleteAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => apiFetch<User>('/api/me/avatar', { method: 'DELETE' }),
+    onSuccess: (user) => queryClient.setQueryData(sessionKey, user),
+  })
+}
+
 /**
  * Backend parol almashganda barcha sessiyalarni bekor qiladi, shuning uchun lokal sessiya ham yopiladi.
  * Toast va navigatsiya shu yerda — hook darajasida — amalga oshiriladi: `mutate()`ga
