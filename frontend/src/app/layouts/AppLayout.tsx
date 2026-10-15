@@ -75,7 +75,7 @@ export function AppLayout() {
             {user.role === 'student' && <StudentChip />}
             <LanguageSwitch />
             <NavLink
-              to="/app/profile"
+              to={user.role === 'admin' ? '/admin/profile' : '/app/profile'}
               title={t('nav.profile')}
               className={({ isActive }) =>
                 cx(

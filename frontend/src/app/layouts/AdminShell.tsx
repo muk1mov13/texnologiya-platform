@@ -17,6 +17,9 @@ import { LanguageSwitch } from './LanguageSwitch'
 const MESSAGES_PATH = '/admin/messages'
 const USERS_PATH = '/admin/users'
 const REVIEW_PATH = '/teach/review'
+const PROFILE_PATH = '/admin/profile'
+/** Profil menyuda yo'q (pastki karta orqali ochiladi), breadcrumb uchun alohida bo'lim. */
+const PROFILE_ITEM: NavItem = { to: PROFILE_PATH, label: 'nav.profile', end: true }
 const COLLAPSED_KEY = 'admin.sidebar.collapsed'
 
 /** To'q fondagi klaviatura fokusi halqasi (`FOCUS_RING` oq fon uchun). */
@@ -54,7 +57,8 @@ export function AdminShell() {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const group = ADMIN_NAV.find((g) => g.items.some((item) => matches(pathname, item)))
-  const current = group?.items.find((item) => matches(pathname, item))
+  const current =
+    group?.items.find((item) => matches(pathname, item)) ?? (pathname === PROFILE_PATH ? PROFILE_ITEM : undefined)
 
   // Havola bosilganda panel o'zi yopiladi (`onNavigate`), shuning uchun yo'l kuzatilmaydi.
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
@@ -206,6 +210,7 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
     [REVIEW_PATH]: t('adminShell.reviewCount'),
   }
   const pillId = onClose ? 'admin-drawer-pill' : 'admin-nav-pill'
+  const profileActive = pathname === PROFILE_PATH
 
   return (
     <div className="relative isolate flex h-full w-full flex-col overflow-hidden bg-brand-950 text-brand-50">
@@ -304,12 +309,15 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
         {user && (
           <div
             className={cx(
-              'flex items-center gap-3 rounded-2xl bg-white/[0.04] p-2 ring-1 ring-white/10',
+              'flex items-center gap-3 rounded-2xl p-2 ring-1 transition-colors motion-reduce:transition-none',
+              profileActive ? 'bg-white/10 ring-white/20' : 'bg-white/[0.04] ring-white/10',
               collapsed && 'flex-col p-1.5',
             )}
           >
             <Link
-              to="/app/profile"
+              to={PROFILE_PATH}
+              onClick={onClose}
+              aria-current={profileActive ? 'page' : undefined}
               title={t('nav.profile')}
               className={cx('flex min-w-0 flex-1 items-center gap-3 rounded-xl', DARK_FOCUS)}
             >

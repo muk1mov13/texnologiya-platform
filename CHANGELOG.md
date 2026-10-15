@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin profili boshqaruv panelida
+
+- Yangi marshrut `/admin/profile`: admin profili `AdminShell` ichida (chap menyu va breadcrumb "Boshqaruv › Profil" bilan) ochiladi, yuqori navbarli `AppLayout`da emas.
+- `AdminShell`: menyu pastidagi avatar kartasi `/admin/profile` ga olib boradi, profil ochiq bo'lsa karta ajratiladi (`aria-current`); telefondagi panel bosilganda yopiladi.
+- Yangi `app/ProfileRoute.tsx`: admin `/app/profile` ga kirsa `/admin/profile` ga yo'naltiriladi; `AppLayout`dagi ("Talaba ko'rinishi") avatar havolasi ham adminda `/admin/profile`.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Fanlar yig'iladigan ro'yxatda (mavzular va statistika)
 
 - Yangi `features/teach/SubjectAccordion.tsx`: fan kartasi — sarlavha qatori (fan nomi, mavzular soni, nashr holati, `aria-expanded`) bosilganda ichidagi tarkib ochiladi; yopiq fanning tarkibi chizilmaydi (so'rov ham yuborilmaydi).

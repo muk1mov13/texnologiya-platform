@@ -36,6 +36,7 @@ import { StatsPage } from '@/features/teach/StatsPage'
 import { TeachHomePage } from '@/features/teach/TeachHomePage'
 import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
+import { ProfileRoute } from './ProfileRoute'
 import { AdminShell } from './layouts/AdminShell'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
@@ -79,7 +80,7 @@ export const routes: RouteObject[] = [
           { path: 'app', element: <SubjectsPage /> },
           { path: 'app/subjects/:slug', element: <SubjectPage /> },
           { path: 'app/topics/:topicId/:kind?', element: <PlayerPage /> },
-          { path: 'app/profile', element: <ProfilePage /> },
+          { path: 'app/profile', element: <ProfileRoute /> },
           { path: 'app/results', element: <ResultsPage /> },
           { path: 'app/results/attempts/:attemptId', element: <AttemptDetailPage /> },
           { path: 'app/tutor', element: <TutorPage /> },
@@ -120,6 +121,7 @@ export const routes: RouteObject[] = [
               { path: 'admin/faq', element: <AdminFaqPage /> },
               { path: 'admin/messages', element: <AdminMessagesPage /> },
               { path: 'admin/site', element: <AdminSitePage /> },
+              { path: 'admin/profile', element: <ProfilePage /> },
             ],
           },
         ],
