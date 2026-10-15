@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Yangi logo: "EDU 🔬" (ochiq sayt)
+
+- `app/layouts/BrandLogo.tsx`: "T" gradient belgi va "Texnologiya" nomi o'rniga loyiha logosi (`src/logo.png` asosida) — "EDU" yozuvi va chiziqli mikroskop belgisi, inline SVG (har o'lchamda tiniq, fon bilan qo'shilib ketadi). "PLATFORM" so'zi olib tashlandi. Footerdagi to'q fonda och rangli; hover'da mikroskop egiladi (`motion-reduce` hurmat qilinadi).
+- Hozircha faqat ochiq sayt (header va footer); talaba/admin panellari, login sahifalari va favicon keyingi bosqichda.
+- Tekshiruv: lint, typecheck, brauzerda 1366px va 375px (gorizontal siljish yo'q).
+
 ## 2026-10-15 — Admin profili boshqaruv panelida
 
 - Yangi marshrut `/admin/profile`: admin profili `AdminShell` ichida (chap menyu va breadcrumb "Boshqaruv › Profil" bilan) ochiladi, yuqori navbarli `AppLayout`da emas.
