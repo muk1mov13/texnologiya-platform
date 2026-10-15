@@ -33,6 +33,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - Tuzatish: parol kuchi uchun `watch()` o'rniga `useWatch` (React Compiler ogohlantirishi).
 - Tekshiruv: lint, typecheck.
 
+### Task 5: yangi `LoginPage`
+- Email maydonida `mail` ikonka, parolda `PasswordInput`, `RegisterPage` dagi kabi gradient tugma va havola uslubi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
