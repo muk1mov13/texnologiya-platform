@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bosqich tablari qayta dizayni (3/3): faoliyatlar va vazifa
+
+- `ActivitiesTab`: emoji o'rniga SVG ikonkalar (`quiz`/`check`/`grid`); faoliyatlar `DataList flat`/`ListRow` qatorlarida, holat `Badge dot`; ↑/↓, ko'rib chiqish, tahrirlash va o'chirish — `IconAction`; krossvord ko'rinishi qator ostida to'liq kenglikda. "Yangi test/ha-yo'q/krossvord" — ikonkali uchta karta-tugma, yangi faoliyat formasi `AddSection` ichida; bo'sh holat — `EmptyBlock`.
+- `TaskTab`: "hali vazifa yo'q" eslatmasi ikonkali sariq blokka aylandi.
+- `ListRow`: `below` slot (qator ostidagi to'liq kenglikdagi tarkib); `IconAction`: `pressed` (`aria-pressed`).
+- i18n: `activityEditor.emptyText` qo'shildi; `activityEditor.new*` matnlaridan "+ " olib tashlandi ("Yangi test" va h.k.) (uz/ru).
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Bosqich tablari qayta dizayni (2/3): glossariy va adabiyotlar
 
 - `GlossaryTab`, `LiteratureTab`: elementlar `DataList flat`/`ListRow` qatorlarida (ikonka plitkasi, tahrirlash va o'chirish `IconAction`), tahrirlash formasi qatorning o'zida ochiladi; bo'sh holat — `EmptyBlock`.

@@ -614,10 +614,11 @@
     "back": "Natijalarim"
   },
   "activityEditor": {
+    "emptyText": "Quyidan test, ha/yo'q savollari yoki krossvord qo'shing; talabaga faqat nashr qilinganlari ko'rinadi",
     "empty": "Bu bosqichda hali faoliyat yo'q",
-    "newQuiz": "+ Test",
-    "newYesNo": "+ Ha/yo'q",
-    "newCrossword": "+ Krossvord",
+    "newQuiz": "Yangi test",
+    "newYesNo": "Yangi ha/yo'q",
+    "newCrossword": "Yangi krossvord",
     "title": "Nomi",
     "question": "Savol",
     "options": "Javob variantlari",

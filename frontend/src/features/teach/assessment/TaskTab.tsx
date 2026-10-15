@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDeleteTask, useSaveTask, useStepTask } from '@/api/teachAssessment'
 import type { TaskIn, TaskOut } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Select, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
@@ -65,7 +66,12 @@ export function TaskForm({ topicId, stepId, task, draft }: TaskFormProps) {
 
   return (
     <form noValidate className="flex flex-col gap-4" onSubmit={onSubmit}>
-      {!task && !draft && <p className="text-slate-500">{t('taskEdit.empty')}</p>}
+      {!task && !draft && (
+        <p className="flex items-center gap-3 rounded-2xl bg-amber-50/70 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200/70">
+          <Icon name="clipboard" className="size-5 shrink-0 text-amber-600" />
+          {t('taskEdit.empty')}
+        </p>
+      )}
       <Field id="task-title" label={t('taskEdit.title')} error={errors.title?.message}>
         <Input id="task-title" {...register('title')} />
       </Field>

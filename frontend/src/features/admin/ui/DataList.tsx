@@ -51,10 +51,12 @@ interface ListRowProps extends Omit<ComponentProps<'li'>, 'title'> {
   actions?: ReactNode
   /** Qo'shimcha tarkib (sarlavha ostida). */
   extra?: ReactNode
+  /** Qator ostidagi to'liq kenglikdagi tarkib (masalan, ko'rib chiqish). */
+  below?: ReactNode
 }
 
 /** `DataList` qatori: telefonda ustma-ust, kengroq ekranda bir qatorda. */
-export function ListRow({ leading, title, meta, badges, actions, extra, className, ...rest }: ListRowProps) {
+export function ListRow({ leading, title, meta, badges, actions, extra, below, className, ...rest }: ListRowProps) {
   return (
     <li
       className={cx(
@@ -71,6 +73,7 @@ export function ListRow({ leading, title, meta, badges, actions, extra, classNam
       </div>
       {badges && <div className="flex flex-wrap items-center gap-2">{badges}</div>}
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {below && <div className="basis-full">{below}</div>}
     </li>
   )
 }

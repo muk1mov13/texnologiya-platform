@@ -7,14 +7,21 @@ import {
   useStepActivities,
 } from '@/api/teachAssessment'
 import type { ActivityTeach, ActivityType, TeachLayout } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
+import type { IconName } from '@/components/icons/paths'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
+import { DataList, ListRow, RowIcon } from '@/features/admin/ui/DataList'
+import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
+import { IconAction } from '@/features/admin/ui/IconAction'
 import { cellKey, type CellKey } from '@/features/student/assessment/crossword'
+import { cx, FOCUS_RING } from '@/lib/cx'
+import { AddSection } from '../AddSection'
 import { ActivityEditor } from './ActivityEditor'
 
-const ICONS: Record<ActivityType, string> = { quiz: '📝', yesno: '✅', crossword: '🧩' }
+const ICONS: Record<ActivityType, IconName> = { quiz: 'quiz', yesno: 'check', crossword: 'grid' }
 const NEW_LABELS: Record<ActivityType, string> = {
   quiz: 'activityEditor.newQuiz',
   yesno: 'activityEditor.newYesNo',
@@ -45,18 +52,14 @@ export function ActivitiesTab({ topicId, stepId }: { topicId: number; stepId: nu
           reorder.mutate(ids)
         }
         return (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             {items.length === 0 ? (
-              <p className="text-slate-500">{t('activityEditor.empty')}</p>
+              <EmptyBlock icon="quiz" title={t('activityEditor.empty')} text={t('activityEditor.emptyText')} />
             ) : (
-              <ul className="flex flex-col gap-2">
-                {items.map((activity, index) => (
-                  <li
-                    key={activity.id}
-                    aria-label={activity.title}
-                    className="rounded-xl border-2 border-slate-100 bg-white p-3"
-                  >
-                    {editing?.kind === 'edit' && editing.id === activity.id ? (
+              <DataList flat>
+                {items.map((activity, index) =>
+                  editing?.kind === 'edit' && editing.id === activity.id ? (
+                    <li key={activity.id} aria-label={activity.title} className="bg-slate-50/70 px-5 py-4 sm:px-6">
                       <ActivityEditor
                         topicId={topicId}
                         stepId={stepId}
@@ -64,24 +67,26 @@ export function ActivitiesTab({ topicId, stepId }: { topicId: number; stepId: nu
                         initial={activity}
                         onDone={closeEditor}
                       />
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xl" aria-hidden="true">
-                            {ICONS[activity.type]}
-                          </span>
-                          <div className="min-w-40 flex-1">
-                            <p className="font-semibold">{activity.title}</p>
-                            <p className="text-sm text-slate-600">
-                              {t(`activity.${activity.type}`)} ·{' '}
-                              {t('activityEditor.itemsCount', { count: activity.items.length })}
-                            </p>
-                          </div>
-                          <Badge tone={activity.is_published ? 'green' : 'amber'}>
-                            {activity.is_published ? t('common.published') : t('common.draft')}
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
+                    </li>
+                  ) : (
+                    <ListRow
+                      key={activity.id}
+                      aria-label={activity.title}
+                      leading={<RowIcon icon={ICONS[activity.type]} tone={activity.is_published ? 'brand' : 'slate'} />}
+                      title={activity.title}
+                      meta={
+                        <>
+                          {t(`activity.${activity.type}`)} ·{' '}
+                          {t('activityEditor.itemsCount', { count: activity.items.length })}
+                        </>
+                      }
+                      badges={
+                        <Badge dot tone={activity.is_published ? 'green' : 'amber'}>
+                          {activity.is_published ? t('common.published') : t('common.draft')}
+                        </Badge>
+                      }
+                      actions={
+                        <>
                           <Button
                             variant="secondary"
                             size="sm"
@@ -90,59 +95,75 @@ export function ActivitiesTab({ topicId, stepId }: { topicId: number; stepId: nu
                           >
                             {activity.is_published ? t('activityEditor.unpublish') : t('activityEditor.publish')}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={index === 0 || reorder.isPending}
-                            aria-label={t('activityEditor.moveUp')}
-                            onClick={() => move(index, -1)}
-                          >
-                            ↑
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={index === items.length - 1 || reorder.isPending}
-                            aria-label={t('activityEditor.moveDown')}
-                            onClick={() => move(index, 1)}
-                          >
-                            ↓
-                          </Button>
-                          {activity.layout && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              aria-expanded={previewId === activity.id}
-                              onClick={() => setPreviewId(previewId === activity.id ? null : activity.id)}
-                            >
-                              {t('activityEditor.preview')}
-                            </Button>
-                          )}
-                          <Button variant="ghost" size="sm" onClick={() => setEditing({ kind: 'edit', id: activity.id })}>
-                            {t('common.edit')}
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setToDelete(activity)}>
-                            {t('common.delete')}
-                          </Button>
-                        </div>
-                        {activity.layout && previewId === activity.id && <CrosswordPreview layout={activity.layout} />}
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                          <span className="flex items-center">
+                            <IconAction
+                              icon="arrowUp"
+                              label={t('activityEditor.moveUp')}
+                              disabled={index === 0 || reorder.isPending}
+                              onClick={() => move(index, -1)}
+                            />
+                            <IconAction
+                              icon="arrowDown"
+                              label={t('activityEditor.moveDown')}
+                              disabled={index === items.length - 1 || reorder.isPending}
+                              onClick={() => move(index, 1)}
+                            />
+                            {activity.layout && (
+                              <IconAction
+                                icon="eye"
+                                label={t('activityEditor.preview')}
+                                pressed={previewId === activity.id}
+                                onClick={() => setPreviewId(previewId === activity.id ? null : activity.id)}
+                              />
+                            )}
+                            <IconAction
+                              icon="pencil"
+                              label={t('common.edit')}
+                              onClick={() => setEditing({ kind: 'edit', id: activity.id })}
+                            />
+                            <IconAction icon="trash" label={t('common.delete')} onClick={() => setToDelete(activity)} />
+                          </span>
+                        </>
+                      }
+                      below={
+                        activity.layout &&
+                        previewId === activity.id && (
+                          <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60">
+                            <CrosswordPreview layout={activity.layout} />
+                          </div>
+                        )
+                      }
+                    />
+                  ),
+                )}
+              </DataList>
             )}
             {editing?.kind === 'new' ? (
-              <section className="rounded-2xl bg-slate-50 p-4">
-                <h3 className="mb-3 font-semibold">{t(NEW_LABELS[editing.type])}</h3>
+              <AddSection title={t(NEW_LABELS[editing.type])}>
                 <ActivityEditor topicId={topicId} stepId={stepId} type={editing.type} onDone={closeEditor} />
-              </section>
+              </AddSection>
             ) : (
-              <div className="flex flex-wrap gap-2">
+              <div className="grid gap-2 sm:grid-cols-3">
                 {(['quiz', 'yesno', 'crossword'] as const).map((type) => (
-                  <Button key={type} variant="secondary" size="sm" onClick={() => setEditing({ kind: 'new', type })}>
-                    {t(NEW_LABELS[type])}
-                  </Button>
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setEditing({ kind: 'new', type })}
+                    className={cx(
+                      'group flex items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-700',
+                      'transition-colors hover:border-brand-300 hover:bg-brand-50/40 hover:text-brand-800 motion-reduce:transition-none',
+                      FOCUS_RING,
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-50 text-slate-500 ring-1 ring-slate-200/70 transition-colors group-hover:bg-white group-hover:text-brand-700 motion-reduce:transition-none"
+                    >
+                      <Icon name={ICONS[type]} className="size-4" />
+                    </span>
+                    <span className="flex-1">{t(NEW_LABELS[type])}</span>
+                    <Icon name="plus" className="size-4 text-slate-400 group-hover:text-brand-600" />
+                  </button>
                 ))}
               </div>
             )}
