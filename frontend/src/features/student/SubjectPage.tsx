@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
-import { BACK_LINK, EYEBROW, SURFACE, SURFACE_LINK } from '@/components/ui/styles'
+import { BACK_LINK, EYEBROW, SURFACE, SURFACE_LINK_SM } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { useProtectedDownload } from '@/lib/download'
 import { LESSON_TYPES } from '@/lib/lessonType'
@@ -194,7 +194,7 @@ function TopicLink({ topic, number }: { topic: TopicCard; number: number }) {
   return (
     <Link
       to={`/app/topics/${topic.id}`}
-      className={cx(SURFACE_LINK, 'group flex min-w-0 flex-1 items-center gap-4 rounded-2xl p-4')}
+      className={cx(SURFACE_LINK_SM, 'group flex min-w-0 flex-1 items-center gap-4 p-4')}
     >
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">

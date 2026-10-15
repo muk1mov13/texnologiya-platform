@@ -20,12 +20,12 @@ export function AttemptResult({ score, maxScore, items, onRetry, onBack }: Attem
   const percent = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0
   return (
     <div className="flex flex-col gap-4">
-      <Card className="flex items-center gap-4">
+      <Card className="flex items-center gap-5">
         {/* Ball yonidagi matnda yozilgan; halqaning "Bajarildi: …" yozuvi bu yerda noto'g'ri bo'lardi. */}
-        <ProgressRing completed={score} total={maxScore} size={64} decorative />
+        <ProgressRing completed={score} total={maxScore} size={72} decorative />
         <div>
-          <p className="text-2xl font-extrabold">{t('activity.score', { score, max: maxScore })}</p>
-          <p className="text-slate-600">{percent}%</p>
+          <p className="text-2xl font-extrabold tracking-tight text-slate-900 tabular-nums">{t('activity.score', { score, max: maxScore })}</p>
+          <p className="font-semibold text-slate-600 tabular-nums">{percent}%</p>
         </div>
       </Card>
       <ol className="flex flex-col gap-3">
@@ -33,8 +33,8 @@ export function AttemptResult({ score, maxScore, items, onRetry, onBack }: Attem
           <li
             key={index}
             className={cx(
-              'rounded-xl border-2 p-4',
-              item.is_correct ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50',
+              'rounded-2xl p-4 ring-1',
+              item.is_correct ? 'bg-emerald-50/70 ring-emerald-200' : 'bg-red-50/70 ring-red-200',
             )}
           >
             <p className="font-semibold">

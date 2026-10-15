@@ -1,13 +1,14 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCompleteStep, useStep } from '@/api/student'
 import type { GlossaryTerm, LiteratureItem, MaterialView, StepBrief, StepKind } from '@/api/types'
-import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/icons/Icon'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
+import { SURFACE_SM } from '@/components/ui/styles'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { ACTIVITY_KINDS, FILE_KINDS, SELF_COMPLETE_KINDS } from '@/lib/steps'
@@ -35,7 +36,7 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
   const content = useStep(step.has_content ? step.id : undefined)
   const complete = useCompleteStep(topicId)
 
-  const empty = <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+  const empty = <EmptyState icon="folder" title={t('player.noContent')} text={t('player.noContentText')} />
   // Kontentsiz bosqichda so'rov o'chiq (abadiy `isPending`) — QueryState'ga yuborilmaydi.
   if (!step.has_content) return empty
 
@@ -59,27 +60,25 @@ export function StepContentView({ topicId, step, nextKind }: StepContentViewProp
               <TaskStep topicId={topicId} stepId={data.id} task={data.task} submission={data.submission} />
             )}
             {(ACTIVITY_KINDS.has(data.kind) || data.kind === 'task') && nextKind && (
-              <div className="border-t-2 border-slate-100 pt-4">
-                <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
-                  {t('player.next')} →
-                </Link>
-              </div>
+              <StepFooter>
+                <NextLink topicId={topicId} kind={nextKind} primary />
+              </StepFooter>
             )}
             {SELF_COMPLETE_KINDS.has(data.kind) && (
-              <div className="flex flex-wrap items-center gap-3 border-t-2 border-slate-100 pt-4">
+              <StepFooter>
                 {data.status === 'completed' ? (
-                  <Badge tone="green">✓ {t('player.completed')}</Badge>
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-200/70">
+                    <Icon name="check" className="size-4" />
+                    {t('player.completed')}
+                  </span>
                 ) : (
                   <Button loading={complete.isPending} onClick={() => complete.mutate(step.id)}>
+                    {!complete.isPending && <Icon name="check" className="size-4" />}
                     {t('player.complete')}
                   </Button>
                 )}
-                {nextKind && (
-                  <Link to={`/app/topics/${topicId}/${nextKind}`} className={buttonClasses('secondary')}>
-                    {t('player.next')} →
-                  </Link>
-                )}
-              </div>
+                {nextKind && <NextLink topicId={topicId} kind={nextKind} primary={data.status === 'completed'} />}
+              </StepFooter>
             )}
           </div>
         )
@@ -110,13 +109,14 @@ function FileMaterials({ materials }: { materials: MaterialView[] }) {
                 aria-pressed={isSelected}
                 onClick={() => setSelectedId(material.id)}
                 className={cx(
-                  'rounded-xl border-2 px-3 py-1.5 text-sm font-semibold transition',
+                  'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition motion-reduce:transition-none',
                   isSelected
-                    ? 'border-brand-700 bg-brand-100 text-brand-900'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+                    ? 'bg-brand-50 text-brand-900 ring-2 ring-brand-600'
+                    : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-brand-300',
                   FOCUS_RING,
                 )}
               >
+                <Icon name="pdf" className="size-4" />
                 {material.title}
               </button>
             )
@@ -132,11 +132,12 @@ function FileMaterials({ materials }: { materials: MaterialView[] }) {
 
 function GlossaryList({ items }: { items: GlossaryTerm[] }) {
   return (
-    <dl className="grid gap-3">
+    <dl className="grid gap-3 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.id} className="rounded-xl border-2 border-slate-100 bg-white p-4">
-          <dt className="font-bold text-brand-900">{item.term}</dt>
-          <dd className="mt-1 text-slate-700">{item.definition}</dd>
+        <div key={item.id} className={cx(SURFACE_SM, 'relative overflow-hidden p-4 pl-5')}>
+          <span aria-hidden="true" className="absolute inset-y-3 left-0 w-1 rounded-r-full bg-gradient-to-b from-brand-400 to-brand-700" />
+          <dt className="font-bold tracking-tight text-brand-900">{item.term}</dt>
+          <dd className="mt-1 text-sm leading-relaxed text-pretty text-slate-700">{item.definition}</dd>
         </div>
       ))}
     </dl>
@@ -146,28 +147,62 @@ function GlossaryList({ items }: { items: GlossaryTerm[] }) {
 function LiteratureList({ items }: { items: LiteratureItem[] }) {
   const { t } = useTranslation()
   return (
-    <ol className="flex list-decimal flex-col gap-3 pl-6">
-      {items.map((item) => (
-        <li key={item.id} className="pl-1">
-          <span className="font-semibold">{item.title}</span>
-          {(item.author || item.year) && (
-            <span className="text-slate-600"> — {[item.author, item.year].filter(Boolean).join(', ')}</span>
-          )}
-          {item.url && (
-            <>
-              {' '}
+    <ol className="flex flex-col gap-3">
+      {items.map((item, index) => (
+        <li key={item.id} className={cx(SURFACE_SM, 'flex items-start gap-4 p-4')}>
+          <span
+            aria-hidden="true"
+            className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-sm font-bold text-brand-800 tabular-nums ring-1 ring-brand-200/70"
+          >
+            {index + 1}
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="font-semibold text-balance text-slate-900">{item.title}</span>
+            {(item.author || item.year) && (
+              <span className="text-sm text-slate-600">{[item.author, item.year].filter(Boolean).join(', ')}</span>
+            )}
+            {item.url && (
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-brand-700 hover:underline"
+                className={cx(
+                  'mt-1 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900 hover:underline',
+                  FOCUS_RING,
+                )}
               >
                 {t('player.openLink')}
+                <Icon name="externalLink" className="size-3.5" />
               </a>
-            </>
-          )}
+            )}
+          </span>
         </li>
       ))}
     </ol>
+  )
+}
+
+/** Bosqich ostidagi amallar paneli ("Tugatdim", "Keyingi bosqich"). */
+function StepFooter({ children }: { children: ReactNode }) {
+  return (
+    <div className={cx(SURFACE_SM, 'flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4')}>
+      {children}
+    </div>
+  )
+}
+
+function NextLink({ topicId, kind, primary = false }: { topicId: number; kind: StepKind; primary?: boolean }) {
+  const { t } = useTranslation()
+  return (
+    <Link
+      to={`/app/topics/${topicId}/${kind}`}
+      className={buttonClasses(primary ? 'primary' : 'secondary', 'md', 'group ml-auto')}
+    >
+      {t('player.next')}
+      <Icon
+        name="arrowRight"
+        className="size-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
+      />
+    </Link>
   )
 }

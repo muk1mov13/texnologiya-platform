@@ -34,8 +34,8 @@ export function PdfViewer({ url, title }: { url: string; title: string }) {
 
   return (
     <figure className="flex flex-col gap-3">
-      <figcaption className="font-semibold">{title}</figcaption>
-      <div ref={containerRef} className="min-h-40 overflow-hidden rounded-xl border-2 border-slate-100 bg-slate-100">
+      <figcaption className="font-semibold tracking-tight text-slate-900">{title}</figcaption>
+      <div ref={containerRef} className="min-h-40 overflow-hidden rounded-2xl bg-slate-100 shadow-soft ring-1 ring-slate-200/70">
         {!file ? (
           // Fon qayta so'rovi muvaffaqiyatsiz bo'lsa ham, avval yuklangan fayl (`file`) bo'lsa,
           // u ko'rsatilishda davom etadi — xato holati faqat ma'lumot umuman yo'q bo'lsa chiqadi.

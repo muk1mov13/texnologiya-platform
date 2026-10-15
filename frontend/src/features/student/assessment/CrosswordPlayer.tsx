@@ -134,9 +134,9 @@ export function CrosswordPlayer({ activity, pending, onSubmit }: CrosswordPlayer
                   onChange={(event) => onInput(key, event.target.value)}
                   onKeyDown={(event) => onKeyDown(key, event)}
                   className={cx(
-                    'size-full rounded-md border-2 p-0 text-center text-sm font-bold uppercase outline-none sm:text-base',
-                    'focus:border-brand-700',
-                    activeCells.includes(key) ? 'border-brand-500 bg-brand-50' : 'border-slate-300 bg-white',
+                    'size-full rounded-lg border-2 p-0 text-center text-sm font-bold text-slate-900 uppercase shadow-sm outline-none sm:text-base',
+                    'transition-colors focus:border-brand-700 focus:bg-white motion-reduce:transition-none',
+                    activeCells.includes(key) ? 'border-brand-400 bg-brand-50' : 'border-slate-200 bg-white',
                   )}
                 />
               </div>
@@ -146,8 +146,8 @@ export function CrosswordPlayer({ activity, pending, onSubmit }: CrosswordPlayer
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {(['across', 'down'] as const).map((direction) => (
-          <section key={direction}>
-            <h4 className="mb-2 font-semibold">{t(`crossword.${direction}`)}</h4>
+          <section key={direction} className="rounded-2xl bg-white p-4 shadow-soft ring-1 ring-slate-200/70">
+            <h4 className="mb-2 font-bold tracking-tight text-slate-900">{t(`crossword.${direction}`)}</h4>
             <ol className="flex flex-col gap-1">
               {words.map((word, index) =>
                 word.direction === direction ? (
@@ -159,9 +159,9 @@ export function CrosswordPlayer({ activity, pending, onSubmit }: CrosswordPlayer
                         focusCell(wordCells(word)[0])
                       }}
                       className={cx(
-                        'w-full rounded-lg px-2 py-1 text-left text-sm',
+                        'w-full rounded-lg px-2.5 py-1.5 text-left text-sm transition motion-reduce:transition-none',
                         FOCUS_RING,
-                        index === active ? 'bg-brand-100 font-semibold' : 'hover:bg-slate-50',
+                        index === active ? 'bg-brand-50 font-semibold text-brand-900 ring-1 ring-brand-200' : 'text-slate-700 hover:bg-slate-50',
                       )}
                     >
                       {word.number}. {word.clue} ({t('crossword.letters', { count: word.length })})

@@ -49,7 +49,7 @@ export function ChoicePlayer({ activity, pending, onSubmit }: ChoicePlayerProps)
             'statement' in item ? (
               <li
                 key={position}
-                className="flex flex-col gap-2 rounded-xl border-2 border-slate-100 bg-white p-4 sm:flex-row sm:items-center"
+                className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-soft ring-1 ring-slate-200/70 sm:flex-row sm:items-center"
               >
                 <p className="flex-1">{item.statement}</p>
                 <div className="flex gap-2" role="group" aria-label={item.statement}>
@@ -60,11 +60,11 @@ export function ChoicePlayer({ activity, pending, onSubmit }: ChoicePlayerProps)
                       aria-pressed={answers[position] === value}
                       onClick={() => setAnswer(position, value)}
                       className={cx(
-                        'rounded-xl border-2 px-4 py-1.5 text-sm font-semibold',
+                        'rounded-xl px-4 py-2 text-sm font-semibold transition motion-reduce:transition-none',
                         FOCUS_RING,
                         answers[position] === value
-                          ? 'border-brand-700 bg-brand-100 text-brand-900'
-                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+                          ? 'bg-brand-50 text-brand-900 ring-2 ring-brand-600'
+                          : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-brand-300',
                       )}
                     >
                       {value ? t('activity.yes') : t('activity.no')}
@@ -126,13 +126,16 @@ function QuizQuestion({ activity, index, answer, onAnswer }: QuizQuestionProps) 
       <legend className="mb-2 text-sm font-semibold text-slate-600">
         {t('activity.questionOf', { n: index + 1, total: activity.items.length })}
       </legend>
-      <p className="text-lg font-semibold">{item.text}</p>
+      <p className="text-lg font-semibold tracking-tight text-balance text-slate-900">{item.text}</p>
       {item.options.map((option, k) => (
         <label
           key={k}
           className={cx(
-            'flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3',
-            answer === k ? 'border-brand-700 bg-brand-50' : 'border-slate-200 bg-white hover:bg-slate-50',
+            'flex cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 transition motion-reduce:transition-none',
+            'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand-700',
+            answer === k
+              ? 'bg-brand-50 ring-2 ring-brand-600'
+              : 'bg-white shadow-soft ring-1 ring-slate-200 hover:ring-brand-300',
           )}
         >
           <input

@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 11: bosqich kontenti va faoliyatlar
+- `StepContent`: material tanlagich — PDF ikonkali chiplar (`ring` holatlari); lug'at — 2 ustunli kartalar (chapda gradient chiziq); adabiyotlar — raqamli kartalar, havola tashqi-havola ikonkasi bilan; pastda amallar paneli (`StepFooter`): "Tugatdim" belgi ikonkasi bilan, tugatilgan holat yashil yorliq, "Keyingi bosqich →" (bosqich tugagan bo'lsa asosiy tugma).
+- `ActivityList`: faoliyat turi SVG ikonkasi (emoji o'rniga), "Boshlash/Qayta" ikonkali, "Orqaga" ikonkali secondary tugma. `ChoicePlayer` (ha/yo'q va variantlar — `ring` tanlov holatlari, variantda klaviatura fokusi `has-[:focus-visible]`), `CrosswordPlayer` (katakchalar, ko'rsatmalar kartalarda), `AttemptResult`, `TaskStep`, `PdfViewer` — yangi sirtlar; mantiq o'zgarmadi.
+- `components/ui/styles.ts`: `SURFACE_SM`, `SURFACE_LINK_SM` (kichik radiusli sirtlar — `cx` bilan ikki `rounded-*` to'qnashmasligi uchun); `SubjectPage` mavzu kartasi shunga o'tdi.
+- Tekshiruv: lint, typecheck.
+
 ### Task 10: pleyer paneli va bosqichlar
 - `PlayerPage`: "orqaga" chip (fan nomi), chap panelda mavzu sarlavhasi + `ProgressRing` va `ProgressBar`; bosqichlar stepper'i — SVG ikonkali kvadratchalar (tugatilgan: gradient + belgi, joriy: brand halqa, qolganlar: kulrang), faol bosqichda chapda gradient chiziq (md+), mobilda avvalgidek gorizontal scroll.
 - Bosqich sarlavhasi: ikonka kvadrati + `text-2xl font-extrabold`; fokus/scroll mantiqi va `aria-current="step"` o'zgarmadi. Bo'sh holatlar SVG ikonkali.

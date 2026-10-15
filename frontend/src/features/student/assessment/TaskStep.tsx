@@ -29,7 +29,7 @@ export function TaskStep({ topicId, stepId, task, submission }: TaskStepProps) {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-3 p-5">
-        <h3 className="text-lg font-bold text-brand-900">{task.title}</h3>
+        <h3 className="text-lg font-bold tracking-tight text-slate-900">{task.title}</h3>
         <p className="whitespace-pre-line text-slate-700">{task.description}</p>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <Badge tone="brand">{t('task.maxScore', { score: task.max_score })}</Badge>
@@ -41,7 +41,7 @@ export function TaskStep({ topicId, stepId, task, submission }: TaskStepProps) {
           {overdue && <Badge tone="amber">{t('task.overdue')}</Badge>}
         </div>
         {task.rubric && (
-          <div className="rounded-xl bg-slate-50 p-3">
+          <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
             <p className="text-sm font-semibold text-slate-700">{t('task.rubric')}</p>
             <p className="mt-1 whitespace-pre-line text-sm text-slate-700">{task.rubric}</p>
           </div>
