@@ -243,25 +243,25 @@
       }
     },
     "how": {
-      "eyebrow": "Qanday ishlaydi",
-      "title": "To'rt qadamda boshlang",
-      "subtitle": "Ro'yxatdan o'tishdan birinchi XP gacha bir necha daqiqa",
+      "eyebrow": "Foydalanish tartibi",
+      "title": "Platformadan foydalanish bosqichlari",
+      "subtitle": "Ro'yxatdan o'tishdan o'quv jarayoniga qadar to'rt bosqich",
       "steps": {
         "register": {
-          "title": "Ro'yxatdan o'ting",
-          "text": "Ism, email va parol bilan bir daqiqada hisob yarating"
+          "title": "Ro'yxatdan o'tish",
+          "text": "Ism-sharif, elektron pochta manzili va parolni kiritib, shaxsiy hisob yarating."
         },
         "approve": {
-          "title": "Tasdiqni kuting",
-          "text": "Administrator hisobingizni tekshiradi va faollashtiradi"
+          "title": "Hisobning tasdiqlanishi",
+          "text": "Administrator ma'lumotlaringizni ko'rib chiqib, hisobingizni faollashtiradi."
         },
         "choose": {
-          "title": "Fan va mavzuni tanlang",
-          "text": "Kabinetda fanlaringiz va ulardagi mavzular ro'yxati turadi"
+          "title": "Fan va mavzuni tanlash",
+          "text": "Shaxsiy kabinetda sizga biriktirilgan fanlar va ularning mavzulari ro'yxati keltirilgan."
         },
         "learn": {
-          "title": "O'rganing va XP to'plang",
-          "text": "7 bosqichni o'ting, mashqlarni bajaring, nishonlarga ega bo'ling"
+          "title": "O'quv jarayoni",
+          "text": "Mavzuning 7 bosqichini o'zlashtiring, topshiriqlarni bajaring va natijalaringizni kuzatib boring."
         }
       }
     },

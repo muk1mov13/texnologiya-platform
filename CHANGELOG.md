@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — "Platformadan foydalanish bosqichlari" rasmiy uslubda
+
+- `i18n/uz.json`, `ru.json` (`home.how.*`): "To'rt qadamda boshlang" bo'limi matnlari rasmiy uslubga o'tkazildi — "Foydalanish tartibi", "Platformadan foydalanish bosqichlari"; bosqichlar: ro'yxatdan o'tish, hisobning tasdiqlanishi, fan va mavzuni tanlash, o'quv jarayoni.
+
 ## 2026-10-15 — Bosh sahifadagi kutubxona kartasi premium ko'rinishda
 
 - `features/public/home/ExploreSection.tsx`: kutubxona kartasi alohida `LibraryCard` — gradient ramka, yumshoq nur va katak fon, o'ng burchakda kitob javoni SVG bezagi, "Ochiq kutubxona" yorlig'i.
