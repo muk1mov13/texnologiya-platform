@@ -469,6 +469,7 @@
     "deleteLiteratureTitle": "Удаление источника",
     "detailsTitle": "Сведения о теме",
     "detailsNoSummary": "Краткое содержание не указано",
+    "topicsCount": "Тем: {{count}}",
     "studentView": "Вид студента",
     "prevTopic": "Предыдущая тема",
     "nextTopic": "Следующая тема",

@@ -105,7 +105,7 @@ function EditorHeader({ topic }: { topic: TopicEditor }) {
   return (
     <div className="flex flex-col gap-4">
       <Link
-        to="/teach"
+        to={`/teach?subject=${topic.subject_id}`}
         className={cx(
           'inline-flex w-fit items-center gap-1.5 rounded-lg text-sm font-semibold text-slate-500 transition-colors hover:text-brand-700 motion-reduce:transition-none',
           FOCUS_RING,

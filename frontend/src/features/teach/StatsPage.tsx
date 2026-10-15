@@ -1,12 +1,11 @@
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router'
+import { Link } from 'react-router'
 import { useTeachSubjects } from '@/api/teach'
 import { useTeachStats } from '@/api/teachAssessment'
-import type { TopicStats } from '@/api/types'
+import type { TeachSubject, TopicStats } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Select } from '@/components/ui/Field'
 import { QueryState } from '@/components/ui/QueryState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
@@ -14,55 +13,46 @@ import { PageHeader } from '@/features/admin/ui/PageHeader'
 import { Panel } from '@/features/admin/ui/Panel'
 import { StatCard } from '@/features/admin/ui/StatCard'
 import { cx, FOCUS_RING } from '@/lib/cx'
+import { useOpenSubject } from './openSubject'
 import { completionOf, percent, scoreTone, sortRows, summarize, type SortDir, type SortKey } from './statsSummary'
+import { SubjectAccordion } from './SubjectAccordion'
 
 /** O'qituvchi statistikasi: tanlangan fan mavzulari bo'yicha talabalar faolligi va natijasi. */
 export function StatsPage() {
   const { t } = useTranslation()
   const subjects = useTeachSubjects()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const list = subjects.data ?? []
-  // Tanlangan fan manzilda saqlanadi; noto'g'ri yoki yo'q bo'lsa, birinchi fan olinadi.
-  const subject = list.find((item) => String(item.id) === searchParams.get('subject')) ?? list[0]
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        icon="chart"
-        eyebrow={t('navGroups.learning')}
-        title={t('stats.title')}
-        subtitle={subject && list.length === 1 ? subject.title : t('stats.subtitle')}
-        actions={
-          subject &&
-          list.length > 1 && (
-            <div className="w-full sm:w-64">
-              <label htmlFor="stats-subject" className="sr-only">
-                {t('stats.subject')}
-              </label>
-              <Select
-                id="stats-subject"
-                value={subject.id}
-                onChange={(event) => setSearchParams({ subject: event.target.value }, { replace: true })}
-              >
-                {list.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.title}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          )
-        }
-      />
+      <PageHeader icon="chart" eyebrow={t('navGroups.learning')} title={t('stats.title')} subtitle={t('stats.subtitle')} />
       <QueryState query={subjects}>
         {(data) =>
-          data.length === 0 || !subject ? (
+          data.length === 0 ? (
             <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
           ) : (
-            <SubjectStats key={subject.id} subjectId={subject.id} />
+            <SubjectList subjects={data} />
           )
         }
       </QueryState>
+    </div>
+  )
+}
+
+/** Fanlar yig'ilgan holda; bosilgan fanning statistikasi ochiladi (yopiq fanlar so'ralmaydi). */
+function SubjectList({ subjects }: { subjects: TeachSubject[] }) {
+  const [openId, toggle] = useOpenSubject(subjects)
+  return (
+    <div className="flex flex-col gap-3">
+      {subjects.map((subject) => (
+        <SubjectAccordion
+          key={subject.id}
+          subject={subject}
+          open={openId === subject.id}
+          onToggle={() => toggle(subject.id)}
+        >
+          <SubjectStats subjectId={subject.id} />
+        </SubjectAccordion>
+      ))}
     </div>
   )
 }
@@ -73,7 +63,7 @@ function SubjectStats({ subjectId }: { subjectId: number }) {
   const summary = stats.data ? summarize(stats.data) : undefined
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 bg-slate-50/50 p-4 sm:p-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           icon="users"

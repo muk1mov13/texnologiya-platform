@@ -4,6 +4,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Fanlar yig'iladigan ro'yxatda (mavzular va statistika)
+
+- Yangi `features/teach/SubjectAccordion.tsx`: fan kartasi — sarlavha qatori (fan nomi, mavzular soni, nashr holati, `aria-expanded`) bosilganda ichidagi tarkib ochiladi; yopiq fanning tarkibi chizilmaydi (so'rov ham yuborilmaydi).
+- Yangi `features/teach/openSubject.ts` (`useOpenSubject`): bir vaqtda bitta fan ochiq, manzilda `?subject=<id>`; fan bitta bo'lsa doim ochiq.
+- `TeachHomePage`: fanlar yig'ilgan holda, mavzular fan bosilgandagina ochiladi (fan ko'p bo'lsa sahifa uzayib ketmaydi); ↑/↓/🗑️ belgilari SVG ikonkalarga almashdi.
+- `StatsPage`: fan tanlash (`Select`) o'rniga xuddi shu yig'iladigan ro'yxat — ochilgan fanda ko'rsatkichlar va mavzular jadvali.
+- `TopicEditorPage`: "Mavzular ro'yxati" havolasi `/teach?subject=<id>` — qaytganda shu fan ochiq turadi.
+- i18n: `teach.topicsCount` (uz/ru).
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Statistika qayta dizayni (2/2): mavzular jadvali
 
 - `StatsPage`: jadval ustun sarlavhasini bosib saralanadi (`aria-sort`; raqamli ustunlarda avval eng kattasi, `null` qiymatlar oxirida); "Tugatgan" ustunida son, foiz va ingichka progress chizig'i (`role=progressbar`); o'rtacha natija rangli belgi (80%+ yashil, 50–79% sariq, <50% qizil); tekshirilmagan javoblar bor bo'lsa `/teach/review` ga havola; mavzu nomi muharrirga olib boradi.

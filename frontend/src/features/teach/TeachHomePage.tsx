@@ -6,13 +6,15 @@ import { useTeachSummary } from '@/api/teachAssessment'
 import type { TeachSubject, TeachTopicBrief } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
+import { Icon } from '@/components/icons/Icon'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { PageHeader } from '@/features/admin/ui/PageHeader'
 import { cx, FOCUS_RING } from '@/lib/cx'
+import { useOpenSubject } from './openSubject'
+import { SubjectAccordion } from './SubjectAccordion'
 import { WeeklyReport } from './WeeklyReport'
 
 export function TeachHomePage() {
@@ -28,11 +30,30 @@ export function TeachHomePage() {
           {data.length === 0 ? (
             <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
           ) : (
-            data.map((subject) => <SubjectTopics key={subject.id} subject={subject} />)
+            <SubjectList subjects={data} />
           )}
         </div>
       )}
     </QueryState>
+  )
+}
+
+/** Fanlar yig'ilgan holda; bosilgan fanning mavzulari ochiladi (uzun sahifa bo'lmasin). */
+function SubjectList({ subjects }: { subjects: TeachSubject[] }) {
+  const [openId, toggle] = useOpenSubject(subjects)
+  return (
+    <div className="flex flex-col gap-3">
+      {subjects.map((subject) => (
+        <SubjectAccordion
+          key={subject.id}
+          subject={subject}
+          open={openId === subject.id}
+          onToggle={() => toggle(subject.id)}
+        >
+          <SubjectTopics subject={subject} />
+        </SubjectAccordion>
+      ))}
+    </div>
   )
 }
 
@@ -151,16 +172,12 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
   }
 
   return (
-    <Card className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-bold">{subject.title}</h2>
-        <PublishedBadge published={subject.is_published} />
-      </header>
+    <div className="flex flex-col gap-4 px-5 py-5 sm:px-6">
       <WeeklyReport subjectId={subject.id} />
       {topics.length === 0 ? (
         <p className="text-slate-500">{t('teach.noTopics')}</p>
       ) : (
-        <ol className="flex flex-col divide-y-2 divide-slate-100">
+        <ol className="flex flex-col divide-y divide-slate-100">
           {topics.map((topic, index) => (
             <li key={topic.id} className="flex flex-wrap items-center gap-2 py-2">
               <span className="w-6 text-sm font-bold text-slate-500">{index + 1}</span>
@@ -186,7 +203,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
                 className={reorder.isPending ? 'aria-disabled:pointer-events-none aria-disabled:opacity-60' : undefined}
                 onClick={() => move(index, -1)}
               >
-                ↑
+                <Icon name="arrowUp" className="size-4" />
               </Button>
               <Button
                 id={moveButtonId(topic.id, 'down')}
@@ -198,7 +215,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
                 className={reorder.isPending ? 'aria-disabled:pointer-events-none aria-disabled:opacity-60' : undefined}
                 onClick={() => move(index, 1)}
               >
-                ↓
+                <Icon name="arrowDown" className="size-4" />
               </Button>
               <Button
                 variant="ghost"
@@ -206,7 +223,7 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
                 aria-label={t('teach.deleteTopic', { title: topic.title })}
                 onClick={() => setToDelete(topic)}
               >
-                🗑️
+                <Icon name="trash" className="size-4" />
               </Button>
             </li>
           ))}
@@ -238,6 +255,6 @@ function SubjectTopics({ subject }: { subject: TeachSubject }) {
           if (toDelete) remove.mutate(toDelete.id, { onSuccess: () => setToDelete(null) })
         }}
       />
-    </Card>
+    </div>
   )
 }

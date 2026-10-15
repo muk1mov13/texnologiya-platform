@@ -469,6 +469,7 @@
     "deleteLiteratureTitle": "Adabiyotni o'chirish",
     "detailsTitle": "Mavzu ma'lumotlari",
     "detailsNoSummary": "Qisqacha mazmun kiritilmagan",
+    "topicsCount": "{{count}} ta mavzu",
     "studentView": "Talaba ko'rinishi",
     "prevTopic": "Oldingi mavzu",
     "nextTopic": "Keyingi mavzu",
