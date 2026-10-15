@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Mavzu muharriri qayta dizayni (3/3): mavzu ma'lumotlari paneli
+
+- `TopicDetailsForm`: sahifa tepasidagi katta forma o'rniga yig'iladigan panel (sarlavhada qisqacha mazmun, `aria-expanded`); yopiq holatda forma `hidden` bilan DOM'da qoladi. Ichida nom + mashg'ulot turi bir qatorda, nashr holati almashtirgich (switch) ko'rinishida; "Saqlash" faqat o'zgarish bo'lsa faol, "Bekor qilish" o'zgarishlarni qaytaradi, saqlangach forma yangi qiymatlar bilan tiklanadi.
+- i18n: `teach.detailsTitle`, `teach.detailsNoSummary` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Mavzu muharriri qayta dizayni (2/3): bosqichlar menyusi
 
 - Yangi `features/teach/StepNav.tsx`: 7 bosqich `role=tablist` menyusi — SVG ikonka, tartib raqami, elementlar soni; katta ekranda chapda yopishqoq vertikal ro'yxat, telefonda gorizontal suriladigan qator; ←↑/→↓ klaviatura bilan almashtirish.

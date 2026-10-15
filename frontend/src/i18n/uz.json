@@ -461,6 +461,8 @@
     "addLiterature": "Yangi adabiyot",
     "noLiterature": "Adabiyotlar ro'yxati hali bo'sh",
     "deleteLiteratureTitle": "Adabiyotni o'chirish",
+    "detailsTitle": "Mavzu ma'lumotlari",
+    "detailsNoSummary": "Qisqacha mazmun kiritilmagan",
     "studentView": "Talaba ko'rinishi",
     "prevTopic": "Oldingi mavzu",
     "nextTopic": "Keyingi mavzu",

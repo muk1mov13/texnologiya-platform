@@ -461,6 +461,8 @@
     "addLiterature": "Новый источник",
     "noLiterature": "Список литературы пока пуст",
     "deleteLiteratureTitle": "Удаление источника",
+    "detailsTitle": "Сведения о теме",
+    "detailsNoSummary": "Краткое содержание не указано",
     "studentView": "Вид студента",
     "prevTopic": "Предыдущая тема",
     "nextTopic": "Следующая тема",
