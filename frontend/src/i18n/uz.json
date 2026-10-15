@@ -990,6 +990,8 @@
     "deleteText": "\"{{title}}\" savoli o'chiriladi."
   },
   "adminMessages": {
+    "filter": "Xabarlar filtri",
+    "filterAll": "Hammasi",
     "title": "Xabarlar",
     "subtitle": "Saytdagi bog'lanish formasi orqali kelgan xabarlar.",
     "unreadOnly": "Faqat o'qilmaganlar",
@@ -1003,6 +1005,9 @@
     "deleteText": "{{name}} yuborgan xabar o'chiriladi."
   },
   "adminSite": {
+    "contactsHint": "Footer va \"Bog'lanish\" sahifasida ko'rinadi",
+    "socialsHint": "Footerdagi ikonkalar; bo'sh qoldirilsa ko'rsatilmaydi",
+    "aboutHint": "\"Biz haqimizda\" sahifasining matni (Markdown)",
     "title": "Sayt sozlamalari",
     "subtitle": "Footer va \"Bog'lanish\" sahifasidagi kontaktlar, ijtimoiy tarmoqlar va \"Biz haqimizda\" matni.",
     "contacts": "Kontaktlar",

@@ -2,22 +2,31 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDeleteMessage, useMessages, useUpdateMessage } from '@/api/adminCms'
 import type { ContactMessage } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Checkbox } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
-import { cx } from '@/lib/cx'
+import { Tabs } from '@/components/ui/Tabs'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { formatDateTime } from '@/lib/format'
+import { initials } from '@/lib/initials'
+import { DataList } from '../ui/DataList'
+import { ListSkeleton } from '../ui/ListSkeleton'
+import { PageHeader } from '../ui/PageHeader'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+type Filter = 'all' | 'unread'
+
 /** Kontakt email bo'lsa `mailto:`, telefon bo'lsa `tel:` havolasi. */
 function ContactLink({ value }: { value: string }) {
+  const linkClass = cx('inline-flex items-center gap-1.5 rounded text-brand-700 hover:underline', FOCUS_RING)
   if (EMAIL_RE.test(value)) {
     return (
-      <a href={`mailto:${value}`} className="break-all text-brand-700 hover:underline">
+      <a href={`mailto:${value}`} className={cx(linkClass, 'break-all')}>
+        <Icon name="mail" className="size-3.5 shrink-0" />
         {value}
       </a>
     )
@@ -25,7 +34,8 @@ function ContactLink({ value }: { value: string }) {
   const digits = value.replace(/[^\d+]/g, '')
   if (digits.length >= 7) {
     return (
-      <a href={`tel:${digits}`} className="text-brand-700 hover:underline">
+      <a href={`tel:${digits}`} className={cx(linkClass, 'tabular-nums')}>
+        <Icon name="phone" className="size-3.5 shrink-0" />
         {value}
       </a>
     )
@@ -33,37 +43,57 @@ function ContactLink({ value }: { value: string }) {
   return <span className="break-all">{value}</span>
 }
 
-function MessageCard({ message, onDelete }: { message: ContactMessage; onDelete: () => void }) {
+function MessageRow({ message, onDelete }: { message: ContactMessage; onDelete: () => void }) {
   const { t, i18n } = useTranslation()
   const update = useUpdateMessage()
+  const unread = !message.is_read
   return (
     <li
       className={cx(
-        'flex flex-col gap-3 rounded-2xl border-2 bg-white p-4',
-        message.is_read ? 'border-slate-100' : 'border-brand-200',
+        'relative flex gap-4 px-5 py-5 transition-colors motion-reduce:transition-none sm:px-6',
+        unread ? 'bg-brand-50/40 hover:bg-brand-50/70' : 'hover:bg-slate-50/70',
       )}
     >
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="font-bold break-words">{message.name}</span>
-        <ContactLink value={message.contact} />
-        {!message.is_read && <Badge tone="brand">{t('adminMessages.new')}</Badge>}
-        <span className="ml-auto text-sm text-slate-500">
-          {formatDateTime(message.created_at, i18n.language)}
-        </span>
-      </div>
-      <p className="whitespace-pre-line break-words text-slate-800">{message.message}</p>
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          loading={update.isPending}
-          onClick={() => update.mutate({ id: message.id, is_read: !message.is_read })}
-        >
-          {t(message.is_read ? 'adminMessages.markUnread' : 'adminMessages.markRead')}
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onDelete}>
-          {t('common.delete')}
-        </Button>
+      {/* O'qilmagan xabar chap chetida brand chiziq bilan ajraladi. */}
+      {unread && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-brand-500" />}
+      <span
+        aria-hidden="true"
+        className={cx(
+          'grid size-10 shrink-0 place-items-center rounded-xl text-sm font-bold ring-1',
+          unread ? 'bg-brand-600 text-white ring-brand-700/20' : 'bg-slate-100 text-slate-600 ring-slate-200/70',
+        )}
+      >
+        {initials(message.name)}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className={cx('break-words text-slate-900', unread ? 'font-bold' : 'font-semibold')}>
+            {message.name}
+          </span>
+          {unread && <Badge tone="brand">{t('adminMessages.new')}</Badge>}
+          <span className="ml-auto text-xs text-slate-500 tabular-nums">
+            {formatDateTime(message.created_at, i18n.language)}
+          </span>
+        </div>
+        <div className="text-sm">
+          <ContactLink value={message.contact} />
+        </div>
+        <p className="max-w-prose text-pretty whitespace-pre-line break-words text-slate-700">{message.message}</p>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={update.isPending}
+            onClick={() => update.mutate({ id: message.id, is_read: !message.is_read })}
+          >
+            {!update.isPending && <Icon name={unread ? 'check' : 'mail'} className="size-4" />}
+            {t(message.is_read ? 'adminMessages.markUnread' : 'adminMessages.markRead')}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onDelete}>
+            <Icon name="trash" className="size-4" />
+            {t('common.delete')}
+          </Button>
+        </div>
       </div>
     </li>
   )
@@ -71,34 +101,42 @@ function MessageCard({ message, onDelete }: { message: ContactMessage; onDelete:
 
 export function AdminMessagesPage() {
   const { t } = useTranslation()
-  const [unreadOnly, setUnreadOnly] = useState(false)
+  const [filter, setFilter] = useState<Filter>('all')
+  const unreadOnly = filter === 'unread'
   const query = useMessages(unreadOnly)
   const remove = useDeleteMessage()
   const [deleting, setDeleting] = useState<ContactMessage | null>(null)
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold">{t('adminMessages.title')}</h1>
-          <p className="text-slate-600">{t('adminMessages.subtitle')}</p>
-        </div>
-        <Checkbox
-          label={t('adminMessages.unreadOnly')}
-          checked={unreadOnly}
-          onChange={(event) => setUnreadOnly(event.target.checked)}
-        />
-      </div>
-      <QueryState query={query}>
+      <PageHeader
+        icon="inbox"
+        eyebrow={t('navGroups.site')}
+        title={t('adminMessages.title')}
+        subtitle={t('adminMessages.subtitle')}
+        actions={
+          <Tabs
+            variant="pill"
+            label={t('adminMessages.filter')}
+            value={filter}
+            onChange={setFilter}
+            items={[
+              { id: 'all', label: t('adminMessages.filterAll') },
+              { id: 'unread', label: t('adminMessages.unreadOnly') },
+            ]}
+          />
+        }
+      />
+      <QueryState query={query} loading={<ListSkeleton />}>
         {(messages) =>
           messages.length === 0 ? (
-            <EmptyState icon="✉️" title={t(unreadOnly ? 'adminMessages.noUnread' : 'adminMessages.empty')} />
+            <EmptyState icon="inbox" title={t(unreadOnly ? 'adminMessages.noUnread' : 'adminMessages.empty')} />
           ) : (
-            <ul className="flex flex-col gap-3">
+            <DataList>
               {messages.map((message) => (
-                <MessageCard key={message.id} message={message} onDelete={() => setDeleting(message)} />
+                <MessageRow key={message.id} message={message} onDelete={() => setDeleting(message)} />
               ))}
-            </ul>
+            </DataList>
           )
         }
       </QueryState>

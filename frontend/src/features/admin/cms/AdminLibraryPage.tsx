@@ -4,7 +4,6 @@ import { useDeleteDocument, useDeleteFolder, useSwapFolders } from '@/api/adminC
 import { documentFileUrl, useFolderTree } from '@/api/library'
 import type { FolderNode, LibraryDocument, LibrarySection } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
-import type { IconName } from '@/components/icons/paths'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/Modal'
@@ -12,6 +11,7 @@ import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { formatSize } from '@/lib/format'
+import { IconAction } from '../ui/IconAction'
 import { PageHeader } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
 import {
@@ -46,36 +46,6 @@ interface TreeActions {
   /** Ko'rinish tartibida: `upper` yuqoridagi, `lower` pastdagi qo'shni. */
   onSwap: (upper: FolderNode, lower: FolderNode) => void
   swapping: boolean
-}
-
-/** Daraxtdagi ixcham ikonka-tugma: nomi `aria-label` va hover'da `title`. */
-function IconAction({
-  icon,
-  label,
-  onClick,
-  disabled,
-}: {
-  icon: IconName
-  label: string
-  onClick: () => void
-  disabled?: boolean
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      disabled={disabled}
-      onClick={onClick}
-      className={cx(
-        'grid size-8 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-white hover:text-brand-700 hover:shadow-soft',
-        'disabled:pointer-events-none disabled:opacity-35 motion-reduce:transition-none',
-        FOCUS_RING,
-      )}
-    >
-      <Icon name={icon} className="size-4" />
-    </button>
-  )
 }
 
 function DocumentItem({ document, actions }: { document: LibraryDocument; actions: TreeActions }) {

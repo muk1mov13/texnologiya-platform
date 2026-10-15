@@ -5,13 +5,15 @@ import { useTranslation } from 'react-i18next'
 import { useAdminSite, useUpdateSite } from '@/api/adminCms'
 import type { SiteSettings, SiteSocials } from '@/api/types'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { Field, Input, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
 import { Markdown } from '@/components/ui/Markdown'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { pushToast } from '@/components/ui/toast-store'
+import { PageHeader } from '../ui/PageHeader'
+import { Panel } from '../ui/Panel'
 import {
   aboutSchema,
   contactsSchema,
@@ -52,16 +54,16 @@ function ContactsForm({ initial }: { initial: SiteSettings['contacts'] }) {
     >
       {update.error && <FormError error={update.error} />}
       <Field id="site-phone" label={t('adminSite.phone')} error={errors.phone?.message}>
-        <Input id="site-phone" type="tel" maxLength={50} {...register('phone')} />
+        <Input id="site-phone" type="tel" icon="phone" maxLength={50} {...register('phone')} />
       </Field>
       <Field id="site-email" label={t('adminSite.email')} error={errors.email?.message}>
-        <Input id="site-email" type="email" maxLength={150} {...register('email')} />
+        <Input id="site-email" type="email" icon="mail" maxLength={150} {...register('email')} />
       </Field>
       <Field id="site-address" label={t('adminSite.address')} error={errors.address?.message}>
-        <Input id="site-address" maxLength={300} {...register('address')} />
+        <Input id="site-address" icon="mapPin" maxLength={300} {...register('address')} />
       </Field>
       <Field id="site-hours" label={t('adminSite.hours')} error={errors.hours?.message}>
-        <Input id="site-hours" maxLength={100} {...register('hours')} />
+        <Input id="site-hours" icon="clock" maxLength={100} {...register('hours')} />
       </Field>
       <SaveButton pending={update.isPending} />
     </form>
@@ -87,7 +89,7 @@ function SocialsForm({ initial }: { initial: SiteSocials }) {
       {update.error && <FormError error={update.error} />}
       {SOCIALS.map((key) => (
         <Field key={key} id={`site-${key}`} label={t(`socials.${key}`)} error={errors[key]?.message}>
-          <Input id={`site-${key}`} type="url" placeholder="https://" maxLength={300} {...register(key)} />
+          <Input id={`site-${key}`} type="url" icon={key} placeholder="https://" maxLength={300} {...register(key)} />
         </Field>
       ))}
       <SaveButton pending={update.isPending} />
@@ -117,6 +119,7 @@ function AboutForm({ initial }: { initial: string }) {
       {update.error && <FormError error={update.error} />}
       <div>
         <Tabs
+          variant="pill"
           label={t('adminSite.about')}
           value={mode}
           onChange={setMode}
@@ -131,9 +134,9 @@ function AboutForm({ initial }: { initial: string }) {
               <Textarea id="site-about" rows={12} className="font-mono text-sm" {...register('about')} />
             </Field>
           ) : about.trim() ? (
-            <Markdown className="rounded-2xl border-2 border-slate-100 p-5">{about}</Markdown>
+            <Markdown className="min-h-48 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200/60">{about}</Markdown>
           ) : (
-            <p className="text-slate-500">{t('adminNews.previewEmpty')}</p>
+            <p className="py-10 text-center text-slate-500">{t('adminNews.previewEmpty')}</p>
           )}
         </TabPanel>
       </div>
@@ -147,27 +150,34 @@ export function AdminSitePage() {
   const query = useAdminSite()
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-extrabold">{t('adminSite.title')}</h1>
-        <p className="text-slate-600">{t('adminSite.subtitle')}</p>
-      </div>
-      <QueryState query={query}>
+      <PageHeader
+        icon="settings"
+        eyebrow={t('navGroups.site')}
+        title={t('adminSite.title')}
+        subtitle={t('adminSite.subtitle')}
+      />
+      <QueryState
+        query={query}
+        loading={
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Skeleton className="h-96 rounded-3xl" />
+            <Skeleton className="h-96 rounded-3xl" />
+          </div>
+        }
+      >
         {(site) => (
           <div className="flex flex-col gap-6">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card className="flex flex-col gap-4">
-                <h2 className="text-lg font-bold">{t('adminSite.contacts')}</h2>
+            <div className="grid items-start gap-6 lg:grid-cols-2">
+              <Panel title={t('adminSite.contacts')} description={t('adminSite.contactsHint')}>
                 <ContactsForm initial={site.contacts} />
-              </Card>
-              <Card className="flex flex-col gap-4">
-                <h2 className="text-lg font-bold">{t('footer.socials')}</h2>
+              </Panel>
+              <Panel title={t('footer.socials')} description={t('adminSite.socialsHint')}>
                 <SocialsForm initial={site.socials} />
-              </Card>
+              </Panel>
             </div>
-            <Card className="flex flex-col gap-4">
-              <h2 className="text-lg font-bold">{t('adminSite.about')}</h2>
+            <Panel title={t('adminSite.about')} description={t('adminSite.aboutHint')}>
               <AboutForm initial={site.about} />
-            </Card>
+            </Panel>
           </div>
         )}
       </QueryState>

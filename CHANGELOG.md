@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: savol-javob, xabarlar, sayt sozlamalari (9/9)
+
+- `AdminFaqPage`: `PageHeader`, `DataList` qatorlari tartib raqami belgisi, nuqtali holat, javobdan 2 qator; tartib/tahrir/o'chirish ixcham ikonka-tugmalar. Yuklanishda skelet.
+- `AdminMessagesPage`: pochta qutisi ko'rinishi — o'qilmagan xabar chap chetida brand chiziq, och fon va to'q bosh harf belgisi; kontakt email/telefon ikonkasi bilan; "Faqat o'qilmaganlar" belgilash qutisi o'rniga segment filtr (Hammasi / Faqat o'qilmaganlar).
+- `AdminSitePage`: bo'limlar izohli `Panel` larda, kontakt va ijtimoiy tarmoq maydonlari ikonkali, "Biz haqimizda" `Tabs pill` bilan; yuklanishda skelet.
+- `IconAction` `features/admin/ui/` ga ko'chirildi (kutubxona va savol-javob umumiy). CLAUDE.md da admin primitivlari qayd etildi. i18n: `adminMessages.filter/filterAll`, `adminSite.contactsHint/socialsHint/aboutHint` (uz/ru).
+- Shu bilan admin panel redizayni rejasi (9 vazifa) yakunlandi.
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Admin panel redizayni: kutubxona va kitoblar (8/9)
 
 - `AdminLibraryPage`: `PageHeader`, bo'limlar `Tabs pill`, daraxt `Panel` ichida. Emoji o'rniga ikonkalar (papka, PDF). Papka qatorida tartib, tahrirlash va o'chirish ixcham ikonka-tugmalar (nomi `aria-label`/`title`: "Tahrirlash: <nom>"), "+ Hujjat"/"+ Ichki papka" ikonkali; ichki daraja uzuq chiziq bilan.
