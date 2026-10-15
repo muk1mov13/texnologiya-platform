@@ -854,6 +854,8 @@
     "noBooksFound": "Hech narsa topilmadi"
   },
   "news": {
+    "eyebrow": "Institut hayoti",
+    "read": "O'qish",
     "title": "Yangiliklar",
     "description": "Institut va biologiya ta'limi yo'nalishi yangiliklari.",
     "empty": "Hozircha yangiliklar yo'q",

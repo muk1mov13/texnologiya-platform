@@ -49,7 +49,7 @@ export function NewsSection() {
             <m.div
               key={item.id}
               variants={fadeUp}
-              className="flex transition duration-300 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 [&>a]:flex-1 [&>a]:shadow-soft"
+              className="flex [&>a]:flex-1"
             >
               <NewsCard news={item} />
             </m.div>

@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Yangiliklar ro'yxati yangi dizaynda
+
+- `NewsListPage.tsx`: `PageHero` sarlavhasi; 1-sahifada eng yangi xabar katta gorizontal "featured" karta, qolganlari 3 ustunli grid (ketma-ket paydo bo'ladi); yuklanishda kartaga mos skelet.
+- `NewsCard.tsx`: `SURFACE_LINK` sirti, rasm hover'da sekin kattalashadi, sana rasm ustida chip, pastda "O'qish →"; muqovasiz yangilikda emoji o'rniga brand gradient + `news` ikonka; `featured` varianti.
+- `home/NewsSection.tsx`: karta o'z hover/soyasiga ega bo'lgani uchun o'ramdagi takroriy effekt olib tashlandi.
+- i18n (uz + ru): `news.eyebrow`, `news.read`.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Ochiq sahifalar uchun umumiy `PageHero`
 
 - Yangi `features/public/PageHero.tsx`: ichki ochiq sahifalar (yangiliklar, kutubxona, FAQ, biz haqimizda, bog'lanish) uchun sarlavha bloki — ikonli yorliq, katta sarlavha, izoh, ixtiyoriy yon ustun; fonda gradient, katak va xira bloblar (bosh sahifa hero'si uslubida, `motion-reduce` hisobga olinadi).
