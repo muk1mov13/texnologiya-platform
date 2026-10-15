@@ -17,6 +17,11 @@ Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradi
 - i18n `admin.users.pendingCount` (uz/ru).
 - Tekshiruv: lint, typecheck.
 
+### Task 3: bosh sahifada kutayotgan talabalar kartasi
+- `TeachHomePage`: admin uchun "Tasdiq kutayotgan talabalar: N ta" kartasi → `/admin/users` (o'qituvchi rolida so'rov yuborilmaydi); karta uslubi `NoticeLink` ga ajratildi, `PendingReviews` ham undan foydalanadi.
+- i18n `teach.pendingStudents` (uz/ru).
+- Tekshiruv: lint, typecheck, i18n kalitlar testi.
+
 ## 2026-10-15 — Bitta o'qituvchi = admin: soddalashtirish
 
 Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `admin` akkaunt). Backend o'zgarmaydi, faqat ortiqcha UI olib tashlanadi.

@@ -363,6 +363,7 @@
     "passwordChanged": "Parol almashtirildi. Yangi parol bilan qayta kiring"
   },
   "teach": {
+    "pendingStudents": "Tasdiq kutayotgan talabalar: {{count}} ta",
     "title": "Mavzu muharriri",
     "noSubjects": "Sizga hali fan biriktirilmagan",
     "noSubjectsText": "Administrator sizni fanga biriktirgach, mavzular shu yerda paydo bo'ladi",
