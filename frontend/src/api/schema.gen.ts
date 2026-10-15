@@ -618,6 +618,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/avatars/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Avatar File
+         * @description Profil rasmi (ochiq: `<img>` token yubora olmaydi, nom esa taxmin qilinmaydi).
+         */
+        get: operations["avatar_file_api_avatars__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/contact": {
         parameters: {
             query?: never;
@@ -818,6 +838,30 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload Avatar
+         * @description Profil rasmini yuklaydi yoki almashtiradi (JPG/PNG/WEBP, magic bytes tekshiriladi).
+         */
+        put: operations["upload_avatar_api_me_avatar_put"];
+        post?: never;
+        /**
+         * Delete Avatar
+         * @description Profil rasmini o'chiradi — standart avatar qaytadi.
+         */
+        delete: operations["delete_avatar_api_me_avatar_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1914,6 +1958,11 @@ export interface components {
             file?: string | null;
             /** Text */
             text?: string | null;
+        };
+        /** Body_upload_avatar_api_me_avatar_put */
+        Body_upload_avatar_api_me_avatar_put: {
+            /** File */
+            file: string;
         };
         /** Body_upload_book_api_teach_books_post */
         Body_upload_book_api_teach_books_post: {
@@ -3407,6 +3456,8 @@ export interface components {
         };
         /** UserOut */
         UserOut: {
+            /** Avatar Url */
+            avatar_url: string | null;
             /** Email */
             email: string;
             /** Full Name */
@@ -5044,6 +5095,35 @@ export interface operations {
             };
         };
     };
+    avatar_file_api_avatars__name__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     contact_form_api_contact_post: {
         parameters: {
             query?: never;
@@ -5398,6 +5478,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_avatar_api_me_avatar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_avatar_api_me_avatar_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_avatar_api_me_avatar_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
                 };
             };
         };

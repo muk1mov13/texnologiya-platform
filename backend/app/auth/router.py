@@ -1,7 +1,10 @@
+import re
+from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Request, Response
+from fastapi import APIRouter, Cookie, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
+from sqlalchemy import select
 
 from app.auth import service
 from app.auth.deps import CurrentUser
@@ -15,8 +18,9 @@ from app.auth.schemas import (
     UserOut,
 )
 from app.core.config import Settings
-from app.core.deps import AppSettings, DbSession, LoginLimiter
+from app.core.deps import AppSettings, AppStorage, DbSession, LoginLimiter
 from app.core.errors import AppError, error_body
+from app.core.files import ALLOWED_IMAGE_EXT, file_response, save_checked
 
 router = APIRouter(tags=["auth"])
 
@@ -144,3 +148,54 @@ async def update_me(data: MeUpdateIn, user: CurrentUser, db: DbSession) -> User:
 async def change_password(data: PasswordChangeIn, user: CurrentUser, db: DbSession) -> Response:
     await service.change_password(db, user, data.current_password, data.new_password)
     return Response(status_code=204)
+
+
+AVATAR_DIR = "avatars"
+# Storage nomlari: `uuid4().hex` + rasm kengaytmasi (`Storage._new_rel`).
+_AVATAR_NAME = re.compile(r"^[0-9a-f]{32}\.(?:jpg|jpeg|png|webp)$")
+
+
+@router.put("/me/avatar", response_model=UserOut)
+async def upload_avatar(
+    file: UploadFile, user: CurrentUser, db: DbSession, settings: AppSettings, storage: AppStorage
+) -> User:
+    """Profil rasmini yuklaydi yoki almashtiradi (JPG/PNG/WEBP, magic bytes tekshiriladi)."""
+    rel, _, _ = await save_checked(
+        storage, file, AVATAR_DIR, allowed_ext=ALLOWED_IMAGE_EXT, max_mb=settings.max_avatar_mb
+    )
+    old = user.avatar
+    user.avatar = rel
+    try:
+        await db.commit()
+    except Exception:
+        storage.delete_quietly([rel])
+        raise
+    storage.delete_quietly([old])
+    return user
+
+
+@router.delete("/me/avatar", response_model=UserOut)
+async def delete_avatar(user: CurrentUser, db: DbSession, storage: AppStorage) -> User:
+    """Profil rasmini o'chiradi — standart avatar qaytadi."""
+    old = user.avatar
+    user.avatar = None
+    await db.commit()
+    storage.delete_quietly([old])
+    return user
+
+
+@router.get("/avatars/{name}", response_class=Response)
+async def avatar_file(
+    name: str, db: DbSession, settings: AppSettings, storage: AppStorage
+) -> Response:
+    """Profil rasmi (ochiq: `<img>` token yubora olmaydi, nom esa taxmin qilinmaydi)."""
+    rel = f"{AVATAR_DIR}/{name}"
+    if (
+        not _AVATAR_NAME.match(name)
+        or await db.scalar(select(User.id).where(User.avatar == rel)) is None
+    ):
+        raise AppError(404, "AVATAR_NOT_FOUND", "Rasm topilmadi")
+    response = file_response(settings, storage, rel, f"avatar{Path(name).suffix}")
+    # Fayl nomi har yuklashda yangi, shuning uchun uzoq keshlash xavfsiz.
+    response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return response

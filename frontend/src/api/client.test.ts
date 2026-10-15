@@ -23,6 +23,7 @@ const session: TokenOut = {
     role: 'student',
     status: 'active',
     locale: 'uz',
+    avatar_url: null,
   },
 }
 

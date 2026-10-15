@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
+from pathlib import PurePosixPath
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -36,6 +37,15 @@ class User(IdMixin, CreatedAtMixin, Base):
     status: Mapped[UserStatus] = mapped_column(str_enum(UserStatus), default=UserStatus.pending)
     locale: Mapped[Locale] = mapped_column(str_enum(Locale), default=Locale.uz)
     last_seen_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # Profil rasmi: storage ichidagi nisbiy yo'l (`avatars/<uuid>.<ext>`); NULL — standart avatar.
+    avatar: Mapped[str | None] = mapped_column(String(500))
+
+    @property
+    def avatar_url(self) -> str | None:
+        """Ochiq URL: fayl nomi tasodifiy UUID, shuning uchun taxmin qilib bo'lmaydi."""
+        if self.avatar is None:
+            return None
+        return f"/api/avatars/{PurePosixPath(self.avatar).name}"
 
 
 class RefreshSession(IdMixin, CreatedAtMixin, Base):

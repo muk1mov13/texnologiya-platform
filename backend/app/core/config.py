@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     max_submission_mb: int = 20
     max_library_mb: int = 50
     max_cover_mb: int = 5
+    max_avatar_mb: int = 2
     contact_rate_limit: int = 5
     contact_rate_window_seconds: int = 3600
     # Sitemap va robots.txt dagi to'liq manzillar uchun (prod'da haqiqiy domen).

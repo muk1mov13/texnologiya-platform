@@ -18,6 +18,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     role: 'student',
     status: 'active',
     locale: 'uz',
+    avatar_url: null,
     ...overrides,
   }
 }

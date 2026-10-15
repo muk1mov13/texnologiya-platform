@@ -4,6 +4,16 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Profil rasmi (avatar) va profil kartasi
+
+Foydalanuvchi o'z rasmini yuklay oladi; rasm bo'lmasa har kimga o'ziga xos standart avatar chiziladi. Profil kartasi va maydonlari tuzatildi.
+
+### Task 1: backend — profil rasmi
+- `users.avatar` (storage'dagi nisbiy yo'l, NULL — standart avatar) va migratsiya `53dd6bb26442`; `User.avatar_url` (`/api/avatars/<uuid>.<ext>`), `UserOut.avatar_url`.
+- `PUT /api/me/avatar` (multipart `file`; JPG/PNG/WEBP, magic bytes, `MAX_AVATAR_MB`=2) — eski fayl commit'dan keyin o'chiriladi; `DELETE /api/me/avatar`; ochiq `GET /api/avatars/{name}` (nom UUID formatida tekshiriladi va bazada bo'lishi shart, `Cache-Control: immutable`).
+- Frontend: `schema.gen.ts` qayta yaratildi, `User.avatar_url`; test fixture'lariga `avatar_url: null`.
+- Tekshiruv: ruff, mypy, `alembic upgrade head`, `alembic check`, typecheck.
+
 ## 2026-10-15 — Talaba paneli: premium dizayn
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.

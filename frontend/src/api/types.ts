@@ -23,6 +23,8 @@ export interface User {
   role: Role
   status: UserStatus
   locale: Locale
+  /** Profil rasmi (ochiq URL) yoki `null` — standart avatar. */
+  avatar_url: string | null
 }
 
 export interface TokenOut {

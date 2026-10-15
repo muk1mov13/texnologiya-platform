@@ -27,6 +27,7 @@ class UserOut(BaseModel):
     role: Role
     status: UserStatus
     locale: Locale
+    avatar_url: str | None
 
 
 class TokenOut(BaseModel):
