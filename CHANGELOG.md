@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Kirish va ro'yxatdan o'tish: premium dizayn
+
+`/login` va `/register` bosh sahifa uslubidagi split-screen layoutga o'tadi (chapda to'q brand panel, o'ngda forma). Mantiq va backend o'zgarmaydi.
+
+### Task 1: yangi ikonkalar
+- `components/icons/paths.ts`: `lock`, `eye`, `eyeOff`.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
