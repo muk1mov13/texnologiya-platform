@@ -10,7 +10,7 @@ from app.cms.models import News
 from app.core.types import utcnow
 
 # Frontend'dagi ochiq marshrutlar (4B) bilan bir xil bo'lishi kerak.
-STATIC_PATHS = ("/", "/news", "/library", "/faq", "/about", "/contact")
+STATIC_PATHS = ("/", "/news", "/library", "/faq", "/about", "/contact", "/sitemap")
 PRIVATE_PREFIXES = ("/app", "/teach", "/admin", "/api", "/pending")
 SITEMAP_NEWS_LIMIT = 5000
 

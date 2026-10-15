@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Odamlar uchun sayt xaritasi sahifasi
+
+- Yangi `SitemapPage` (`/sitemap`): ochiq sahifalar guruhlab — asosiy sahifalar (bosh sahifa, biz haqimizda, savol-javob, bog'lanish), kutubxona va uning bo'limlari, platforma (kirish/ro'yxatdan o'tish yoki kabinet), yangiliklar ro'yxati va oxirgi 10 ta yangilik.
+- Footerdagi "Sayt xaritasi" endi xom XML (`/api/seo/sitemap.xml`) o'rniga shu sahifaga olib boradi; XML sitemap qidiruv tizimlari uchun `robots.txt` orqali qoladi.
+- `LIBRARY_TABS` footer'dan `paths.ts` ga ko'chirildi (footer va sayt xaritasi umumiy ishlatadi). Backend `seo.py: STATIC_PATHS` ga `/sitemap` qo'shildi. i18n: `sitemap.*` (uz/ru).
+- Tekshiruv: lint, typecheck, ruff.
+
 ## 2026-10-15 — Footer'dan so'nggi yangiliklar olib tashlandi
 
 - `SiteFooter`: "So'nggi yangiliklar" ustuni (3 ta yangilik) olib tashlandi, grid 4 ustunga o'tdi. Ishlatilmay qolgan `footer.latestNews` i18n kaliti (uz/ru) o'chirildi. "Bo'limlar" ustunidagi "Yangiliklar" havolasi qoldi.

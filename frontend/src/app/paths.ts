@@ -25,6 +25,9 @@ export const PUBLIC_NAV: NavItem[] = [
   { to: '/contact', label: 'nav.contact' },
 ]
 
+/** Kutubxona bo'limlari (`/library?tab=...`): footer va sayt xaritasi uchun. */
+export const LIBRARY_TABS = ['metodik', 'huquqiy', 'books'] as const
+
 export function navLinksFor(role: Role): NavItem[] {
   if (role === 'student') {
     // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.

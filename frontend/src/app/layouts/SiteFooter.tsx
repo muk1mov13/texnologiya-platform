@@ -6,11 +6,10 @@ import { useSite } from '@/api/cms'
 import type { SiteSocials } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { cx } from '@/lib/cx'
-import { homePathFor, PUBLIC_NAV } from '../paths'
+import { homePathFor, LIBRARY_TABS, PUBLIC_NAV } from '../paths'
 import { BrandLogo } from './BrandLogo'
 
 const SOCIALS: (keyof SiteSocials)[] = ['telegram', 'instagram', 'facebook', 'youtube']
-const LIBRARY_TABS = ['metodik', 'huquqiy', 'books'] as const
 
 interface FooterTheme {
   root: string
@@ -250,9 +249,9 @@ export function SiteFooter({ flush = false }: { flush?: boolean }) {
             <Link to="/contact" className={link}>
               {t('nav.contact')}
             </Link>
-            <a href="/api/seo/sitemap.xml" className={link}>
+            <Link to="/sitemap" className={link}>
               {t('footer.sitemap')}
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

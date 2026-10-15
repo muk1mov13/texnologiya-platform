@@ -818,6 +818,15 @@
     "more": "Javob topmadingizmi?",
     "contactLink": "Bizga yozing"
   },
+  "sitemap": {
+    "title": "Sayt xaritasi",
+    "description": "Saytning barcha ochiq sahifalari bir joyda.",
+    "main": "Asosiy sahifalar",
+    "home": "Bosh sahifa",
+    "libraryAll": "Butun kutubxona",
+    "newsAll": "Barcha yangiliklar",
+    "noNews": "Hozircha yangiliklar yo'q"
+  },
   "about": { "title": "Biz haqimizda", "empty": "Ma'lumot hozircha kiritilmagan" },
   "contact": {
     "title": "Bog'lanish",

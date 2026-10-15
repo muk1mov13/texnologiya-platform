@@ -21,6 +21,7 @@ import { NewsPage } from '@/features/public/NewsPage'
 import { NotFoundPage } from '@/features/public/NotFoundPage'
 import { PendingPage } from '@/features/public/PendingPage'
 import { RegisterPage } from '@/features/public/RegisterPage'
+import { SitemapPage } from '@/features/public/SitemapPage'
 import { AttemptDetailPage } from '@/features/student/AttemptDetailPage'
 import { PlayerPage } from '@/features/student/PlayerPage'
 import { ResultsPage } from '@/features/student/ResultsPage'
@@ -55,6 +56,7 @@ export const routes: RouteObject[] = [
       { path: 'faq', element: <FaqPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'contact', element: <ContactPage /> },
+      { path: 'sitemap', element: <SitemapPage /> },
       { path: 'pending', element: <PendingPage /> },
       {
         element: <RedirectIfAuthed />,
