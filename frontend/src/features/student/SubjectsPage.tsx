@@ -6,9 +6,11 @@ import { useContinue, useSubjects } from '@/api/student'
 import type { ContinueTarget, SubjectCard } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
-import { EYEBROW, SECTION_HEADING, SURFACE } from '@/components/ui/styles'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { EYEBROW, SECTION_HEADING, SURFACE, SURFACE_LINK } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
 import { greetingKey } from '@/lib/greeting'
@@ -118,45 +120,95 @@ function ContinueCard({ target }: { target: ContinueTarget }) {
 function SubjectList() {
   const { t } = useTranslation()
   const subjects = useSubjects()
+  // Birinchi yuklanishda spinner o'rniga kartalar shaklidagi skelet.
+  if (subjects.isPending) return <SubjectSkeletons />
   // Masalan, "Tugatdim" ['subjects']ni invalidatsiya qiladi; keyingi qayta so'rov 500 bo'lsa
   // ham ro'yxat ko'rinishda qoladi (QueryState).
   return (
     <QueryState query={subjects}>
       {(data) =>
         data.length === 0 ? (
-          <EmptyState icon="📚" title={t('student.noSubjects')} text={t('student.noSubjectsText')} />
+          <EmptyState icon="book" title={t('student.noSubjects')} text={t('student.noSubjectsText')} />
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data.map((subject) => (
-              <li key={subject.id}>
-                <SubjectTile subject={subject} />
-              </li>
+          <m.ul
+            initial="hidden"
+            animate="show"
+            variants={stagger(0.06)}
+            className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {data.map((subject, index) => (
+              <m.li key={subject.id} variants={fadeUp}>
+                <SubjectTile subject={subject} index={index} />
+              </m.li>
             ))}
-          </ul>
+          </m.ul>
         )
       }
     </QueryState>
   )
 }
 
-function SubjectTile({ subject }: { subject: SubjectCard }) {
+function SubjectSkeletons() {
+  return (
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {[0, 1, 2].map((key) => (
+        <div key={key} className={cx(SURFACE, 'flex flex-col overflow-hidden')}>
+          <Skeleton className="h-28 rounded-none" />
+          <div className="flex flex-col gap-3 p-5">
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="mt-2 h-2 w-full rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Fan kartalari banneri — bitta brand aksent ichida bir-biridan ajralib turadigan uch soya.
+const BANNERS = [
+  'from-brand-500 to-brand-800',
+  'from-brand-700 to-brand-950',
+  'from-brand-400 to-brand-700',
+]
+
+function SubjectTile({ subject, index }: { subject: SubjectCard; index: number }) {
   const { t } = useTranslation()
+  const { completed, total } = subject.progress
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0
   return (
     <Link
       to={`/app/subjects/${subject.slug}`}
-      className={cx(
-        'flex h-full items-start gap-4 rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-brand-200 hover:shadow-md',
-        FOCUS_RING,
-      )}
+      className={cx(SURFACE_LINK, 'group flex h-full flex-col overflow-hidden')}
     >
-      <span className="flex flex-1 flex-col gap-1">
-        <span className="text-lg font-bold">{subject.title}</span>
-        {subject.description && <span className="line-clamp-2 text-sm text-slate-600">{subject.description}</span>}
-        <span className="text-sm font-semibold text-slate-500">
-          {t('student.topicCount', { count: subject.topic_count })}
+      <span
+        aria-hidden="true"
+        className={cx('relative flex h-28 items-end overflow-hidden bg-gradient-to-br p-4', BANNERS[index % BANNERS.length])}
+      >
+        <span className="absolute inset-0 bg-grid opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+        <span className="absolute -right-3 -bottom-8 text-[7rem] leading-none font-extrabold text-white/10 transition-transform duration-500 group-hover:scale-110 motion-reduce:transition-none">
+          {subject.title.trim().charAt(0).toLocaleUpperCase()}
+        </span>
+        <span className="relative grid size-10 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/25 backdrop-blur">
+          <Icon name="book" className="size-5" />
         </span>
       </span>
-      <ProgressRing completed={subject.progress.completed} total={subject.progress.total} />
+      <span className="flex flex-1 flex-col gap-2 p-5">
+        <span className="flex items-start justify-between gap-3">
+          <span className="text-lg leading-snug font-bold tracking-tight text-balance text-slate-900">
+            {subject.title}
+          </span>
+          <ProgressRing completed={completed} total={total} size={44} />
+        </span>
+        {subject.description && <span className="line-clamp-2 text-sm text-slate-600">{subject.description}</span>}
+        <span className="mt-auto flex flex-col gap-2 pt-3">
+          <ProgressBar value={total > 0 ? completed / total : 0} />
+          <span className="flex items-center justify-between text-sm font-semibold text-slate-500">
+            <span>{t('student.topicCount', { count: subject.topic_count })}</span>
+            <span className="text-brand-800 tabular-nums">{percent}%</span>
+          </span>
+        </span>
+      </span>
     </Link>
   )
 }

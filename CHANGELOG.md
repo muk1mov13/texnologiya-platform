@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 8: fan kartalari
+- `SubjectsPage`: fan kartasi — gradient banner (brand soyalari, katak naqsh, katta bosh harf, kitob ikonkasi), sarlavha + `ProgressRing`, tavsif, pastda `ProgressBar`, mavzular soni va foiz; hover'da ko'tariladi (`SURFACE_LINK`). Ro'yxat `stagger` bilan ochiladi, birinchi yuklanishda skelet kartalar; bo'sh holat SVG ikonkali.
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 7: yutuqlar bento-bloki
 - `DashboardStats`: uchta bir xil karta o'rniga bento — seriya (olov ikonka, katta raqam, bugungi faollik nuqtasi, eng uzun seriya), XP (yulduz, katta `tabular-nums` raqam, izoh), nishonlar (ikki ustun kenglikda, `ProgressBar` olingan/jami, qulflanganlar xira + qulf belgisi). Ekran o'quvchi uchun to'liq matnlar va `aria-label`lar saqlandi.
 - i18n (uz/ru): `dashboard.streakLabel`, `dashboard.xpLabel`, `dashboard.xpHint`, `dashboard.badgesTitle`.
