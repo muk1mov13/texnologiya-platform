@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Gemini modellari yangilandi va so'rov timeout'i
+
+- `gemini-2.5-flash`/`-flash-lite` yangi kalitlar uchun 404 qaytaradi — default'lar (`config.py`, `.env.example`) `gemini-3.5-flash` / `gemini-3.5-flash-lite` ga o'tdi (ikkalasi ~2–3 s'da javob beradi; `gemini-3.8-flash` hozir 503/osilib qoladi).
+- `GeminiProvider`: `genai.Client` ga 60 s timeout (`GEMINI_TIMEOUT_MS`). Avval band model javobini cheksiz kutib qolar edi (`ai-check` 5 daqiqada ham tugamadi), endi timeout → qayta urinish → `AI_BUSY`/zaxira provayder.
+- Tekshiruv: ruff, mypy; `ai-check` — compat chat/fast, Gemini chat/fast, embedding hammasi OK.
+
 ## 2026-10-15 — `ai-check` CLI buyrug'i
 
 - Yangi `app/ai/check.py` va `python -m app.cli ai-check`: kaliti bor har bir provayder (compat chat/fast, Gemini chat/fast, embedding — Gemini yoki TEI) fallback'siz alohida tekshiriladi; har biri uchun OK/XATO, xato sababi va vaqt chiqadi. Prompt va javob matni chiqarilmaydi. Hammasi OK bo'lmasa chiqish kodi 1.

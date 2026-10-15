@@ -21,6 +21,8 @@ from app.ai.constants import EMBED_BATCH, EMBEDDING_DIM
 
 logger = logging.getLogger(__name__)
 
+GEMINI_TIMEOUT_MS = 60_000
+
 EmbedTask = Literal["document", "query"]
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
@@ -173,8 +175,12 @@ async def with_retry[T](call: Callable[[], Awaitable[T]]) -> T:
 class GeminiProvider:
     def __init__(self, api_key: str, embedding_model: str, limiter: TokenBucket) -> None:
         from google import genai
+        from google.genai import types
 
-        self._client = genai.Client(api_key=api_key)
+        # Timeout'siz band model (503) javobini daqiqalab kutib qolishi mumkin.
+        self._client = genai.Client(
+            api_key=api_key, http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_MS)
+        )
         self.model_name = embedding_model
         self._limiter = limiter
 

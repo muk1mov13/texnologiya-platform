@@ -37,8 +37,8 @@ class Settings(BaseSettings):
     # `gemini` — Google Gemini. Ikkinchisining kaliti bo'lsa, u zaxira bo'ladi.
     ai_provider: Literal["compat", "gemini", "fake"] = "gemini"
     gemini_api_key: str = ""
-    gemini_model_chat: str = "gemini-2.5-flash"
-    gemini_model_fast: str = "gemini-2.5-flash-lite"
+    gemini_model_chat: str = "gemini-3.5-flash"
+    gemini_model_fast: str = "gemini-3.5-flash-lite"
     gemini_embedding_model: str = "gemini-embedding-001"
     gemini_rpm: int = Field(default=10, ge=1)
     llm_base_url: str = "https://api.groq.com/openai/v1"
