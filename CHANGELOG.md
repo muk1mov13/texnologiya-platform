@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bosqich tablari qayta dizayni (1/3): materiallar
+
+- `MaterialsTab`: yuklash formasi sudrab tashlash (drag-and-drop) zonasiga aylandi — tanlangan fayl nomi va hajmi ko'rsatiladi, ruxsat etilmagan kengaytma tashlansa xabar chiqadi, nom maydoni bo'sh bo'lsa fayl nomidan to'ldiriladi. Materiallar `DataList`/`ListRow` qatorlarida (PDF ikonkasi, holat `Badge dot`, o'chirish `IconAction`), bo'sh holat — `EmptyBlock`.
+- `DataList`: `flat` varianti (panel ichida soyasiz); yangi `RowIcon` (qator ikonka plitkasi).
+- i18n: `teach.noMaterialsText`, `teach.addMaterial`, `teach.materialDrop`, `teach.materialWrongType` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Mavzu muharriri qayta dizayni (3/3): mavzu ma'lumotlari paneli
 
 - `TopicDetailsForm`: sahifa tepasidagi katta forma o'rniga yig'iladigan panel (sarlavhada qisqacha mazmun, `aria-expanded`); yopiq holatda forma `hidden` bilan DOM'da qoladi. Ichida nom + mashg'ulot turi bir qatorda, nashr holati almashtirgich (switch) ko'rinishida; "Saqlash" faqat o'zgarish bo'lsa faol, "Bekor qilish" o'zgarishlarni qaytaradi, saqlangach forma yangi qiymatlar bilan tiklanadi.
