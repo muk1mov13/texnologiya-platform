@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 9: fan sahifasi
+- `SubjectPage`: "orqaga" chip (`BACK_LINK`), hero (mavzular soni yorlig'i, katta sarlavha, tavsif, yuklab olish ikonkali "O'quv dasturi", tugatilgan mavzular halqasi); bir nechta mashg'ulot turi bo'lsa segment-filtr ("Barchasi" + turlar, `aria-pressed`), guruh sarlavhasida soni.
+- Mavzular yo'li: zig-zag o'rniga bog'langan vertikal timeline — tugun (tugatilgan: gradient belgi, boshlangan: brand halqa, boshlanmagan: kulrang raqam) va karta (yorliq, "Tugatilgan" belgisi, sarlavha, boshlanganlarda bosqichlar chizig'i, chevron).
+- i18n (uz/ru): `student.topicsDone`, `student.allTypes`, `student.lessonFilter`, `student.stepsDone`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 8: fan kartalari
 - `SubjectsPage`: fan kartasi — gradient banner (brand soyalari, katak naqsh, katta bosh harf, kitob ikonkasi), sarlavha + `ProgressRing`, tavsif, pastda `ProgressBar`, mavzular soni va foiz; hover'da ko'tariladi (`SURFACE_LINK`). Ro'yxat `stagger` bilan ochiladi, birinchi yuklanishda skelet kartalar; bo'sh holat SVG ikonkali.
 - Tekshiruv: lint, typecheck, build.
