@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Foydalanuvchi materiallarni o'zi tayyorladi: 2) va 7) uchun PDF, barcha matnli fayllar `.docx`. Avvalgi chala import natijasi (2 fan, 51 mavzu, 96 material, `media/` fayllari) lokal dev bazadan o'chirildi.
 
+### Task 3: test variantlarini aralashtirish
+- `assessment/options.py: option_order(user_id, question_id, n)`: har talaba va savol uchun deterministik tartib (saqlanmaydi; bazada o'qituvchi tartibi qoladi).
+- `views.activity_views`: variantlar talabaga shu tartibda; `attempts.grade(..., user_id)`: javob ko'rsatilgan tartibdagi indeks deb baholanadi, urinish `result`i (variantlar, `given`, `correct`) ham shu tartibda — natija sahifasi talaba ko'rgan tartibni ko'rsatadi. Frontend o'zgarmadi.
+- Sabab: import qilingan ko'p testlarda to'g'ri javob doim `A` edi.
+- `CLAUDE.md`: `attempts.py` bandi.
+- Tekshiruv: dev bazadagi 60 test × 2 foydalanuvchi — ko'rsatilgan tartib bo'yicha 1490/1490 to'g'ri, siljitilgan javoblar 0 ta to'g'ri; to'g'ri javob o'rni A/B/C/D: 355/399/352/384. ruff, mypy o'tdi.
+
 ### Task 2: import — tayyor PDF materiallar
 - `resource_parse.topic_files`: `2)`/`7)` raqamli `.pdf` `lecture_pdf`/`presentation_pdf` kalitlariga yoziladi (matn esa DOC/DOCX'dan o'qilishda davom etadi); `dastur` papkasida PDF DOC/DOCX'dan ustun.
 - `resource_import._add_material`: PDF manba konvertatsiyasiz darhol `ready` (sahifalar `count_pages`, buzilgan bo'lsa `failed`/`INVALID_PDF`), keyin AI indeksi; PDF bo'lmasa avvalgidek `convert_material_job`.

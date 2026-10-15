@@ -71,7 +71,7 @@ Local development needs no Docker, PostgreSQL or Redis. PPT/DOC → PDF conversi
 
 `app/assessment/` (phase 2) follows the same split:
 - `activities.py`: quiz, yes/no and crossword editing. An activity is saved whole: its items are replaced and the crossword grid is rebuilt by `crossword.py`, which holds pure, deterministic functions.
-- `attempts.py`: grading, plus completing `review`/`practice` steps.
+- `attempts.py`: grading, plus completing `review`/`practice` steps. Quiz options are shown to each student in their own order (`options.py: option_order(user_id, question_id, n)`, deterministic, never stored); the student view and `grade()` both use it, so answers are indexes in the shown order and the saved attempt `result` keeps that order. The DB keeps the teacher's order.
 - `tasks.py` and `review.py`: submissions and grading.
 - `views.py` and `reports.py`: student and teacher views.
 

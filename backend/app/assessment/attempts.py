@@ -13,6 +13,7 @@ from app.assessment.models import (
     QuizQuestion,
     YesNoItem,
 )
+from app.assessment.options import option_order
 from app.assessment.schemas import AttemptIn, AttemptOut, ResultItem
 from app.assessment.views import attempt_stats
 from app.auth.models import User
@@ -78,9 +79,10 @@ def _grade_crossword(
 
 
 def grade(
-    activity: Activity, items: list[ActivityItem], answers: list[Answer]
+    activity: Activity, items: list[ActivityItem], answers: list[Answer], user_id: int
 ) -> list[dict[str, Any]]:
-    """Har element bo'yicha natija (urinish ichida nusxa sifatida saqlanadi)."""
+    """Har element bo'yicha natija (urinish ichida nusxa sifatida saqlanadi). Test javobi —
+    talabaga ko'rsatilgan (aralashtirilgan) tartibdagi indeks; natija ham shu tartibda."""
     if activity.type == ActivityType.crossword:
         return _grade_crossword(activity, items, answers)
     if len(answers) != len(items):
@@ -88,17 +90,21 @@ def grade(
     result: list[dict[str, Any]] = []
     for item, answer in zip(items, answers, strict=True):
         if isinstance(item, QuizQuestion):
+            order = option_order(user_id, item.id, len(item.options))
             if answer is not None and (
-                isinstance(answer, bool) or not isinstance(answer, int) or not 0 <= answer <= 3
+                isinstance(answer, bool)
+                or not isinstance(answer, int)
+                or not 0 <= answer < len(order)
             ):
                 raise _invalid()
+            correct = order.index(item.correct_index)
             result.append(
                 {
                     "prompt": item.text,
-                    "options": list(item.options),
+                    "options": [item.options[index] for index in order],
                     "given": answer,
-                    "correct": item.correct_index,
-                    "is_correct": answer is not None and answer == item.correct_index,
+                    "correct": correct,
+                    "is_correct": answer is not None and answer == correct,
                     "explanation": item.explanation,
                 }
             )
@@ -152,7 +158,7 @@ async def submit_attempt(
 ) -> AttemptOut:
     activity, step, topic = await get_attemptable_activity(db, user, activity_id)
     items = (await load_items(db, [activity]))[activity.id]
-    result = grade(activity, items, data.answers)
+    result = grade(activity, items, data.answers, user.id)
     score = sum(1 for entry in result if entry["is_correct"])
     max_score = len(result)
     now = utcnow()

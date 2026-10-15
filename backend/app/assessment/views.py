@@ -17,6 +17,7 @@ from app.assessment.models import (
     Task,
     YesNoItem,
 )
+from app.assessment.options import option_order
 from app.assessment.view_schemas import (
     ActivityView,
     QuizItemView,
@@ -90,7 +91,9 @@ async def activity_views(db: AsyncSession, user_id: int, step_id: int) -> list[A
         clues: dict[int, str] = {}
         for item in items[activity.id]:
             if isinstance(item, QuizQuestion):
-                item_views.append(QuizItemView(text=item.text, options=list(item.options)))
+                order = option_order(user_id, item.id, len(item.options))
+                options = [item.options[index] for index in order]
+                item_views.append(QuizItemView(text=item.text, options=options))
             elif isinstance(item, YesNoItem):
                 item_views.append(YesNoItemView(statement=item.statement))
             else:
