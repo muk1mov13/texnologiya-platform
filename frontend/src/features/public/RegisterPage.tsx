@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { useRegister } from '@/api/auth'
@@ -21,13 +21,13 @@ export function RegisterPage() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors },
   } = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { full_name: '', email: '', phone: '', password: '', password_confirm: '' },
   })
-  const password = watch('password')
+  const password = useWatch({ control, name: 'password' })
 
   function onSubmit(values: RegisterValues) {
     registerUser.mutate(

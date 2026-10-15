@@ -30,6 +30,7 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - Maydonlarda ikonkalar (`user`, `mail`, `phone`), ikkala parolda `PasswordInput`, parol ostida `PasswordStrength`.
 - Tugma oldida "administrator tasdiqlaydi" eslatmasi; gradient tugma o'q bilan.
 - `authStyles.ts`: umumiy `AUTH_SUBMIT`, `AUTH_LINK`.
+- Tuzatish: parol kuchi uchun `watch()` o'rniga `useWatch` (React Compiler ogohlantirishi).
 - Tekshiruv: lint, typecheck.
 
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
