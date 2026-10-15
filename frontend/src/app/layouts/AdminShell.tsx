@@ -7,6 +7,7 @@ import { useMessages } from '@/api/adminCms'
 import { useTeachSummary } from '@/api/teachAssessment'
 import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Icon } from '@/components/icons/Icon'
+import { MicroscopeMark } from '@/components/icons/MicroscopeMark'
 import type { IconName } from '@/components/icons/paths'
 import { Avatar } from '@/components/ui/Avatar'
 import { cx } from '@/lib/cx'
@@ -225,18 +226,24 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
       />
 
       <div className={cx('flex h-14 shrink-0 items-center gap-3', collapsed ? 'justify-center px-3' : 'px-5')}>
-        <Link to="/admin" className={cx('flex min-w-0 items-center gap-3 rounded-xl', DARK_FOCUS)}>
-          <span
-            aria-hidden="true"
-            className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-300 via-brand-500 to-brand-700 text-white shadow-[0_0_0_1px_rgb(255_255_255/0.12)_inset,0_8px_24px_-6px_rgb(45_212_191/0.55)]"
-          >
-            <Icon name="layers" className="size-5" />
-          </span>
-          <span className={cx('min-w-0 leading-tight', collapsed && 'sr-only')}>
-            <span className="block truncate text-[0.95rem] font-extrabold tracking-tight text-white">
-              {t('app.name')}
+        {/* Logo "EDU [mikroskop]"; yig'ilgan menyuda faqat mikroskop belgisi. */}
+        <Link to="/admin" className={cx('group flex min-w-0 items-center gap-3 rounded-xl', DARK_FOCUS)}>
+          {collapsed && (
+            <span
+              aria-hidden="true"
+              className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/10 text-brand-100 ring-1 ring-white/15"
+            >
+              <MicroscopeMark className="h-7 w-auto" />
             </span>
-            <span className="block text-[0.7rem] font-semibold tracking-[0.14em] text-brand-300/80 uppercase">
+          )}
+          <span className={cx('min-w-0 leading-tight', collapsed && 'sr-only')}>
+            <span className="flex items-center gap-0.5">
+              <span className="text-[1.3rem] leading-none font-bold tracking-[0.06em] text-brand-300">
+                {t('app.name')}
+              </span>
+              <MicroscopeMark className="h-7 w-auto shrink-0 origin-bottom text-brand-100 transition-transform duration-300 group-hover:-rotate-6 motion-reduce:transition-none" />
+            </span>
+            <span className="block text-[0.65rem] font-semibold tracking-[0.14em] text-brand-300/80 uppercase">
               {t('adminShell.root')}
             </span>
           </span>

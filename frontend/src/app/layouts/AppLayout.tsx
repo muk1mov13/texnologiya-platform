@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { SPRING } from '@/lib/motion'
 import { homePathFor, navLinksFor } from '../paths'
+import { BrandLogo } from './BrandLogo'
 import { LanguageSwitch } from './LanguageSwitch'
 import { MobileMenu } from './MobileMenu'
 import { appNavClass } from './navClass'
@@ -30,20 +31,7 @@ export function AppLayout() {
       <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/75 backdrop-blur-xl">
         <div className="relative mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
           {/* Talaba va o'qituvchida logo bosh sahifaga (landing) olib boradi, adminda — o'z paneliga. */}
-          <Link
-            to={user.role === 'admin' ? homePathFor(user) : '/'}
-            className={cx('flex shrink-0 items-center gap-2.5 rounded-xl', FOCUS_RING)}
-          >
-            <span
-              aria-hidden="true"
-              className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-800 text-white shadow-glow-sm"
-            >
-              <Icon name="layers" className="size-5" />
-            </span>
-            <span className="sr-only text-lg font-extrabold tracking-tight text-slate-900 sm:not-sr-only">
-              {t('app.name')}
-            </span>
-          </Link>
+          <BrandLogo to={user.role === 'admin' ? homePathFor(user) : '/'} className="shrink-0" />
           <nav aria-label={t('nav.main')} className="hidden flex-1 justify-center lg:flex">
             <ul className="flex items-center gap-1 rounded-2xl bg-slate-100/70 p-1 ring-1 ring-slate-200/60">
               {links.map((item) => (

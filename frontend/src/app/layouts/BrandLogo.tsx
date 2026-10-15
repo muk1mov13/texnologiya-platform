@@ -1,40 +1,17 @@
 import { Link } from 'react-router'
+import { MicroscopeMark } from '@/components/icons/MicroscopeMark'
 import { cx, FOCUS_RING } from '@/lib/cx'
 
 interface BrandLogoProps {
-  /** `dark` — to'q fonda (footer): yozuv va belgi och rangda. */
+  /** `dark` — to'q fonda (footer, admin paneli): yozuv va belgi och rangda. */
   tone?: 'light' | 'dark'
+  /** Logo qayerga olib boradi (standart — bosh sahifa). */
+  to?: string
   className?: string
 }
 
-/** "EDU 🔬" logotipidagi mikroskop belgisi (chiziqli, `currentColor`). */
-function MicroscopeMark({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 32 40"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={className}
-    >
-      <g transform="rotate(-32 18 13)">
-        <rect x="15" y="1.5" width="6" height="3.5" rx="1" />
-        <rect x="14" y="5" width="8" height="13" rx="1.5" />
-        <path d="M16 18v3.5h4V18" />
-      </g>
-      <path d="M13.5 16.5C5.5 19 5 31 13 32.5" />
-      <path d="M13 32.5h7.5M17 28.5h13" />
-      <path d="M9 37.5h14" />
-      <path d="M14.5 32.5v5" />
-    </svg>
-  )
-}
-
-/** Ochiq sayt logotipi: "EDU [mikroskop]", bosh sahifaga olib boradi. */
-export function BrandLogo({ tone = 'light', className }: BrandLogoProps) {
+/** Loyiha logotipi: "EDU [mikroskop]". Ochiq sayt, talaba va admin panellarida bir xil. */
+export function BrandLogo({ tone = 'light', to = '/', className }: BrandLogoProps) {
   const dark = tone === 'dark'
   const word = cx(
     'text-[1.5rem] leading-none font-bold tracking-[0.06em]',
@@ -42,7 +19,7 @@ export function BrandLogo({ tone = 'light', className }: BrandLogoProps) {
   )
   return (
     <Link
-      to="/"
+      to={to}
       aria-label="EDU"
       className={cx('group inline-flex items-center gap-1 rounded-xl', FOCUS_RING, className)}
     >

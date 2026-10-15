@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — "EDU 🔬" logosi barcha panellarda
+
+- Yangi `components/icons/MicroscopeMark.tsx`: mikroskop belgisi umumiy komponent; `BrandLogo` undan foydalanadi va `to` propini oladi.
+- `AppLayout` (talaba/o'qituvchi paneli): "layers" ikonkali eski belgi va "Texnologiya" nomi o'rniga `BrandLogo` (EDU + mikroskop).
+- `AdminShell`: menyuda "EDU" yozuvi + mikroskop, ostida "Boshqaruv"; yig'ilgan menyuda faqat mikroskop belgisi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Qolgan "texnologik ta'lim" matnlari biologiyaga
 
 - `i18n/uz.json`, `ru.json`: footer mualliflik qatori, ro'yxatdan o'tish paneli matni (`auth.aside.registerText`, `institute`) va yangiliklar sahifasi tavsifi "Biologiya ta'limi" ga o'tkazildi. Endi tarjimalarda "texnologik ta'lim" qolmadi.
