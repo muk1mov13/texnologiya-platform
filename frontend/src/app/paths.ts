@@ -15,6 +15,8 @@ export interface NavItem {
   end?: boolean
   /** Ilova menyusidagi ikonka (ochiq sayt menyusi ikonkasiz). */
   icon?: IconName
+  /** `end` bo'lsa ham shu bilan boshlanadigan yo'llarda faol (masalan, `/teach` → mavzu tahriri). */
+  activePrefix?: string
 }
 
 /** Ochiq sayt menyusi (yo'llar backend `seo.py: STATIC_PATHS` bilan mos). Bosh sahifaga — logo orqali. */
@@ -68,6 +70,9 @@ export const ADMIN_NAV: NavGroup[] = [
   {
     label: 'navGroups.learning',
     items: [
+      { to: '/teach', label: 'nav.teach', end: true, icon: 'pencil', activePrefix: '/teach/topics' },
+      { to: '/teach/review', label: 'nav.review', icon: 'clipboard' },
+      { to: '/teach/stats', label: 'nav.stats', icon: 'chart' },
       { to: '/admin/subjects', label: 'nav.adminSubjects', icon: 'layers' },
       { to: '/admin/ai', label: 'nav.adminAi', icon: 'sparkles' },
     ],

@@ -882,7 +882,8 @@
     "collapse": "Свернуть меню",
     "expand": "Развернуть меню",
     "viewSite": "Открыть сайт",
-    "teachPanel": "Панель преподавателя",
+    "submission": "Ответ",
+    "reviewCount": "не проверено",
     "breadcrumb": "Навигационная цепочка"
   },
   "myBooks": {

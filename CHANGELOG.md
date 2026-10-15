@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (2/4): yon menyu
+
+- `ADMIN_NAV`: "O'quv jarayoni" guruhiga "Mavzu muharriri" (`/teach`), "Tekshirish" va "Statistika" qo'shildi.
+- `NavItem.activePrefix`: mavzu tahririda (`/teach/topics/:id`) ham "Mavzu muharriri" faol ko'rinadi; `SidebarLink` faollikni `matches()` dan oladi.
+- "Tekshirish" yonida tekshirilmagan javoblar soni (`useTeachSummary`).
+- Pastki havolalar: "O'qituvchi paneli" o'rniga "Talaba ko'rinishi" (`/app`). Breadcrumb: javob sahifasida "Javob".
+- i18n: `adminShell.teachPanel` o'chirildi, `adminShell.submission/reviewCount` qo'shildi (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (1/4): marshrutlar
 
 - Yangi `StaffLayout`: `/teach/*` sahifalari admin uchun `AdminShell` ichida, oddiy o'qituvchi uchun avvalgidek `AppLayout` da ochiladi. URL'lar o'zgarmadi.

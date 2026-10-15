@@ -1,9 +1,10 @@
 import { AnimatePresence, m } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 import { usePendingUsersCount } from '@/api/admin'
 import { useMessages } from '@/api/adminCms'
+import { useTeachSummary } from '@/api/teachAssessment'
 import { useCurrentUser, useLogoutAndRedirect } from '@/api/auth'
 import { Icon } from '@/components/icons/Icon'
 import type { IconName } from '@/components/icons/paths'
@@ -15,6 +16,7 @@ import { LanguageSwitch } from './LanguageSwitch'
 
 const MESSAGES_PATH = '/admin/messages'
 const USERS_PATH = '/admin/users'
+const REVIEW_PATH = '/teach/review'
 const COLLAPSED_KEY = 'admin.sidebar.collapsed'
 
 /** To'q fondagi klaviatura fokusi halqasi (`FOCUS_RING` oq fon uchun). */
@@ -37,11 +39,12 @@ function writeCollapsed(value: boolean) {
 }
 
 function matches(pathname: string, item: NavItem): boolean {
-  return pathname === item.to || (!item.end && pathname.startsWith(`${item.to}/`))
+  if (pathname === item.to || (!item.end && pathname.startsWith(`${item.to}/`))) return true
+  return item.activePrefix !== undefined && pathname.startsWith(`${item.activePrefix}/`)
 }
 
 /**
- * `/admin/*` uchun alohida karkas: `md` dan kengda chapda to'q, yig'iladigan menyu; tepada
+ * `/admin/*` va (admin uchun) `/teach/*` karkasi — o'qitish va boshqaruv bitta panelda: `md` dan kengda chapda to'q, yig'iladigan menyu; tepada
  * joylashuv (breadcrumb) va til; telefonda menyu chapdan chiquvchi panelda ochiladi.
  */
 export function AdminShell() {
@@ -118,7 +121,13 @@ function Breadcrumb({ groupLabel, current, pathname }: BreadcrumbProps) {
   const { t } = useTranslation()
   // Bo'lim sahifasidan chuqurroq (masalan, `/admin/news/12`) — uchinchi daraja.
   const nested = current && pathname !== current.to
-  const leaf = nested ? (pathname.endsWith('/new') ? t('adminNews.new') : t('common.edit')) : null
+  const leaf = !nested
+    ? null
+    : pathname.endsWith('/new')
+      ? t('adminNews.new')
+      : current.to === REVIEW_PATH
+        ? t('adminShell.submission')
+        : t('common.edit')
 
   return (
     <nav aria-label={t('adminShell.breadcrumb')} className="min-w-0">
@@ -178,15 +187,24 @@ interface SidebarProps {
 /** Menyu tarkibi: kompyuterdagi yon panel va telefondagi chiquvchi panel uchun umumiy. */
 function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
   const { t } = useTranslation()
+  const { pathname } = useLocation()
   const user = useCurrentUser()
   const logout = useLogoutAndRedirect()
   // O'qilmagan bog'lanish xabarlari "Xabarlar" yonida, tasdiq kutayotgan talabalar
-  // "Foydalanuvchilar" yonida ko'rsatiladi.
+  // "Foydalanuvchilar" yonida, tekshirilmagan javoblar "Tekshirish" yonida ko'rsatiladi.
   const unread = useMessages(true).data?.length ?? 0
   const pendingUsers = usePendingUsersCount()
-  const countFor = (to: string) => (to === MESSAGES_PATH ? unread : to === USERS_PATH ? pendingUsers : 0)
-  const countLabel = (to: string) =>
-    to === USERS_PATH ? t('admin.users.pendingCount') : t('adminMessages.unreadCount')
+  const pendingReviews = useTeachSummary().data?.pending_submissions ?? 0
+  const counts: Record<string, number> = {
+    [MESSAGES_PATH]: unread,
+    [USERS_PATH]: pendingUsers,
+    [REVIEW_PATH]: pendingReviews,
+  }
+  const countLabels: Record<string, string> = {
+    [MESSAGES_PATH]: t('adminMessages.unreadCount'),
+    [USERS_PATH]: t('admin.users.pendingCount'),
+    [REVIEW_PATH]: t('adminShell.reviewCount'),
+  }
   const pillId = onClose ? 'admin-drawer-pill' : 'admin-nav-pill'
 
   return (
@@ -249,10 +267,11 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
               <SidebarLink
                 key={item.to}
                 item={item}
+                active={matches(pathname, item)}
                 collapsed={collapsed}
                 pillId={pillId}
-                count={countFor(item.to)}
-                countLabel={countLabel(item.to)}
+                count={counts[item.to] ?? 0}
+                countLabel={countLabels[item.to] ?? ''}
                 onNavigate={onClose}
               />
             ))}
@@ -263,7 +282,7 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
       <div className="flex shrink-0 flex-col gap-2 border-t border-white/10 px-3 py-2.5">
         {/* Qo'shimcha havolalar: yoyilganda ikonka + yozuv, yig'ilganda faqat ikonka. */}
         <div className={cx('flex flex-col gap-0.5', collapsed && 'items-center')}>
-          <FooterLink to="/teach" icon="pencil" label={t('adminShell.teachPanel')} collapsed={collapsed} />
+          <FooterLink to="/app" icon="user" label={t('nav.studentView')} collapsed={collapsed} />
           <div className={cx('flex items-center gap-1', collapsed && 'flex-col gap-0.5')}>
             <FooterLink to="/" icon="globe" label={t('adminShell.viewSite')} collapsed={collapsed} />
             {onToggle && (
@@ -322,6 +341,8 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
 
 interface SidebarLinkProps {
   item: NavItem
+  /** `matches()` natijasi: `activePrefix` ni ham hisobga oladi (oddiy `NavLink` buni bilmaydi). */
+  active: boolean
   collapsed: boolean
   pillId: string
   count: number
@@ -329,62 +350,56 @@ interface SidebarLinkProps {
   onNavigate?: () => void
 }
 
-function SidebarLink({ item, collapsed, pillId, count, countLabel, onNavigate }: SidebarLinkProps) {
+function SidebarLink({ item, active, collapsed, pillId, count, countLabel, onNavigate }: SidebarLinkProps) {
   const { t } = useTranslation()
   const label = t(item.label)
   return (
-    <NavLink
+    <Link
       to={item.to}
-      end={item.end}
       onClick={onNavigate}
       title={collapsed ? label : undefined}
-      className={({ isActive }) =>
-        cx(
-          'group relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors motion-reduce:transition-none',
-          collapsed && 'justify-center',
-          isActive ? 'text-white' : 'text-brand-100/70 hover:bg-white/5 hover:text-white',
-          DARK_FOCUS,
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          {isActive && (
-            <m.span
-              layoutId={pillId}
-              transition={SPRING}
-              aria-hidden="true"
-              className="absolute inset-0 rounded-xl bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] ring-1 ring-white/10"
-            >
-              <span className="absolute top-1/2 -left-3 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand-300 shadow-[0_0_12px_rgb(94_234_212/0.8)]" />
-            </m.span>
-          )}
-          <span className="relative">
-            {item.icon && (
-              <Icon
-                name={item.icon}
-                className={cx('size-[1.15rem] shrink-0', isActive ? 'text-brand-300' : 'text-brand-200/60 group-hover:text-brand-200')}
-              />
-            )}
-            {collapsed && count > 0 && (
-              <span aria-hidden="true" className="absolute -top-1 -right-1 size-2 rounded-full bg-brand-300 ring-2 ring-brand-950" />
-            )}
-          </span>
-          <span className={cx('relative min-w-0 flex-1 truncate', collapsed && 'sr-only')}>{label}</span>
-          {count > 0 && (
-            <span
-              className={cx(
-                'relative min-w-5 rounded-md bg-brand-300 px-1.5 py-px text-center text-[0.7rem] font-bold text-brand-950 tabular-nums',
-                collapsed && 'sr-only',
-              )}
-            >
-              {count}
-              <span className="sr-only"> {countLabel}</span>
-            </span>
-          )}
-        </>
+      aria-current={active ? 'page' : undefined}
+      className={cx(
+        'group relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors motion-reduce:transition-none',
+        collapsed && 'justify-center',
+        active ? 'text-white' : 'text-brand-100/70 hover:bg-white/5 hover:text-white',
+        DARK_FOCUS,
       )}
-    </NavLink>
+    >
+      {active && (
+        <m.span
+          layoutId={pillId}
+          transition={SPRING}
+          aria-hidden="true"
+          className="absolute inset-0 rounded-xl bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] ring-1 ring-white/10"
+        >
+          <span className="absolute top-1/2 -left-3 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand-300 shadow-[0_0_12px_rgb(94_234_212/0.8)]" />
+        </m.span>
+      )}
+      <span className="relative">
+        {item.icon && (
+          <Icon
+            name={item.icon}
+            className={cx('size-[1.15rem] shrink-0', active ? 'text-brand-300' : 'text-brand-200/60 group-hover:text-brand-200')}
+          />
+        )}
+        {collapsed && count > 0 && (
+          <span aria-hidden="true" className="absolute -top-1 -right-1 size-2 rounded-full bg-brand-300 ring-2 ring-brand-950" />
+        )}
+      </span>
+      <span className={cx('relative min-w-0 flex-1 truncate', collapsed && 'sr-only')}>{label}</span>
+      {count > 0 && (
+        <span
+          className={cx(
+            'relative min-w-5 rounded-md bg-brand-300 px-1.5 py-px text-center text-[0.7rem] font-bold text-brand-950 tabular-nums',
+            collapsed && 'sr-only',
+          )}
+        >
+          {count}
+          <span className="sr-only"> {countLabel}</span>
+        </span>
+      )}
+    </Link>
   )
 }
 
