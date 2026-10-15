@@ -5,7 +5,7 @@ import type { IconName } from '@/components/icons/paths'
 import { Reveal } from '@/components/motion/Reveal'
 import { cx } from '@/lib/cx'
 import { stagger, VIEWPORT_ONCE } from '@/lib/motion'
-import { SpotlightCard } from './SpotlightCard'
+import { SpotlightCard } from '@/components/ui/SpotlightCard'
 import { EYEBROW, SECTION_TITLE } from './styles'
 
 const STEPS = ['review', 'lecture', 'presentation', 'practice', 'task', 'glossary', 'literature'] as const

@@ -15,9 +15,8 @@ export const CTA_SECONDARY = cx(
   FOCUS_RING,
 )
 
-/** Bo'lim sarlavhasi ustidagi kichik yorliq ("eyebrow"). */
-export const EYEBROW =
-  'inline-flex items-center gap-2 rounded-full bg-brand-100/70 px-3 py-1 text-xs font-bold tracking-wider text-brand-800 uppercase'
+/** Bo'lim sarlavhasi ustidagi kichik yorliq ("eyebrow") — ilova bilan umumiy. */
+export { EYEBROW } from '@/components/ui/styles'
 
 export const SECTION_TITLE = 'text-3xl font-extrabold tracking-tight text-balance text-slate-900 sm:text-4xl'
 

@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 4: umumiy uslublar
+- Yangi `components/ui/styles.ts`: `SURFACE`, `SURFACE_LINK`, `PAGE_TITLE`, `SECTION_HEADING`, `EYEBROW`, `BACK_LINK`; `home/styles.ts` `EYEBROW`ni shu yerdan qayta eksport qiladi.
+- `SpotlightCard` `features/public/home/` dan `components/ui/` ga ko'chirildi (ilova ham ishlatadi).
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 3: progress halqasi va chizig'i
 - `ProgressRing`: gradient chiziq (`useId` bilan alohida gradient), kulrang iz, `tabular-nums`; 100% bo'lsa raqam o'rniga belgi (aria-label o'zgarmaydi).
 - Yangi `ProgressBar` (gradient, `label` berilsa `role="progressbar"`, aks holda bezak).
