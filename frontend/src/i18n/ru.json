@@ -299,6 +299,9 @@
     "fullName": "Имя и фамилия",
     "phone": "Телефон",
     "phoneHint": "Необязательно",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "strength": { "weak": "Слабый", "fair": "Средний", "good": "Хороший", "strong": "Надёжный" },
     "login": { "title": "Вход", "submit": "Войти", "noAccount": "Нет аккаунта?" },
     "register": { "title": "Регистрация", "submit": "Зарегистрироваться", "haveAccount": "Уже есть аккаунт?" }
   },

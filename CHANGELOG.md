@@ -12,6 +12,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - `components/icons/paths.ts`: `lock`, `eye`, `eyeOff`.
 - Tekshiruv: lint, typecheck.
 
+### Task 2: ikonkali maydon, parol maydoni va kuch ko'rsatkichi
+- `Field.tsx`: `Input` ixtiyoriy `icon` (chapda) va `trailing` (o'ngda) oladi; ularsiz avvalgidek.
+- `PasswordInput`: qulf ikonka + ko'rsatish/yashirish tugmasi (`aria-pressed`).
+- `lib/passwordStrength.ts` (0–4 ball, faqat ko'rsatish uchun) va `PasswordStrength` (4 segment, `aria-live`).
+- i18n `auth.showPassword`, `auth.hidePassword`, `auth.strength.*` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).

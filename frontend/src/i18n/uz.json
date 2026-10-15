@@ -299,6 +299,9 @@
     "fullName": "To'liq ism",
     "phone": "Telefon",
     "phoneHint": "Ixtiyoriy",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
+    "strength": { "weak": "Zaif", "fair": "O'rtacha", "good": "Yaxshi", "strong": "Kuchli" },
     "login": { "title": "Kirish", "submit": "Kirish", "noAccount": "Akkauntingiz yo'qmi?" },
     "register": { "title": "Ro'yxatdan o'tish", "submit": "Ro'yxatdan o'tish", "haveAccount": "Akkauntingiz bormi?" }
   },

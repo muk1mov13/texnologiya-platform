@@ -1,5 +1,7 @@
 import { createContext, useContext, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Icon } from '@/components/icons/Icon'
+import type { IconName } from '@/components/icons/paths'
 import { cx } from '@/lib/cx'
 
 const CONTROL =
@@ -47,20 +49,42 @@ export function Field({ id, label, error, hint, children }: FieldProps) {
   )
 }
 
+interface InputProps extends ComponentProps<'input'> {
+  /** Chap tomondagi bezak ikonka. */
+  icon?: IconName
+  /** O'ng tomondagi element (masalan, parolni ko'rsatish tugmasi). */
+  trailing?: ReactNode
+}
+
 export function Input({
   className,
+  icon,
+  trailing,
   'aria-describedby': describedBy,
   'aria-invalid': invalid,
   ...rest
-}: ComponentProps<'input'>) {
+}: InputProps) {
   const field = useContext(FieldContext)
-  return (
+  const input = (
     <input
-      className={cx(CONTROL, className)}
+      className={cx(CONTROL, icon && 'pl-10', trailing != null && 'pr-11', className)}
       aria-describedby={describedBy ?? field?.describedBy}
       aria-invalid={invalid ?? (field?.invalid ? true : undefined)}
       {...rest}
     />
+  )
+  if (!icon && trailing == null) return input
+  return (
+    <div className="group/input relative">
+      {icon && (
+        <Icon
+          name={icon}
+          className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within/input:text-brand-600"
+        />
+      )}
+      {input}
+      {trailing != null && <div className="absolute inset-y-0 right-1.5 flex items-center">{trailing}</div>}
+    </div>
   )
 }
 
