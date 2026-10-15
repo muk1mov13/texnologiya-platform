@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 3: progress halqasi va chizig'i
+- `ProgressRing`: gradient chiziq (`useId` bilan alohida gradient), kulrang iz, `tabular-nums`; 100% bo'lsa raqam o'rniga belgi (aria-label o'zgarmaydi).
+- Yangi `ProgressBar` (gradient, `label` berilsa `role="progressbar"`, aks holda bezak).
+- Tekshiruv: lint, typecheck.
+
 ### Task 2: UI primitivlar premium uslubda
 - `Card`: `rounded-3xl`, `shadow-soft`, `ring-1` (border-2 o'rniga) — barcha sahifalarda.
 - `button-classes.ts`: primary — gradient + `shadow-glow-sm` (yangi `@theme` soya), secondary — `ring-1` + `shadow-soft`, danger — `red-600` (AA kontrast), bosilganda `scale(0.98)`; border olib tashlandi, padding moslandi.
