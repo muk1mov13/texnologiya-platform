@@ -887,8 +887,18 @@
     "newsAll": "Barcha yangiliklar",
     "noNews": "Hozircha yangiliklar yo'q"
   },
-  "about": { "title": "Biz haqimizda", "empty": "Ma'lumot hozircha kiritilmagan" },
+  "about": {
+    "eyebrow": "Institut haqida",
+    "title": "Biz haqimizda",
+    "subtitle": "Buxoro davlat pedagogika instituti biologiya ta'limi yo'nalishining metodik platformasi: maqsadimiz, yo'nalishimiz va jamoamiz.",
+    "quickLinks": "Tezkor havolalar",
+    "empty": "Ma'lumot hozircha kiritilmagan"
+  },
   "contact": {
+    "phone": "Telefon",
+    "email": "Email",
+    "address": "Manzil",
+    "hours": "Ish vaqti",
     "title": "Bog'lanish",
     "description": "Savol yoki taklifingizni yozing — javobni ko'rsatgan email yoki telefoningizga beramiz.",
     "info": "Kontaktlar",

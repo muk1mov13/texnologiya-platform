@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — "Biz haqimizda" sahifasi yangi dizaynda
+
+- `AboutPage.tsx`: `PageHero` (yorliq va izoh bilan); CMS matni oq kartada, o'qishga qulay kenglikda; o'ngda sticky "Tezkor havolalar" (Kutubxona, Yangiliklar, Savol-javob, Bog'lanish — ikonkali kartalar); yuklanishda skelet, bo'sh holatda `users` ikonkasi.
+- i18n (uz + ru): `about.eyebrow`, `about.subtitle`, `about.quickLinks`; `about` obyekti ko'p qatorli ko'rinishga o'tdi; keyingi vazifa uchun `contact.phone/email/address/hours`.
+- Tekshiruv: lint, typecheck; brauzerda 1280px va 375px.
+
 ## 2026-10-15 — Savol-javob sahifasi qidiruv bilan
 
 - `FaqPage.tsx`: `PageHero` ichida qidiruv (savol va javob matni bo'yicha, brauzerning o'zida; topilganlar soni `role="status"` bilan e'lon qilinadi, natija bo'lmasa alohida holat); savollar chapda, o'ngda sticky to'q "Javob topmadingizmi?" kartasi (bog'lanish sahifasiga havola); yuklanishda skelet; bo'sh holatda emoji o'rniga `help` ikonkasi.
