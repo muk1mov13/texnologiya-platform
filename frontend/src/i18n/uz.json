@@ -299,6 +299,14 @@
     "fullName": "To'liq ism",
     "phone": "Telefon",
     "phoneHint": "Ixtiyoriy",
+    "placeholders": {
+      "email": "misol@mail.uz",
+      "password": "Parolingizni kiriting",
+      "passwordNew": "Parol o'ylab toping",
+      "passwordConfirm": "Parolni qayta kiriting",
+      "fullName": "Familiya Ism Sharif",
+      "phone": "+998 90 123 45 67"
+    },
     "aside": {
       "pendingTitle": "Deyarli tayyor",
       "pendingText": "Administrator akkauntingizni ko'rib chiqmoqda. Tasdiqlangach, barcha darslar va topshiriqlar ochiladi.",

@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Kirish va ro'yxatdan o'tish maydonlariga placeholder
+
+- `LoginPage`/`RegisterPage`: barcha maydonlarda placeholder (email, parol, ism, telefon, parolni takrorlash).
+- i18n `auth.placeholders.*` (uz/ru).
+- `Field.tsx`: umumiy maydon uslubiga `placeholder:text-slate-400`.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Kirish va ro'yxatdan o'tish: premium dizayn
 
 `/login` va `/register` bosh sahifa uslubidagi split-screen layoutga o'tadi (chapda to'q brand panel, o'ngda forma). Mantiq va backend o'zgarmaydi.

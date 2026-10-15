@@ -43,6 +43,7 @@ export function LoginPage() {
             type="email"
             icon="mail"
             autoComplete="email"
+            placeholder={t('auth.placeholders.email')}
             aria-invalid={Boolean(errors.email)}
             {...register('email')}
           />
@@ -51,6 +52,7 @@ export function LoginPage() {
           <PasswordInput
             id="password"
             autoComplete="current-password"
+            placeholder={t('auth.placeholders.password')}
             aria-invalid={Boolean(errors.password)}
             {...register('password')}
           />

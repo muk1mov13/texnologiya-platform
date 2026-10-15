@@ -63,6 +63,7 @@ export function RegisterPage() {
             id="full_name"
             icon="user"
             autoComplete="name"
+            placeholder={t('auth.placeholders.fullName')}
             aria-invalid={Boolean(errors.full_name)}
             {...register('full_name')}
           />
@@ -73,6 +74,7 @@ export function RegisterPage() {
             type="email"
             icon="mail"
             autoComplete="email"
+            placeholder={t('auth.placeholders.email')}
             aria-invalid={Boolean(errors.email)}
             {...register('email')}
           />
@@ -83,6 +85,7 @@ export function RegisterPage() {
             type="tel"
             icon="phone"
             autoComplete="tel"
+            placeholder={t('auth.placeholders.phone')}
             aria-invalid={Boolean(errors.phone)}
             {...register('phone')}
           />
@@ -91,6 +94,7 @@ export function RegisterPage() {
           <PasswordInput
             id="password"
             autoComplete="new-password"
+            placeholder={t('auth.placeholders.passwordNew')}
             aria-invalid={Boolean(errors.password)}
             {...register('password')}
           />
@@ -100,6 +104,7 @@ export function RegisterPage() {
           <PasswordInput
             id="password_confirm"
             autoComplete="new-password"
+            placeholder={t('auth.placeholders.passwordConfirm')}
             aria-invalid={Boolean(errors.password_confirm)}
             {...register('password_confirm')}
           />
