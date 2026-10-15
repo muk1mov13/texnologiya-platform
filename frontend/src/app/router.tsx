@@ -39,6 +39,7 @@ import { RedirectIfAuthed, RequireAuth } from './guards'
 import { AdminShell } from './layouts/AdminShell'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
+import { StaffLayout } from './layouts/StaffLayout'
 import { RouteError } from './RouteError'
 
 // Har bir yuqori darajadagi marshrutga (ochiq layout, ichki ilova layout'i, 404 fallback)
@@ -82,8 +83,14 @@ export const routes: RouteObject[] = [
           { path: 'app/results', element: <ResultsPage /> },
           { path: 'app/results/attempts/:attemptId', element: <AttemptDetailPage /> },
           { path: 'app/tutor', element: <TutorPage /> },
+        ],
+      },
+      {
+        // O'qitish bo'limi: admin uchun `AdminShell` ichida (bitta panel), o'qituvchi uchun `AppLayout`.
+        element: <RequireAuth roles={['teacher', 'admin']} />,
+        children: [
           {
-            element: <RequireAuth roles={['teacher', 'admin']} />,
+            element: <StaffLayout />,
             children: [
               { path: 'teach', element: <TeachHomePage /> },
               { path: 'teach/topics/:topicId', element: <TopicEditorPage /> },

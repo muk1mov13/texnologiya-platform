@@ -3,8 +3,9 @@ import type { IconName } from '@/components/icons/paths'
 
 export function homePathFor(user: User): string {
   if (user.status !== 'active') return '/pending'
-  // Admin — saytdagi yagona o'qituvchi, kundalik ishi `/teach` da.
-  if (user.role === 'admin' || user.role === 'teacher') return '/teach'
+  // Admin — saytdagi yagona o'qituvchi: o'qitish va boshqaruv bitta panelda (`AdminShell`).
+  if (user.role === 'admin') return '/admin'
+  if (user.role === 'teacher') return '/teach'
   return '/app'
 }
 
@@ -37,19 +38,22 @@ export function navLinksFor(role: Role): NavItem[] {
       { to: '/app/tutor', label: 'nav.tutor', icon: 'sparkles' },
     ]
   }
-  // O'qituvchi (amalda — admin) ish bo'limlari oldinda; talaba sahifalari bitta havolada,
+  // Admin ilova karkasini faqat talaba ko'rinishida ko'radi; o'qitish va boshqaruv `AdminShell` da.
+  if (role === 'admin') {
+    return [
+      { to: '/admin', label: 'nav.admin', icon: 'shield' },
+      { to: '/app', label: 'nav.studentView', end: true, icon: 'user' },
+    ]
+  }
+  // O'qituvchi: ish bo'limlari oldinda; talaba sahifalari bitta havolada,
   // AI repetitor esa mavzu pleyeridagi `TutorDock` orqali ochiladi.
-  const items: NavItem[] = [
+  return [
     { to: '/teach', label: 'nav.teach', end: true, icon: 'pencil' },
     { to: '/teach/review', label: 'nav.review', icon: 'clipboard' },
     { to: '/teach/stats', label: 'nav.stats', icon: 'chart' },
+    { to: '/teach/books', label: 'nav.myBooks', icon: 'book' },
+    { to: '/app', label: 'nav.studentView', end: true, icon: 'user' },
   ]
-  // Admin kitoblarni `/admin/books` da yuklaydi va boshqaradi.
-  if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks', icon: 'book' })
-  // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminShell` da.
-  if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin', icon: 'shield' })
-  items.push({ to: '/app', label: 'nav.studentView', end: true, icon: 'user' })
-  return items
 }
 
 export interface NavGroup {

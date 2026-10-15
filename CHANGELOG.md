@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (1/4): marshrutlar
+
+- Yangi `StaffLayout`: `/teach/*` sahifalari admin uchun `AdminShell` ichida, oddiy o'qituvchi uchun avvalgidek `AppLayout` da ochiladi. URL'lar o'zgarmadi.
+- `homePathFor`: admin kirganda `/admin` (boshqaruv bosh sahifasi) ochiladi, o'qituvchi uchun `/teach`.
+- `navLinksFor('admin')`: talaba ko'rinishida yuqori menyuda faqat "Boshqaruv" va "Talaba ko'rinishi".
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin menyusi: pastki havolalar yozuv bilan
 
 - `AdminShell`: yon menyuning pastidagi "O'qituvchi paneli" va "Saytga o'tish" endi ikonka va yozuv bilan alohida qatorlarda (avval faqat ikonka edi); menyu yig'ilganda avvalgidek faqat ikonka. Yig'ish tugmasi "Saytga o'tish" qatorining o'ng tomonida.
