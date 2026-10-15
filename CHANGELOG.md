@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 5: premium yuqori menyu
+- `AppLayout`: shishasimon header (`backdrop-blur-xl`), gradient logo belgisi, ikonali tablar (`m.span layoutId` bilan suriladigan faol fon), talaba uchun seriya/XP chipi (`useDashboard`, `/app/results` ga havola), bosh harfli avatar (`lib/initials.ts`), ikonali "Chiqish"; `main` → `max-w-7xl`, sahifa tepasida yumshoq radial nur.
+- `paths.ts`: `NavItem.icon` (ilova menyusi ikonkalari); `MobileMenu` ikonkalarni ko'rsatadi, `LanguageSwitch`/`navClass` yangi uslubda, yangi `appNavClass`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 4: umumiy uslublar
 - Yangi `components/ui/styles.ts`: `SURFACE`, `SURFACE_LINK`, `PAGE_TITLE`, `SECTION_HEADING`, `EYEBROW`, `BACK_LINK`; `home/styles.ts` `EYEBROW`ni shu yerdan qayta eksport qiladi.
 - `SpotlightCard` `features/public/home/` dan `components/ui/` ga ko'chirildi (ilova ham ishlatadi).

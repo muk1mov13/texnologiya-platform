@@ -1,4 +1,5 @@
 import type { Role, User } from '@/api/types'
+import type { IconName } from '@/components/icons/paths'
 
 export function homePathFor(user: User): string {
   if (user.status !== 'active') return '/pending'
@@ -11,6 +12,8 @@ export interface NavItem {
   to: string
   label: string
   end?: boolean
+  /** Ilova menyusidagi ikonka (ochiq sayt menyusi ikonkasiz). */
+  icon?: IconName
 }
 
 /** Ochiq sayt menyusi (yo'llar backend `seo.py: STATIC_PATHS` bilan mos). Bosh sahifaga — logo orqali. */
@@ -26,23 +29,23 @@ export function navLinksFor(role: Role): NavItem[] {
   if (role === 'student') {
     // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.
     return [
-      { to: '/app', label: 'nav.subjects', end: true },
-      { to: '/app/results', label: 'nav.results' },
-      { to: '/app/tutor', label: 'nav.tutor' },
+      { to: '/app', label: 'nav.subjects', end: true, icon: 'home' },
+      { to: '/app/results', label: 'nav.results', icon: 'chart' },
+      { to: '/app/tutor', label: 'nav.tutor', icon: 'sparkles' },
     ]
   }
   // O'qituvchi (amalda — admin) ish bo'limlari oldinda; talaba sahifalari bitta havolada,
   // AI repetitor esa mavzu pleyeridagi `TutorDock` orqali ochiladi.
   const items: NavItem[] = [
-    { to: '/teach', label: 'nav.teach', end: true },
-    { to: '/teach/review', label: 'nav.review' },
-    { to: '/teach/stats', label: 'nav.stats' },
+    { to: '/teach', label: 'nav.teach', end: true, icon: 'pencil' },
+    { to: '/teach/review', label: 'nav.review', icon: 'clipboard' },
+    { to: '/teach/stats', label: 'nav.stats', icon: 'chart' },
   ]
   // Admin kitoblarni `/admin/books` da yuklaydi va boshqaradi.
-  if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks' })
+  if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks', icon: 'book' })
   // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminLayout` da.
-  if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin' })
-  items.push({ to: '/app', label: 'nav.studentView', end: true })
+  if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin', icon: 'shield' })
+  items.push({ to: '/app', label: 'nav.studentView', end: true, icon: 'user' })
   return items
 }
 

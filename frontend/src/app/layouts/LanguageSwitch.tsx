@@ -19,7 +19,7 @@ export function LanguageSwitch() {
   }
 
   return (
-    <div role="group" aria-label={t('nav.language')} className="inline-flex shrink-0 rounded-xl border-2 border-slate-200 p-0.5">
+    <div role="group" aria-label={t('nav.language')} className="inline-flex shrink-0 rounded-xl bg-slate-100/70 p-0.5 ring-1 ring-slate-200/60">
       {LOCALES.map((lang) => {
         const active = i18n.language === lang
         return (
@@ -30,9 +30,9 @@ export function LanguageSwitch() {
             aria-label={t(`languages.${lang}`)}
             onClick={() => choose(lang)}
             className={cx(
-              'rounded-lg px-2 py-1 text-xs font-bold uppercase',
+              'rounded-lg px-2 py-1 text-xs font-bold uppercase transition motion-reduce:transition-none',
               // brand-700: oq matn bilan WCAG AA kontrastini ta'minlaydi (brand-500 ~2.5:1 edi, yetarli emas).
-              active ? 'bg-brand-700 text-white' : 'text-slate-600 hover:bg-slate-100',
+              active ? 'bg-brand-700 text-white shadow-sm' : 'text-slate-600 hover:bg-white',
             )}
           >
             {lang}

@@ -52,7 +52,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
         aria-label={t(open ? 'nav.menuClose' : 'nav.menuOpen')}
         onClick={() => setOpen((value) => !value)}
         className={cx(
-          'grid size-9 place-items-center rounded-xl border-2 border-slate-200 bg-white/70 text-slate-700',
+          'grid size-9 place-items-center rounded-xl bg-white/70 text-slate-700 shadow-soft ring-1 ring-slate-200/70',
           FOCUS_RING,
         )}
       >
@@ -83,7 +83,7 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
             <m.div
               key="panel"
               id={panelId}
-              className="absolute inset-x-0 top-full z-40 origin-top border-b-2 border-slate-100 bg-white/95 px-4 pb-4 shadow-soft backdrop-blur-xl"
+              className="absolute inset-x-0 top-full z-40 origin-top border-b border-slate-200/60 bg-white/95 px-4 pb-4 shadow-soft backdrop-blur-xl"
               initial={{ opacity: 0, y: -8, scaleY: 0.96 }}
               animate={{ opacity: 1, y: 0, scaleY: 1 }}
               exit={{ opacity: 0, y: -8, scaleY: 0.96 }}
@@ -102,15 +102,16 @@ export function MobileMenu({ items, extra, until = 'md' }: MobileMenuProps) {
                       to={item.to}
                       end={item.end}
                       onClick={close}
-                      className={(state) => cx(navClass(state), 'block py-2.5 text-base')}
+                      className={(state) => cx(navClass(state), 'flex items-center gap-3 py-2.5 text-base')}
                     >
+                      {item.icon && <Icon name={item.icon} className="size-5 opacity-80" />}
                       {t(item.label)}
                     </NavLink>
                   </m.div>
                 ))}
               </m.nav>
               {extra && (
-                <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-slate-100 pt-3" onClick={close}>
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-200/70 pt-3" onClick={close}>
                   {extra}
                 </div>
               )}
