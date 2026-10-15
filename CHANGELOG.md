@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Statistika qayta dizayni (2/2): mavzular jadvali
+
+- `StatsPage`: jadval ustun sarlavhasini bosib saralanadi (`aria-sort`; raqamli ustunlarda avval eng kattasi, `null` qiymatlar oxirida); "Tugatgan" ustunida son, foiz va ingichka progress chizig'i (`role=progressbar`); o'rtacha natija rangli belgi (80%+ yashil, 50–79% sariq, <50% qizil); tekshirilmagan javoblar bor bo'lsa `/teach/review` ga havola; mavzu nomi muharrirga olib boradi.
+- Telefonda (`md` dan past) jadval o'rniga kartochkalar ro'yxati — gorizontal surish yo'q. Yuklanishda qator skeleti, bo'sh holat — `EmptyBlock`.
+- Oldingi commitda `StatsPage.tsx` loyiha sozlamasisiz `prettier` bilan boshqa uslubga (qo'sh tirnoq, nuqta-vergul) o'tib qolgan edi — fayl qayta loyiha uslubida yozildi.
+- `statsSummary.ts`: `sortRows()`, `scoreTone()`.
+- i18n: `stats.topicsHint`, `stats.completionOf`, `stats.emptyText` (uz/ru).
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Statistika qayta dizayni (1/2): umumiy ko'rsatkichlar
 
 - `StatsPage`: fan tanlash sarlavhaga ko'chdi (fan bitta bo'lsa — tanlash o'rniga fan nomi); 4 ta `StatCard`: faol talabalar, tugatish darajasi, o'rtacha natija, tekshirilmagan javoblar (bor bo'lsa sariq va `/teach/review` ga havola). Jadval `Panel` ichida.

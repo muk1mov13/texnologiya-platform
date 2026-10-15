@@ -690,6 +690,9 @@
     "title": "Statistika",
     "subtitle": "Talabalar mavzularni qanchalik o'zlashtirayotgani",
     "topicsTitle": "Mavzular bo'yicha",
+    "topicsHint": "Ustun nomini bosib saralang",
+    "completionOf": "«{{title}}» mavzusini tugatganlar ulushi",
+    "emptyText": "Talabalar mavzularni boshlagach, natijalar shu yerda ko'rinadi",
     "kpi": {
       "students": "Faol talabalar",
       "studentsHint": "Eng ko'p boshlangan mavzu bo'yicha",

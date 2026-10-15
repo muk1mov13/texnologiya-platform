@@ -41,3 +41,37 @@ export function percent(value: number | null): string {
 export function completionOf(row: TopicStats): number | null {
   return row.started === 0 ? null : (row.completed / row.started) * 100
 }
+
+export type SortKey = 'order' | 'title' | 'started' | 'completion' | 'score' | 'pending'
+export type SortDir = 'asc' | 'desc'
+
+function sortValue(row: TopicStats, key: Exclude<SortKey, 'order' | 'title'>): number | null {
+  if (key === 'started') return row.started
+  if (key === 'completion') return completionOf(row)
+  if (key === 'score') return row.avg_best_percent
+  return row.pending_submissions
+}
+
+/**
+ * Mavzular qatorini saralaydi (asl massiv o'zgarmaydi). `order` — backenddagi mavzu tartibi.
+ * Qiymati yo'q (`null`) qatorlar yo'nalishdan qat'i nazar oxirida qoladi.
+ */
+export function sortRows(rows: TopicStats[], key: SortKey, dir: SortDir): TopicStats[] {
+  const indexed = rows.map((row, index) => ({ row, index }))
+  const sign = dir === 'asc' ? 1 : -1
+  indexed.sort((a, b) => {
+    if (key === 'order') return sign * (a.index - b.index)
+    if (key === 'title') return sign * a.row.topic_title.localeCompare(b.row.topic_title)
+    const x = sortValue(a.row, key)
+    const y = sortValue(b.row, key)
+    if (x === null || y === null) return x === y ? a.index - b.index : x === null ? 1 : -1
+    return sign * (x - y) || a.index - b.index
+  })
+  return indexed.map((item) => item.row)
+}
+
+/** Natija rangi: 80+ yaxshi, 50–79 o'rta, <50 past. */
+export function scoreTone(value: number | null): 'good' | 'mid' | 'low' | 'none' {
+  if (value === null) return 'none'
+  return value >= 80 ? 'good' : value >= 50 ? 'mid' : 'low'
+}
