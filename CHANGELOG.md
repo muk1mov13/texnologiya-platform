@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Sayt sarlavhasi va mikroskop favicon
+
+- `index.html`: tab sarlavhasi "Texnologiya platformasi" o'rniga "EDU — Biologiya ta'limi metodik platformasi", meta tavsif biologiyaga; favicon ulandi.
+- Yangi `public/favicon.svg`: brand gradientli dumaloq kvadratda oq chiziqli mikroskop (logodagi `MicroscopeMark` asosida).
+- i18n (uz + ru): `meta.siteTitle`, `meta.description`, `footer.tagline` biologiyaga; `app.name` → "EDU" (sahifa sarlavhalari endi "Kutubxona — EDU" kabi).
+- Tekshiruv: lint, typecheck, build; brauzerda 1366px va 375px (gorizontal siljish yo'q).
+
 ## 2026-10-15 — Kutubxona kartasi: telefon ko'rinishi tuzatildi
 
 - `ExploreSection.tsx`: karta grid ichida `min-w-0` (375px ekranda gorizontal siljish yo'qoldi), kitob javoni bezagi faqat `sm+` ekranda, bo'lim izohlari kesilmasdan qatorga o'raladi.
