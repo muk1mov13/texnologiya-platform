@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bosh sahifadagi kutubxona kartasi premium ko'rinishda
+
+- `features/public/home/ExploreSection.tsx`: kutubxona kartasi alohida `LibraryCard` — gradient ramka, yumshoq nur va katak fon, o'ng burchakda kitob javoni SVG bezagi, "Ochiq kutubxona" yorlig'i.
+- Bo'limlar (metodik / huquqiy / kitoblar) boy plitkalar: rangli gradient ikonka, nom va qisqa izoh, hover'da ko'tarilish va strelka; pastda "Kutubxonaga o'tish" havolasi. `motion-reduce` hurmat qilinadi.
+- i18n: `home.library.eyebrow`, `items.*`, `open` (uz + ru), tavsif biologiya yo'nalishiga moslandi.
+
 ## 2026-10-15 — Bosh sahifa hero matni biologiya yo'nalishiga
 
 - `i18n/uz.json`, `ru.json` (`home.hero.*`): sarlavha "Bo'lajak biologiya o'qituvchilari uchun metodik platforma", badge "BuxDPI · Biologiya ta'limi", tavsif platformadagi resurslarga mos (biologiya o'qitish metodikasi va o'simliklar fiziologiyasi: ma'ruza, amaliy va seminar mashg'ulotlari).

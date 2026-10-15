@@ -281,8 +281,15 @@
     "latestNews": "So'nggi yangiliklar",
     "allNews": "Barcha yangiliklar",
     "library": {
+      "eyebrow": "Ochiq kutubxona",
       "title": "Kutubxona",
-      "text": "Metodik va huquqiy hujjatlar hamda kitoblar — ro'yxatdan o'tmasdan ochiq."
+      "text": "Biologiya o'qitish metodikasiga oid metodik qo'llanmalar, me'yoriy-huquqiy hujjatlar va o'quv adabiyotlari — ro'yxatdan o'tmasdan, bepul.",
+      "items": {
+        "metodik": "Qo'llanmalar, ishlanmalar va tavsiyalar",
+        "huquqiy": "Davlat standartlari, qarorlar va nizomlar",
+        "books": "Darsliklar va o'quv qo'llanmalari"
+      },
+      "open": "Kutubxonaga o'tish"
     },
     "tutor": {
       "title": "AI repetitor",
