@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Footer'dan so'nggi yangiliklar olib tashlandi
+
+- `SiteFooter`: "So'nggi yangiliklar" ustuni (3 ta yangilik) olib tashlandi, grid 4 ustunga o'tdi. Ishlatilmay qolgan `footer.latestNews` i18n kaliti (uz/ru) o'chirildi. "Bo'limlar" ustunidagi "Yangiliklar" havolasi qoldi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Fan kartasidagi halqa mavzular sonini ko'rsatadi
 
 - Talaba fan kartalaridagi halqa ichida avval bosqichlar soni (masalan, `0/210`) chiqardi; endi tugatilgan mavzular / mavzular soni (`0/30`).

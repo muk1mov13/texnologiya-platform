@@ -2,18 +2,15 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
-import { useNewsPage, useSite } from '@/api/cms'
+import { useSite } from '@/api/cms'
 import type { SiteSocials } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { cx } from '@/lib/cx'
-import { formatDate } from '@/lib/format'
 import { homePathFor, PUBLIC_NAV } from '../paths'
 import { BrandLogo } from './BrandLogo'
 
 const SOCIALS: (keyof SiteSocials)[] = ['telegram', 'instagram', 'facebook', 'youtube']
 const LIBRARY_TABS = ['metodik', 'huquqiy', 'books'] as const
-/** Bosh sahifadagi `NewsSection` bilan bir xil so'rov — kesh umumiy, qo'shimcha so'rov yo'q. */
-const LATEST_NEWS = 3
 
 interface FooterTheme {
   root: string
@@ -116,16 +113,15 @@ function Column({ title, theme, children }: { title: string; theme: FooterTheme;
 
 /**
  * Ochiq sayt footer'i: brend va ijtimoiy tarmoqlar, bo'limlar, platforma havolalari,
- * so'nggi yangiliklar va kontaktlar (`/api/site`). Ma'lumot bo'lmagan ustun chiqmaydi.
+ * va kontaktlar (`/api/site`). Ma'lumot bo'lmagan ustun chiqmaydi.
  * `flush`: ustidagi bo'lim (bosh sahifa CTA) footer rangida tugaydi — chok chizig'i yo'q,
  * tepada panel uchun qo'shimcha joy.
  */
 export function SiteFooter({ flush = false }: { flush?: boolean }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const theme = THEMES[FOOTER_THEME]
   const user = useCurrentUser()
   const { data: site } = useSite()
-  const news = useNewsPage(1, LATEST_NEWS).data?.items ?? []
   const contacts = site?.contacts
   const socials = site ? SOCIALS.filter((key) => site.socials[key]) : []
   const hasContacts = Boolean(
@@ -141,7 +137,7 @@ export function SiteFooter({ flush = false }: { flush?: boolean }) {
       </div>
       <div
         className={cx(
-          'mx-auto grid max-w-6xl gap-10 px-4 pb-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.9fr_1.2fr_1.2fr] lg:gap-8',
+          'mx-auto grid max-w-6xl gap-10 px-4 pb-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1.3fr] lg:gap-8',
           flush ? 'pt-20' : 'pt-14',
         )}
       >
@@ -202,25 +198,6 @@ export function SiteFooter({ flush = false }: { flush?: boolean }) {
             </Link>
           ))}
         </Column>
-
-        {news.length > 0 && (
-          <Column theme={theme} title={t('footer.latestNews')}>
-            <ul className="flex flex-col gap-3">
-              {news.map((item) => (
-                <li key={item.id}>
-                  <Link to={`/news/${item.slug}`} className={cx(link, 'line-clamp-2 font-medium')}>
-                    {item.title}
-                  </Link>
-                  {item.published_at && (
-                    <time dateTime={item.published_at} className={cx('mt-0.5 block text-xs', theme.muted)}>
-                      {formatDate(item.published_at, i18n.language)}
-                    </time>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </Column>
-        )}
 
         {hasContacts && contacts && (
           <Column theme={theme} title={t('footer.contacts')}>
