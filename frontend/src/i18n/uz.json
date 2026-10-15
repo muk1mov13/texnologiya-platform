@@ -464,7 +464,16 @@
     "studentView": "Talaba ko'rinishi",
     "prevTopic": "Oldingi mavzu",
     "nextTopic": "Keyingi mavzu",
-    "topicPosition": "{{index}}-mavzu, jami {{total}} ta"
+    "topicPosition": "{{index}}-mavzu, jami {{total}} ta",
+    "stepHints": {
+      "review": "Oldingi mavzuni eslatuvchi test, ha/yo'q savollari yoki krossvord",
+      "lecture": "Ma'ruza matni: PDF, PPT yoki DOC fayl",
+      "presentation": "Mavzu bo'yicha slaydlar yoki o'yin taqdimoti",
+      "practice": "Bilimni mustahkamlovchi testlar va mashqlar",
+      "task": "Talaba javob yuboradigan mustaqil topshiriq",
+      "glossary": "Mavzudagi asosiy atamalar va ularning izohi",
+      "literature": "Tavsiya etilgan kitoblar va manbalar"
+    }
   },
   "admin": {
     "users": {

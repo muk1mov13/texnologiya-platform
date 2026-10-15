@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Mavzu muharriri qayta dizayni (2/3): bosqichlar menyusi
+
+- Yangi `features/teach/StepNav.tsx`: 7 bosqich `role=tablist` menyusi — SVG ikonka, tartib raqami, elementlar soni; katta ekranda chapda yopishqoq vertikal ro'yxat, telefonda gorizontal suriladigan qator; ←↑/→↓ klaviatura bilan almashtirish.
+- `TopicEditorPage`: emoji'li chiziqli tablar o'rniga ikki ustunli layout (menyu + `Panel`); panel sarlavhasi — bosqich nomi va qisqa izohi, tab almashganda yengil fade (`m.div`, `motion-reduce` hurmat qilinadi). `?tab=` avvalgidek saqlanadi.
+- i18n: `teach.stepHints.*` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Mavzu muharriri qayta dizayni (1/3): sarlavha
 
 - `TopicEditorPage`: "← orqaga" havolasi o'rniga `PageHeader` — fan nomi (eyebrow), mavzu nomi, mashg'ulot turi, tartib raqami ("3-mavzu, jami 12 ta") va nashr holati; amallar: "Talaba ko'rinishi" (faqat nashr qilingan mavzuda, yangi oynada) va oldingi/keyingi mavzuga o'tish.
