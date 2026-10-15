@@ -19,14 +19,28 @@ export const adminKeys = {
   subjects: ['admin', 'subjects'] as const,
 }
 
-export function useAdminUsers(status: UserFilter, q: string) {
+export function useAdminUsers(
+  status: UserFilter,
+  q: string,
+  options: { enabled?: boolean; refetchInterval?: number } = {},
+) {
   const params = new URLSearchParams({ limit: '200' })
   if (status !== 'all') params.set('status', status)
   if (q) params.set('q', q)
   return useQuery({
     queryKey: adminKeys.users(status, q),
     queryFn: ({ signal }) => apiFetch<User[]>(`/api/admin/users?${params.toString()}`, { signal }),
+    ...options,
   })
+}
+
+/**
+ * Tasdiq kutayotgan foydalanuvchilar soni (menyu badge'i va bosh sahifa kartasi uchun).
+ * Kesh `AdminUsersPage` ning standart "pending" filtri bilan umumiy; tasdiqlash `usersRoot` ni
+ * yangilaydi, shuning uchun son o'zi kamayadi. Har daqiqada yangi ro'yxatdan o'tganlar tekshiriladi.
+ */
+export function usePendingUsersCount({ enabled = true }: { enabled?: boolean } = {}) {
+  return useAdminUsers('pending', '', { enabled, refetchInterval: 60_000 }).data?.length ?? 0
 }
 
 export function useUpdateUser() {

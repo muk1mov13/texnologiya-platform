@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Yangi talabalar haqida adminga bildirish
+
+Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
+
+### Task 1: kutayotganlar soni uchun hook
+- `api/admin.ts`: `usePendingUsersCount()` (har 60 s yangilanadi, `AdminUsersPage` keshi bilan umumiy); `useAdminUsers` ixtiyoriy `enabled`/`refetchInterval` oladi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Bitta o'qituvchi = admin: soddalashtirish
 
 Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `admin` akkaunt). Backend o'zgarmaydi, faqat ortiqcha UI olib tashlanadi.
