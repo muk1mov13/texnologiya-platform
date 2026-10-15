@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 7: yutuqlar bento-bloki
+- `DashboardStats`: uchta bir xil karta o'rniga bento — seriya (olov ikonka, katta raqam, bugungi faollik nuqtasi, eng uzun seriya), XP (yulduz, katta `tabular-nums` raqam, izoh), nishonlar (ikki ustun kenglikda, `ProgressBar` olingan/jami, qulflanganlar xira + qulf belgisi). Ekran o'quvchi uchun to'liq matnlar va `aria-label`lar saqlandi.
+- i18n (uz/ru): `dashboard.streakLabel`, `dashboard.xpLabel`, `dashboard.xpHint`, `dashboard.badgesTitle`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 6: bosh panel hero
 - `SubjectsPage`: tepada hero-karta — kun vaqtiga qarab salomlashuv (`lib/greeting.ts`, `student.greeting.*`), bugungi sana, sarlavha, izoh; o'ngda to'q "Davom ettirish" kartasi (bosqich SVG ikonkasi, mavzu, fan, "Davom etish →"). Davom ettirish yo'q bo'lsa — fan tanlashga undovchi matn. `fadeUp`/`stagger` bilan kirish.
 - i18n (uz/ru): `student.greeting.*`, `student.heroText`, `student.startHint`, `student.continueCta`.

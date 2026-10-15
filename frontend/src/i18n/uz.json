@@ -498,6 +498,10 @@
     "badge": "{{icon}} Yangi nishon: {{title}}"
   },
   "dashboard": {
+    "streakLabel": "Kunlik seriya",
+    "xpLabel": "Tajriba ballari",
+    "xpHint": "Har bir bajarilgan bosqich va faoliyat uchun beriladi",
+    "badgesTitle": "Nishonlar",
     "title": "Mening yutuqlarim",
     "streak": "{{count}} kunlik seriya",
     "streakToday": "Bugun ham o'qidingiz 👏",
