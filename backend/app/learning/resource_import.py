@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.indexing import (
     index_library_job,
+    index_material_quietly,
     index_topic_glossary_job,
     index_topic_questions_job,
 )
@@ -156,6 +157,19 @@ async def _add_material(
         original_name=source.name[:255],
         status=MaterialStatus.processing,
     )
+    if source.suffix.lower() == rp.PDF_EXT:
+        # Tayyor PDF: `materials.upload_material` kabi darhol tayyor (konvertatsiyasiz).
+        try:
+            material.page_count = convert.count_pages(ctx.storage.path(rel))
+            material.pdf_file = rel
+            material.status = MaterialStatus.ready
+        except convert.ConversionError:
+            material.status = MaterialStatus.failed
+            material.error = "INVALID_PDF"
+        db.add(material)
+        await db.commit()
+        await index_material_quietly(ctx, material.id)
+        return material
     db.add(material)
     await db.commit()
     # Konvertatsiya + AI indekslash shu yerda kutiladi (job o'z qisqa sessiyalarini ochadi).
@@ -214,7 +228,7 @@ async def _import_topic(
         ("lecture", StepKind.lecture, "Ma'ruza matni"),
         ("presentation", StepKind.presentation, "Interaktiv o'yin"),
     ):
-        path = source.files.get(key)
+        path = source.files.get(f"{key}_pdf") or source.files.get(key)
         if path is None:
             continue
         material = await _add_material(db, ctx, steps[kind], title, path)
@@ -353,6 +367,20 @@ async def _existing_topic(
     )
 
 
+def _needs_soffice(sources: list[rp.SubjectSource]) -> bool:
+    """LibreOffice faqat .doc matn, PDF'i yo'q material yoki DOC/DOCX o'quv dasturi uchun kerak."""
+    for subject in sources:
+        if subject.syllabus is not None and subject.syllabus.suffix.lower() != rp.PDF_EXT:
+            return True
+        for topic in subject.topics:
+            files = topic.files
+            if any(key in files and f"{key}_pdf" not in files for key in rp.MATERIAL_KEYS) or any(
+                path.suffix.lower() == ".doc" for path in files.values()
+            ):
+                return True
+    return False
+
+
 async def import_resources(
     settings: Settings,
     root: Path,
@@ -362,15 +390,15 @@ async def import_resources(
     allow_no_soffice: bool = False,
 ) -> ImportReport:
     report = ImportReport()
-    if convert.resolve_soffice(settings.soffice_path) is None:
+    sources = rp.scan(root)
+    if _needs_soffice(sources) and convert.resolve_soffice(settings.soffice_path) is None:
         message = (
             "LibreOffice topilmadi (SOFFICE_PATH): .doc fayllar o'qilmaydi, "
-            "materiallar PDF'ga o'girilmaydi"
+            "PDF'i yo'q materiallar va DOC/DOCX o'quv dasturlari PDF'ga o'girilmaydi"
         )
         if not dry_run and not allow_no_soffice:
             raise ValueError(message)
         report.warnings.append(message)
-    sources = rp.scan(root)
     reader = _Reader(settings, report)
     if dry_run:
         for subject_source in sources:
@@ -380,16 +408,24 @@ async def import_resources(
                 label = _label(subject_source, source)
                 parsed = await _parse_topic(reader, source, label)
                 report.topics_created += 1
-                report.materials += sum(k in source.files for k in ("lecture", "presentation"))
+                report.materials += sum(
+                    k in source.files or f"{k}_pdf" in source.files for k in rp.MATERIAL_KEYS
+                )
                 report.quizzes += bool(parsed.quiz)
                 report.crosswords += len(parsed.crossword) >= 3
                 report.tasks += parsed.task is not None
                 report.glossary += len(parsed.glossary)
                 report.literature += len(parsed.literature)
+                pdfs = ",".join(
+                    number
+                    for number, key in (("2", "lecture"), ("7", "presentation"))
+                    if f"{key}_pdf" in source.files
+                )
                 print(
                     f"{label}: «{parsed.title[:60]}» test={len(parsed.quiz)} "
                     f"krossvord={len(parsed.crossword)} glossariy={len(parsed.glossary)} "
-                    f"adabiyot={len(parsed.literature)} topshiriq={parsed.task is not None}"
+                    f"adabiyot={len(parsed.literature)} topshiriq={parsed.task is not None} "
+                    f"pdf={pdfs or '-'}"
                 )
         return report
 

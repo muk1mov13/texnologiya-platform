@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Foydalanuvchi materiallarni o'zi tayyorladi: 2) va 7) uchun PDF, barcha matnli fayllar `.docx`. Avvalgi chala import natijasi (2 fan, 51 mavzu, 96 material, `media/` fayllari) lokal dev bazadan o'chirildi.
 
+### Task 2: import — tayyor PDF materiallar
+- `resource_parse.topic_files`: `2)`/`7)` raqamli `.pdf` `lecture_pdf`/`presentation_pdf` kalitlariga yoziladi (matn esa DOC/DOCX'dan o'qilishda davom etadi); `dastur` papkasida PDF DOC/DOCX'dan ustun.
+- `resource_import._add_material`: PDF manba konvertatsiyasiz darhol `ready` (sahifalar `count_pages`, buzilgan bo'lsa `failed`/`INVALID_PDF`), keyin AI indeksi; PDF bo'lmasa avvalgidek `convert_material_job`.
+- LibreOffice faqat kerak bo'lganda talab qilinadi (`_needs_soffice`: .doc matn, PDF'siz material, DOC/DOCX o'quv dasturi). `--dry-run` har mavzu uchun `pdf=2,7` ko'rsatadi.
+- `CLAUDE.md`: import bandi yangilandi.
+- Tekshiruv: ruff, mypy o'tdi; `--dry-run` 60 mavzuda PDF topdi (45 tasida 2 va 7, 15 labda 2); vaqtinchalik bazaga 1 mavzu noto'g'ri `SOFFICE_PATH` bilan import qilindi — 2 material PDF'dan `ready`.
+
 ### Task 1: parser — prefikssiz javob kaliti, lab sarlavhasi
 - `resource_parse.parse_quiz`: `Javoblar:` so'zisiz kalit ham taniladi: faqat `raqam–harf` juftlaridan iborat qator (`1–B 2–A`, `1 — b; 2 — a.`, har juft alohida qatorda `1-B`).
 - `parse_title`: birinchi qator faqat `1-LABORATORIYA MASHG'ULOTI` kabi sarlavhasiz bo'lsa, sarlavha keyingi qatordan olinadi.

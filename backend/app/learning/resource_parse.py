@@ -5,6 +5,9 @@ mashg'ulot turini, `dastur` so'zi esa o'quv dasturi papkasini bildiradi. Mavzu p
 fayllar nomi bilan emas, `N)` prefiksi bilan aniqlanadi (nomlarda imlo xatolari bor):
 
 1) krossvord, 2) ma'ruza matni, 3) test, 4) topshiriq, 5) glossariy, 6) adabiyotlar, 7) o'yin.
+
+Matn doim DOC/DOCX'dan o'qiladi. 2) va 7) yonida shu raqamli PDF bo'lsa, material sifatida o'sha
+olinadi; `dastur` papkasida ham PDF DOC/DOCX'dan ustun.
 """
 
 import re
@@ -41,6 +44,9 @@ FILE_KEYS = {
 }
 TEXT_EXT = frozenset({".doc", ".docx"})
 SLIDE_EXT = frozenset({".ppt", ".pptx"})
+PDF_EXT = ".pdf"
+# Fayli material bo'ladigan kalitlar; ularning `N)` raqamli PDF'i `<kalit>_pdf` bo'lib yoziladi.
+MATERIAL_KEYS = ("lecture", "presentation")
 
 TITLE_MAX = 200
 CLUE_MAX = 300
@@ -98,6 +104,10 @@ def topic_files(folder: Path) -> dict[str, Path]:
             continue
         key = FILE_KEYS.get(int(match.group(1)))
         ext = path.suffix.lower()
+        if ext == PDF_EXT and key in MATERIAL_KEYS:
+            # Tayyor PDF: material sifatida asl fayl o'rniga olinadi (LibreOffice kerak emas).
+            files.setdefault(f"{key}_pdf", path)
+            continue
         allowed = SLIDE_EXT if key == "presentation" else TEXT_EXT
         if key is not None and ext in allowed and key not in files:
             files[key] = path
@@ -116,8 +126,10 @@ def scan(root: Path) -> list[SubjectSource]:
         subject = SubjectSource(title=subject_dir.name.strip(), folder=subject_dir)
         for section in sorted(p for p in subject_dir.iterdir() if p.is_dir()):
             if SYLLABUS_KEYWORD in _plain(section.name):
+                pdfs = sorted(p for p in section.iterdir() if p.suffix.lower() == PDF_EXT)
                 docs = sorted(p for p in section.iterdir() if p.suffix.lower() in TEXT_EXT)
-                subject.syllabus = docs[0] if docs else None
+                found = pdfs or docs
+                subject.syllabus = found[0] if found else None
                 continue
             lesson_type = section_type(section.name)
             if lesson_type is None:
