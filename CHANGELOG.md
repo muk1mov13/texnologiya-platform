@@ -4,6 +4,17 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — AI: almashtiriladigan provayder va lokal embedding
+
+Gemini'ning bepul limiti kam: matn asosan OpenAI'ga mos API'da (Groq/Cerebras/OpenRouter), Gemini zaxirada; embedding lokal `multilingual-e5-base` (TEI konteyneri).
+
+### Task 1: OpenAI'ga mos asosiy provayder, Gemini zaxira
+- `providers.GroqProvider` -> `OpenAICompatProvider(base_url, ...)`: istalgan `/chat/completions` API (`LLM_BASE_URL`).
+- `AI_PROVIDER=compat|gemini|fake`: asosiy matn provayderi; ikkinchisining kaliti bo'lsa `FallbackProvider` orqali zaxira (modellar juftlab almashtiriladi). `AiServices.chat_model/fast_model` asosiy provayderdan.
+- Sozlamalar nomlari: `AI_MODEL_*`/`AI_EMBEDDING_MODEL`/`AI_RPM` -> `GEMINI_*`, `GROQ_*` -> `LLM_*` (`.env.example`, lokal `.env` ham). `ai_configured`: asosiy provayder kaliti va embedding bo'lishi kerak.
+- Admin: `provider` endi `compat+gemini` / `gemini+compat`, `chat_model` haqiqiy asosiy model.
+- Tekshiruv: ruff, mypy o'tdi; `build_ai` 5 kombinatsiyada (fake, compat+gemini, faqat compat, gemini+compat, kalitsiz) to'g'ri provayder, model xaritasi va `configured`.
+
 ## 2026-10-15 — import: tayyor PDF va yangi fayl formatlari
 
 Foydalanuvchi materiallarni o'zi tayyorladi: 2) va 7) uchun PDF, barcha matnli fayllar `.docx`. Avvalgi chala import natijasi (2 fan, 51 mavzu, 96 material, `media/` fayllari) lokal dev bazadan o'chirildi.

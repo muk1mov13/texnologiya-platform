@@ -1,4 +1,4 @@
-"""AI provayder adapteri: Gemini va sinov uchun `FakeProvider`.
+"""AI provayder adapteri: Gemini, OpenAI'ga mos API va sinov uchun `FakeProvider`.
 
 Boshqa modullar faqat `LLMProvider` / `EmbeddingProvider` protokollarini biladi.
 """
@@ -133,7 +133,7 @@ RETRY_DELAYS = (1.0, 2.0, 4.0)
 
 
 def _status(exc: BaseException) -> int | None:
-    """Gemini (`APIError.code`) yoki Groq (`httpx.HTTPStatusError`) xatosining HTTP kodi."""
+    """Gemini (`APIError.code`) yoki httpx (`HTTPStatusError`) xatosining HTTP kodi."""
     from google.genai import errors
 
     if isinstance(exc, errors.APIError):
@@ -270,13 +270,11 @@ class GeminiProvider:
         return result
 
 
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+class OpenAICompatProvider:
+    """OpenAI'ga mos `/chat/completions` API (Groq, Cerebras, OpenRouter...) — faqat matn."""
 
-
-class GroqProvider:
-    """Groq (OpenAI'ga mos API) — faqat matn yaratish; embedding modeli yo'q."""
-
-    def __init__(self, api_key: str, limiter: TokenBucket) -> None:
+    def __init__(self, base_url: str, api_key: str, limiter: TokenBucket) -> None:
+        self._url = base_url.rstrip("/") + "/chat/completions"
         self._client = httpx.AsyncClient(
             headers={"Authorization": f"Bearer {api_key}"},
             timeout=httpx.Timeout(60.0, connect=10.0),
@@ -291,7 +289,7 @@ class GroqProvider:
 
     async def _complete(self, body: dict[str, Any]) -> str:
         async def call() -> str:
-            response = await self._client.post(GROQ_URL, json=body)
+            response = await self._client.post(self._url, json=body)
             response.raise_for_status()
             return str(response.json()["choices"][0]["message"].get("content") or "")
 
@@ -327,7 +325,7 @@ class GroqProvider:
         body = {"model": model, "messages": self._messages(system, messages), "stream": True}
 
         async def start() -> httpx.Response:
-            request = self._client.build_request("POST", GROQ_URL, json=body)
+            request = self._client.build_request("POST", self._url, json=body)
             response = await self._client.send(request, stream=True)
             if response.is_error:
                 await response.aclose()

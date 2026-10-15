@@ -11,8 +11,8 @@ from app.ai.providers import (
     FakeProvider,
     FallbackProvider,
     GeminiProvider,
-    GroqProvider,
     LLMProvider,
+    OpenAICompatProvider,
     TokenBucket,
 )
 from app.ai.vectors import PgVectorStore, SqliteVectorStore, VectorStore
@@ -26,7 +26,7 @@ class AiServices:
     llm: LLMProvider
     embedder: EmbeddingProvider
     vectors: VectorStore
-    configured: bool  # Gemini kaliti bor yoki `AI_PROVIDER=fake`
+    configured: bool  # asosiy provayder kaliti va embedding bor yoki `AI_PROVIDER=fake`
     chat_model: str
     fast_model: str
 
@@ -35,34 +35,56 @@ def build_ai(settings: Settings, dialect_name: str) -> AiServices:
     """Kalit bo'lmasa ham obyekt yaratiladi (`FakeProvider` bilan), lekin `configured=False`
     bo'lgani uchun `ai_enabled` yolg'on qaytaradi va AI endpoint'lari 503 beradi."""
     vectors: VectorStore = PgVectorStore() if dialect_name == "postgresql" else SqliteVectorStore()
-    llm: LLMProvider
-    embedder: EmbeddingProvider
-    if settings.ai_provider == "gemini" and settings.gemini_api_key:
-        gemini = GeminiProvider(
-            settings.gemini_api_key, settings.ai_embedding_model, TokenBucket(settings.ai_rpm)
+    fake = FakeProvider()
+    gemini = (
+        GeminiProvider(
+            settings.gemini_api_key,
+            settings.gemini_embedding_model,
+            TokenBucket(settings.gemini_rpm),
         )
-        llm, embedder = gemini, gemini
-        if settings.groq_api_key:
-            # Groq'da embedding yo'q: indeks Gemini'da qoladi, Groq faqat matn uchun zaxira.
-            llm = FallbackProvider(
-                gemini,
-                GroqProvider(settings.groq_api_key, TokenBucket(settings.groq_rpm)),
-                {
-                    settings.ai_model_chat: settings.groq_model_chat,
-                    settings.ai_model_fast: settings.groq_model_fast,
-                },
-                settings.groq_model_chat,
-            )
-    else:
-        fake = FakeProvider()
-        llm, embedder = fake, fake
+        if settings.gemini_api_key and settings.ai_provider != "fake"
+        else None
+    )
+    compat = (
+        OpenAICompatProvider(
+            settings.llm_base_url, settings.llm_api_key, TokenBucket(settings.llm_rpm)
+        )
+        if settings.llm_api_key and settings.ai_provider != "fake"
+        else None
+    )
+    gemini_models = (settings.gemini_model_chat, settings.gemini_model_fast)
+    compat_models = (settings.llm_model_chat, settings.llm_model_fast)
+    # Asosiy provayder band bo'lsa (429/5xx), matn ikkinchisida yaratiladi.
+    llm: LLMProvider = fake
+    models = gemini_models
+    if settings.ai_provider == "compat" and compat is not None:
+        llm, models = _with_fallback(compat, gemini, compat_models, gemini_models), compat_models
+    elif settings.ai_provider == "gemini" and gemini is not None:
+        llm, models = _with_fallback(gemini, compat, gemini_models, compat_models), gemini_models
+    embedder: EmbeddingProvider = gemini if gemini is not None else fake
     return AiServices(
         llm=llm,
         embedder=embedder,
         vectors=vectors,
         configured=settings.ai_configured,
-        chat_model=settings.ai_model_chat,
-        fast_model=settings.ai_model_fast,
+        chat_model=models[0],
+        fast_model=models[1],
+    )
+
+
+def _with_fallback(
+    primary: LLMProvider,
+    secondary: LLMProvider | None,
+    primary_models: tuple[str, str],
+    secondary_models: tuple[str, str],
+) -> LLMProvider:
+    if secondary is None:
+        return primary
+    return FallbackProvider(
+        primary,
+        secondary,
+        dict(zip(primary_models, secondary_models, strict=True)),
+        secondary_models[0],
     )
 
 

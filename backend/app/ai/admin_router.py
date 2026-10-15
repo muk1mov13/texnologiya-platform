@@ -19,14 +19,19 @@ from app.core.deps import Ai, AppSettings, DbSession, Jobs
 router = APIRouter(prefix="/admin/ai", tags=["admin-ai"])
 
 
+def _fallback_name(settings: Settings) -> str:
+    return "+gemini" if settings.ai_provider == "compat" else "+compat"
+
+
 def _settings_out(row: AiSettings, settings: Settings, ai: AiServices) -> AiSettingsOut:
     """Kalitning o'zi hech qachon qaytarilmaydi — faqat sozlangan yoki yo'qligi."""
     return AiSettingsOut(
         enabled=row.enabled,
         student_daily_limit=row.student_daily_limit,
         configured=ai.configured,
-        provider=settings.ai_provider + ("+groq" if isinstance(ai.llm, FallbackProvider) else ""),
-        chat_model=settings.ai_model_chat,
+        provider=settings.ai_provider
+        + (_fallback_name(settings) if isinstance(ai.llm, FallbackProvider) else ""),
+        chat_model=ai.chat_model,
         embedding_model=ai.embedder.model_name,
     )
 
