@@ -189,10 +189,10 @@
   },
   "home": {
     "hero": {
-      "badge": "BuxDPI · Texnologik ta'lim",
-      "title": "Bo'lajak texnologiya o'qituvchilari uchun",
+      "badge": "BuxDPI · Biologiya ta'limi",
+      "title": "Bo'lajak biologiya o'qituvchilari uchun",
       "accent": "metodik platforma",
-      "subtitle": "Ma'ruzalar, taqdimotlar, testlar, glossariy va adabiyotlar — har bir mavzu 7 bosqichli aniq yo'l. Yonida esa savollaringizga javob beradigan AI repetitor.",
+      "subtitle": "Biologiya o'qitish metodikasi va o'simliklar fiziologiyasi fanlari bo'yicha ma'ruzalar, amaliy va seminar mashg'ulotlari, testlar, glossariy va adabiyotlar — har bir mavzu 7 bosqichli aniq yo'l. Yonida esa savollaringizga javob beradigan AI repetitor.",
       "scroll": "Pastga",
       "chips": {
         "steps": "7 bosqichli mavzular",
@@ -200,8 +200,8 @@
         "languages": "O'zbek va rus tillarida"
       },
       "mock": {
-        "subject": "Texnologiya",
-        "topic": "Yog'ochga ishlov berish asoslari",
+        "subject": "Biologiya o'qitish metodikasi",
+        "topic": "Fotosintez jarayoni",
         "xp": "+10 XP",
         "ai": "AI: savol bering",
         "badge": "Yangi nishon"
@@ -234,8 +234,8 @@
       "tutor": {
         "title": "AI repetitor",
         "text": "Mavzu bo'yicha savol bering — javob dars materiallari va kutubxonadan, manbalari bilan olinadi.",
-        "ask": "Frezalash nima?",
-        "answer": "Frezalash — aylanuvchi kesuvchi asbob bilan ishlov berish usuli…"
+        "ask": "Fotosintez nima?",
+        "answer": "Fotosintez — yashil o'simliklarda yorug'lik energiyasi hisobiga organik modda hosil bo'lishi…"
       },
       "library": {
         "title": "Ochiq kutubxona",

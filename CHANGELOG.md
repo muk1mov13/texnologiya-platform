@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bosh sahifa hero matni biologiya yo'nalishiga
+
+- `i18n/uz.json`, `ru.json` (`home.hero.*`): sarlavha "Bo'lajak biologiya o'qituvchilari uchun metodik platforma", badge "BuxDPI · Biologiya ta'limi", tavsif platformadagi resurslarga mos (biologiya o'qitish metodikasi va o'simliklar fiziologiyasi: ma'ruza, amaliy va seminar mashg'ulotlari).
+- Hero mockup va AI repetitor namunasi ham biologiyaga: "Fotosintez jarayoni", "Fotosintez nima?".
+
 ## 2026-10-15 — Yangi logo: "EDU 🔬" (ochiq sayt)
 
 - `app/layouts/BrandLogo.tsx`: "T" gradient belgi va "Texnologiya" nomi o'rniga loyiha logosi (`src/logo.png` asosida) — "EDU" yozuvi va chiziqli mikroskop belgisi, inline SVG (har o'lchamda tiniq, fon bilan qo'shilib ketadi). "PLATFORM" so'zi olib tashlandi. Footerdagi to'q fonda och rangli; hover'da mikroskop egiladi (`motion-reduce` hurmat qilinadi).
