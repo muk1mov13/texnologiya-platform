@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (4/4): sarlavhalar va hujjat
+
+- `TeachHomePage`, `ReviewQueuePage`, `StatsPage`: sarlavha `PageHeader` (ikonka + "O'quv jarayoni" yorlig'i), shunda ular `AdminShell` ichida boshqa admin sahifalari bilan bir xil ko'rinadi.
+- `CLAUDE.md`: yagona panel (`StaffLayout`, admin bosh sahifasi `/admin`, `ADMIN_NAV` dagi `/teach` sahifalari, `activePrefix`) qayd etildi.
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (3/4): bosh sahifa
 
 - `AdminOverviewPage`: birinchi ko'rsatkich — "Tekshirilmagan javoblar" (`useTeachSummary`, `/teach/review` ga havola); ko'rsatkichlar 5 ta (telefonda birinchisi to'liq kenglikda).

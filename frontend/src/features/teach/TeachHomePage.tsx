@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
+import { PageHeader } from '@/features/admin/ui/PageHeader'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { WeeklyReport } from './WeeklyReport'
 
@@ -22,7 +23,7 @@ export function TeachHomePage() {
     <QueryState query={subjects}>
       {(data) => (
         <div className="flex flex-col gap-6">
-          <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
+          <PageHeader icon="pencil" eyebrow={t('navGroups.learning')} title={t('teach.title')} />
           <PendingReviews />
           {data.length === 0 ? (
             <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />

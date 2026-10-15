@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Field, Select } from '@/components/ui/Field'
 import { QueryState } from '@/components/ui/QueryState'
+import { PageHeader } from '@/features/admin/ui/PageHeader'
 
 /** O'qituvchi statistikasi: tanlangan fan mavzulari bo'yicha talabalar faolligi va natijasi. */
 export function StatsPage() {
@@ -15,7 +16,7 @@ export function StatsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t('stats.title')}</h1>
+      <PageHeader icon="chart" eyebrow={t('navGroups.learning')} title={t('stats.title')} />
       <QueryState query={subjects}>
         {(data) =>
           data.length === 0 ? (

@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
+import { PageHeader } from '@/features/admin/ui/PageHeader'
 import { cx, FOCUS_RING } from '@/lib/cx'
 
 const STATUSES: readonly SubmissionStatus[] = ['submitted', 'returned', 'graded']
@@ -25,7 +26,7 @@ export function ReviewQueuePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t('review.title')}</h1>
+      <PageHeader icon="clipboard" eyebrow={t('navGroups.learning')} title={t('review.title')} />
       <Card className="p-0 sm:p-0">
         <div className="px-4 pt-3 sm:px-5">
           <Tabs
