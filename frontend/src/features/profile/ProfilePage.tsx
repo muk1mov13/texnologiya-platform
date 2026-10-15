@@ -1,14 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { m } from 'motion/react'
+import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDashboard } from '@/api/assessment'
 import { useChangePassword, useCurrentUser, useUpdateMe } from '@/api/auth'
 import type { User } from '@/api/types'
 import { LanguageSwitch } from '@/app/layouts/LanguageSwitch'
+import { Icon } from '@/components/icons/Icon'
+import type { IconName } from '@/components/icons/paths'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Field, Input } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
+import { PasswordInput } from '@/components/ui/PasswordInput'
+import { PAGE_TITLE, SURFACE } from '@/components/ui/styles'
 import { pushToast } from '@/components/ui/toast-store'
+import { cx } from '@/lib/cx'
+import { initials } from '@/lib/initials'
+import { fadeUp } from '@/lib/motion'
 import { passwordSchema, profileSchema, type PasswordValues, type ProfileValues } from './schemas'
 
 export function ProfilePage() {
@@ -16,21 +26,94 @@ export function ProfilePage() {
   const user = useCurrentUser()
   if (!user) return null
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t('profile.title')}</h1>
-      <Card className="flex flex-col gap-1">
-        <p className="text-sm text-slate-500">{t('auth.email')}</p>
-        <p className="font-semibold">{user.email}</p>
-        <p className="mt-2 text-sm text-slate-500">{t('profile.role')}</p>
-        <p className="font-semibold">{t(`roles.${user.role}`)}</p>
-      </Card>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      <h1 className={PAGE_TITLE}>{t('profile.title')}</h1>
+      <ProfileHero user={user} />
       <ProfileForm user={user} />
       <Card className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">{t('profile.language')}</h2>
+        <SectionTitle icon="globe">{t('profile.language')}</SectionTitle>
         <LanguageSwitch />
       </Card>
       <PasswordForm />
     </div>
+  )
+}
+
+/** Yuqori karta: avatar (bosh harflar), ism, rol, email; talabada — seriya va XP. */
+function ProfileHero({ user }: { user: User }) {
+  const { t } = useTranslation()
+  return (
+    <m.section
+      initial="hidden"
+      animate="show"
+      variants={fadeUp}
+      aria-label={user.full_name}
+      className={cx(SURFACE, 'overflow-hidden')}
+    >
+      <div aria-hidden="true" className="relative h-24 bg-gradient-to-br from-brand-500 to-brand-900 sm:h-28">
+        <div className="absolute inset-0 bg-grid opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      </div>
+      <div className="flex flex-col gap-4 px-5 pb-5 sm:flex-row sm:items-end sm:px-6 sm:pb-6">
+        <span
+          aria-hidden="true"
+          className="-mt-10 grid size-20 shrink-0 place-items-center rounded-[1.4rem] bg-gradient-to-br from-brand-100 to-brand-200 text-2xl font-extrabold text-brand-900 shadow-soft ring-4 ring-white"
+        >
+          {initials(user.full_name)}
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="truncate text-xl font-extrabold tracking-tight text-slate-900">{user.full_name}</p>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-0.5 font-semibold text-brand-800 ring-1 ring-brand-200/70">
+              <span className="sr-only">{t('profile.role')}: </span>
+              {t(`roles.${user.role}`)}
+            </span>
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <Icon name="mail" className="size-4 shrink-0 text-slate-400" />
+              <span className="sr-only">{t('auth.email')}: </span>
+              <span className="truncate">{user.email}</span>
+            </span>
+          </p>
+        </div>
+        {user.role === 'student' && <StudentStats />}
+      </div>
+    </m.section>
+  )
+}
+
+/** Talabaning seriya va XP ko'rsatkichi (ma'lumot yo'q bo'lsa ko'rinmaydi). */
+function StudentStats() {
+  const { t } = useTranslation()
+  const { data } = useDashboard()
+  if (!data) return null
+  return (
+    <dl className="flex gap-2">
+      <div className="flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 ring-1 ring-orange-200/70">
+        <Icon name="flame" className="size-4 text-orange-700" />
+        <dt className="sr-only">{t('dashboard.streakLabel')}</dt>
+        <dd className="text-sm font-bold text-orange-800 tabular-nums">
+          {t('dashboard.streak', { count: data.streak.current })}
+        </dd>
+      </div>
+      <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 ring-1 ring-amber-200/70">
+        <Icon name="star" className="size-4 text-amber-700" />
+        <dt className="sr-only">{t('dashboard.xpLabel')}</dt>
+        <dd className="text-sm font-bold text-amber-800 tabular-nums">{t('dashboard.xp', { xp: data.xp_total })}</dd>
+      </div>
+    </dl>
+  )
+}
+
+function SectionTitle({ icon, children }: { icon: IconName; children: ReactNode }) {
+  return (
+    <h2 className="flex items-center gap-3 text-lg font-bold tracking-tight text-slate-900">
+      <span
+        aria-hidden="true"
+        className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 ring-1 ring-brand-200/70"
+      >
+        <Icon name={icon} className="size-4.5" />
+      </span>
+      {children}
+    </h2>
   )
 }
 
@@ -51,7 +134,9 @@ function ProfileForm({ user }: { user: User }) {
 
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">{t('profile.personal')}</h2>
+      <div className="mb-5">
+        <SectionTitle icon="user">{t('profile.personal')}</SectionTitle>
+      </div>
       <form
         noValidate
         className="flex flex-col gap-4"
@@ -76,13 +161,14 @@ function ProfileForm({ user }: { user: User }) {
         <Field id="full_name" label={t('auth.fullName')} error={errors.full_name?.message}>
           <Input
             id="full_name"
+            icon="user"
             autoComplete="name"
             aria-invalid={Boolean(errors.full_name)}
             {...register('full_name')}
           />
         </Field>
         <Field id="phone" label={t('auth.phone')} error={errors.phone?.message}>
-          <Input id="phone" type="tel" autoComplete="tel" aria-invalid={Boolean(errors.phone)} {...register('phone')} />
+          <Input id="phone" type="tel" icon="phone" autoComplete="tel" aria-invalid={Boolean(errors.phone)} {...register('phone')} />
         </Field>
         <div>
           <Button type="submit" loading={updateMe.isPending}>
@@ -105,7 +191,9 @@ function PasswordForm() {
 
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">{t('profile.passwordTitle')}</h2>
+      <div className="mb-5">
+        <SectionTitle icon="lock">{t('profile.passwordTitle')}</SectionTitle>
+      </div>
       <form
         noValidate
         className="flex flex-col gap-4"
@@ -119,9 +207,8 @@ function PasswordForm() {
       >
         {changePassword.error && <FormError error={changePassword.error} />}
         <Field id="current_password" label={t('profile.currentPassword')} error={errors.current_password?.message}>
-          <Input
+          <PasswordInput
             id="current_password"
-            type="password"
             autoComplete="current-password"
             aria-invalid={Boolean(errors.current_password)}
             {...register('current_password')}
@@ -133,18 +220,16 @@ function PasswordForm() {
           hint={t('auth.passwordHint')}
           error={errors.new_password?.message}
         >
-          <Input
+          <PasswordInput
             id="new_password"
-            type="password"
             autoComplete="new-password"
             aria-invalid={Boolean(errors.new_password)}
             {...register('new_password')}
           />
         </Field>
         <Field id="confirm" label={t('auth.passwordConfirm')} error={errors.confirm?.message}>
-          <Input
+          <PasswordInput
             id="confirm"
-            type="password"
             autoComplete="new-password"
             aria-invalid={Boolean(errors.confirm)}
             {...register('confirm')}

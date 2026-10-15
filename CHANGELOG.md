@@ -8,6 +8,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 15: profil sahifasi
+- `ProfilePage`: yuqori karta — gradient banner, ustiga chiqib turgan bosh harfli avatar, ism, rol belgisi, email; talabada seriya va XP chiplari (`useDashboard`). Bo'lim sarlavhalari ikonkali (`SectionTitle`), ism/telefon maydonlari ikonkali `Input`, parol maydonlari `PasswordInput` (ko'rsatish/yashirish). Maydon yorliqlari va tugma nomlari o'zgarmadi.
+- Tekshiruv: lint, typecheck.
+
 ### Task 14: AI repetitor sahifasi
 - `TutorPage`: sarlavha + izoh; chapda suhbatlar kartasi (asosiy "Yangi suhbat" tugmasi, chat ikonkali elementlar, faol suhbat halqa bilan, sana `formatDate`, o'chirish — `trash` ikonka, bo'sh ro'yxat matni, uzun ro'yxat scroll), o'ngda `SURFACE` panel (`100dvh`).
 - `TutorPanel`: ixtiyoriy `suggestions` — bo'sh umumiy suhbatda namuna savollar chiplari (bosilsa yuboriladi; limit tugagan yoki javob kutilayotganda o'chiq).
