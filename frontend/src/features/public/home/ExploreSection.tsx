@@ -19,7 +19,7 @@ function BookStack() {
     <svg
       viewBox="0 0 160 120"
       aria-hidden="true"
-      className="pointer-events-none absolute -top-2 right-4 h-28 w-auto opacity-90 sm:right-8 sm:h-32"
+      className="pointer-events-none absolute -top-2 right-8 hidden h-32 w-auto opacity-90 sm:block"
     >
       <defs>
         <linearGradient id="lib-a" x1="0" x2="0" y1="0" y2="1">
@@ -60,7 +60,7 @@ function LibraryCard() {
   return (
     <m.div
       variants={fadeUp}
-      className="rounded-3xl bg-gradient-to-br from-brand-300/80 via-slate-200 to-amber-200/80 p-px shadow-soft"
+      className="min-w-0 rounded-3xl bg-gradient-to-br from-brand-300/80 via-slate-200 to-amber-200/80 p-px shadow-soft"
     >
       <div className="relative isolate flex h-full flex-col gap-6 overflow-hidden rounded-[calc(1.5rem-1px)] bg-white p-7 sm:p-9">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -70,7 +70,7 @@ function LibraryCard() {
         </div>
         <BookStack />
 
-        <div className="flex flex-col items-start gap-3 pr-24 sm:pr-36">
+        <div className="flex flex-col items-start gap-3 sm:pr-36">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold tracking-wider text-brand-800 uppercase ring-1 ring-brand-200/70">
             <Icon name="globe" className="size-3.5" />
             {t('home.library.eyebrow')}
@@ -103,7 +103,7 @@ function LibraryCard() {
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="font-bold text-slate-900">{t(`library.tabs.${link.tab}`)}</span>
-                  <span className="truncate text-sm text-slate-500">{t(`home.library.items.${link.tab}`)}</span>
+                  <span className="text-sm text-slate-500">{t(`home.library.items.${link.tab}`)}</span>
                 </span>
                 <span className="grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition group-hover:bg-brand-600 group-hover:text-white">
                   <Icon name="arrowRight" className="size-4 transition-transform group-hover:translate-x-0.5" />
