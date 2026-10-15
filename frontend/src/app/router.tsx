@@ -35,7 +35,7 @@ import { StatsPage } from '@/features/teach/StatsPage'
 import { TeachHomePage } from '@/features/teach/TeachHomePage'
 import { TopicEditorPage } from '@/features/teach/TopicEditorPage'
 import { RedirectIfAuthed, RequireAuth } from './guards'
-import { AdminLayout } from './layouts/AdminLayout'
+import { AdminShell } from './layouts/AdminShell'
 import { AppLayout } from './layouts/AppLayout'
 import { PublicLayout } from './layouts/PublicLayout'
 import { RouteError } from './RouteError'
@@ -92,25 +92,26 @@ export const routes: RouteObject[] = [
               { path: 'teach/books', element: <MyBooksPage /> },
             ],
           },
+        ],
+      },
+      {
+        // Admin bo'limi o'z karkasida (`AdminShell`): ilova headeri bu yerda ko'rinmaydi.
+        element: <RequireAuth roles={['admin']} />,
+        children: [
+          { path: 'admin', element: <Navigate to="/admin/users" replace /> },
           {
-            element: <RequireAuth roles={['admin']} />,
+            element: <AdminShell />,
             children: [
-              { path: 'admin', element: <Navigate to="/admin/users" replace /> },
-              {
-                element: <AdminLayout />,
-                children: [
-                  { path: 'admin/users', element: <AdminUsersPage /> },
-                  { path: 'admin/subjects', element: <AdminSubjectsPage /> },
-                  { path: 'admin/ai', element: <AdminAiPage /> },
-                  { path: 'admin/library', element: <AdminLibraryPage /> },
-                  { path: 'admin/books', element: <AdminBooksPage /> },
-                  { path: 'admin/news', element: <AdminNewsPage /> },
-                  { path: 'admin/news/:newsId', element: <NewsEditorPage /> },
-                  { path: 'admin/faq', element: <AdminFaqPage /> },
-                  { path: 'admin/messages', element: <AdminMessagesPage /> },
-                  { path: 'admin/site', element: <AdminSitePage /> },
-                ],
-              },
+              { path: 'admin/users', element: <AdminUsersPage /> },
+              { path: 'admin/subjects', element: <AdminSubjectsPage /> },
+              { path: 'admin/ai', element: <AdminAiPage /> },
+              { path: 'admin/library', element: <AdminLibraryPage /> },
+              { path: 'admin/books', element: <AdminBooksPage /> },
+              { path: 'admin/news', element: <AdminNewsPage /> },
+              { path: 'admin/news/:newsId', element: <NewsEditorPage /> },
+              { path: 'admin/faq', element: <AdminFaqPage /> },
+              { path: 'admin/messages', element: <AdminMessagesPage /> },
+              { path: 'admin/site', element: <AdminSitePage /> },
             ],
           },
         ],

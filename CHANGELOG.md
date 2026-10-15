@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: alohida `AdminShell` (2/9)
+
+- `/admin/*` endi `AppLayout` ichida emas, o'z karkasida (`app/layouts/AdminShell.tsx`); `AdminLayout` o'chirildi.
+- Kompyuterda chapda to'q (`brand-950`, yumshoq nur va katak bezagi) yon menyu: guruhlar, ikonkalar, faol band uchun suriluvchi indikator (`layoutId`), hisoblagichlar (kutayotgan talabalar, o'qilmagan xabarlar), pastda "O'qituvchi paneli", "Saytni ko'rish", profil va chiqish. Menyu ikonka rejimiga yig'iladi (holat `localStorage` da, xato bo'lsa e'tiborsiz).
+- Tepada joylashuv (Boshqaruv › guruh › bo'lim › tahrirlash) va til tanlash. Telefonda `<select>` o'rniga chapdan chiquvchi panel (Escape/fon/havola bilan yopiladi, fokus qaytariladi).
+- CLAUDE.md dagi admin karkasi tavsifi yangilandi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: ikonkalar va menyu (1/9)
 
 - Admin panelni "premium" ko'rinishga o'tkazish rejasi boshlandi (alohida admin shell, dashboard, sahifalar yangi uslubda).

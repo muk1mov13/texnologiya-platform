@@ -46,7 +46,7 @@ export function navLinksFor(role: Role): NavItem[] {
   ]
   // Admin kitoblarni `/admin/books` da yuklaydi va boshqaradi.
   if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks', icon: 'book' })
-  // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminLayout` da.
+  // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminShell` da.
   if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin', icon: 'shield' })
   items.push({ to: '/app', label: 'nav.studentView', end: true, icon: 'user' })
   return items
@@ -57,7 +57,7 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-/** `/admin/*` ichki menyusi (`AdminLayout`). */
+/** `/admin/*` ichki menyusi (`AdminShell`). */
 export const ADMIN_NAV: NavGroup[] = [
   { label: 'navGroups.people', items: [{ to: '/admin/users', label: 'nav.adminUsers', icon: 'users' }] },
   {
