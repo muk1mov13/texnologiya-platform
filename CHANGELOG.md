@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: kutubxona va kitoblar (8/9)
+
+- `AdminLibraryPage`: `PageHeader`, bo'limlar `Tabs pill`, daraxt `Panel` ichida. Emoji o'rniga ikonkalar (papka, PDF). Papka qatorida tartib, tahrirlash va o'chirish ixcham ikonka-tugmalar (nomi `aria-label`/`title`: "Tahrirlash: <nom>"), "+ Hujjat"/"+ Ichki papka" ikonkali; ichki daraja uzuq chiziq bilan.
+- `AdminBooksPage`: `PageHeader` (yuklash tugmasi), `Tabs pill`, kitoblar `md` dan ikki ustunli kartalarda: katta muqova (yo'q bo'lsa ikonka), nuqtali holat, muallif/turkum, yuklagan, `formatDate` va hajm; pastki qatorda tasdiqlash va amallar ikonkalar bilan. Yuklanishda skelet.
+- Yangi `arrowDown` ikonkasi. `LibraryModals` va `BookEditModal` o'zgarmadi (umumiy `Modal` allaqachon yangi uslubda).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: yangiliklar (7/9)
 
 - `AdminNewsPage`: `PageHeader` ("Yangi yangilik" tugmasi ikonka bilan), `DataList` qatorlari: holat rangidagi belgi (muqova bo'lsa kamera ikonkasi), sana va ko'rishlar ikonkalar bilan, nuqtali holat belgisi, o'ng strelka; yuklanishda skelet. Har qatorga muqova rasmi yuklanmaydi (qoralama muqovalari himoyalangan, alohida so'rov og'ir).

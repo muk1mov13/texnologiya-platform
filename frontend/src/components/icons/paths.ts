@@ -38,6 +38,7 @@ export const ICON_PATHS = {
   ],
   arrowRight: ['M5 12h14', 'M13 6l6 6-6 6'],
   arrowUp: ['M12 19V5', 'M6 11l6-6 6 6'],
+  arrowDown: ['M12 5v14', 'M6 13l6 6 6-6'],
   plus: ['M12 5v14', 'M5 12h14'],
   menu: ['M4 7h16', 'M4 12h16', 'M4 17h16'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
