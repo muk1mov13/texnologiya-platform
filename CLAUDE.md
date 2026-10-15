@@ -21,6 +21,7 @@ uv run alembic upgrade head
 uv run python -m app.cli create-admin --email admin@example.uz --name "Administrator"   # password from --password, ADMIN_PASSWORD, or prompt
 uv run uvicorn app.main:create_app --factory --reload   # API docs: http://localhost:8000/api/docs (disabled when ENV=prod)
 uv run python -m app.cli weekly-report [--week-start YYYY-MM-DD] [--subject ID]   # weekly AI report (default: last Mon–Sun)
+uv run python -m app.cli ai-check   # one short request to every configured AI provider + embedding (no fallback), prints OK/error and time
 uv run python -m app.cli seed-demo [--force]   # demo news, FAQ and site settings for the public site (idempotent)
 uv run python -m app.cli import-resources --path "../resource/Platforma materiallari" [--dry-run] [--force]   # import the ready-made course files (needs LibreOffice only for .doc text, DOC/DOCX curricula or materials without a PDF)
 

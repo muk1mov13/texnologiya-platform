@@ -111,6 +111,23 @@ def _import_resources(args: argparse.Namespace) -> int:
     return 0
 
 
+def _ai_check(args: argparse.Namespace) -> int:
+    from app.ai.check import run_checks
+
+    settings = get_settings()
+    print(
+        f"Asosiy provayder: {settings.ai_provider}, embedding: {settings.embedding_provider}, "
+        f"sozlangan: {'ha' if settings.ai_configured else "yo'q"}"
+    )
+    results = asyncio.run(run_checks(settings))
+    if not results:
+        print("Tekshiriladigan provayder yo'q (kalit berilmagan yoki AI_PROVIDER=fake)")
+        return 0 if settings.ai_provider == "fake" else 1
+    for r in results:
+        print(f"{'OK ' if r.ok else 'XATO'} {r.name}: {r.detail} ({r.seconds:.1f} s)")
+    return 0 if all(r.ok for r in results) and settings.ai_configured else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -143,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
     resources.add_argument(
         "--dry-run", action="store_true", help="Bazaga yozmasdan faqat o'qish hisobotini ko'rsatish"
     )
+    commands.add_parser("ai-check", help="AI provayderlari va embedding ishlashini tekshirish")
     args = parser.parse_args(argv)
 
     if args.command == "weekly-report":
@@ -151,6 +169,8 @@ def main(argv: list[str] | None = None) -> int:
         return _seed_demo(args)
     if args.command == "import-resources":
         return _import_resources(args)
+    if args.command == "ai-check":
+        return _ai_check(args)
 
     try:
         email = _resolve_email(args)

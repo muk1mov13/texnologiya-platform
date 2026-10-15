@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — `ai-check` CLI buyrug'i
+
+- Yangi `app/ai/check.py` va `python -m app.cli ai-check`: kaliti bor har bir provayder (compat chat/fast, Gemini chat/fast, embedding — Gemini yoki TEI) fallback'siz alohida tekshiriladi; har biri uchun OK/XATO, xato sababi va vaqt chiqadi. Prompt va javob matni chiqarilmaydi. Hammasi OK bo'lmasa chiqish kodi 1.
+- CLAUDE.md buyruqlar ro'yxatiga qo'shildi.
+- Birinchi ishga tushirish: Groq (`gpt-oss-120b`/`20b`) va `gemini-embedding-001` ishlaydi; `gemini-2.5-flash`/`-lite` yangi kalitlar uchun o'chirilgan (404) — keyingi commit'da tuzatiladi.
+
 ## 2026-10-15 — Ochiq sahifalar redizayni: yakuniy tekshiruv
 
 - `NewsListPage`, `FolderTree`, `BookCatalog`: bo'sh holatlarda emoji o'rniga SVG ikonkalar (`news`, `folder`, `book`) — endi yangilangan ochiq sahifalarda emoji qolmadi.
