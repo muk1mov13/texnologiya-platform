@@ -410,6 +410,7 @@
   },
   "admin": {
     "users": {
+      "pendingCount": "ta tasdiq kutmoqda",
       "title": "Foydalanuvchilar",
       "filter": "Holat bo'yicha filtr",
       "filters": { "pending": "Tasdiq kutayotganlar", "active": "Faol", "blocked": "Bloklangan", "all": "Hammasi" },

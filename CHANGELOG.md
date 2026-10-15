@@ -12,6 +12,11 @@ Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradi
 - `api/admin.ts`: `usePendingUsersCount()` (har 60 s yangilanadi, `AdminUsersPage` keshi bilan umumiy); `useAdminUsers` ixtiyoriy `enabled`/`refetchInterval` oladi.
 - Tekshiruv: lint, typecheck.
 
+### Task 2: admin menyusida badge
+- `AdminLayout`: "Foydalanuvchilar" yonida tasdiq kutayotganlar soni (sidebar `Badge`, telefonda `Select` ichida "(N)"); sr-only matni yo'lga qarab.
+- i18n `admin.users.pendingCount` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Bitta o'qituvchi = admin: soddalashtirish
 
 Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `admin` akkaunt). Backend o'zgarmaydi, faqat ortiqcha UI olib tashlanadi.

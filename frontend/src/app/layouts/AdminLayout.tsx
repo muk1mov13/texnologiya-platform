@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+import { usePendingUsersCount } from '@/api/admin'
 import { useMessages } from '@/api/adminCms'
 import { Badge } from '@/components/ui/Badge'
 import { Select } from '@/components/ui/Field'
@@ -8,6 +9,7 @@ import { ADMIN_NAV } from '../paths'
 import { navClass } from './navClass'
 
 const MESSAGES_PATH = '/admin/messages'
+const USERS_PATH = '/admin/users'
 
 /**
  * `/admin/*` sahifalari: `md` dan kengda chapda guruhlangan menyu, telefonda ochiladigan ro'yxat
@@ -17,9 +19,13 @@ export function AdminLayout() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  // O'qilmagan bog'lanish xabarlari soni "Xabarlar" yonida ko'rsatiladi.
+  // O'qilmagan bog'lanish xabarlari "Xabarlar" yonida, tasdiq kutayotgan talabalar
+  // "Foydalanuvchilar" yonida ko'rsatiladi.
   const unread = useMessages(true).data?.length ?? 0
-  const countFor = (to: string) => (to === MESSAGES_PATH ? unread : 0)
+  const pendingUsers = usePendingUsersCount()
+  const countFor = (to: string) => (to === MESSAGES_PATH ? unread : to === USERS_PATH ? pendingUsers : 0)
+  const countLabel = (to: string) =>
+    to === USERS_PATH ? t('admin.users.pendingCount') : t('adminMessages.unreadCount')
   const current = ADMIN_NAV.flatMap((group) => group.items).find(
     (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
   )
@@ -58,7 +64,7 @@ export function AdminLayout() {
                 {countFor(item.to) > 0 && (
                   <Badge tone="brand">
                     {countFor(item.to)}
-                    <span className="sr-only"> {t('adminMessages.unreadCount')}</span>
+                    <span className="sr-only"> {countLabel(item.to)}</span>
                   </Badge>
                 )}
               </NavLink>
