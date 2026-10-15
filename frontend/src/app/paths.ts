@@ -2,8 +2,8 @@ import type { Role, User } from '@/api/types'
 
 export function homePathFor(user: User): string {
   if (user.status !== 'active') return '/pending'
-  if (user.role === 'admin') return '/admin/users'
-  if (user.role === 'teacher') return '/teach'
+  // Admin — saytdagi yagona o'qituvchi, kundalik ishi `/teach` da.
+  if (user.role === 'admin' || user.role === 'teacher') return '/teach'
   return '/app'
 }
 

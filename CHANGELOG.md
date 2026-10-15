@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bitta o'qituvchi = admin: soddalashtirish
+
+Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `admin` akkaunt). Backend o'zgarmaydi, faqat ortiqcha UI olib tashlanadi.
+
+### Task 1: admin bosh sahifasi `/teach`
+- `paths.ts: homePathFor` admin uchun `/admin/users` o'rniga `/teach` (kirish, `RedirectIfAuthed`, noto'g'ri rol yo'naltirishi shu orqali).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — AI: almashtiriladigan provayder va lokal embedding
 
 Gemini'ning bepul limiti kam: matn asosan OpenAI'ga mos API'da (Groq/Cerebras/OpenRouter), Gemini zaxirada; embedding lokal `multilingual-e5-base` (TEI konteyneri).
