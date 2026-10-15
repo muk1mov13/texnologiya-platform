@@ -29,10 +29,10 @@ Sana: 2026-10-13. Asosiy spec: `2026-10-08-texnologiya-platform-design.md` (3-bo
 |---|---|
 | Lokal vektor qidiruv | `VectorStore` interfeysi. SQLite'da embedding BLOB (float32), o'xshashlik `numpy` bilan; PostgreSQL'da (CI, prod) `pgvector`. Lokal ishlab chiqish Docker'siz qoladi. |
 | Haftalik tahlil lokal muhitda | CLI: `uv run python -m app.cli weekly-report`. 4-bosqichda arq cron shu funksiyani chaqiradi. |
-| Provayder | Gemini, Python SDK `google-genai`. |
-| Sukut modellar | `AI_MODEL_CHAT=gemini-2.5-flash`, `AI_MODEL_FAST=gemini-2.5-flash-lite`, `AI_EMBEDDING_MODEL=gemini-embedding-001`, `AI_EMBEDDING_DIM=768` (`output_dimensionality`). Hammasi `.env` da almashtiriladi. |
-| Bepul tarif limitlari | Sozlanadigan: `AI_RPM` (daqiqasiga global so'rov, sukut 10). Aniq raqamlar implementatsiyada ai.google.dev dan tekshiriladi va `.env.example` ga izoh bilan yoziladi. |
-| Kalit yo'q bo'lsa | `AI_PROVIDER=gemini` va `GEMINI_API_KEY` bo'sh bo'lsa, AI o'chiq: AI endpoint'lari 503 `AI_DISABLED`, qolgan sayt to'liq ishlaydi. `AI_PROVIDER=fake` lokal sinov uchun (deterministik javoblar). Testlar doim `fake`. |
+| Provayder | Gemini (`google-genai`) yoki OpenAI'ga mos API (Groq, Cerebras, OpenRouter — `LLM_*`). `AI_PROVIDER=compat\|gemini` asosiyni tanlaydi, ikkinchisi kaliti bo'lsa zaxira. Embedding alohida: `EMBEDDING_PROVIDER=gemini\|tei` (lokal `multilingual-e5-base`, 2026-10-15 qo'shildi). |
+| Sukut modellar | `GEMINI_MODEL_CHAT=gemini-2.5-flash`, `GEMINI_MODEL_FAST=gemini-2.5-flash-lite`, `GEMINI_EMBEDDING_MODEL=gemini-embedding-001`, `LLM_MODEL_CHAT=openai/gpt-oss-120b`, `LLM_MODEL_FAST=openai/gpt-oss-20b`, `TEI_MODEL=intfloat/multilingual-e5-base`, `AI_EMBEDDING_DIM=768` (`output_dimensionality`). Hammasi `.env` da almashtiriladi. |
+| Bepul tarif limitlari | Sozlanadigan: `GEMINI_RPM` / `LLM_RPM` (daqiqasiga global so'rov, sukut 10). Aniq raqamlar implementatsiyada ai.google.dev dan tekshiriladi va `.env.example` ga izoh bilan yoziladi. |
+| Kalit yo'q bo'lsa | Asosiy provayder kaliti (`GEMINI_API_KEY` yoki `LLM_API_KEY`) yoki embedding bo'lmasa, AI o'chiq: AI endpoint'lari 503 `AI_DISABLED`, qolgan sayt to'liq ishlaydi. `AI_PROVIDER=fake` lokal sinov uchun (deterministik javoblar). Testlar doim `fake`. |
 | Bo'linish | 3A backend, 3B frontend. |
 
 `GEMINI_API_KEY` faqat `.env` da turadi. `.env.example` da bo'sh qiymat bo'ladi, kalit repoga va loglarga tushmaydi.

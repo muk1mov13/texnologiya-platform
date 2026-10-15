@@ -106,7 +106,8 @@ Fayl xatolari mavjud kodlardan foydalanadi.
 - `ArqJobRunner` (`JOB_RUNNER=arq`, `JobRunner` protokoliga mos), `backend/worker/` (`WorkerSettings`, haftalik `weekly-report` cron, dushanba ertalab Asia/Tashkent).
 - Rate limiter Redis'ga (`RATE_LIMIT_BACKEND=redis`); lokal muhit o'zgarmaydi.
 - Dockerfile'lar: api; worker (+ LibreOffice headless); frontend (build → nginx).
-- `docker-compose.yml`: nginx, api, worker, PostgreSQL 16 + pgvector, Redis; `docker-compose.dev.yml`.
+- `docker-compose.yml`: nginx, api, worker, PostgreSQL 16 + pgvector, Redis, `embeddings`; `docker-compose.dev.yml`.
+- `embeddings` (2026-10-15): `ghcr.io/huggingface/text-embeddings-inference` CPU image, `--model-id intfloat/multilingual-e5-base`, model keshi uchun volume, faqat ichki tarmoqda; api va worker `EMBEDDING_PROVIDER=tei`, `TEI_URL=http://embeddings:80`. ~1–1.5 GB RAM, shuning uchun server kamida 4 GB. Birinchi ishga tushirishdan keyin admin → AI → "Qayta indekslash"; `AI_MIN_SIMILARITY`/`AI_HINT_SIMILARITY` haqiqiy savollarda kalibrlanadi.
 - `nginx.conf`: HTTPS (certbot), `/api` proksi, SSE uchun buffering o'chiq, ichki `/protected-media/`, SPA fallback, `/sitemap.xml` va `/robots.txt` proksi, CSP, HSTS, X-Content-Type-Options.
 - Prod `.env.example` (`ENV=prod`, kuchli `JWT_SECRET`, `COOKIE_SECURE=true`, CORS, `MEDIA_ACCEL_REDIRECT=true`, `PUBLIC_BASE_URL`), `backup.sh` (kunlik `pg_dump` + media arxivi, 14 kun), `deploy/README.md` (ishga tushirish, `alembic upgrade head`, `create-admin`, tiklash).
 - CI'da yangi `deploy` jobi: `docker compose config` va image'larni build qilish.

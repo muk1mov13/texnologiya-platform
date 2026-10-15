@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Gemini'ning bepul limiti kam: matn asosan OpenAI'ga mos API'da (Groq/Cerebras/OpenRouter), Gemini zaxirada; embedding lokal `multilingual-e5-base` (TEI konteyneri).
 
+### Task 3: hujjatlar va deploy eslatmalari
+- `CLAUDE.md`: AI provayderlari bandi (compat/gemini, zaxira, TEI embedder, yangi sozlama nomlari, eskirgan chunk'lar va chegaralarni kalibrlash).
+- Phase-3 spec: provayder, model va limit qatorlari yangi nomlarga.
+- Phase-4 spec 8-bo'lim (4C): `embeddings` konteyneri (TEI CPU image, model volume, ichki tarmoq, ~1–1.5 GB RAM, server kamida 4 GB, birinchi ishga tushirishdan keyin qayta indekslash).
+- Roadmap: 12-band (bajarildi, ochiq masalalar: chegaralarni kalibrlash, serverni O'zbekistonda joylash).
+
 ### Task 2: lokal embedding (TEI, multilingual-e5-base)
 - `providers.TeiEmbeddingProvider`: `POST {TEI_URL}/embed` (32 tadan, `normalize`/`truncate`), e5 prefikslari `query: ` / `passage: `, o'lcham `EMBEDDING_DIM` (768) bilan tekshiriladi — migratsiya kerak emas.
 - Sozlamalar: `EMBEDDING_PROVIDER=gemini|tei`, `TEI_URL`, `TEI_MODEL`; embedding matn provayderidan mustaqil tanlanadi, `tei` bo'lsa Gemini kaliti shart emas.
