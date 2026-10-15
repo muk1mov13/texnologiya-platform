@@ -261,24 +261,26 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
       </nav>
 
       <div className="flex shrink-0 flex-col gap-2 border-t border-white/10 px-3 py-2.5">
-        {/* Qo'shimcha havolalar bitta ikonka qatorida — menyu past ekranga ham sig'sin. */}
-        <div className={cx('flex items-center gap-1', collapsed && 'flex-col')}>
-          <FooterLink to="/teach" icon="pencil" label={t('adminShell.teachPanel')} />
-          <FooterLink to="/" icon="globe" label={t('adminShell.viewSite')} />
-          {onToggle && (
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-label={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
-              title={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
-              className={cx(FOOTER_BUTTON, !collapsed && 'ml-auto')}
-            >
-              <Icon
-                name="panelLeft"
-                className={cx('size-[1.15rem] transition-transform motion-reduce:transition-none', collapsed && 'rotate-180')}
-              />
-            </button>
-          )}
+        {/* Qo'shimcha havolalar: yoyilganda ikonka + yozuv, yig'ilganda faqat ikonka. */}
+        <div className={cx('flex flex-col gap-0.5', collapsed && 'items-center')}>
+          <FooterLink to="/teach" icon="pencil" label={t('adminShell.teachPanel')} collapsed={collapsed} />
+          <div className={cx('flex items-center gap-1', collapsed && 'flex-col gap-0.5')}>
+            <FooterLink to="/" icon="globe" label={t('adminShell.viewSite')} collapsed={collapsed} />
+            {onToggle && (
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-label={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
+                title={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
+                className={FOOTER_BUTTON}
+              >
+                <Icon
+                  name="panelLeft"
+                  className={cx('size-[1.15rem] transition-transform motion-reduce:transition-none', collapsed && 'rotate-180')}
+                />
+              </button>
+            )}
+          </div>
         </div>
         {user && (
           <div
@@ -395,13 +397,23 @@ interface FooterLinkProps {
   to: string
   icon: IconName
   label: string
+  collapsed: boolean
 }
 
-/** Pastki qatordagi ikonka-havola: nomi `aria-label` va `title` (hover'da) orqali. */
-function FooterLink({ to, icon, label }: FooterLinkProps) {
+/** Pastki havola: yoyilganda ikonka va yozuv; yig'ilganda faqat ikonka (nomi `title`da). */
+function FooterLink({ to, icon, label, collapsed }: FooterLinkProps) {
   return (
-    <Link to={to} aria-label={label} title={label} className={FOOTER_BUTTON}>
-      <Icon name={icon} className="size-[1.15rem]" />
+    <Link
+      to={to}
+      title={collapsed ? label : undefined}
+      className={cx(
+        'group flex h-9 items-center gap-3 rounded-xl text-sm font-medium text-brand-100/70 transition-colors hover:bg-white/5 hover:text-white motion-reduce:transition-none',
+        collapsed ? 'w-9 justify-center' : 'min-w-0 flex-1 px-3',
+        DARK_FOCUS,
+      )}
+    >
+      <Icon name={icon} className="size-[1.15rem] shrink-0 text-brand-200/60 group-hover:text-brand-200" />
+      <span className={cx('min-w-0 truncate', collapsed && 'sr-only')}>{label}</span>
     </Link>
   )
 }

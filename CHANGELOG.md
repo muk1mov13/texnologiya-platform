@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin menyusi: pastki havolalar yozuv bilan
+
+- `AdminShell`: yon menyuning pastidagi "O'qituvchi paneli" va "Saytga o'tish" endi ikonka va yozuv bilan alohida qatorlarda (avval faqat ikonka edi); menyu yig'ilganda avvalgidek faqat ikonka. Yig'ish tugmasi "Saytga o'tish" qatorining o'ng tomonida.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: savol-javob, xabarlar, sayt sozlamalari (9/9)
 
 - `AdminFaqPage`: `PageHeader`, `DataList` qatorlari tartib raqami belgisi, nuqtali holat, javobdan 2 qator; tartib/tahrir/o'chirish ixcham ikonka-tugmalar. Yuklanishda skelet.
