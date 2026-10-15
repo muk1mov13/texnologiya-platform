@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Talaba uchun logo bosh sahifaga olib boradi
+
+- `AppLayout`: talaba header'dagi logoni bossa endi landing sahifaga (`/`) o'tadi (avval `/app` ga). O'qituvchi va admin uchun logo avvalgidek o'z paneliga olib boradi.
+
 ## 2026-10-15 — AI repetitor: tarjima kalitlari tuzatildi
 
 - `tutor.subtitle`, `tutor.noConversations`, `tutor.suggestionsTitle`, `tutor.suggestion1..3` kalitlari `uz.json`/`ru.json`da xato bilan `home.features.tutor` ichiga tushib qolgan edi, shuning uchun `/app/tutor` sahifasida matn o'rniga kalit nomlari chiqardi. Kalitlar `tutor` bo'limiga ko'chirildi.
