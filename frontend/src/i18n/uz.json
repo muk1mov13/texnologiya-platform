@@ -232,12 +232,6 @@
         "text": "Har bir bajarilgan bosqich uchun ball va yutuq nishonlari oling"
       },
       "tutor": {
-    "subtitle": "Dars materiallari asosida javob beradigan yordamchi. Savolingizni yozing yoki namunadan boshlang.",
-    "noConversations": "Hali suhbatlar yo'q",
-    "suggestionsTitle": "Masalan, so'rang:",
-    "suggestion1": "Ma'ruzaning asosiy g'oyasini qisqacha tushuntirib bering",
-    "suggestion2": "Bu mavzu bo'yicha o'zimni tekshirish uchun 3 ta savol tuzing",
-    "suggestion3": "Lug'atdagi atamalarni oddiy misollar bilan izohlang",
         "title": "AI repetitor",
         "text": "Mavzu bo'yicha savol bering — javob dars materiallari va kutubxonadan, manbalari bilan olinadi.",
         "ask": "Frezalash nima?",
@@ -693,7 +687,13 @@
     "conversations": "Suhbatlar",
     "deleteTitle": "Suhbatni o'chirish",
     "deleteText": "\"{{title}}\" suhbati o'chiriladi.",
-    "disabled": "AI repetitor hozircha o'chirilgan"
+    "disabled": "AI repetitor hozircha o'chirilgan",
+    "subtitle": "Dars materiallari asosida javob beradigan yordamchi. Savolingizni yozing yoki namunadan boshlang.",
+    "noConversations": "Hali suhbatlar yo'q",
+    "suggestionsTitle": "Masalan, so'rang:",
+    "suggestion1": "Ma'ruzaning asosiy g'oyasini qisqacha tushuntirib bering",
+    "suggestion2": "Bu mavzu bo'yicha o'zimni tekshirish uchun 3 ta savol tuzing",
+    "suggestion3": "Lug'atdagi atamalarni oddiy misollar bilan izohlang"
   },
   "aiDraft": {
     "create": "AI bilan yaratish",
