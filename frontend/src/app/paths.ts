@@ -59,6 +59,7 @@ export interface NavGroup {
 
 /** `/admin/*` ichki menyusi (`AdminShell`). */
 export const ADMIN_NAV: NavGroup[] = [
+  { label: 'navGroups.main', items: [{ to: '/admin', label: 'nav.adminOverview', end: true, icon: 'grid' }] },
   { label: 'navGroups.people', items: [{ to: '/admin/users', label: 'nav.adminUsers', icon: 'users' }] },
   {
     label: 'navGroups.learning',

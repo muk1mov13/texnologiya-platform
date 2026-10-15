@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
+import { createBrowserRouter, type RouteObject } from 'react-router'
 import { AdminAiPage } from '@/features/admin/AdminAiPage'
+import { AdminOverviewPage } from '@/features/admin/AdminOverviewPage'
 import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { AdminBooksPage } from '@/features/admin/cms/AdminBooksPage'
@@ -98,10 +99,10 @@ export const routes: RouteObject[] = [
         // Admin bo'limi o'z karkasida (`AdminShell`): ilova headeri bu yerda ko'rinmaydi.
         element: <RequireAuth roles={['admin']} />,
         children: [
-          { path: 'admin', element: <Navigate to="/admin/users" replace /> },
           {
             element: <AdminShell />,
             children: [
+              { path: 'admin', element: <AdminOverviewPage /> },
               { path: 'admin/users', element: <AdminUsersPage /> },
               { path: 'admin/subjects', element: <AdminSubjectsPage /> },
               { path: 'admin/ai', element: <AdminAiPage /> },

@@ -33,6 +33,7 @@
     "adminNews": "Yangiliklar",
     "adminFaq": "Savol-javob",
     "adminMessages": "Xabarlar",
+    "adminOverview": "Umumiy ko'rinish",
     "adminSite": "Sayt sozlamalari"
   },
   "languages": { "uz": "O'zbekcha", "ru": "Русский" },
@@ -842,7 +843,35 @@
     "sentText": "Rahmat! Tez orada siz bilan bog'lanamiz.",
     "again": "Yana yozish"
   },
-  "navGroups": { "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" },
+  "navGroups": { "main": "Asosiy", "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" },
+  "adminOverview": {
+    "title": "Xush kelibsiz, {{name}}",
+    "subtitle": "Bugun e'tibor talab qiladigan ishlar va platforma holati",
+    "stats": {
+      "pendingUsers": "Tasdiq kutayotgan talabalar",
+      "unreadMessages": "O'qilmagan xabarlar",
+      "pendingBooks": "Tasdiq kutayotgan kitoblar",
+      "unpublishedNews": "Nashr qilinmagan yangiliklar"
+    },
+    "pendingTitle": "Tasdiq kutayotgan talabalar",
+    "pendingText": "Ro'yxatdan o'tgan talabalar tasdiqlangach platformaga kira oladi",
+    "pendingEmpty": "Tasdiq kutayotgan talaba yo'q",
+    "messagesTitle": "O'qilmagan xabarlar",
+    "messagesEmpty": "Yangi xabar yo'q",
+    "aiTitle": "AI yordamchi",
+    "aiOn": "Yoqilgan",
+    "aiOff": "O'chirilgan",
+    "aiNotConfigured": "Sozlanmagan",
+    "aiLimit": "Kunlik limit",
+    "quickTitle": "Tezkor amallar",
+    "quick": {
+      "news": "Yangilik yozish",
+      "subjects": "Fanlar",
+      "library": "Kutubxona",
+      "site": "Sayt sozlamalari"
+    },
+    "seeAll": "Hammasi"
+  },
   "adminShell": {
     "root": "Boshqaruv",
     "collapse": "Menyuni yig'ish",

@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: dashboard (4/9)
+
+- Yangi `AdminOverviewPage` (`/admin`; avval `/admin/users` ga yo'naltirardi). Backend o'zgarmadi — faqat mavjud so'rovlar.
+- Ko'rsatkichlar: tasdiq kutayotgan talabalar, o'qilmagan xabarlar, tasdiq kutayotgan kitoblar, nashr qilinmagan yangiliklar (har biri tegishli sahifaga havola, kutayotgan ish bo'lsa rang o'zgaradi).
+- Tasdiq kutayotgan talabalar (5 tasi, shu yerda tasdiqlash), o'qilmagan xabarlar, AI holati (yoqilgan/o'chirilgan/sozlanmagan, provayder, model, kunlik limit), tezkor amallar.
+- Menyuda yangi "Asosiy" guruhi va "Umumiy ko'rinish" bandi. i18n: `adminOverview.*`, `nav.adminOverview`, `navGroups.main` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: UI primitivlari (3/9)
 
 - `features/admin/ui/`: `PageHeader` (ikonka, eyebrow, sarlavha, izoh, amallar), `Panel` (sarlavhali bo'lim kartasi, `flush`), `StatCard` (ko'rsatkich, skelet, havola), `DataList` + `ListRow` (eski `border-2` qatorlar o'rniga bitta kartada ajratilgan qatorlar), `Toolbar` (filtr + qidiruv), `ListSkeleton`.
