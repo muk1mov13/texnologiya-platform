@@ -7,6 +7,10 @@ import type { GlossaryTerm } from '@/api/types'
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Textarea } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
+import { DataList, ListRow, RowIcon } from '@/features/admin/ui/DataList'
+import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
+import { IconAction } from '@/features/admin/ui/IconAction'
+import { AddSection } from './AddSection'
 import { glossarySchema, type GlossaryValues } from './schemas'
 
 export function GlossaryTab({ topicId, items }: { topicId: number; items: GlossaryTerm[] }) {
@@ -16,14 +20,14 @@ export function GlossaryTab({ topicId, items }: { topicId: number; items: Glossa
   const [toDelete, setToDelete] = useState<GlossaryTerm | null>(null)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {items.length === 0 ? (
-        <p className="text-slate-500">{t('teach.noGlossary')}</p>
+        <EmptyBlock icon="glossary" title={t('teach.noGlossary')} text={t('teach.noGlossaryText')} />
       ) : (
-        <ul className="flex flex-col gap-2">
-          {items.map((item) => (
-            <li key={item.id} aria-label={item.term} className="rounded-xl border-2 border-slate-100 bg-white p-3">
-              {editingId === item.id ? (
+        <DataList flat>
+          {items.map((item) =>
+            editingId === item.id ? (
+              <li key={item.id} aria-label={item.term} className="bg-slate-50/70 px-5 py-4 sm:px-6">
                 <GlossaryForm
                   idPrefix={`glossary-${item.id}`}
                   initial={item}
@@ -34,33 +38,34 @@ export function GlossaryTab({ topicId, items }: { topicId: number; items: Glossa
                     update.mutate({ id: item.id, data: values }, { onSuccess: () => setEditingId(null) })
                   }
                 />
-              ) : (
-                <div className="flex flex-wrap items-start gap-2">
-                  <div className="min-w-40 flex-1">
-                    <p className="font-semibold">{item.term}</p>
-                    <p className="text-slate-600">{item.definition}</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>
-                    {t('common.edit')}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setToDelete(item)}>
-                    {t('common.delete')}
-                  </Button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+              </li>
+            ) : (
+              <ListRow
+                key={item.id}
+                aria-label={item.term}
+                className="items-start"
+                leading={<RowIcon icon="glossary" tone="brand" />}
+                title={item.term}
+                meta={<span className="text-pretty text-slate-600">{item.definition}</span>}
+                actions={
+                  <>
+                    <IconAction icon="pencil" label={t('common.edit')} onClick={() => setEditingId(item.id)} />
+                    <IconAction icon="trash" label={t('common.delete')} onClick={() => setToDelete(item)} />
+                  </>
+                }
+              />
+            ),
+          )}
+        </DataList>
       )}
-      <section className="rounded-2xl bg-slate-50 p-4">
-        <h3 className="mb-3 font-semibold">{t('teach.addTerm')}</h3>
+      <AddSection title={t('teach.addTerm')}>
         <GlossaryForm
           idPrefix="glossary-new"
           submitLabel={t('common.add')}
           pending={add.isPending}
           onSubmit={(values, reset) => add.mutate(values, { onSuccess: reset })}
         />
-      </section>
+      </AddSection>
       <ConfirmDialog
         open={toDelete !== null}
         title={t('teach.deleteTermTitle')}

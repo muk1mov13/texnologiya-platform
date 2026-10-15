@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bosqich tablari qayta dizayni (2/3): glossariy va adabiyotlar
+
+- `GlossaryTab`, `LiteratureTab`: elementlar `DataList flat`/`ListRow` qatorlarida (ikonka plitkasi, tahrirlash va o'chirish `IconAction`), tahrirlash formasi qatorning o'zida ochiladi; bo'sh holat — `EmptyBlock`.
+- Yangi `features/teach/AddSection.tsx`: "yangi element qo'shish" bloki (glossariy, adabiyotlar).
+- i18n: `teach.noGlossaryText`, `teach.noLiteratureText` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Bosqich tablari qayta dizayni (1/3): materiallar
 
 - `MaterialsTab`: yuklash formasi sudrab tashlash (drag-and-drop) zonasiga aylandi — tanlangan fayl nomi va hajmi ko'rsatiladi, ruxsat etilmagan kengaytma tashlansa xabar chiqadi, nom maydoni bo'sh bo'lsa fayl nomidan to'ldiriladi. Materiallar `DataList`/`ListRow` qatorlarida (PDF ikonkasi, holat `Badge dot`, o'chirish `IconAction`), bo'sh holat — `EmptyBlock`.

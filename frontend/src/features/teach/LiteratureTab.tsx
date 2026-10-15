@@ -7,6 +7,10 @@ import type { LiteratureIn, LiteratureItem } from '@/api/types'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Field'
 import { ConfirmDialog } from '@/components/ui/Modal'
+import { DataList, ListRow, RowIcon } from '@/features/admin/ui/DataList'
+import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
+import { IconAction } from '@/features/admin/ui/IconAction'
+import { AddSection } from './AddSection'
 import { literatureSchema, type LiteratureValues } from './schemas'
 
 function toPayload(values: LiteratureValues): LiteratureIn {
@@ -27,14 +31,14 @@ export function LiteratureTab({ topicId, items }: { topicId: number; items: Lite
   const [toDelete, setToDelete] = useState<LiteratureItem | null>(null)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {items.length === 0 ? (
-        <p className="text-slate-500">{t('teach.noLiterature')}</p>
+        <EmptyBlock icon="library" title={t('teach.noLiterature')} text={t('teach.noLiteratureText')} />
       ) : (
-        <ul className="flex flex-col gap-2">
-          {items.map((item) => (
-            <li key={item.id} aria-label={item.title} className="rounded-xl border-2 border-slate-100 bg-white p-3">
-              {editingId === item.id ? (
+        <DataList flat>
+          {items.map((item) =>
+            editingId === item.id ? (
+              <li key={item.id} aria-label={item.title} className="bg-slate-50/70 px-5 py-4 sm:px-6">
                 <LiteratureForm
                   idPrefix={`literature-${item.id}`}
                   initial={{
@@ -50,38 +54,43 @@ export function LiteratureTab({ topicId, items }: { topicId: number; items: Lite
                     update.mutate({ id: item.id, data: toPayload(values) }, { onSuccess: () => setEditingId(null) })
                   }
                 />
-              ) : (
-                <div className="flex flex-wrap items-start gap-2">
-                  <div className="min-w-40 flex-1">
-                    <p className="font-semibold">{item.title}</p>
-                    {(item.author || item.year) && (
-                      <p className="text-slate-600">{[item.author, item.year].filter(Boolean).join(', ')}</p>
-                    )}
-                    {item.url && (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm break-all text-brand-700 hover:underline"
-                      >
-                        {item.url}
-                      </a>
-                    )}
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>
-                    {t('common.edit')}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setToDelete(item)}>
-                    {t('common.delete')}
-                  </Button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+              </li>
+            ) : (
+              <ListRow
+                key={item.id}
+                aria-label={item.title}
+                className="items-start"
+                leading={<RowIcon icon="book" tone="brand" />}
+                title={item.title}
+                meta={
+                  (item.author || item.year) && (
+                    <span className="text-slate-600">{[item.author, item.year].filter(Boolean).join(' · ')}</span>
+                  )
+                }
+                extra={
+                  item.url && (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-sm break-all text-brand-700 hover:underline"
+                    >
+                      {item.url}
+                    </a>
+                  )
+                }
+                actions={
+                  <>
+                    <IconAction icon="pencil" label={t('common.edit')} onClick={() => setEditingId(item.id)} />
+                    <IconAction icon="trash" label={t('common.delete')} onClick={() => setToDelete(item)} />
+                  </>
+                }
+              />
+            ),
+          )}
+        </DataList>
       )}
-      <section className="rounded-2xl bg-slate-50 p-4">
-        <h3 className="mb-3 font-semibold">{t('teach.addLiterature')}</h3>
+      <AddSection title={t('teach.addLiterature')}>
         <LiteratureForm
           idPrefix="literature-new"
           initial={EMPTY}
@@ -89,7 +98,7 @@ export function LiteratureTab({ topicId, items }: { topicId: number; items: Lite
           pending={add.isPending}
           onSubmit={(values, reset) => add.mutate(toPayload(values), { onSuccess: reset })}
         />
-      </section>
+      </AddSection>
       <ConfirmDialog
         open={toDelete !== null}
         title={t('teach.deleteLiteratureTitle')}
