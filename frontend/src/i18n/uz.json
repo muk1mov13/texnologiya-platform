@@ -688,6 +688,17 @@
   },
   "stats": {
     "title": "Statistika",
+    "subtitle": "Talabalar mavzularni qanchalik o'zlashtirayotgani",
+    "topicsTitle": "Mavzular bo'yicha",
+    "kpi": {
+      "students": "Faol talabalar",
+      "studentsHint": "Eng ko'p boshlangan mavzu bo'yicha",
+      "completion": "Tugatish darajasi",
+      "completionHint": "Boshlaganlarning qanchasi tugatgan",
+      "score": "O'rtacha natija",
+      "scoreHint": "Testlardagi eng yaxshi urinishlar",
+      "pending": "Tekshirilmagan javoblar"
+    },
     "subject": "Fan",
     "topic": "Mavzu",
     "started": "Boshlagan",

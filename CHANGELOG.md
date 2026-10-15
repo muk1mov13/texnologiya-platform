@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Statistika qayta dizayni (1/2): umumiy ko'rsatkichlar
+
+- `StatsPage`: fan tanlash sarlavhaga ko'chdi (fan bitta bo'lsa — tanlash o'rniga fan nomi); 4 ta `StatCard`: faol talabalar, tugatish darajasi, o'rtacha natija, tekshirilmagan javoblar (bor bo'lsa sariq va `/teach/review` ga havola). Jadval `Panel` ichida.
+- Yangi `features/teach/statsSummary.ts`: `summarize()`, `percent()`, `completionOf()` — sof hisob-kitob funksiyalari.
+- i18n: `stats.subtitle`, `stats.topicsTitle`, `stats.kpi.*` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Bosqich tablari qayta dizayni (3/3): faoliyatlar va vazifa
 
 - `ActivitiesTab`: emoji o'rniga SVG ikonkalar (`quiz`/`check`/`grid`); faoliyatlar `DataList flat`/`ListRow` qatorlarida, holat `Badge dot`; ↑/↓, ko'rib chiqish, tahrirlash va o'chirish — `IconAction`; krossvord ko'rinishi qator ostida to'liq kenglikda. "Yangi test/ha-yo'q/krossvord" — ikonkali uchta karta-tugma, yangi faoliyat formasi `AddSection` ichida; bo'sh holat — `EmptyBlock`.
