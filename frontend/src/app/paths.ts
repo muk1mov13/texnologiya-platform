@@ -32,9 +32,10 @@ export function navLinksFor(role: Role): NavItem[] {
       { to: '/teach', label: 'nav.teach', end: true },
       { to: '/teach/review', label: 'nav.review' },
       { to: '/teach/stats', label: 'nav.stats' },
-      { to: '/teach/books', label: 'nav.myBooks' },
     )
   }
+  // Admin kitoblarni `/admin/books` da yuklaydi va boshqaradi.
+  if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks' })
   // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminLayout` da.
   if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin' })
   return items

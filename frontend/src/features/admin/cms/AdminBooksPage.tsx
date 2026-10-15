@@ -10,11 +10,13 @@ import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { pushToast } from '@/components/ui/toast-store'
+import { BookUploadModal } from '@/features/teach/BookUploadModal'
 import { useProtectedDownload } from '@/lib/download'
 import { formatSize } from '@/lib/format'
 import { BookEditModal } from './BookEditModal'
 
-const STATUSES: BookStatus[] = ['pending', 'approved']
+// Admin yuklagan kitob darhol tasdiqlanadi, shuning uchun asosiy ro'yxat — tasdiqlanganlar.
+const STATUSES: BookStatus[] = ['approved', 'pending']
 
 function BookRow({
   book,
@@ -93,17 +95,21 @@ function BookRow({
 export function AdminBooksPage() {
   const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const status: BookStatus = searchParams.get('status') === 'approved' ? 'approved' : 'pending'
+  const status: BookStatus = searchParams.get('status') === 'pending' ? 'pending' : 'approved'
   const query = useAdminBooks(status)
   const remove = useDeleteBook()
+  const [uploading, setUploading] = useState(false)
   const [editing, setEditing] = useState<BookAdmin | null>(null)
   const [deleting, setDeleting] = useState<BookAdmin | null>(null)
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-extrabold">{t('adminBooks.title')}</h1>
-        <p className="text-slate-600">{t('adminBooks.subtitle')}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold">{t('adminBooks.title')}</h1>
+          <p className="text-slate-600">{t('adminBooks.subtitle')}</p>
+        </div>
+        <Button onClick={() => setUploading(true)}>{t('myBooks.upload')}</Button>
       </div>
       <div>
         <Tabs
@@ -133,6 +139,7 @@ export function AdminBooksPage() {
           </QueryState>
         </TabPanel>
       </div>
+      <BookUploadModal open={uploading} onClose={() => setUploading(false)} />
       <BookEditModal book={editing} onClose={() => setEditing(null)} />
       <ConfirmDialog
         open={deleting !== null}

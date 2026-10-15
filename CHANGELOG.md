@@ -15,6 +15,12 @@ Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `adm
 - Unit test: biriktirish testi olib tashlandi.
 - Tekshiruv: lint, typecheck.
 
+### Task 3: kitoblar bitta admin sahifasida
+- `/admin/books`: "Kitob yuklash" tugmasi (mavjud `BookUploadModal`, admin kitobi darhol tasdiqlanadi); standart tab "Tasdiqlanganlar", "Tasdiq kutayotganlar" ikkinchi tab.
+- Menyu: "Kitoblarim" (`/teach/books`) faqat `teacher` roliga; admin ko'rmaydi (marshrut qoldi).
+- `adminBooks.subtitle` matni uz/ru yangilandi.
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 1: admin bosh sahifasi `/teach`
 - `paths.ts: homePathFor` admin uchun `/admin/users` o'rniga `/teach` (kirish, `RedirectIfAuthed`, noto'g'ri rol yo'naltirishi shu orqali).
 - Tekshiruv: lint, typecheck.

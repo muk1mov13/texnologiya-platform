@@ -812,7 +812,7 @@
   },
   "adminBooks": {
     "title": "Kitoblar",
-    "subtitle": "O'qituvchilar yuklagan kitoblar tasdiqlangach kutubxona katalogida ochiq bo'ladi.",
+    "subtitle": "Kutubxona katalogidagi kitoblar. Siz yuklagan kitob darhol katalogda ko'rinadi.",
     "tab": { "pending": "Tasdiq kutayotganlar", "approved": "Tasdiqlanganlar" },
     "empty": { "pending": "Tasdiq kutayotgan kitoblar yo'q", "approved": "Tasdiqlangan kitoblar yo'q" },
     "uploadedBy": "Yuklagan: {{name}}",
