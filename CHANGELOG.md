@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — O'qituvchi menyusidan "Talaba ko'rinishi" olib tashlandi
+
+- `paths.ts: navLinksFor('teacher')`: `/app` ("Talaba ko'rinishi") havolasi o'chirildi; u endi faqat adminda (`AppLayout` va `AdminShell` footeri).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (4/4): sarlavhalar va hujjat
 
 - `TeachHomePage`, `ReviewQueuePage`, `StatsPage`: sarlavha `PageHeader` (ikonka + "O'quv jarayoni" yorlig'i), shunda ular `AdminShell` ichida boshqa admin sahifalari bilan bir xil ko'rinadi.

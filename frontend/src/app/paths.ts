@@ -47,14 +47,12 @@ export function navLinksFor(role: Role): NavItem[] {
       { to: '/app', label: 'nav.studentView', end: true, icon: 'user' },
     ]
   }
-  // O'qituvchi: ish bo'limlari oldinda; talaba sahifalari bitta havolada,
-  // AI repetitor esa mavzu pleyeridagi `TutorDock` orqali ochiladi.
+  // O'qituvchi: faqat ish bo'limlari ("Talaba ko'rinishi" yo'q, u faqat adminda).
   return [
     { to: '/teach', label: 'nav.teach', end: true, icon: 'pencil' },
     { to: '/teach/review', label: 'nav.review', icon: 'clipboard' },
     { to: '/teach/stats', label: 'nav.stats', icon: 'chart' },
     { to: '/teach/books', label: 'nav.myBooks', icon: 'book' },
-    { to: '/app', label: 'nav.studentView', end: true, icon: 'user' },
   ]
 }
 
