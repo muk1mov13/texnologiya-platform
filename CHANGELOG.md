@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Kitoblar katalogi yangi dizaynda
+
+- `BookCatalog.tsx`: qidiruv (ichida `search` ikonkasi) va kategoriya bitta oq panelda; kitob kartasi `SURFACE` sirtida, muqova "kitob" ko'rinishida (chap qirrada umurtqa soyasi, hover'da biroz ko'tarilib qiyshayadi), muqovasiz kitobda brand gradientli muqova va nomi; kategoriya kvadrat yorliq, "Yuklab olish" to'liq tugma + hajm; grid 1→2→3 ustun; yuklanishda skelet.
+- Tekshiruv: lint, typecheck; brauzerda 1280px (kitoblar API javobi vaqtincha soxtalashtirilib).
+
 ## 2026-10-15 — Kutubxona sahifasi va papkalar daraxti yangi dizaynda
 
 - `LibraryPage.tsx`: `PageHero`; oddiy tablar o'rniga hero ichida 3 ta bo'lim kartasi (ikonka + izoh, tanlangani brand gradientda, `layoutId` bilan siljiydi). `tablist`/`tab` semantikasi va strelka bilan almashtirish saqlandi.
