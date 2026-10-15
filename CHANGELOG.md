@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: foydalanuvchilar (5/9)
+
+- `AdminUsersPage`: `PageHeader`, bir qatorda segment filtr (`Tabs pill`) va ikonkali qidiruv, `DataList` qatorlari Avatar, email/telefon ikonkalari va nuqtali holat belgisi bilan; yuklanishda skelet, bo'sh holatda SVG ikonka.
+- Vaqtinchalik parol oynasi: to'q mono blok va "Nusxa olish" tugmasi (ruxsat bo'lmasa parol baribir ko'rinadi).
+- Accessible nomlar (qator nomi, tugmalar) o'zgarmadi. i18n: `admin.users.subtitle/copy/copied` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: dashboard (4/9)
 
 - Yangi `AdminOverviewPage` (`/admin`; avval `/admin/users` ga yo'naltirardi). Backend o'zgarmadi — faqat mavjud so'rovlar.

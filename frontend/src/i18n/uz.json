@@ -479,7 +479,10 @@
       "tempPassword": "Vaqtinchalik parol",
       "tempTitle": "Yangi vaqtinchalik parol",
       "tempText": "{{name}} uchun yangi parol. Uni foydalanuvchiga xavfsiz yo'l bilan yetkazing — oyna yopilgach parol qayta ko'rsatilmaydi.",
-      "you": "(siz)"
+      "you": "(siz)",
+      "subtitle": "Talabalarni tasdiqlash, bloklash va vaqtinchalik parol berish",
+      "copy": "Nusxa olish",
+      "copied": "Parol nusxalandi"
     },
     "subjects": {
       "title": "Fanlarni boshqarish",
