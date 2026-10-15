@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: UI primitivlari (3/9)
+
+- `features/admin/ui/`: `PageHeader` (ikonka, eyebrow, sarlavha, izoh, amallar), `Panel` (sarlavhali bo'lim kartasi, `flush`), `StatCard` (ko'rsatkich, skelet, havola), `DataList` + `ListRow` (eski `border-2` qatorlar o'rniga bitta kartada ajratilgan qatorlar), `Toolbar` (filtr + qidiruv), `ListSkeleton`.
+- `Badge`: `dot` ko'rinishi (oq fon, rangli nuqta) — holatlar uchun. `Tabs`: `variant="pill"` (segment ko'rinishi). Mavjud chaqiruvlar o'zgarmaydi.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: alohida `AdminShell` (2/9)
 
 - `/admin/*` endi `AppLayout` ichida emas, o'z karkasida (`app/layouts/AdminShell.tsx`); `AdminLayout` o'chirildi.
