@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Yangilik sahifasi yangi dizaynda
+
+- `NewsPage.tsx`: "orqaga" chip (`BACK_LINK`), ikonli yorliq, katta sarlavha, sana va ko'rishlar soni ikonkalar bilan; muqova `rounded-3xl` + yumshoq soya; matn o'qish uchun qulay kenglikda (`68ch`, katta qator oralig'i); yuklanishda maqola shaklidagi skelet; pastda "Boshqa yangiliklar" paneli.
+- i18n (uz + ru): `news.moreTitle`.
+- Tekshiruv: lint, typecheck, build; brauzerda 1280px va 375px (gorizontal siljish yo'q).
+
 ## 2026-10-15 — Yangiliklar ro'yxati yangi dizaynda
 
 - `NewsListPage.tsx`: `PageHero` sarlavhasi; 1-sahifada eng yangi xabar katta gorizontal "featured" karta, qolganlari 3 ustunli grid (ketma-ket paydo bo'ladi); yuklanishda kartaga mos skelet.

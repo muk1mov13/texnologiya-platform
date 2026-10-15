@@ -860,6 +860,7 @@
     "description": "Institut va biologiya ta'limi yo'nalishi yangiliklari.",
     "empty": "Hozircha yangiliklar yo'q",
     "all": "Barcha yangiliklar",
+    "moreTitle": "Boshqa yangiliklarni ham o'qing",
     "views": "Ko'rishlar: {{count}}"
   },
   "faq": {
