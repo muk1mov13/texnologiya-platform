@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 13: "Natijalarim" sahifasi
+- `ResultsPage`: sarlavha + izoh; tepada xulosa (bajarilgan faoliyatlar, o'rtacha eng yaxshi natija `ProgressBar` bilan, baholangan/jami vazifalar — faqat kelgan ma'lumotdan); fanlar `details` bilan yig'iladigan kartalar; faoliyat qatori — tur ikonkasi, ball chizig'i + foiz (ekran o'quvchiga "Eng yaxshi: N%"), "Tahlil →"; vazifa qatori — ikonka, holat belgisi, izoh alohida blokda. Sana `formatDate` orqali.
+- `AttemptDetailPage`: "orqaga" chip, `PAGE_TITLE`, sana `formatDateTime`.
+- i18n (uz/ru): `results.subtitle`, `results.summaryActivities`, `results.summaryAverage`, `results.summaryTasks`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 12: AI repetitor paneli
 - `TutorPanel`: shishasimon sarlavha (gradient avatar, foydalanish hisoblagichi chipda, ikonkali "Yangi suhbat"), xabarlar fonida yumshoq kulrang; pufakchalar — talaba: brand gradient (o'ngda), repetitor: oq karta + kichik avatar (chapda); manbalar alohida blokda; bo'sh holat ikonkali; "Yuborish" ikonkali.
 - `TutorDock`: keng ekranda `SURFACE` panel (`100dvh`), telefonda gradient suzuvchi tugma va pastki panel (`85dvh`, tutqich chizig'i, xiralashgan fon).

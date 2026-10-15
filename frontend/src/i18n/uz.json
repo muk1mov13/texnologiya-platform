@@ -567,6 +567,10 @@
     "download": "Faylni yuklab olish"
   },
   "results": {
+    "subtitle": "Testlar, krossvordlar va vazifalar bo'yicha eng yaxshi natijalaringiz.",
+    "summaryActivities": "Bajarilgan faoliyatlar",
+    "summaryAverage": "O'rtacha natija",
+    "summaryTasks": "Baholangan vazifalar",
     "title": "Natijalarim",
     "empty": "Hali natijalar yo'q",
     "emptyText": "Test yoki vazifani bajarsangiz, natijalar shu yerda ko'rinadi",
