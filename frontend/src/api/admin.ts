@@ -16,7 +16,6 @@ export type UserFilter = UserStatus | 'all'
 export const adminKeys = {
   usersRoot: ['admin', 'users'] as const,
   users: (status: UserFilter, q: string) => ['admin', 'users', status, q] as const,
-  teachers: ['admin', 'users', 'teachers'] as const,
   subjects: ['admin', 'subjects'] as const,
 }
 
@@ -27,15 +26,6 @@ export function useAdminUsers(status: UserFilter, q: string) {
   return useQuery({
     queryKey: adminKeys.users(status, q),
     queryFn: ({ signal }) => apiFetch<User[]>(`/api/admin/users?${params.toString()}`, { signal }),
-  })
-}
-
-/** Fanlarga biriktirish uchun faol o'qituvchilar. */
-export function useTeachers() {
-  return useQuery({
-    queryKey: adminKeys.teachers,
-    queryFn: ({ signal }) => apiFetch<User[]>('/api/admin/users?status=active&limit=200', { signal }),
-    select: (users) => users.filter((user) => user.role === 'teacher'),
   })
 }
 
@@ -85,15 +75,6 @@ export function useDeleteSubject() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => apiFetch<void>(`/api/admin/subjects/${id}`, { method: 'DELETE' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.subjects }),
-  })
-}
-
-export function useSetTeachers() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, teacherIds }: { id: number; teacherIds: number[] }) =>
-      apiFetch<SubjectAdmin>(`/api/admin/subjects/${id}/teachers`, { method: 'PUT', json: { teacher_ids: teacherIds } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.subjects }),
   })
 }

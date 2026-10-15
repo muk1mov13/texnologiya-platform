@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw/http'
 import type { SubjectAdmin } from '@/api/types'
 import { i18n } from '@/i18n'
-import { adminUser, makeUser, renderRoute, teacherUser } from '@/test/render'
+import { adminUser, renderRoute } from '@/test/render'
 import { server } from '@/test/server'
 import { AdminSubjectsPage } from './AdminSubjectsPage'
 
@@ -20,12 +20,7 @@ const subject: SubjectAdmin = {
 }
 
 function mockBase(subjects: SubjectAdmin[] = [subject]) {
-  server.use(
-    http.get('/api/admin/subjects', () => HttpResponse.json(subjects)),
-    http.get('/api/admin/users', () =>
-      HttpResponse.json([adminUser, teacherUser, makeUser({ id: 9, full_name: 'Talaba', role: 'student' })]),
-    ),
-  )
+  server.use(http.get('/api/admin/subjects', () => HttpResponse.json(subjects)))
 }
 
 test("yangi fan yaratish POST yuboradi (bo'sh slug null bo'ladi)", async () => {
@@ -76,25 +71,6 @@ test('nashr tugmasi is_published ni almashtiradi', async () => {
   const row = await screen.findByRole('listitem', { name: subject.title })
   await userEvent.click(within(row).getByRole('button', { name: i18n.t('admin.subjects.publish') }))
   await waitFor(() => expect(body).toEqual({ is_published: true }))
-})
-
-test("o'qituvchi biriktirish PUT yuboradi", async () => {
-  let body: unknown = null
-  mockBase()
-  server.use(
-    http.put('/api/admin/subjects/1/teachers', async ({ request }) => {
-      body = await request.json()
-      return HttpResponse.json({ ...subject, teacher_ids: [teacherUser.id] })
-    }),
-  )
-  renderRoute(<AdminSubjectsPage />, { user: adminUser })
-  const row = await screen.findByRole('listitem', { name: subject.title })
-  await userEvent.click(within(row).getByRole('button', { name: i18n.t('admin.subjects.teachers') }))
-  const dialog = screen.getByRole('dialog')
-  await userEvent.click(await within(dialog).findByLabelText(teacherUser.full_name))
-  expect(within(dialog).queryByLabelText('Talaba')).not.toBeInTheDocument()
-  await userEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.save') }))
-  await waitFor(() => expect(body).toEqual({ teacher_ids: [teacherUser.id] }))
 })
 
 test("fanni o'chirish tasdiqlangach DELETE yuboriladi", async () => {

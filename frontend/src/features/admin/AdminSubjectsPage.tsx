@@ -4,7 +4,6 @@ import {
   useAdminSubjects,
   useDeleteSubject,
   useDeleteSyllabus,
-  useTeachers,
   useUpdateSubject,
   useUploadSyllabus,
 } from '@/api/admin'
@@ -16,19 +15,14 @@ import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { pushToast } from '@/components/ui/toast-store'
 import { SubjectFormModal } from './SubjectFormModal'
-import { TeachersModal } from './TeachersModal'
 
 export function AdminSubjectsPage() {
   const { t } = useTranslation()
   const subjects = useAdminSubjects()
-  const teachers = useTeachers()
   const update = useUpdateSubject()
   const remove = useDeleteSubject()
   const [editing, setEditing] = useState<SubjectAdmin | 'new' | null>(null)
-  const [teachersFor, setTeachersFor] = useState<SubjectAdmin | null>(null)
   const [toDelete, setToDelete] = useState<SubjectAdmin | null>(null)
-
-  const teacherNames = new Map((teachers.data ?? []).map((teacher) => [teacher.id, teacher.full_name]))
 
   return (
     <div className="flex flex-col gap-5">
@@ -51,11 +45,6 @@ export function AdminSubjectsPage() {
                   <div className="min-w-48 flex-1">
                     <p className="font-semibold">{subject.title}</p>
                     <p className="font-mono text-xs text-slate-500">{subject.slug}</p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {subject.teacher_ids.length === 0
-                        ? t('admin.subjects.noAssigned')
-                        : subject.teacher_ids.map((id) => teacherNames.get(id) ?? `#${id}`).join(', ')}
-                    </p>
                     <SyllabusControls subject={subject} />
                   </div>
                   <Badge tone={subject.is_published ? 'green' : 'amber'}>
@@ -69,9 +58,6 @@ export function AdminSubjectsPage() {
                       onClick={() => update.mutate({ id: subject.id, data: { is_published: !subject.is_published } })}
                     >
                       {subject.is_published ? t('admin.subjects.unpublish') : t('admin.subjects.publish')}
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setTeachersFor(subject)}>
-                      {t('admin.subjects.teachers')}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditing(subject)}>
                       {t('common.edit')}
@@ -91,7 +77,6 @@ export function AdminSubjectsPage() {
         subject={editing === 'new' ? null : editing}
         onClose={() => setEditing(null)}
       />
-      <TeachersModal subject={teachersFor} teachers={teachers.data ?? []} onClose={() => setTeachersFor(null)} />
       <ConfirmDialog
         open={toDelete !== null}
         title={t('admin.subjects.deleteTitle')}

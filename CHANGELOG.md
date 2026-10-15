@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `admin` akkaunt). Backend o'zgarmaydi, faqat ortiqcha UI olib tashlanadi.
 
+### Task 2: fanga o'qituvchi biriktirish UI olib tashlandi
+- `AdminSubjectsPage`: "O'qituvchilar" tugmasi va biriktirilganlar qatori yo'q; `TeachersModal.tsx` o'chirildi.
+- `api/admin.ts`: `useTeachers`, `useSetTeachers`, `adminKeys.teachers` olib tashlandi; i18n kalitlari (`admin.subjects.teachers/teachersTitle/noTeachers/noAssigned`) uz/ru dan olib tashlandi.
+- Backend `PUT /api/admin/subjects/{id}/teachers` va `teacher_ids` qoldi (admin hamma fanni baribir tahrirlaydi).
+- Unit test: biriktirish testi olib tashlandi.
+- Tekshiruv: lint, typecheck.
+
 ### Task 1: admin bosh sahifasi `/teach`
 - `paths.ts: homePathFor` admin uchun `/admin/users` o'rniga `/teach` (kirish, `RedirectIfAuthed`, noto'g'ri rol yo'naltirishi shu orqali).
 - Tekshiruv: lint, typecheck.
