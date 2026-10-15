@@ -21,7 +21,8 @@
   --shadow-press-danger: 0 3px 0 var(--color-red-700);
   /* Ochiq sayt (bosh sahifa) uchun yumshoq "premium" soyalar. */
   --shadow-glow: 0 10px 40px -10px rgb(13 148 136 / 0.45);
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px -12px rgb(15 23 42 / 0.12);
+  --shadow-glow-sm: 0 1px 0 rgb(255 255 255 / 0.15) inset, 0 8px 20px -8px rgb(13 148 136 / 0.6);
+  --shadow-soft:0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px -12px rgb(15 23 42 / 0.12);
 
   --animate-blob: blob-float 18s ease-in-out infinite;
   --animate-shine: shine 6s ease-in-out infinite;

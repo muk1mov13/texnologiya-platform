@@ -107,3 +107,7 @@ export const ICON_PATHS = {
 } as const satisfies Record<string, readonly string[]>
 
 export type IconName = keyof typeof ICON_PATHS
+
+export function isIconName(value: string): value is IconName {
+  return Object.hasOwn(ICON_PATHS, value)
+}

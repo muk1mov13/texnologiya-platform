@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 2: UI primitivlar premium uslubda
+- `Card`: `rounded-3xl`, `shadow-soft`, `ring-1` (border-2 o'rniga) — barcha sahifalarda.
+- `button-classes.ts`: primary — gradient + `shadow-glow-sm` (yangi `@theme` soya), secondary — `ring-1` + `shadow-soft`, danger — `red-600` (AA kontrast), bosilganda `scale(0.98)`; border olib tashlandi, padding moslandi.
+- `EmptyState`: gradient kvadrat ichida SVG ikonka (`IconName`; eski emoji ham ishlaydi, `isIconName`), yumshoq radial fon.
+- Yangi `Skeleton` (yuklanish shakli, `motion-reduce`).
+- Tekshiruv: lint, typecheck.
+
 ### Task 1: talaba paneli ikonkalari
 - `components/icons/paths.ts`: `flame`, `star`, `medal`, `home`, `chart`, `chat`, `logout`, `chevronRight`, `chevronDown`, `arrowLeft`, `download`, `play`, `target`, `refresh`, `presentation`, `pencil`, `clipboard`, `glossary`, `library`, `bolt`, `folder`, `search`, `send`.
 - `lib/steps.ts`: `STEP_ICON_NAMES` — bosqich turlari uchun SVG ikonka nomlari (emoji `STEP_ICONS` o'qituvchi muharririda qoladi).
