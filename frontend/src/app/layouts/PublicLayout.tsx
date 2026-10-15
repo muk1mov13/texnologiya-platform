@@ -26,6 +26,10 @@ export function PublicLayout() {
   const user = useCurrentUser()
   // Bosh sahifa bo'limlari to'liq kenglikdagi fonga ega, konteynerni har bo'lim o'zi qo'yadi.
   const isHome = useMatch({ path: '/', end: true }) !== null
+  // Kirish/ro'yxatdan o'tish: karta vertikal markazda, orqasida yumshoq gradient va katak.
+  const loginMatch = useMatch('/login')
+  const registerMatch = useMatch('/register')
+  const isAuth = loginMatch !== null || registerMatch !== null
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
   useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > SCROLLED_AT))
@@ -110,9 +114,19 @@ export function PublicLayout() {
           />
         </div>
       </header>
-      <main className={cx('w-full flex-1', !isHome && 'mx-auto max-w-6xl px-4 py-8')}>
-        <Outlet />
-      </main>
+      {isAuth ? (
+        <main className="relative isolate flex w-full flex-1 flex-col justify-center overflow-hidden px-4 py-8 sm:py-12">
+          <div aria-hidden="true" className="absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-50/70 via-white to-white" />
+            <div className="absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
+          </div>
+          <Outlet />
+        </main>
+      ) : (
+        <main className={cx('w-full flex-1', !isHome && 'mx-auto max-w-6xl px-4 py-8')}>
+          <Outlet />
+        </main>
+      )}
       <SiteFooter flush={isHome} />
     </div>
   )

@@ -37,6 +37,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - Email maydonida `mail` ikonka, parolda `PasswordInput`, `RegisterPage` dagi kabi gradient tugma va havola uslubi.
 - Tekshiruv: lint, typecheck.
 
+### Task 6: `PublicLayout` da auth sahifalar foni
+- `/login` va `/register` da `main` to'liq kenglikda: karta vertikal markazda, orqasida yumshoq `brand-50` gradient va niqoblangan katak.
+- Tekshiruv: lint, typecheck, build.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
