@@ -300,6 +300,8 @@
     "phone": "Telefon",
     "phoneHint": "Ixtiyoriy",
     "aside": {
+      "pendingTitle": "Deyarli tayyor",
+      "pendingText": "Administrator akkauntingizni ko'rib chiqmoqda. Tasdiqlangach, barcha darslar va topshiriqlar ochiladi.",
       "eyebrow": "Metodik ta'minot",
       "loginTitle": "Qaytganingizdan xursandmiz",
       "loginText": "Qolgan joyingizdan davom eting: darslar, topshiriqlar va natijalaringiz sizni kutmoqda.",
@@ -328,6 +330,8 @@
     "register": { "title": "Ro'yxatdan o'tish", "subtitle": "Bir daqiqada akkaunt yarating", "pendingNote": "Ro'yxatdan o'tgach, akkauntingizni administrator tasdiqlaydi.", "submit": "Ro'yxatdan o'tish", "haveAccount": "Akkauntingiz bormi?" }
   },
   "pending": {
+    "subtitle": "Akkauntingiz ko'rib chiqilmoqda",
+    "steps": { "registered": "Ro'yxatdan o'tildi", "review": "Administrator tasdig'i", "access": "Platformaga to'liq kirish" },
     "title": "Tasdiq kutilmoqda",
     "textUser": "{{name}}, akkauntingiz administrator tasdig'ini kutmoqda. Tasdiqlangach, platformadan to'liq foydalanishingiz mumkin.",
     "textGuest": "Ro'yxatdan o'tdingiz! Administrator akkauntingizni tasdiqlagach, tizimga kira olasiz.",

@@ -41,6 +41,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - `/login` va `/register` da `main` to'liq kenglikda: karta vertikal markazda, orqasida yumshoq `brand-50` gradient va niqoblangan katak.
 - Tekshiruv: lint, typecheck, build.
 
+### Task 7: `PendingPage` ham shu uslubda
+- `PendingPage` endi `AuthCard` (`variant="pending"`) ichida: matn, 3 bosqichli holat ro'yxati (ro'yxatdan o'tildi → admin tasdig'i → to'liq kirish), gradient "Holatni tekshirish" tugmasi, "Chiqish" pastki havola sifatida; "hali tasdiqlanmagan" xabari amber blokda. Mantiq o'zgarmaydi.
+- `AuthAside`/`AuthCard`: `pending` varianti; `PublicLayout`: `/pending` ham auth foniga ega.
+- i18n `auth.aside.pendingTitle`, `auth.aside.pendingText`, `pending.subtitle`, `pending.steps.*` (uz/ru).
+- Tekshiruv: lint, typecheck, i18n kalitlar testi.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).

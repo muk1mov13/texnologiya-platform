@@ -26,10 +26,11 @@ export function PublicLayout() {
   const user = useCurrentUser()
   // Bosh sahifa bo'limlari to'liq kenglikdagi fonga ega, konteynerni har bo'lim o'zi qo'yadi.
   const isHome = useMatch({ path: '/', end: true }) !== null
-  // Kirish/ro'yxatdan o'tish: karta vertikal markazda, orqasida yumshoq gradient va katak.
+  // Kirish/ro'yxatdan o'tish/tasdiq kutish: karta vertikal markazda, orqasida yumshoq gradient va katak.
   const loginMatch = useMatch('/login')
   const registerMatch = useMatch('/register')
-  const isAuth = loginMatch !== null || registerMatch !== null
+  const pendingMatch = useMatch('/pending')
+  const isAuth = loginMatch !== null || registerMatch !== null || pendingMatch !== null
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
   useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > SCROLLED_AT))

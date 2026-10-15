@@ -12,8 +12,8 @@ const PERKS: { key: string; icon: IconName }[] = [
   { key: 'xp', icon: 'trophy' },
 ]
 
-/** Kirish/ro'yxatdan o'tish sahifasining chap to'q paneli (faqat `lg+`). */
-export function AuthAside({ variant }: { variant: 'login' | 'register' }) {
+/** Kirish/ro'yxatdan o'tish/tasdiq kutish sahifasining chap to'q paneli (faqat `lg+`). */
+export function AuthAside({ variant }: { variant: 'login' | 'register' | 'pending' }) {
   const { t } = useTranslation()
   return (
     <div className="relative isolate hidden overflow-hidden bg-gradient-to-br from-brand-800 via-brand-900 to-brand-950 p-10 text-white lg:flex lg:flex-col xl:p-12">

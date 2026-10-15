@@ -7,7 +7,7 @@ interface AuthCardProps {
   title: string
   subtitle?: string
   /** Chap paneldagi matnlar qaysi sahifaga mos bo'lishi. */
-  variant: 'login' | 'register'
+  variant: 'login' | 'register' | 'pending'
   children: ReactNode
   footer?: ReactNode
 }
