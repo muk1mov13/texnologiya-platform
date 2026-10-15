@@ -270,6 +270,43 @@ class GeminiProvider:
         return result
 
 
+TEI_BATCH = 32  # TEI `--max-client-batch-size` default qiymati
+E5_PREFIX: dict[EmbedTask, str] = {"query": "query: ", "document": "passage: "}
+
+
+class TeiEmbeddingProvider:
+    """Lokal embedding: HuggingFace text-embeddings-inference (`POST /embed`) konteyneri.
+
+    `multilingual-e5` modellari savol va matnni `query: ` / `passage: ` prefikslari bilan
+    farqlaydi. Uzun matnni TEI o'zi kesadi (`truncate`).
+    """
+
+    def __init__(self, url: str, model_name: str) -> None:
+        self._url = url.rstrip("/") + "/embed"
+        self.model_name = model_name
+        self._client = httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+
+    async def embed(self, texts: Sequence[str], task: EmbedTask) -> list[list[float]]:
+        result: list[list[float]] = []
+        for start in range(0, len(texts), TEI_BATCH):
+            body = {
+                "inputs": [E5_PREFIX[task] + t for t in texts[start : start + TEI_BATCH]],
+                "normalize": True,
+                "truncate": True,
+            }
+
+            async def call(body: dict[str, Any] = body) -> list[list[float]]:
+                response = await self._client.post(self._url, json=body)
+                response.raise_for_status()
+                return list(response.json())
+
+            for vec in await with_retry(call):
+                if len(vec) != EMBEDDING_DIM:
+                    raise ValueError(f"Embedding o'lchami {len(vec)}, kutilgan {EMBEDDING_DIM}")
+                result.append(normalize(vec))
+        return result
+
+
 class OpenAICompatProvider:
     """OpenAI'ga mos `/chat/completions` API (Groq, Cerebras, OpenRouter...) — faqat matn."""
 

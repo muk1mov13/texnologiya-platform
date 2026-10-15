@@ -13,6 +13,7 @@ from app.ai.providers import (
     GeminiProvider,
     LLMProvider,
     OpenAICompatProvider,
+    TeiEmbeddingProvider,
     TokenBucket,
 )
 from app.ai.vectors import PgVectorStore, SqliteVectorStore, VectorStore
@@ -61,7 +62,13 @@ def build_ai(settings: Settings, dialect_name: str) -> AiServices:
         llm, models = _with_fallback(compat, gemini, compat_models, gemini_models), compat_models
     elif settings.ai_provider == "gemini" and gemini is not None:
         llm, models = _with_fallback(gemini, compat, gemini_models, compat_models), gemini_models
-    embedder: EmbeddingProvider = gemini if gemini is not None else fake
+    # Embedding matn provayderidan mustaqil; model nomi chunk'larda saqlanadi, shuning uchun
+    # almashtirilsa eski chunk'lar "eskirgan" bo'ladi va admin ularni qayta indekslaydi.
+    embedder: EmbeddingProvider = fake
+    if settings.ai_provider != "fake" and settings.embedding_provider == "tei":
+        embedder = TeiEmbeddingProvider(settings.tei_url, settings.tei_model)
+    elif gemini is not None:
+        embedder = gemini
     return AiServices(
         llm=llm,
         embedder=embedder,

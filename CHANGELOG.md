@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Gemini'ning bepul limiti kam: matn asosan OpenAI'ga mos API'da (Groq/Cerebras/OpenRouter), Gemini zaxirada; embedding lokal `multilingual-e5-base` (TEI konteyneri).
 
+### Task 2: lokal embedding (TEI, multilingual-e5-base)
+- `providers.TeiEmbeddingProvider`: `POST {TEI_URL}/embed` (32 tadan, `normalize`/`truncate`), e5 prefikslari `query: ` / `passage: `, o'lcham `EMBEDDING_DIM` (768) bilan tekshiriladi — migratsiya kerak emas.
+- Sozlamalar: `EMBEDDING_PROVIDER=gemini|tei`, `TEI_URL`, `TEI_MODEL`; embedding matn provayderidan mustaqil tanlanadi, `tei` bo'lsa Gemini kaliti shart emas.
+- Model nomi chunk'larda saqlangani uchun almashtirilganda eski chunk'lar eskirgan deb ko'rinadi; admin sahifasidagi "Qayta indekslash" yangilaydi.
+- `.env.example`: TEI va e5 uchun o'xshashlik chegaralari (kalibrlash kerak) izohi.
+- Tekshiruv: ruff, mypy o'tdi; `build_ai` compat+tei -> `TeiEmbeddingProvider`, `configured=True`; soxta HTTP bilan 70 matn 32+32+6 partiyada, prefikslar va normalizatsiya to'g'ri.
+
 ### Task 1: OpenAI'ga mos asosiy provayder, Gemini zaxira
 - `providers.GroqProvider` -> `OpenAICompatProvider(base_url, ...)`: istalgan `/chat/completions` API (`LLM_BASE_URL`).
 - `AI_PROVIDER=compat|gemini|fake`: asosiy matn provayderi; ikkinchisining kaliti bo'lsa `FallbackProvider` orqali zaxira (modellar juftlab almashtiriladi). `AiServices.chat_model/fast_model` asosiy provayderdan.
