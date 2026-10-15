@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin yon menyusida scroll olib tashlandi
+
+- `AdminShell` yon menyusi ixchamlashtirildi, oddiy noutbuk ekraniga (~700px balandlik) scrollsiz sig'adi: header 56px, guruhlar orasi va bandlar balandligi kichraytirildi.
+- Pastdagi "O'qituvchi paneli", "Saytni ko'rish" va "Menyuni yig'ish" bitta ikonka qatoriga o'tdi (nomi `aria-label` va hover'da `title`).
+- Menyu scrollbar'i yashirildi; juda past ekranda baribir g'ildirak/klaviatura bilan aylantirish mumkin.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin panel redizayni: fanlar va AI sozlamalari (6/9)
 
 - `AdminSubjectsPage`: `PageHeader` ("Yangi fan" tugmasi bilan), fanlar `lg` da ikki ustunli kartalar to'rida — tartib raqami belgisi, slug, tavsif (2 qator), nuqtali nashr holati, o'quv dasturi alohida blokda PDF ikonkasi bilan, amallar ikonkali. Yuklanishda skelet.

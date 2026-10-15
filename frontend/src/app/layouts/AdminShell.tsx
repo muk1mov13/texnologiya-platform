@@ -201,7 +201,7 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(to_bottom,black,transparent_40%)]"
       />
 
-      <div className={cx('flex h-16 shrink-0 items-center gap-3', collapsed ? 'justify-center px-3' : 'px-5')}>
+      <div className={cx('flex h-14 shrink-0 items-center gap-3', collapsed ? 'justify-center px-3' : 'px-5')}>
         <Link to="/admin" className={cx('flex min-w-0 items-center gap-3 rounded-xl', DARK_FOCUS)}>
           <span
             aria-hidden="true"
@@ -233,13 +233,13 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
 
       <nav
         aria-label={t('nav.adminSection')}
-        className="flex flex-1 flex-col gap-6 overflow-x-hidden overflow-y-auto px-3 py-4 [scrollbar-width:thin]"
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto px-3 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {ADMIN_NAV.map((group) => (
           <div key={group.label} className="flex flex-col gap-0.5">
             <h2
               className={cx(
-                'mb-1 px-3 text-[0.68rem] font-bold tracking-[0.14em] text-brand-200/50 uppercase',
+                'mb-0.5 px-3 text-[0.68rem] font-bold tracking-[0.14em] text-brand-200/50 uppercase',
                 collapsed && 'sr-only',
               )}
             >
@@ -260,32 +260,30 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="flex shrink-0 flex-col gap-0.5 border-t border-white/10 px-3 py-3">
-        <FooterLink to="/teach" icon="pencil" label={t('adminShell.teachPanel')} collapsed={collapsed} />
-        <FooterLink to="/" icon="globe" label={t('adminShell.viewSite')} collapsed={collapsed} />
-        {onToggle && (
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
-            title={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
-            className={cx(
-              'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-brand-100/70 transition-colors hover:bg-white/5 hover:text-white motion-reduce:transition-none',
-              collapsed && 'justify-center',
-              DARK_FOCUS,
-            )}
-          >
-            <Icon
-              name="panelLeft"
-              className={cx('size-[1.15rem] shrink-0 transition-transform motion-reduce:transition-none', collapsed && 'rotate-180')}
-            />
-            <span className={cx(collapsed && 'sr-only')}>{t('adminShell.collapse')}</span>
-          </button>
-        )}
+      <div className="flex shrink-0 flex-col gap-2 border-t border-white/10 px-3 py-2.5">
+        {/* Qo'shimcha havolalar bitta ikonka qatorida — menyu past ekranga ham sig'sin. */}
+        <div className={cx('flex items-center gap-1', collapsed && 'flex-col')}>
+          <FooterLink to="/teach" icon="pencil" label={t('adminShell.teachPanel')} />
+          <FooterLink to="/" icon="globe" label={t('adminShell.viewSite')} />
+          {onToggle && (
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-label={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
+              title={collapsed ? t('adminShell.expand') : t('adminShell.collapse')}
+              className={cx(FOOTER_BUTTON, !collapsed && 'ml-auto')}
+            >
+              <Icon
+                name="panelLeft"
+                className={cx('size-[1.15rem] transition-transform motion-reduce:transition-none', collapsed && 'rotate-180')}
+              />
+            </button>
+          )}
+        </div>
         {user && (
           <div
             className={cx(
-              'mt-2 flex items-center gap-3 rounded-2xl bg-white/[0.04] p-2 ring-1 ring-white/10',
+              'flex items-center gap-3 rounded-2xl bg-white/[0.04] p-2 ring-1 ring-white/10',
               collapsed && 'flex-col p-1.5',
             )}
           >
@@ -340,7 +338,7 @@ function SidebarLink({ item, collapsed, pillId, count, countLabel, onNavigate }:
       title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cx(
-          'group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors motion-reduce:transition-none',
+          'group relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors motion-reduce:transition-none',
           collapsed && 'justify-center',
           isActive ? 'text-white' : 'text-brand-100/70 hover:bg-white/5 hover:text-white',
           DARK_FOCUS,
@@ -388,26 +386,22 @@ function SidebarLink({ item, collapsed, pillId, count, countLabel, onNavigate }:
   )
 }
 
+const FOOTER_BUTTON = cx(
+  'grid size-9 place-items-center rounded-xl text-brand-100/70 transition-colors hover:bg-white/10 hover:text-white motion-reduce:transition-none',
+  DARK_FOCUS,
+)
+
 interface FooterLinkProps {
   to: string
   icon: IconName
   label: string
-  collapsed: boolean
 }
 
-function FooterLink({ to, icon, label, collapsed }: FooterLinkProps) {
+/** Pastki qatordagi ikonka-havola: nomi `aria-label` va `title` (hover'da) orqali. */
+function FooterLink({ to, icon, label }: FooterLinkProps) {
   return (
-    <Link
-      to={to}
-      title={collapsed ? label : undefined}
-      className={cx(
-        'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-brand-100/70 transition-colors hover:bg-white/5 hover:text-white motion-reduce:transition-none',
-        collapsed && 'justify-center',
-        DARK_FOCUS,
-      )}
-    >
-      <Icon name={icon} className="size-[1.15rem] shrink-0" />
-      <span className={cx('truncate', collapsed && 'sr-only')}>{label}</span>
+    <Link to={to} aria-label={label} title={label} className={FOOTER_BUTTON}>
+      <Icon name={icon} className="size-[1.15rem]" />
     </Link>
   )
 }
