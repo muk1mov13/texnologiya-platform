@@ -150,7 +150,7 @@ export function BookCatalog() {
       <QueryState query={books} loading={<CatalogSkeleton />}>
         {(data) =>
           data.items.length === 0 ? (
-            <EmptyState icon="📚" title={t(q || category ? 'library.noBooksFound' : 'library.noBooks')} />
+            <EmptyState icon="book" title={t(q || category ? 'library.noBooksFound' : 'library.noBooks')} />
           ) : (
             <>
               <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">

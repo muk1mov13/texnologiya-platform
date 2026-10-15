@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Ochiq sahifalar redizayni: yakuniy tekshiruv
+
+- `NewsListPage`, `FolderTree`, `BookCatalog`: bo'sh holatlarda emoji o'rniga SVG ikonkalar (`news`, `folder`, `book`) — endi yangilangan ochiq sahifalarda emoji qolmadi.
+- Tekshiruv: lint, typecheck, build; brauzerda `/news`, `/news/:slug`, `/library` (uchala bo'lim), `/faq`, `/about`, `/contact` 1280px va 375px kenglikda (gorizontal siljish yo'q); kutubxona bo'limlari strelka tugmalari bilan almashadi va fokus to'g'ri ko'chadi.
+
 ## 2026-10-15 — Bog'lanish sahifasi yangi dizaynda
 
 - `ContactPage.tsx`: `PageHero`; ikki ustun — chapda to'q `brand-950` panel (glow, katak naqsh, kontaktlar, ijtimoiy tarmoqlar), o'ngda forma kartasi (sarlavha, ikonkali maydonlar, ism va kontakt yonma-yon, "Yuborish" ikonkasi bilan). Telefonda forma birinchi chiqadi. Muvaffaqiyat holati: emoji o'rniga animatsiyali `check` doirasi. Honeypot va zod sxemasi o'zgarmadi.

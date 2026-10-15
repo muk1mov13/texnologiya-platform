@@ -115,7 +115,7 @@ export function FolderTree({ section }: { section: LibrarySection }) {
     <QueryState query={query} loading={<TreeSkeleton />}>
       {(folders) =>
         folders.length === 0 ? (
-          <EmptyState icon="📂" title={t('library.empty')} />
+          <EmptyState icon="folder" title={t('library.empty')} />
         ) : (
           <ul className="flex flex-col gap-4">
             {folders.map((folder) => (

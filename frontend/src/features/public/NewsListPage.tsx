@@ -53,7 +53,7 @@ export function NewsListPage() {
       <PageHero eyebrow={t('news.eyebrow')} icon="news" title={t('news.title')} subtitle={t('news.description')} />
       <QueryState query={query} loading={<ListSkeleton />}>
         {(data) => {
-          if (data.items.length === 0) return <EmptyState icon="📰" title={t('news.empty')} />
+          if (data.items.length === 0) return <EmptyState icon="news" title={t('news.empty')} />
           // Faqat birinchi sahifada eng yangi xabar katta "featured" karta bo'ladi.
           const [first, ...rest] = data.items
           const featured = page === 1 ? first : undefined
