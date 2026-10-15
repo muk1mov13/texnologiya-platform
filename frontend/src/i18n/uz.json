@@ -843,6 +843,14 @@
     "again": "Yana yozish"
   },
   "navGroups": { "people": "Foydalanuvchilar", "learning": "O'quv jarayoni", "site": "Sayt" },
+  "adminShell": {
+    "root": "Boshqaruv",
+    "collapse": "Menyuni yig'ish",
+    "expand": "Menyuni yoyish",
+    "viewSite": "Saytni ko'rish",
+    "teachPanel": "O'qituvchi paneli",
+    "breadcrumb": "Joylashuv"
+  },
   "myBooks": {
     "title": "Kitoblarim",
     "subtitle": "Kutubxonaga yuklagan kitoblaringiz va ularning holati",

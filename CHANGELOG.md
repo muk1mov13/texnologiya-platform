@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: ikonkalar va menyu (1/9)
+
+- Admin panelni "premium" ko'rinishga o'tkazish rejasi boshlandi (alohida admin shell, dashboard, sahifalar yangi uslubda).
+- `components/icons/paths.ts`: yangi ikonkalar `users`, `news`, `help`, `inbox`, `settings`, `grid`, `panelLeft`, `copy`.
+- `ADMIN_NAV` (`paths.ts`): har bir bandga ikonka. i18n: `adminShell.*` (uz/ru) — keyingi qadamdagi shell uchun.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Odamlar uchun sayt xaritasi sahifasi
 
 - Yangi `SitemapPage` (`/sitemap`): ochiq sahifalar guruhlab — asosiy sahifalar (bosh sahifa, biz haqimizda, savol-javob, bog'lanish), kutubxona va uning bo'limlari, platforma (kirish/ro'yxatdan o'tish yoki kabinet), yangiliklar ro'yxati va oxirgi 10 ta yangilik.

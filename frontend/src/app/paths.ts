@@ -59,23 +59,23 @@ export interface NavGroup {
 
 /** `/admin/*` ichki menyusi (`AdminLayout`). */
 export const ADMIN_NAV: NavGroup[] = [
-  { label: 'navGroups.people', items: [{ to: '/admin/users', label: 'nav.adminUsers' }] },
+  { label: 'navGroups.people', items: [{ to: '/admin/users', label: 'nav.adminUsers', icon: 'users' }] },
   {
     label: 'navGroups.learning',
     items: [
-      { to: '/admin/subjects', label: 'nav.adminSubjects' },
-      { to: '/admin/ai', label: 'nav.adminAi' },
+      { to: '/admin/subjects', label: 'nav.adminSubjects', icon: 'layers' },
+      { to: '/admin/ai', label: 'nav.adminAi', icon: 'sparkles' },
     ],
   },
   {
     label: 'navGroups.site',
     items: [
-      { to: '/admin/library', label: 'nav.adminLibrary' },
-      { to: '/admin/books', label: 'nav.adminBooks' },
-      { to: '/admin/news', label: 'nav.adminNews' },
-      { to: '/admin/faq', label: 'nav.adminFaq' },
-      { to: '/admin/messages', label: 'nav.adminMessages' },
-      { to: '/admin/site', label: 'nav.adminSite' },
+      { to: '/admin/library', label: 'nav.adminLibrary', icon: 'folder' },
+      { to: '/admin/books', label: 'nav.adminBooks', icon: 'book' },
+      { to: '/admin/news', label: 'nav.adminNews', icon: 'news' },
+      { to: '/admin/faq', label: 'nav.adminFaq', icon: 'help' },
+      { to: '/admin/messages', label: 'nav.adminMessages', icon: 'inbox' },
+      { to: '/admin/site', label: 'nav.adminSite', icon: 'settings' },
     ],
   },
 ]
