@@ -13,19 +13,23 @@ import {
 } from '@/api/adminCms'
 import { ApiError, apiBuffer } from '@/api/client'
 import type { NewsAdmin } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/button-classes'
-import { Card } from '@/components/ui/Card'
 import { Field, Input, Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
 import { Markdown } from '@/components/ui/Markdown'
 import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { BACK_LINK } from '@/components/ui/styles'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
 import { pushToast } from '@/components/ui/toast-store'
 import { fromLocalInput, toLocalInput } from '@/lib/datetime'
 import { FILE_INPUT_CLASS, IMAGE_ACCEPT } from '@/lib/files'
+import { formatDateTime } from '@/lib/format'
+import { Panel } from '../ui/Panel'
 import { NEWS_STATUS_TONE, newsStatus } from './newsStatus'
 import { newsSchema, type NewsValues } from './schemas'
 
@@ -39,20 +43,23 @@ export function NewsEditorPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Link to="/admin/news" className={buttonClasses('ghost', 'sm', 'self-start')}>
-        ← {t('adminNews.title')}
+      <Link to="/admin/news" className={BACK_LINK}>
+        <Icon name="arrowLeft" className="size-4" />
+        {t('adminNews.title')}
       </Link>
       {id === null ? (
         <NewsForm key="new" news={null} />
       ) : (
-        <QueryState query={query}>{(news) => <NewsForm key={news.id} news={news} />}</QueryState>
+        <QueryState query={query} loading={<EditorSkeleton />}>
+          {(news) => <NewsForm key={news.id} news={news} />}
+        </QueryState>
       )}
     </div>
   )
 }
 
 function NewsForm({ news }: { news: NewsAdmin | null }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const create = useCreateNews()
   const update = useUpdateNews()
@@ -110,103 +117,147 @@ function NewsForm({ news }: { news: NewsAdmin | null }) {
   const status = news ? newsStatus(news) : 'draft'
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
-      <form
-        noValidate
-        onSubmit={handleSubmit((values) => save(values))}
-        className="flex min-w-0 flex-col gap-4"
-      >
+    <form
+      noValidate
+      onSubmit={handleSubmit((values) => save(values))}
+      className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
+    >
+      <div className="flex min-w-0 flex-col gap-5">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-extrabold">{t(news ? 'adminNews.editTitle' : 'adminNews.new')}</h1>
-          <Badge tone={NEWS_STATUS_TONE[status]}>{t(`adminNews.status.${status}`)}</Badge>
+          <h1 className="text-2xl font-extrabold tracking-tight text-balance text-slate-900 sm:text-[1.9rem]">
+            {t(news ? 'adminNews.editTitle' : 'adminNews.new')}
+          </h1>
+          <Badge dot tone={NEWS_STATUS_TONE[status]}>
+            {t(`adminNews.status.${status}`)}
+          </Badge>
         </div>
         {mutation.error && !slugTaken && <FormError error={mutation.error} />}
-        <Field id="news-title" label={t('adminNews.titleLabel')} error={errors.title?.message}>
-          <Input id="news-title" maxLength={300} {...register('title')} />
-        </Field>
-        <Field id="news-slug" label={t('adminNews.slugLabel')} hint={t('adminNews.slugHint')} error={errors.slug?.message}>
-          <Input id="news-slug" maxLength={220} {...register('slug')} />
-        </Field>
-        <div>
-          <Tabs
-            label={t('adminNews.bodyLabel')}
-            value={mode}
-            onChange={setMode}
-            items={[
-              { id: 'edit', label: t('adminNews.write') },
-              { id: 'preview', label: t('adminNews.preview') },
-            ]}
-          />
+        <Panel>
+          <div className="flex flex-col gap-4">
+            <Field id="news-title" label={t('adminNews.titleLabel')} error={errors.title?.message}>
+              <Input id="news-title" maxLength={300} className="text-lg font-semibold" {...register('title')} />
+            </Field>
+            <Field id="news-slug" label={t('adminNews.slugLabel')} hint={t('adminNews.slugHint')} error={errors.slug?.message}>
+              <Input id="news-slug" maxLength={220} className="font-mono text-sm" {...register('slug')} />
+            </Field>
+          </div>
+        </Panel>
+        <Panel
+          title={t('adminNews.bodyLabel')}
+          actions={
+            <Tabs
+              variant="pill"
+              label={t('adminNews.bodyLabel')}
+              value={mode}
+              onChange={setMode}
+              items={[
+                { id: 'edit', label: t('adminNews.write') },
+                { id: 'preview', label: t('adminNews.preview') },
+              ]}
+            />
+          }
+        >
           <TabPanel id={mode}>
             {mode === 'edit' ? (
               <Field id="news-body" label={t('adminNews.bodyLabel')} hint={t('adminNews.bodyHint')} error={errors.body?.message}>
-                <Textarea id="news-body" rows={16} className="font-mono text-sm" {...register('body')} />
+                <Textarea id="news-body" rows={18} className="font-mono text-sm leading-relaxed" {...register('body')} />
               </Field>
             ) : body.trim() ? (
-              <Markdown className="rounded-2xl border-2 border-slate-100 bg-white p-5">{body}</Markdown>
+              <Markdown className="min-h-64">{body}</Markdown>
             ) : (
-              <p className="text-slate-500">{t('adminNews.previewEmpty')}</p>
+              <p className="py-10 text-center text-slate-500">{t('adminNews.previewEmpty')}</p>
             )}
           </TabPanel>
-        </div>
-        <Field
-          id="news-published"
-          label={t('adminNews.publishedAt')}
-          hint={t('adminNews.publishedAtHint')}
-          error={errors.published_at?.message}
-        >
-          <Input id="news-published" type="datetime-local" className="sm:max-w-xs" {...register('published_at')} />
-        </Field>
-        <div className="flex flex-wrap gap-2">
-          <Button type="submit" loading={mutation.isPending}>
-            {t('common.save')}
-          </Button>
-          {status !== 'published' && (
-            <Button
-              variant="secondary"
-              disabled={mutation.isPending}
-              onClick={handleSubmit((values) => save(values, new Date().toISOString()))}
+        </Panel>
+      </div>
+
+      <aside className="flex flex-col gap-4 lg:sticky lg:top-20">
+        <Panel title={t('adminNews.publishTitle')}>
+          <div className="flex flex-col gap-4">
+            <Field
+              id="news-published"
+              label={t('adminNews.publishedAt')}
+              hint={t('adminNews.publishedAtHint')}
+              error={errors.published_at?.message}
             >
-              {t('adminNews.publishNow')}
-            </Button>
-          )}
-          {news && status !== 'draft' && (
-            <Button variant="secondary" disabled={mutation.isPending} onClick={handleSubmit((values) => save(values, null))}>
-              {t('adminNews.unpublish')}
-            </Button>
-          )}
-          {news && status === 'published' && (
-            <Link to={`/news/${news.slug}`} target="_blank" className={buttonClasses('ghost')}>
-              {t('adminNews.view')} ↗
-            </Link>
-          )}
-        </div>
-      </form>
-      {news && (
-        <aside className="flex flex-col gap-4">
-          <CoverCard news={news} />
-          <Card className="flex flex-col gap-2 text-sm text-slate-600">
-            <p>{t('news.views', { count: news.views })}</p>
-            <Button variant="danger" size="sm" className="self-start" onClick={() => setConfirmDelete(true)}>
-              {t('adminNews.delete')}
-            </Button>
-          </Card>
-          <ConfirmDialog
-            open={confirmDelete}
-            title={t('adminNews.deleteTitle')}
-            text={t('adminNews.deleteText', { title: news.title })}
-            confirmLabel={t('common.delete')}
-            pending={remove.isPending}
-            onCancel={() => setConfirmDelete(false)}
-            onConfirm={() =>
-              remove.mutate(news.id, {
-                onSuccess: () => void navigate('/admin/news', { replace: true }),
-                onSettled: () => setConfirmDelete(false),
-              })
-            }
-          />
-        </aside>
-      )}
+              <Input id="news-published" type="datetime-local" {...register('published_at')} />
+            </Field>
+            <div className="flex flex-col gap-2">
+              <Button type="submit" loading={mutation.isPending}>
+                {t('common.save')}
+              </Button>
+              {status !== 'published' && (
+                <Button
+                  variant="secondary"
+                  disabled={mutation.isPending}
+                  onClick={handleSubmit((values) => save(values, new Date().toISOString()))}
+                >
+                  <Icon name="send" className="size-4" />
+                  {t('adminNews.publishNow')}
+                </Button>
+              )}
+              {news && status !== 'draft' && (
+                <Button variant="secondary" disabled={mutation.isPending} onClick={handleSubmit((values) => save(values, null))}>
+                  <Icon name="eyeOff" className="size-4" />
+                  {t('adminNews.unpublish')}
+                </Button>
+              )}
+              {news && status === 'published' && (
+                <Link to={`/news/${news.slug}`} target="_blank" className={buttonClasses('ghost', 'md')}>
+                  {t('adminNews.view')}
+                  <Icon name="externalLink" className="size-4" />
+                </Link>
+              )}
+            </div>
+          </div>
+        </Panel>
+        {news && (
+          <>
+            <CoverCard news={news} />
+            <Panel>
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm tabular-nums">
+                <dt className="text-slate-500">{t('adminNews.viewsLabel')}</dt>
+                <dd className="text-right font-semibold text-slate-800">{news.views}</dd>
+                <dt className="text-slate-500">{t('adminNews.createdAt')}</dt>
+                <dd className="text-right text-slate-700">{formatDateTime(news.created_at, i18n.language)}</dd>
+                <dt className="text-slate-500">{t('adminNews.updatedAt')}</dt>
+                <dd className="text-right text-slate-700">{formatDateTime(news.updated_at, i18n.language)}</dd>
+              </dl>
+              <Button variant="ghost" size="sm" className="mt-4 w-full" onClick={() => setConfirmDelete(true)}>
+                <Icon name="trash" className="size-4" />
+                {t('adminNews.delete')}
+              </Button>
+            </Panel>
+            <ConfirmDialog
+              open={confirmDelete}
+              title={t('adminNews.deleteTitle')}
+              text={t('adminNews.deleteText', { title: news.title })}
+              confirmLabel={t('common.delete')}
+              pending={remove.isPending}
+              onCancel={() => setConfirmDelete(false)}
+              onConfirm={() =>
+                remove.mutate(news.id, {
+                  onSuccess: () => void navigate('/admin/news', { replace: true }),
+                  onSettled: () => setConfirmDelete(false),
+                })
+              }
+            />
+          </>
+        )}
+      </aside>
+    </form>
+  )
+}
+
+function EditorSkeleton() {
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="flex flex-col gap-5">
+        <Skeleton className="h-9 w-72" />
+        <Skeleton className="h-40 rounded-3xl" />
+        <Skeleton className="h-96 rounded-3xl" />
+      </div>
+      <Skeleton className="h-72 rounded-3xl" />
     </div>
   )
 }
@@ -239,40 +290,40 @@ function CoverCard({ news }: { news: NewsAdmin }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <Card className="flex flex-col gap-3">
-      <h2 className="font-bold">{t('adminNews.cover')}</h2>
-      {preview ? (
-        <img src={preview} alt="" className="aspect-[16/9] w-full rounded-xl object-cover" />
-      ) : (
-        <div
-          className="flex aspect-[16/9] items-center justify-center rounded-xl bg-slate-100 text-sm text-slate-500"
-        >
-          {t(news.has_cover ? 'common.loading' : 'adminNews.noCover')}
-        </div>
-      )}
-      <Field id="news-cover" label={t(news.has_cover ? 'adminBooks.replaceCover' : 'adminBooks.addCover')} hint={t('myBooks.coverHint')}>
-        <Input
-          ref={inputRef}
-          id="news-cover"
-          type="file"
-          accept={IMAGE_ACCEPT}
-          className={FILE_INPUT_CLASS}
-          disabled={setCover.isPending}
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            if (!file) return
-            setCover.mutate(
-              { id: news.id, cover: file },
-              {
-                onSuccess: () => pushToast('success', t('adminNews.coverSaved')),
-                onSettled: () => {
-                  if (inputRef.current) inputRef.current.value = ''
+    <Panel title={t('adminNews.cover')}>
+      <div className="flex flex-col gap-3">
+        {preview ? (
+          <img src={preview} alt="" className="aspect-[16/9] w-full rounded-2xl object-cover ring-1 ring-slate-900/5" />
+        ) : (
+          <div className="flex aspect-[16/9] flex-col items-center justify-center gap-2 rounded-2xl bg-slate-50 text-sm text-slate-500 border-2 border-dashed border-slate-200">
+            <Icon name="camera" className="size-6 text-slate-400" />
+            {t(news.has_cover ? 'common.loading' : 'adminNews.noCover')}
+          </div>
+        )}
+        <Field id="news-cover" label={t(news.has_cover ? 'adminBooks.replaceCover' : 'adminBooks.addCover')} hint={t('myBooks.coverHint')}>
+          <Input
+            ref={inputRef}
+            id="news-cover"
+            type="file"
+            accept={IMAGE_ACCEPT}
+            className={FILE_INPUT_CLASS}
+            disabled={setCover.isPending}
+            onChange={(event) => {
+              const file = event.target.files?.[0]
+              if (!file) return
+              setCover.mutate(
+                { id: news.id, cover: file },
+                {
+                  onSuccess: () => pushToast('success', t('adminNews.coverSaved')),
+                  onSettled: () => {
+                    if (inputRef.current) inputRef.current.value = ''
+                  },
                 },
-              },
-            )
-          }}
-        />
-      </Field>
-    </Card>
+              )
+            }}
+          />
+        </Field>
+      </div>
+    </Panel>
   )
 }

@@ -948,6 +948,10 @@
     "saved": "Kitob saqlandi"
   },
   "adminNews": {
+    "publishTitle": "Nashr",
+    "viewsLabel": "Ko'rishlar",
+    "createdAt": "Yaratilgan",
+    "updatedAt": "O'zgartirilgan",
     "title": "Yangiliklar",
     "subtitle": "Saytdagi yangiliklar: qoralama, rejalashtirilgan va nashr qilingan.",
     "new": "Yangi yangilik",

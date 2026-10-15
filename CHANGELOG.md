@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin panel redizayni: yangiliklar (7/9)
+
+- `AdminNewsPage`: `PageHeader` ("Yangi yangilik" tugmasi ikonka bilan), `DataList` qatorlari: holat rangidagi belgi (muqova bo'lsa kamera ikonkasi), sana va ko'rishlar ikonkalar bilan, nuqtali holat belgisi, o'ng strelka; yuklanishda skelet. Har qatorga muqova rasmi yuklanmaydi (qoralama muqovalari himoyalangan, alohida so'rov og'ir).
+- `NewsEditorPage`: ikki ustun (`lg`) — chapda sarlavha/slug va matn (`Tabs pill` bilan yozish/ko'rinish) kartalarda; o'ngda yopishqoq panel: "Nashr" (vaqt, saqlash, hozir nashr qilish, nashrdan olish, saytda ko'rish), muqova (bo'sh holat ikonka bilan), ma'lumot (ko'rishlar, yaratilgan/o'zgartirilgan vaqt) va o'chirish. "Orqaga" havolasi chip ko'rinishida, yuklanishda skelet. Forma mantig'i o'zgarmadi.
+- i18n: `adminNews.publishTitle/viewsLabel/createdAt/updatedAt` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin yon menyusida scroll olib tashlandi
 
 - `AdminShell` yon menyusi ixchamlashtirildi, oddiy noutbuk ekraniga (~700px balandlik) scrollsiz sig'adi: header 56px, guruhlar orasi va bandlar balandligi kichraytirildi.
