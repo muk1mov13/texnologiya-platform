@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { BACK_LINK } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { isStepKind, STEP_ICON_NAMES } from '@/lib/steps'
@@ -56,9 +57,29 @@ export function PlayerPage() {
   // Noto'g'ri ID'da so'rov o'chiq (abadiy `isPending`), shuning uchun QueryState'dan oldin ajratiladi.
   if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="target" title={t('notFound.title')} />
   return (
-    <QueryState query={topic}>
+    <QueryState query={topic} loading={<PlayerSkeleton />}>
       {(data) => <PlayerBody topicId={topicId} kind={params.kind} topic={data} headingRef={headingRef} />}
     </QueryState>
+  )
+}
+
+function PlayerSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      <Skeleton className="h-8 w-48 rounded-full" />
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[250px_minmax(0,1fr)_340px]">
+        <Card className="flex flex-col gap-3 p-4">
+          <Skeleton className="h-12 w-full" />
+          {[0, 1, 2, 3, 4, 5, 6].map((key) => (
+            <Skeleton key={key} className="hidden h-9 w-full md:block" />
+          ))}
+        </Card>
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-11 w-56" />
+          <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
+        </div>
+      </div>
+    </div>
   )
 }
 

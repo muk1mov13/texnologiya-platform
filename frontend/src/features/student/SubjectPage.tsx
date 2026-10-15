@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { BACK_LINK, EYEBROW, SURFACE, SURFACE_LINK_SM } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { useProtectedDownload } from '@/lib/download'
@@ -27,8 +28,30 @@ export function SubjectPage() {
         <Icon name="arrowLeft" className="size-4" />
         {t('student.allSubjects')}
       </Link>
-      <QueryState query={subject}>{(data) => <SubjectBody subject={data} />}</QueryState>
+      <QueryState query={subject} loading={<SubjectSkeleton />}>
+        {(data) => <SubjectBody subject={data} />}
+      </QueryState>
     </div>
+  )
+}
+
+function SubjectSkeleton() {
+  return (
+    <>
+      <div className={cx(SURFACE, 'flex flex-col gap-3 p-6 sm:p-8')}>
+        <Skeleton className="h-6 w-32 rounded-full" />
+        <Skeleton className="h-9 w-2/3" />
+        <Skeleton className="h-4 w-full max-w-xl" />
+      </div>
+      <div className="flex max-w-3xl flex-col gap-3">
+        {[0, 1, 2, 3].map((key) => (
+          <div key={key} className="flex items-center gap-4">
+            <Skeleton className="size-10 shrink-0 rounded-full" />
+            <Skeleton className="h-20 flex-1 rounded-2xl" />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 

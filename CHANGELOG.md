@@ -8,6 +8,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 16: yuklanish skeletlari
+- `QueryState`: ixtiyoriy `loading` — birinchi yuklanishda spinner o'rniga sahifa shaklidagi skelet (`role="status"` + "Yuklanmoqda" yorlig'i bilan o'raladi); berilmasa avvalgidek `PageSpinner`.
+- Skeletlar: `SubjectsPage` (fan kartalari — endi `loading` orqali), `SubjectPage` (hero + timeline), `PlayerPage` (bosqichlar paneli + kontent), `ResultsPage` (xulosa + bo'lim).
+- `Skeleton`: `className`da radius berilsa standart `rounded-xl` qo'shilmaydi.
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 15: profil sahifasi
 - `ProfilePage`: yuqori karta — gradient banner, ustiga chiqib turgan bosh harfli avatar, ism, rol belgisi, email; talabada seriya va XP chiplari (`useDashboard`). Bo'lim sarlavhalari ikonkali (`SectionTitle`), ism/telefon maydonlari ikonkali `Input`, parol maydonlari `PasswordInput` (ko'rsatish/yashirish). Maydon yorliqlari va tugma nomlari o'zgarmadi.
 - Tekshiruv: lint, typecheck.

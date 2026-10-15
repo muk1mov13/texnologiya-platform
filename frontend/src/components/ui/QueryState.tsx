@@ -1,5 +1,6 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { canRetry } from '@/api/errors'
 import { ErrorState } from './ErrorState'
 import { PageSpinner } from './Spinner'
@@ -16,11 +17,23 @@ import { PageSpinner } from './Spinner'
 export function QueryState<T>({
   query,
   children,
+  loading,
 }: {
   query: UseQueryResult<T>
   children: (data: T) => ReactNode
+  /** Birinchi yuklanishda spinner o'rniga ko'rsatiladigan skelet (sahifa shaklida). */
+  loading?: ReactNode
 }) {
+  const { t } = useTranslation()
   if (query.data !== undefined) return children(query.data)
-  if (query.isPending) return <PageSpinner />
+  if (query.isPending) {
+    if (loading === undefined) return <PageSpinner />
+    // Skelet bezak (`aria-hidden`), shuning uchun ekran o'quvchiga holat alohida e'lon qilinadi.
+    return (
+      <div role="status" aria-label={t('common.loading')}>
+        {loading}
+      </div>
+    )
+  }
   return <ErrorState error={query.error} onRetry={canRetry(query.error) ? () => void query.refetch() : undefined} />
 }

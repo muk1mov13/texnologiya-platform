@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { PAGE_TITLE, SURFACE, SURFACE_SM } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
@@ -33,7 +34,19 @@ export function ResultsPage() {
         <h1 className={PAGE_TITLE}>{t('results.title')}</h1>
         <p className="text-pretty text-slate-600">{t('results.subtitle')}</p>
       </header>
-      <QueryState query={results}>
+      <QueryState
+        query={results}
+        loading={
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[0, 1, 2].map((key) => (
+                <Skeleton key={key} className="h-32 rounded-3xl" />
+              ))}
+            </div>
+            <Skeleton className="h-64 rounded-3xl" />
+          </div>
+        }
+      >
         {(subjects) =>
           subjects.length === 0 ? (
             <EmptyState icon="chart" title={t('results.empty')} text={t('results.emptyText')} />

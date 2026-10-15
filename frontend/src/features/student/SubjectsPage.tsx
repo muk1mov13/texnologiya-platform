@@ -120,12 +120,10 @@ function ContinueCard({ target }: { target: ContinueTarget }) {
 function SubjectList() {
   const { t } = useTranslation()
   const subjects = useSubjects()
-  // Birinchi yuklanishda spinner o'rniga kartalar shaklidagi skelet.
-  if (subjects.isPending) return <SubjectSkeletons />
   // Masalan, "Tugatdim" ['subjects']ni invalidatsiya qiladi; keyingi qayta so'rov 500 bo'lsa
   // ham ro'yxat ko'rinishda qoladi (QueryState).
   return (
-    <QueryState query={subjects}>
+    <QueryState query={subjects} loading={<SubjectSkeletons />}>
       {(data) =>
         data.length === 0 ? (
           <EmptyState icon="book" title={t('student.noSubjects')} text={t('student.noSubjectsText')} />
