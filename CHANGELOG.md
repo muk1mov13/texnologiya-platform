@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Ochiq sahifalar uchun umumiy `PageHero`
+
+- Yangi `features/public/PageHero.tsx`: ichki ochiq sahifalar (yangiliklar, kutubxona, FAQ, biz haqimizda, bog'lanish) uchun sarlavha bloki — ikonli yorliq, katta sarlavha, izoh, ixtiyoriy yon ustun; fonda gradient, katak va xira bloblar (bosh sahifa hero'si uslubida, `motion-reduce` hisobga olinadi).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — "EDU 🔬" logosi barcha panellarda
 
 - Yangi `components/icons/MicroscopeMark.tsx`: mikroskop belgisi umumiy komponent; `BrandLogo` undan foydalanadi va `to` propini oladi.
