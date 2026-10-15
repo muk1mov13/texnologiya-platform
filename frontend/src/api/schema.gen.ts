@@ -2989,6 +2989,8 @@ export interface components {
             title: string;
             /** Topic Count */
             topic_count: number;
+            /** Topics Completed */
+            topics_completed: number;
         };
         /** SubjectCreate */
         SubjectCreate: {

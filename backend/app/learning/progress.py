@@ -84,11 +84,13 @@ async def list_subject_cards(db: AsyncSession, user: User) -> list[SubjectCard]:
     cards = []
     for subject in subjects:
         subject_topics = [t for t in topics if t.subject_id == subject.id]
-        completed = total = 0
+        completed = total = topics_completed = 0
         for topic in subject_topics:
             done, count = count_progress(infos[topic.id], progress)
             completed += done
             total += count
+            if count > 0 and done == count:
+                topics_completed += 1
         cards.append(
             SubjectCard(
                 id=subject.id,
@@ -97,6 +99,7 @@ async def list_subject_cards(db: AsyncSession, user: User) -> list[SubjectCard]:
                 description=subject.description,
                 cover=subject.cover,
                 topic_count=len(subject_topics),
+                topics_completed=topics_completed,
                 progress=ProgressOut(completed=completed, total=total),
             )
         )

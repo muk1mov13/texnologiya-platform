@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Fan kartasidagi halqa mavzular sonini ko'rsatadi
+
+- Talaba fan kartalaridagi halqa ichida avval bosqichlar soni (masalan, `0/210`) chiqardi; endi tugatilgan mavzular / mavzular soni (`0/30`).
+- Backend: `SubjectCard`ga `topics_completed` maydoni (kontentli barcha bosqichlari bajarilgan mavzular). `schema.gen.ts` qayta generatsiya qilindi.
+- Tekshiruv: ruff, mypy, lint, typecheck.
+
 ## 2026-10-15 — Talaba uchun logo bosh sahifaga olib boradi
 
 - `AppLayout`: talaba header'dagi logoni bossa endi landing sahifaga (`/`) o'tadi (avval `/app` ga). O'qituvchi va admin uchun logo avvalgidek o'z paneliga olib boradi.

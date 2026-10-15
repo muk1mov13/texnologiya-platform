@@ -79,6 +79,7 @@ export interface SubjectCard {
   description: string
   cover: string | null
   topic_count: number
+  topics_completed: number
   progress: Progress
 }
 

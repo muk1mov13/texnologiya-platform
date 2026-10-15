@@ -8,6 +8,7 @@ export const subjectCards: SubjectCard[] = [
     description: 'Metodika asoslari',
     cover: null,
     topic_count: 2,
+    topics_completed: 0,
     progress: { completed: 1, total: 3 },
   },
 ]

@@ -18,6 +18,8 @@ class SubjectCard(BaseModel):
     description: str
     cover: str | None
     topic_count: int
+    # To'liq tugatilgan mavzular (kontentli barcha bosqichlari bajarilgan).
+    topics_completed: int
     progress: ProgressOut
 
 

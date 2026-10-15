@@ -196,7 +196,7 @@ function SubjectTile({ subject, index }: { subject: SubjectCard; index: number }
           <span className="text-lg leading-snug font-bold tracking-tight text-balance text-slate-900">
             {subject.title}
           </span>
-          <ProgressRing completed={completed} total={total} size={44} />
+          <ProgressRing completed={subject.topics_completed} total={subject.topic_count} size={44} />
         </span>
         {subject.description && <span className="line-clamp-2 text-sm text-slate-600">{subject.description}</span>}
         <span className="mt-auto flex flex-col gap-2 pt-3">
