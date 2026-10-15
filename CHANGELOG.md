@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Bog'lanish sahifasi yangi dizaynda
+
+- `ContactPage.tsx`: `PageHero`; ikki ustun — chapda to'q `brand-950` panel (glow, katak naqsh, kontaktlar, ijtimoiy tarmoqlar), o'ngda forma kartasi (sarlavha, ikonkali maydonlar, ism va kontakt yonma-yon, "Yuborish" ikonkasi bilan). Telefonda forma birinchi chiqadi. Muvaffaqiyat holati: emoji o'rniga animatsiyali `check` doirasi. Honeypot va zod sxemasi o'zgarmadi.
+- Yangi `ContactDetails.tsx` (kontakt qatorlari, `light`/`dark` ohang, manzil uchun xarita havolasi) va `contacts.ts` (`hasAnyContact`).
+- i18n (uz + ru): `contact.eyebrow`, `contact.infoText`, `contact.formTitle`, `contact.formHint`.
+- Tekshiruv: lint, typecheck; brauzerda 1280px (bo'sh forma yuborilganda xatolar) va 375px.
+
 ## 2026-10-15 — "Biz haqimizda" sahifasi yangi dizaynda
 
 - `AboutPage.tsx`: `PageHero` (yorliq va izoh bilan); CMS matni oq kartada, o'qishga qulay kenglikda; o'ngda sticky "Tezkor havolalar" (Kutubxona, Yangiliklar, Savol-javob, Bog'lanish — ikonkali kartalar); yuklanishda skelet, bo'sh holatda `users` ikonkasi.
