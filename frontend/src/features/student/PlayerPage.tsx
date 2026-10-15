@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useParams } from 'react-router'
 import { useTopic } from '@/api/student'
 import type { StepBrief, TopicDetail } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { QueryState } from '@/components/ui/QueryState'
+import { BACK_LINK } from '@/components/ui/styles'
 import { cx, FOCUS_RING } from '@/lib/cx'
-import { isStepKind, STEP_ICONS } from '@/lib/steps'
+import { isStepKind, STEP_ICON_NAMES } from '@/lib/steps'
 import { StepContentView } from './StepContent'
 import { TutorDock } from './tutor/TutorDock'
 
@@ -51,7 +54,7 @@ export function PlayerPage() {
   }, [])
 
   // Noto'g'ri ID'da so'rov o'chiq (abadiy `isPending`), shuning uchun QueryState'dan oldin ajratiladi.
-  if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="🧭" title={t('notFound.title')} />
+  if (!Number.isInteger(topicId) || topicId <= 0) return <EmptyState icon="target" title={t('notFound.title')} />
   return (
     <QueryState query={topic}>
       {(data) => <PlayerBody topicId={topicId} kind={params.kind} topic={data} headingRef={headingRef} />}
@@ -71,7 +74,7 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
   const { steps } = topic
   // Backend har mavzuga 7 bosqich kafolatlaydi, ammo kafolat buzilsa sahifa yiqilmasin.
   if (steps.length === 0) {
-    return <EmptyState icon="🗂️" title={t('player.noContent')} text={t('player.noContentText')} />
+    return <EmptyState icon="folder" title={t('player.noContent')} text={t('player.noContentText')} />
   }
   const index = isStepKind(kind) ? steps.findIndex((step) => step.kind === kind) : -1
   if (index === -1) {
@@ -83,25 +86,29 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
   const next = steps.slice(index + 1).find((step) => step.has_content)
 
   return (
-    <div className="flex flex-col gap-4">
-      <Link
-        to={`/app/subjects/${topic.subject.slug}`}
-        className={cx('text-sm font-semibold text-brand-700 hover:underline', FOCUS_RING)}
-      >
-        ← {topic.subject.title}
+    <div className="flex flex-col gap-5">
+      <Link to={`/app/subjects/${topic.subject.slug}`} className={BACK_LINK}>
+        <Icon name="arrowLeft" className="size-4" />
+        {topic.subject.title}
       </Link>
       {/* `minmax(0,1fr)`: aks holda bosqichlar ro'yxati (gorizontal scroll) mobil ustunni kengaytiradi. */}
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)_340px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[250px_minmax(0,1fr)_340px]">
         <aside className="md:sticky md:top-20 md:self-start">
           <Card className="flex flex-col gap-4 p-4">
-            <div className="flex items-center gap-3">
-              <ProgressRing completed={topic.progress.completed} total={topic.progress.total} size={48} />
-              <h1 className="font-bold leading-tight">{topic.title}</h1>
+            <div className="flex flex-col gap-3 px-1">
+              <div className="flex items-center gap-3">
+                <ProgressRing completed={topic.progress.completed} total={topic.progress.total} size={48} />
+                <h1 className="font-bold tracking-tight text-balance leading-tight text-slate-900">{topic.title}</h1>
+              </div>
+              <ProgressBar
+                value={topic.progress.total > 0 ? topic.progress.completed / topic.progress.total : 0}
+                className="h-1.5"
+              />
             </div>
             {/* `relative`: havolalardagi `sr-only` (absolute) matn scroll konteynerdan chiqib sahifani kengaytirmasin. */}
             <ol
               aria-label={t('player.steps')}
-              className="relative flex gap-2 overflow-x-auto pb-1 md:flex-col md:overflow-visible"
+              className="relative -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:flex-col md:gap-0.5 md:overflow-visible"
             >
               {steps.map((step) => (
                 <li key={step.id} className="shrink-0">
@@ -112,19 +119,26 @@ function PlayerBody({ topicId, kind, topic, headingRef }: PlayerBodyProps) {
           </Card>
         </aside>
         <section aria-labelledby="step-title" className="min-w-0">
-          <h2
-            ref={headingRef}
-            id="step-title"
-            tabIndex={-1}
-            // `scroll-mt-28`: AppLayout'ning `sticky top-0` header'i ostida qolmasin (mobil'da
-            // nav ikkinchi qatorga tushishi mumkin, shuning uchun zaxira bilan). `outline-none`
-            // qoldirilgan, `FOCUS_RING` esa YO'Q — bu dastur fokusi (skript orqali), klaviatura
-            // foydalanuvchisi emas, shuning uchun fokus halqasi ko'rsatilmasligi kerak.
-            className="mb-4 scroll-mt-28 text-xl font-bold outline-none"
-          >
-            <span aria-hidden="true">{STEP_ICONS[current.kind]} </span>
-            {t(`steps.${current.kind}`)}
-          </h2>
+          <div className="mb-5 flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 ring-1 ring-brand-200/70"
+            >
+              <Icon name={STEP_ICON_NAMES[current.kind]} className="size-5" />
+            </span>
+            <h2
+              ref={headingRef}
+              id="step-title"
+              tabIndex={-1}
+              // `scroll-mt-28`: AppLayout'ning `sticky top-0` header'i ostida qolmasin (mobil'da
+              // nav ikkinchi qatorga tushishi mumkin, shuning uchun zaxira bilan). `outline-none`
+              // qoldirilgan, `FOCUS_RING` esa YO'Q — bu dastur fokusi (skript orqali), klaviatura
+              // foydalanuvchisi emas, shuning uchun fokus halqasi ko'rsatilmasligi kerak.
+              className="scroll-mt-28 text-2xl font-extrabold tracking-tight text-slate-900 outline-none"
+            >
+              {t(`steps.${current.kind}`)}
+            </h2>
+          </div>
           <StepContentView key={current.id} topicId={topicId} step={current} nextKind={next?.kind} />
         </section>
         <TutorDock topicId={topicId} />
@@ -141,26 +155,36 @@ function StepLink({ topicId, step, active }: { topicId: number; step: StepBrief;
       to={`/app/topics/${topicId}/${step.kind}`}
       aria-current={active ? 'step' : undefined}
       className={cx(
-        'flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm whitespace-nowrap',
+        'relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm whitespace-nowrap transition motion-reduce:transition-none',
         FOCUS_RING,
         // Uch holat o'zaro bir-birini istisno qiladi: faol / oddiy / kontentsiz (xira).
         active
-          ? 'bg-brand-100 font-bold text-slate-900'
+          ? 'bg-brand-50 font-bold text-brand-900 ring-1 ring-brand-200/70'
           : step.has_content
-            ? 'text-slate-700 hover:bg-slate-100'
-            : 'text-slate-500 hover:bg-slate-100',
+            ? 'font-medium text-slate-700 hover:bg-slate-100'
+            : 'text-slate-400 hover:bg-slate-50',
       )}
     >
+      {active && (
+        <span
+          aria-hidden="true"
+          className="absolute top-2 bottom-2 left-0 hidden w-1 rounded-full bg-gradient-to-b from-brand-400 to-brand-700 md:block"
+        />
+      )}
       <span
         aria-hidden="true"
         className={cx(
-          'grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold',
-          // completed/active bir-biridan ajralib turishi va o'qilishi uchun: brand-600 (tugatilgan)
-          // brand-700 (joriy, faol)dan bir pog'ona yengilroq — ikkisi ham oq matn bilan yetarli kontrastda.
-          completed ? 'bg-brand-600 text-white' : active ? 'bg-brand-700 text-white' : 'bg-slate-200 text-slate-600',
+          'grid size-7 shrink-0 place-items-center rounded-lg',
+          // completed/active bir-biridan ajralib turishi uchun: tugatilgan — gradient + belgi,
+          // joriy — oq fon ustida brand ikonka, qolganlari — kulrang.
+          completed
+            ? 'bg-gradient-to-br from-brand-500 to-brand-700 text-white'
+            : active
+              ? 'bg-white text-brand-700 ring-1 ring-brand-200'
+              : 'bg-slate-100 text-slate-500',
         )}
       >
-        {completed ? '✓' : step.order}
+        <Icon name={completed ? 'check' : STEP_ICON_NAMES[step.kind]} className="size-4" />
       </span>
       {t(`steps.${step.kind}`)}
       {completed && <span className="sr-only"> ({t('player.completed')})</span>}
