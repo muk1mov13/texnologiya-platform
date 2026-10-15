@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 12: AI repetitor paneli
+- `TutorPanel`: shishasimon sarlavha (gradient avatar, foydalanish hisoblagichi chipda, ikonkali "Yangi suhbat"), xabarlar fonida yumshoq kulrang; pufakchalar — talaba: brand gradient (o'ngda), repetitor: oq karta + kichik avatar (chapda); manbalar alohida blokda; bo'sh holat ikonkali; "Yuborish" ikonkali.
+- `TutorDock`: keng ekranda `SURFACE` panel (`100dvh`), telefonda gradient suzuvchi tugma va pastki panel (`85dvh`, tutqich chizig'i, xiralashgan fon).
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 11: bosqich kontenti va faoliyatlar
 - `StepContent`: material tanlagich — PDF ikonkali chiplar (`ring` holatlari); lug'at — 2 ustunli kartalar (chapda gradient chiziq); adabiyotlar — raqamli kartalar, havola tashqi-havola ikonkasi bilan; pastda amallar paneli (`StepFooter`): "Tugatdim" belgi ikonkasi bilan, tugatilgan holat yashil yorliq, "Keyingi bosqich →" (bosqich tugagan bo'lsa asosiy tugma).
 - `ActivityList`: faoliyat turi SVG ikonkasi (emoji o'rniga), "Boshlash/Qayta" ikonkali, "Orqaga" ikonkali secondary tugma. `ChoicePlayer` (ha/yo'q va variantlar — `ring` tanlov holatlari, variantda klaviatura fokusi `has-[:focus-visible]`), `CrosswordPlayer` (katakchalar, ko'rsatmalar kartalarda), `AttemptResult`, `TaskStep`, `PdfViewer` — yangi sirtlar; mantiq o'zgarmadi.
