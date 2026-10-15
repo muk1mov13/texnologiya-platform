@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Mavzu muharriri qayta dizayni (1/3): sarlavha
+
+- `TopicEditorPage`: "← orqaga" havolasi o'rniga `PageHeader` — fan nomi (eyebrow), mavzu nomi, mashg'ulot turi, tartib raqami ("3-mavzu, jami 12 ta") va nashr holati; amallar: "Talaba ko'rinishi" (faqat nashr qilingan mavzuda, yangi oynada) va oldingi/keyingi mavzuga o'tish.
+- Yangi `features/admin/ui/EmptyBlock.tsx`: panel ichidagi ixcham bo'sh holat (keyingi qadamlarda ishlatiladi).
+- i18n: `teach.studentView`, `teach.prevTopic`, `teach.nextTopic`, `teach.topicPosition` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — O'qituvchida logo landing sahifaga olib boradi
 
 - `AppLayout`: o'qituvchi logoni bossa `/` (landing) ga o'tadi (avval `/teach` edi); adminda logo avvalgidek `/admin` ga.

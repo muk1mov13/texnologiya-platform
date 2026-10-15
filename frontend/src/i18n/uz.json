@@ -460,7 +460,11 @@
     "litUrl": "Havola (ixtiyoriy)",
     "addLiterature": "Yangi adabiyot",
     "noLiterature": "Adabiyotlar ro'yxati hali bo'sh",
-    "deleteLiteratureTitle": "Adabiyotni o'chirish"
+    "deleteLiteratureTitle": "Adabiyotni o'chirish",
+    "studentView": "Talaba ko'rinishi",
+    "prevTopic": "Oldingi mavzu",
+    "nextTopic": "Keyingi mavzu",
+    "topicPosition": "{{index}}-mavzu, jami {{total}} ta"
   },
   "admin": {
     "users": {

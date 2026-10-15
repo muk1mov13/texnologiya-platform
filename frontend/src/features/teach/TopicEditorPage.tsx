@@ -1,11 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { useEditorTopic } from '@/api/teach'
+import { useEditorTopic, useTeachSubjects } from '@/api/teach'
 import type { StepKind, TopicEditor } from '@/api/types'
+import { Icon } from '@/components/icons/Icon'
+import type { IconName } from '@/components/icons/paths'
+import { Badge } from '@/components/ui/Badge'
+import { buttonClasses } from '@/components/ui/button-classes'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
 import { TabPanel, Tabs } from '@/components/ui/Tabs'
+import { PageHeader } from '@/features/admin/ui/PageHeader'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { ACTIVITY_KINDS, FILE_KINDS, isStepKind, STEP_ICONS, STEP_KINDS } from '@/lib/steps'
 import { AiDraftsSection } from './ai/AiDraftsSection'
 import { ActivitiesTab } from './assessment/ActivitiesTab'
@@ -40,9 +46,7 @@ export function TopicEditorPage() {
         const step = data.steps.find((item) => item.kind === tab)
         return (
           <div className="flex flex-col gap-6">
-            <Link to="/teach" className="text-sm font-semibold text-brand-700 hover:underline">
-              ← {t('teach.backToTopics')}
-            </Link>
+            <EditorHeader topic={data} />
             <TopicDetailsForm key={data.id} topic={data} />
             <Card className="p-0 sm:p-0">
               <div className="px-4 pt-3 sm:px-5">
@@ -83,5 +87,100 @@ export function TopicEditorPage() {
         )
       }}
     </QueryState>
+  )
+}
+
+/**
+ * Muharrir sarlavhasi: fan nomi, mavzu nomi, turi va holati; mavzular orasida o'tish va talaba
+ * ko'rinishi. Fan ma'lumoti `useTeachSubjects` keshidan olinadi (mavzular sahifasi bilan umumiy).
+ */
+function EditorHeader({ topic }: { topic: TopicEditor }) {
+  const { t } = useTranslation()
+  const subjects = useTeachSubjects()
+  const subject = subjects.data?.find((item) => item.id === topic.subject_id)
+  const topics = subject ? [...subject.topics].sort((a, b) => a.order - b.order) : []
+  const index = topics.findIndex((item) => item.id === topic.id)
+  const prev = index > 0 ? topics[index - 1] : undefined
+  const next = index >= 0 ? topics[index + 1] : undefined
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Link
+        to="/teach"
+        className={cx(
+          'inline-flex w-fit items-center gap-1.5 rounded-lg text-sm font-semibold text-slate-500 transition-colors hover:text-brand-700 motion-reduce:transition-none',
+          FOCUS_RING,
+        )}
+      >
+        <Icon name="arrowLeft" className="size-4" />
+        {t('teach.backToTopics')}
+      </Link>
+      <PageHeader
+        icon="pencil"
+        eyebrow={subject?.title ?? t('navGroups.learning')}
+        title={topic.title}
+        subtitle={
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+            <span>{t(`lessonType.${topic.lesson_type}`)}</span>
+            {index >= 0 && (
+              <span className="text-slate-500 tabular-nums">
+                {t('teach.topicPosition', { index: index + 1, total: topics.length })}
+              </span>
+            )}
+            <Badge dot tone={topic.is_published ? 'green' : 'amber'}>
+              {topic.is_published ? t('common.published') : t('common.draft')}
+            </Badge>
+          </span>
+        }
+        actions={
+          <>
+            {topic.is_published && (
+              <Link
+                to={`/app/topics/${topic.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className={buttonClasses('secondary', 'sm')}
+              >
+                <Icon name="eye" className="size-4" />
+                {t('teach.studentView')}
+              </Link>
+            )}
+            {topics.length > 1 && (
+              <div className="flex items-center rounded-xl bg-white p-0.5 shadow-soft ring-1 ring-slate-200">
+                <TopicStepLink to={prev?.id} icon="arrowLeft" label={t('teach.prevTopic')} />
+                <span aria-hidden="true" className="h-5 w-px bg-slate-200" />
+                <TopicStepLink to={next?.id} icon="arrowRight" label={t('teach.nextTopic')} />
+              </div>
+            )}
+          </>
+        }
+      />
+    </div>
+  )
+}
+
+/** Qo'shni mavzuga ikonka-havola; qo'shni yo'q bo'lsa — o'chiq ko'rinish. */
+function TopicStepLink({ to, icon, label }: { to: number | undefined; icon: IconName; label: string }) {
+  const base = 'grid size-8 place-items-center rounded-lg'
+  if (to === undefined) {
+    return (
+      <span aria-hidden="true" className={cx(base, 'text-slate-300')}>
+        <Icon name={icon} className="size-4" />
+      </span>
+    )
+  }
+  return (
+    <Link
+      to={`/teach/topics/${to}`}
+      aria-label={label}
+      title={label}
+      className={cx(
+        base,
+        'text-slate-600 transition-colors hover:bg-brand-50 hover:text-brand-700 motion-reduce:transition-none',
+        FOCUS_RING,
+      )}
+    >
+      <Icon name={icon} className="size-4" />
+    </Link>
   )
 }

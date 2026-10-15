@@ -460,7 +460,11 @@
     "litUrl": "Ссылка (необязательно)",
     "addLiterature": "Новый источник",
     "noLiterature": "Список литературы пока пуст",
-    "deleteLiteratureTitle": "Удаление источника"
+    "deleteLiteratureTitle": "Удаление источника",
+    "studentView": "Вид студента",
+    "prevTopic": "Предыдущая тема",
+    "nextTopic": "Следующая тема",
+    "topicPosition": "Тема {{index}} из {{total}}"
   },
   "admin": {
     "users": {
