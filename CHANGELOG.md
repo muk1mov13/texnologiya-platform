@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Foydalanuvchi materiallarni o'zi tayyorladi: 2) va 7) uchun PDF, barcha matnli fayllar `.docx`. Avvalgi chala import natijasi (2 fan, 51 mavzu, 96 material, `media/` fayllari) lokal dev bazadan o'chirildi.
 
+### Task 4: krossvord — bir necha so'zli javoblar
+- `crossword.normalize_word`: bo'sh joy va chiziqcha (`SEPARATORS`) tashlanadi, "Oziqa eritmasi" -> `OZIQAERITMASI`. Ilgari bunday so'zlar rad etilardi (import ularni tashlab yuborardi, o'qituvchi esa `CROSSWORD_INVALID_WORD` olardi).
+- Resurs: lab 14 krossvordiga mavzuga doir 6 so'z qo'shildi (Antagonizm, Sinergizm, Koleoptil, Gidratatsiya, Bidistillat, Nihol); eski 5 savol bilan birga 11 so'z to'rga joylashadi.
+- Tekshiruv: ruff, mypy o'tdi; `_prepare_crossword` lab 14 ning 11 so'zini joyladi.
+
 ### Task 3: test variantlarini aralashtirish
 - `assessment/options.py: option_order(user_id, question_id, n)`: har talaba va savol uchun deterministik tartib (saqlanmaydi; bazada o'qituvchi tartibi qoladi).
 - `views.activity_views`: variantlar talabaga shu tartibda; `attempts.grade(..., user_id)`: javob ko'rsatilgan tartibdagi indeks deb baholanadi, urinish `result`i (variantlar, `given`, `correct`) ham shu tartibda — natija sahifasi talaba ko'rgan tartibni ko'rsatadi. Frontend o'zgarmadi.

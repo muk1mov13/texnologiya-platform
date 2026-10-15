@@ -12,6 +12,8 @@ DOWN: Direction = "down"
 
 APOSTROPHES = "'ʻʼ’‘`"
 MODIFIER = "ʻ"
+# Bir necha so'zli javob ("Oziqa eritmasi") odatdagi krossvorddagidek qo'shib yoziladi.
+SEPARATORS = frozenset(" -–—")
 DIGRAPH_BASES = ("O", "G")
 MIN_CELLS = 2
 MAX_CELLS = 20
@@ -32,12 +34,15 @@ class UnplaceableError(ValueError):
 
 
 def normalize_word(raw: str) -> list[str]:
-    """So'zni kataklar ro'yxatiga aylantiradi: katta harf, Oʻ va Gʻ bitta katak."""
+    """So'zni kataklar ro'yxatiga aylantiradi: katta harf, Oʻ va Gʻ bitta katak, bo'sh joy va
+    chiziqcha tashlanadi."""
     text = raw.strip().upper()
     for mark in APOSTROPHES:
         text = text.replace(mark, MODIFIER)
     cells: list[str] = []
     for char in text:
+        if char in SEPARATORS:
+            continue
         # MODIFIER (U+02BB) `isalpha()` uchun harf hisoblanadi, shuning uchun avval tekshiriladi.
         if char == MODIFIER:
             if cells and cells[-1] in DIGRAPH_BASES:
