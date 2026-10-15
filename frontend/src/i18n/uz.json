@@ -866,6 +866,12 @@
     "views": "Ko'rishlar: {{count}}"
   },
   "faq": {
+    "eyebrow": "Yordam markazi",
+    "search": "Savollarni qidirish",
+    "searchPlaceholder": "Savol yoki kalit so'zni yozing…",
+    "noResults": "Hech narsa topilmadi. Boshqa so'z bilan urinib ko'ring.",
+    "found": "Topildi: {{count}} ta savol",
+    "moreText": "Savolingizni yozing — o'qituvchi ko'rib chiqib, javob beradi.",
     "title": "Savol-javob",
     "description": "Platforma va o'qish jarayoni bo'yicha ko'p beriladigan savollar.",
     "empty": "Hozircha savollar yo'q",

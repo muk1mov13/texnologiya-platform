@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Savol-javob sahifasi qidiruv bilan
+
+- `FaqPage.tsx`: `PageHero` ichida qidiruv (savol va javob matni bo'yicha, brauzerning o'zida; topilganlar soni `role="status"` bilan e'lon qilinadi, natija bo'lmasa alohida holat); savollar chapda, o'ngda sticky to'q "Javob topmadingizmi?" kartasi (bog'lanish sahifasiga havola); yuklanishda skelet; bo'sh holatda emoji o'rniga `help` ikonkasi.
+- i18n (uz + ru): `faq.eyebrow`, `faq.search`, `faq.searchPlaceholder`, `faq.noResults`, `faq.found`, `faq.moreText`.
+- Tekshiruv: lint, typecheck, build; brauzerda 1280px va 375px (gorizontal siljish yo'q).
+
 ## 2026-10-15 — Kitoblar katalogi yangi dizaynda
 
 - `BookCatalog.tsx`: qidiruv (ichida `search` ikonkasi) va kategoriya bitta oq panelda; kitob kartasi `SURFACE` sirtida, muqova "kitob" ko'rinishida (chap qirrada umurtqa soyasi, hover'da biroz ko'tarilib qiyshayadi), muqovasiz kitobda brand gradientli muqova va nomi; kategoriya kvadrat yorliq, "Yuklab olish" to'liq tugma + hajm; grid 1→2→3 ustun; yuklanishda skelet.
