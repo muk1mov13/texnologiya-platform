@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — O'qituvchida logo landing sahifaga olib boradi
+
+- `AppLayout`: o'qituvchi logoni bossa `/` (landing) ga o'tadi (avval `/teach` edi); adminda logo avvalgidek `/admin` ga.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — O'qituvchi menyusidan "Talaba ko'rinishi" olib tashlandi
 
 - `paths.ts: navLinksFor('teacher')`: `/app` ("Talaba ko'rinishi") havolasi o'chirildi; u endi faqat adminda (`AppLayout` va `AdminShell` footeri).
