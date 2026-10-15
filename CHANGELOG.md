@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — import: tayyor PDF va yangi fayl formatlari
+
+Foydalanuvchi materiallarni o'zi tayyorladi: 2) va 7) uchun PDF, barcha matnli fayllar `.docx`. Avvalgi chala import natijasi (2 fan, 51 mavzu, 96 material, `media/` fayllari) lokal dev bazadan o'chirildi.
+
+### Task 1: parser — prefikssiz javob kaliti, lab sarlavhasi
+- `resource_parse.parse_quiz`: `Javoblar:` so'zisiz kalit ham taniladi: faqat `raqam–harf` juftlaridan iborat qator (`1–B 2–A`, `1 — b; 2 — a.`, har juft alohida qatorda `1-B`).
+- `parse_title`: birinchi qator faqat `1-LABORATORIYA MASHG'ULOTI` kabi sarlavhasiz bo'lsa, sarlavha keyingi qatordan olinadi.
+- Tekshiruv: `--dry-run` "O'simliklar fiziologiyasi" uchun 30/30 test (avval 0) va 15 ta lab sarlavhasini ko'rsatdi; ruff, mypy o'tdi.
+
 ## 2026-10-14 — `resource/` materiallarini import qilish
 
 Reja: `~/.claude/plans/loyihada-resource-papka-bor-snug-pine.md`.

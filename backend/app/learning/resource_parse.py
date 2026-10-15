@@ -166,6 +166,15 @@ def _cut(text: str, limit: int) -> str:
 # --- parserlar -----------------------------------------------------------------------------
 
 DASH = r"[–—-]"
+# Faqat `raqam–harf` juftlaridan iborat qator — `Javoblar:` so'zisiz yozilgan kalit
+# (`1–B 2–A`, `1 — b; 2 — a.`, yoki har juft alohida qatorda: `1-B`).
+_KEY_LINE = re.compile(rf"^(?:\d+\s*{DASH}\s*[a-dA-D]\b[\s;,.]*)+$")
+_KEY_PAIR = re.compile(rf"(\d+)\s*{DASH}?\s*([a-dA-D])\b")
+# Sarlavhasiz sarlavha qatori: `1-LABORATORIYA MASHG'ULOTI`, `A2-amaliy mashg'ulot`.
+_BARE_HEADING = re.compile(
+    r"^[a-z]?\d+\s*-?\s*(?:mavzu|ma'?ruza|amaliy|seminar|laborator\w*|lab)"
+    r"(?:\s+(?:mashg'ulot\w*|ishi))?\s*\.?$"
+)
 
 
 def _sentence_case(text: str) -> str:
@@ -177,10 +186,13 @@ def _sentence_case(text: str) -> str:
 
 
 def parse_title(lines: list[str]) -> str | None:
-    """`1-mavzu. SARLAVHA` yoki `A1-AMALIY MASHG'ULOT. SARLAVHA` -> `Sarlavha`."""
+    """`1-mavzu. SARLAVHA` yoki `A1-AMALIY MASHG'ULOT. SARLAVHA` -> `Sarlavha`. Birinchi qator
+    faqat `1-LABORATORIYA MASHG'ULOTI` bo'lsa, sarlavha keyingi qatordan olinadi."""
     if not lines:
         return None
     first = lines[0]
+    if _BARE_HEADING.match(_plain(first)) and len(lines) > 1:
+        first = lines[1]
     match = re.match(r"^[A-Za-z]?\d+\s*-[^.]{0,40}\.\s*(.+)$", first)
     title = (match.group(1) if match else first).strip(" .")
     return _cut(_sentence_case(title), TITLE_MAX) if len(title) >= 2 else None
@@ -194,12 +206,13 @@ class QuizItem:
 
 
 def parse_quiz(lines: list[str]) -> list[QuizItem]:
-    """`N. savol` + `a) ... d)` variantlar + `Javoblar: 1–a; 2–c; ...` kaliti."""
+    """`N. savol` + `a) ... d)` variantlar + `Javoblar: 1–a; 2–c; ...` kaliti (`Javoblar:`
+    so'zisiz, bir yoki bir necha qatorda ham bo'lishi mumkin)."""
     answers: dict[int, int] = {}
     questions: list[tuple[int, str, list[str]]] = []
     for line in lines:
-        if _plain(line).startswith("javob"):
-            for number, letter in re.findall(rf"(\d+)\s*{DASH}?\s*([a-dA-D])\b", line):
+        if _plain(line).startswith("javob") or _KEY_LINE.match(line):
+            for number, letter in _KEY_PAIR.findall(line):
                 answers[int(number)] = "abcd".index(letter.lower())
             continue
         option = re.match(r"^([a-dA-D])\s*[).]\s*(.+)$", line)
