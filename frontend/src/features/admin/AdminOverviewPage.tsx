@@ -4,6 +4,7 @@ import { useAdminUsers, useUpdateUser } from '@/api/admin'
 import { useAiSettings } from '@/api/adminAi'
 import { useAdminBooks, useAdminNewsList, useMessages } from '@/api/adminCms'
 import { useCurrentUser } from '@/api/auth'
+import { useTeachSummary } from '@/api/teachAssessment'
 import { Icon } from '@/components/icons/Icon'
 import type { IconName } from '@/components/icons/paths'
 import { Avatar } from '@/components/ui/Avatar'
@@ -34,6 +35,7 @@ export function AdminOverviewPage() {
   const me = useCurrentUser()
   // Kesh `AdminShell` dagi hisoblagichlar va tegishli sahifalar bilan umumiy.
   const pending = useAdminUsers('pending', '')
+  const reviews = useTeachSummary().data?.pending_submissions
   const unread = useMessages(true)
   const books = useAdminBooks('pending')
   const news = useAdminNewsList()
@@ -47,7 +49,17 @@ export function AdminOverviewPage() {
         subtitle={t('adminOverview.subtitle')}
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+        {/* O'qitish ishi — kundalik asosiy vazifa, shuning uchun birinchi (telefonda to'liq kenglikda). */}
+        <div className="col-span-2 sm:col-span-1 [&>*]:h-full">
+          <StatCard
+            icon="clipboard"
+            tone={reviews ? 'amber' : 'brand'}
+            label={t('adminOverview.stats.pendingReviews')}
+            value={reviews}
+            to="/teach/review"
+          />
+        </div>
         <StatCard
           icon="users"
           tone={pending.data?.length ? 'amber' : 'brand'}

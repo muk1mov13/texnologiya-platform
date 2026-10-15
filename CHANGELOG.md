@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (3/4): bosh sahifa
+
+- `AdminOverviewPage`: birinchi ko'rsatkich — "Tekshirilmagan javoblar" (`useTeachSummary`, `/teach/review` ga havola); ko'rsatkichlar 5 ta (telefonda birinchisi to'liq kenglikda).
+- `TeachHomePage`: "Tasdiq kutayotgan talabalar" eslatmasi olib tashlandi (sidebar va bosh sahifada bor).
+- i18n: `adminOverview.stats.pendingReviews` qo'shildi, `teach.pendingStudents` o'chirildi (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Admin va o'qituvchi paneli birlashtirildi (2/4): yon menyu
 
 - `ADMIN_NAV`: "O'quv jarayoni" guruhiga "Mavzu muharriri" (`/teach`), "Tekshirish" va "Statistika" qo'shildi.

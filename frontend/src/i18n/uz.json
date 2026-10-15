@@ -417,7 +417,6 @@
     "passwordChanged": "Parol almashtirildi. Yangi parol bilan qayta kiring"
   },
   "teach": {
-    "pendingStudents": "Tasdiq kutayotgan talabalar: {{count}} ta",
     "title": "Mavzu muharriri",
     "noSubjects": "Sizga hali fan biriktirilmagan",
     "noSubjectsText": "Administrator sizni fanga biriktirgach, mavzular shu yerda paydo bo'ladi",
@@ -854,6 +853,7 @@
     "subtitle": "Bugun e'tibor talab qiladigan ishlar va platforma holati",
     "stats": {
       "pendingUsers": "Tasdiq kutayotgan talabalar",
+      "pendingReviews": "Tekshirilmagan javoblar",
       "unreadMessages": "O'qilmagan xabarlar",
       "pendingBooks": "Tasdiq kutayotgan kitoblar",
       "unpublishedNews": "Nashr qilinmagan yangiliklar"

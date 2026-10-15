@@ -1,8 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
-import { usePendingUsersCount } from '@/api/admin'
-import { useCurrentUser } from '@/api/auth'
 import { useCreateTopic, useDeleteTopic, useReorderTopics, useTeachSubjects } from '@/api/teach'
 import { useTeachSummary } from '@/api/teachAssessment'
 import type { TeachSubject, TeachTopicBrief } from '@/api/types'
@@ -25,7 +23,6 @@ export function TeachHomePage() {
       {(data) => (
         <div className="flex flex-col gap-6">
           <h1 className="text-2xl font-bold">{t('teach.title')}</h1>
-          <PendingStudents />
           <PendingReviews />
           {data.length === 0 ? (
             <EmptyState icon="🧑‍🏫" title={t('teach.noSubjects')} text={t('teach.noSubjectsText')} />
@@ -36,15 +33,6 @@ export function TeachHomePage() {
       )}
     </QueryState>
   )
-}
-
-/** Tasdiq kutayotgan talabalar bo'lsa (faqat admin), foydalanuvchilar sahifasiga havola. */
-function PendingStudents() {
-  const { t } = useTranslation()
-  const isAdmin = useCurrentUser()?.role === 'admin'
-  const count = usePendingUsersCount({ enabled: isAdmin })
-  if (!isAdmin || count === 0) return null
-  return <NoticeLink to="/admin/users" icon="👤" text={t('teach.pendingStudents', { count })} />
 }
 
 /** Tekshirilmagan javoblar bo'lsa, navbatga havola; bo'lmasa (yoki yuklanmasa) hech narsa. */
