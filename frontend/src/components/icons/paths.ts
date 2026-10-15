@@ -104,6 +104,7 @@ export const ICON_PATHS = {
   folder: ['M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z'],
   search: ['M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z', 'M21 21l-5-5'],
   send: ['M22 2L11 13', 'M22 2l-7 20-4-9-9-4z'],
+  trash: ['M4 7h16', 'M10 11v6', 'M14 11v6', 'M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12', 'M9 7V4h6v3'],
 } as const satisfies Record<string, readonly string[]>
 
 export type IconName = keyof typeof ICON_PATHS

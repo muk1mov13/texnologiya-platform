@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
 import { Spinner } from '@/components/ui/Spinner'
-import { cx } from '@/lib/cx'
+import { cx, FOCUS_RING } from '@/lib/cx'
 import { plainText } from '@/lib/plainText'
 import { MAX_MESSAGE_CHARS, useTutorChat, type TutorMessage } from './useTutorChat'
 
@@ -18,10 +18,12 @@ interface TutorPanelProps {
   /** Mavjud suhbatni davom ettirish (`/app/tutor`). */
   initial?: ConversationDetail
   onNew?: () => void
+  /** Bo'sh suhbatda ko'rsatiladigan namuna savollar (bosilsa darhol yuboriladi). */
+  suggestions?: string[]
 }
 
 /** Repetitor oynasi: xabarlar, rejim belgisi, manbalar va yuborish formasi. Balandlikni ota-ona beradi. */
-export function TutorPanel({ topicId, initial, onNew }: TutorPanelProps) {
+export function TutorPanel({ topicId, initial, onNew, suggestions = [] }: TutorPanelProps) {
   const { t } = useTranslation()
   const usage = useAiUsage()
   const chat = useTutorChat(topicId, initial)
@@ -84,7 +86,7 @@ export function TutorPanel({ topicId, initial, onNew }: TutorPanelProps) {
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 px-4 py-4"
       >
         {chat.messages.length === 0 ? (
-          <div className="m-auto flex max-w-xs flex-col items-center gap-3 py-6 text-center">
+          <div className="m-auto flex max-w-sm flex-col items-center gap-3 py-6 text-center">
             <span
               aria-hidden="true"
               className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 ring-1 ring-brand-200/70"
@@ -92,6 +94,26 @@ export function TutorPanel({ topicId, initial, onNew }: TutorPanelProps) {
               <Icon name="sparkles" className="size-6" />
             </span>
             <p className="text-sm text-pretty text-slate-600">{t('tutor.empty')}</p>
+            {suggestions.length > 0 && (
+              <div className="mt-2 flex w-full flex-col gap-2">
+                <p className="text-xs font-semibold text-slate-500">{t('tutor.suggestionsTitle')}</p>
+                {suggestions.map((text) => (
+                  <button
+                    key={text}
+                    type="button"
+                    disabled={chat.pending || exhausted}
+                    onClick={() => void chat.send(text)}
+                    className={cx(
+                      'rounded-xl bg-white px-3 py-2 text-left text-sm text-slate-700 shadow-soft ring-1 ring-slate-200/70',
+                      'transition hover:text-brand-800 hover:ring-brand-300 disabled:opacity-60 motion-reduce:transition-none',
+                      FOCUS_RING,
+                    )}
+                  >
+                    {text}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           chat.messages.map((message) => <MessageBubble key={message.key} message={message} />)
