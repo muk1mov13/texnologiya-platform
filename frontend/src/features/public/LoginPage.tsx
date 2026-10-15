@@ -21,6 +21,8 @@ export function LoginPage() {
   return (
     <AuthCard
       title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
+      variant="login"
       footer={
         <>
           {t('auth.login.noAccount')}{' '}

@@ -39,6 +39,8 @@ export function RegisterPage() {
   return (
     <AuthCard
       title={t('auth.register.title')}
+      subtitle={t('auth.register.subtitle')}
+      variant="register"
       footer={
         <>
           {t('auth.register.haveAccount')}{' '}

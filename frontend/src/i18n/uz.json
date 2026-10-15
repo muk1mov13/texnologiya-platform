@@ -299,11 +299,33 @@
     "fullName": "To'liq ism",
     "phone": "Telefon",
     "phoneHint": "Ixtiyoriy",
+    "aside": {
+      "eyebrow": "Metodik ta'minot",
+      "loginTitle": "Qaytganingizdan xursandmiz",
+      "loginText": "Qolgan joyingizdan davom eting: darslar, topshiriqlar va natijalaringiz sizni kutmoqda.",
+      "registerTitle": "O'rganishni bugun boshlang",
+      "registerText": "Texnologik ta'lim fanlari bo'yicha zamonaviy, bosqichma-bosqich o'quv platformasi.",
+      "perks": {
+        "steps": {
+          "title": "7 bosqichli mavzular",
+          "text": "Ma'ruza, taqdimot, test va topshiriqlar bir joyda"
+        },
+        "ai": {
+          "title": "AI yordamchi",
+          "text": "Savollaringizga mavzu materiallari asosida javob"
+        },
+        "xp": {
+          "title": "XP va nishonlar",
+          "text": "Har bir qadamingiz uchun mukofot oling"
+        }
+      },
+      "institute": "Buxoro davlat pedagogika instituti · Texnologik ta'lim"
+    },
     "showPassword": "Parolni ko'rsatish",
     "hidePassword": "Parolni yashirish",
     "strength": { "weak": "Zaif", "fair": "O'rtacha", "good": "Yaxshi", "strong": "Kuchli" },
-    "login": { "title": "Kirish", "submit": "Kirish", "noAccount": "Akkauntingiz yo'qmi?" },
-    "register": { "title": "Ro'yxatdan o'tish", "submit": "Ro'yxatdan o'tish", "haveAccount": "Akkauntingiz bormi?" }
+    "login": { "title": "Kirish", "subtitle": "Davom etish uchun akkauntingizga kiring", "submit": "Kirish", "noAccount": "Akkauntingiz yo'qmi?" },
+    "register": { "title": "Ro'yxatdan o'tish", "subtitle": "Bir daqiqada akkaunt yarating", "pendingNote": "Ro'yxatdan o'tgach, akkauntingizni administrator tasdiqlaydi.", "submit": "Ro'yxatdan o'tish", "haveAccount": "Akkauntingiz bormi?" }
   },
   "pending": {
     "title": "Tasdiq kutilmoqda",

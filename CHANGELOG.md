@@ -19,6 +19,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - i18n `auth.showPassword`, `auth.hidePassword`, `auth.strength.*` (uz/ru).
 - Tekshiruv: lint, typecheck.
 
+### Task 3: split-screen `AuthCard`
+- `AuthCard`: `lg+` da ikki ustunli karta (`scaleIn`), yangi `subtitle` va `variant: 'login' | 'register'` proplari; telefonda faqat forma.
+- `AuthAside`: to'q gradient panel (bloblar, katak), eyebrow, sahifaga mos sarlavha, 3 ta afzallik (`stagger`), institut nomi.
+- `LoginPage`/`RegisterPage` yangi proplarni uzatadi.
+- i18n `auth.aside.*`, `auth.login.subtitle`, `auth.register.subtitle`, `auth.register.pendingNote` (uz/ru).
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
