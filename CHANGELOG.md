@@ -26,6 +26,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 - i18n `auth.aside.*`, `auth.login.subtitle`, `auth.register.subtitle`, `auth.register.pendingNote` (uz/ru).
 - Tekshiruv: lint, typecheck.
 
+### Task 4: yangi `RegisterPage`
+- Maydonlarda ikonkalar (`user`, `mail`, `phone`), ikkala parolda `PasswordInput`, parol ostida `PasswordStrength`.
+- Tugma oldida "administrator tasdiqlaydi" eslatmasi; gradient tugma o'q bilan.
+- `authStyles.ts`: umumiy `AUTH_SUBMIT`, `AUTH_LINK`.
+- Tekshiruv: lint, typecheck.
+
 ## 2026-10-15 — Yangi talabalar haqida adminga bildirish
 
 Ro'yxatdan o'tgan talaba `pending` bo'ladi; endi kutayotganlar soni admin kiradigan joylarda ko'rinadi. Backend o'zgarmaydi (`GET /api/admin/users?status=pending`).
