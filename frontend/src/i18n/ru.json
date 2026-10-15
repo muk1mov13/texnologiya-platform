@@ -402,6 +402,15 @@
     "pageOfLabel": "Страница {{page}} из {{total}}"
   },
   "profile": {
+    "avatarUpload": "Загрузить фото",
+    "avatarChange": "Сменить фото",
+    "avatarRemove": "Удалить фото",
+    "avatarHint": "JPG, PNG или WEBP, до 2 МБ",
+    "avatarSaved": "Фото профиля сохранено",
+    "avatarRemoved": "Фото профиля удалено",
+    "avatarTooBig": "Размер фото не должен превышать 2 МБ",
+    "avatarBadType": "Можно загрузить только JPG, PNG или WEBP",
+    "currentPasswordPlaceholder": "Ваш текущий пароль",
     "title": "Профиль",
     "role": "Роль",
     "personal": "Личные данные",

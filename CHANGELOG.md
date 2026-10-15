@@ -8,6 +8,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Foydalanuvchi o'z rasmini yuklay oladi; rasm bo'lmasa har kimga o'ziga xos standart avatar chiziladi. Profil kartasi va maydonlari tuzatildi.
 
+### Task 3: profil kartasi, rasm yuklash va placeholder'lar
+- Profil kartasi: avatar bannerga qo'shilib ketmasligi uchun oq halqa va soya bilan ajratildi; ism, rol va email endi banner ostida alohida qatorda (avval avatar yonida, banner chegarasida edi). Banner to'qroq gradient.
+- `features/profile/AvatarEditor.tsx`: katta avatar ustida kamera tugmasi — rasm tanlanishi bilan yuklanadi (tur va 2 MB chegarasi oldindan tekshiriladi, `avatarRules.ts`), yuklanayotganda spinner; rasm bo'lsa "Rasmni o'chirish". Muvaffaqiyatda toast.
+- Profil maydonlariga placeholder: ism, telefon, joriy/yangi/takroriy parol.
+- `paths.ts`: `camera` ikonka. i18n (uz/ru): `profile.avatar*`, `profile.currentPasswordPlaceholder`.
+- Tekshiruv: lint, typecheck, build; avatar endpointlari bir martalik skript bilan (yuklash, ochiq URL, noto'g'ri fayl → 400, almashtirganda eski fayl o'chadi, o'chirish).
+
 ### Task 2: avatar komponenti va hook'lar
 - `components/ui/Avatar.tsx`: yuklangan rasm (`object-cover`, yuklanmasa standartga qaytadi) yoki o'ziga xos standart avatar — `lib/avatar.ts` foydalanuvchi ID'sidan (FNV-1a hash) 10 ta rang juftligidan birini, 4 ta naqshdan birini (`orbs`, `waves`, `grid`, `rays`) va burilishni tanlaydi, ustida bosh harflar.
 - `api/auth.ts`: `useUploadAvatar` (`PUT /api/me/avatar`, FormData), `useDeleteAvatar`; javob sessiyaga yoziladi.

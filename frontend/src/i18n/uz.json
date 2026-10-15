@@ -402,6 +402,15 @@
     "pageOfLabel": "Sahifa {{page}} / {{total}}"
   },
   "profile": {
+    "avatarUpload": "Rasm yuklash",
+    "avatarChange": "Rasmni almashtirish",
+    "avatarRemove": "Rasmni o'chirish",
+    "avatarHint": "JPG, PNG yoki WEBP, 2 MB gacha",
+    "avatarSaved": "Profil rasmi saqlandi",
+    "avatarRemoved": "Profil rasmi o'chirildi",
+    "avatarTooBig": "Rasm hajmi 2 MB dan oshmasligi kerak",
+    "avatarBadType": "Faqat JPG, PNG yoki WEBP rasm yuklash mumkin",
+    "currentPasswordPlaceholder": "Hozirgi parolingiz",
     "title": "Profil",
     "role": "Rol",
     "personal": "Shaxsiy ma'lumotlar",

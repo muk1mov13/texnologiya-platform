@@ -17,8 +17,8 @@ import { PasswordInput } from '@/components/ui/PasswordInput'
 import { PAGE_TITLE, SURFACE } from '@/components/ui/styles'
 import { pushToast } from '@/components/ui/toast-store'
 import { cx } from '@/lib/cx'
-import { initials } from '@/lib/initials'
 import { fadeUp } from '@/lib/motion'
+import { AvatarEditor, AvatarRemoveButton } from './AvatarEditor'
 import { passwordSchema, profileSchema, type PasswordValues, type ProfileValues } from './schemas'
 
 export function ProfilePage() {
@@ -50,18 +50,20 @@ function ProfileHero({ user }: { user: User }) {
       aria-label={user.full_name}
       className={cx(SURFACE, 'overflow-hidden')}
     >
-      <div aria-hidden="true" className="relative h-24 bg-gradient-to-br from-brand-500 to-brand-900 sm:h-28">
-        <div className="absolute inset-0 bg-grid opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      <div aria-hidden="true" className="relative h-28 overflow-hidden bg-gradient-to-br from-brand-600 via-brand-800 to-brand-950 sm:h-32">
+        <div className="absolute inset-0 bg-grid opacity-25" />
+        <div className="absolute -top-16 right-10 size-56 rounded-full bg-brand-400/30 blur-3xl" />
       </div>
-      <div className="flex flex-col gap-4 px-5 pb-5 sm:flex-row sm:items-end sm:px-6 sm:pb-6">
-        <span
-          aria-hidden="true"
-          className="-mt-10 grid size-20 shrink-0 place-items-center rounded-[1.4rem] bg-gradient-to-br from-brand-100 to-brand-200 text-2xl font-extrabold text-brand-900 shadow-soft ring-4 ring-white"
-        >
-          {initials(user.full_name)}
-        </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="truncate text-xl font-extrabold tracking-tight text-slate-900">{user.full_name}</p>
+      <div className="px-5 pb-6 sm:px-7">
+        {/* Avatar bannerga yarim chiqadi; ism va ma'lumotlar esa banner ostida, alohida qatorda. */}
+        <div className="-mt-12 flex flex-wrap items-end justify-between gap-4 sm:-mt-14">
+          <AvatarEditor user={user} />
+          {user.role === 'student' && <StudentStats />}
+        </div>
+        <div className="mt-4 flex flex-col gap-2">
+          <p className="text-xl font-extrabold tracking-tight text-balance text-slate-900 sm:text-2xl">
+            {user.full_name}
+          </p>
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
             <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-0.5 font-semibold text-brand-800 ring-1 ring-brand-200/70">
               <span className="sr-only">{t('profile.role')}: </span>
@@ -73,8 +75,11 @@ function ProfileHero({ user }: { user: User }) {
               <span className="truncate">{user.email}</span>
             </span>
           </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+            <span className="text-xs text-slate-500">{t('profile.avatarHint')}</span>
+            <AvatarRemoveButton user={user} />
+          </div>
         </div>
-        {user.role === 'student' && <StudentStats />}
       </div>
     </m.section>
   )
@@ -163,12 +168,21 @@ function ProfileForm({ user }: { user: User }) {
             id="full_name"
             icon="user"
             autoComplete="name"
+            placeholder={t('auth.placeholders.fullName')}
             aria-invalid={Boolean(errors.full_name)}
             {...register('full_name')}
           />
         </Field>
         <Field id="phone" label={t('auth.phone')} error={errors.phone?.message}>
-          <Input id="phone" type="tel" icon="phone" autoComplete="tel" aria-invalid={Boolean(errors.phone)} {...register('phone')} />
+          <Input
+            id="phone"
+            type="tel"
+            icon="phone"
+            autoComplete="tel"
+            placeholder={t('auth.placeholders.phone')}
+            aria-invalid={Boolean(errors.phone)}
+            {...register('phone')}
+          />
         </Field>
         <div>
           <Button type="submit" loading={updateMe.isPending}>
@@ -209,6 +223,7 @@ function PasswordForm() {
         <Field id="current_password" label={t('profile.currentPassword')} error={errors.current_password?.message}>
           <PasswordInput
             id="current_password"
+            placeholder={t('profile.currentPasswordPlaceholder')}
             autoComplete="current-password"
             aria-invalid={Boolean(errors.current_password)}
             {...register('current_password')}
@@ -222,6 +237,7 @@ function PasswordForm() {
         >
           <PasswordInput
             id="new_password"
+            placeholder={t('auth.placeholders.passwordNew')}
             autoComplete="new-password"
             aria-invalid={Boolean(errors.new_password)}
             {...register('new_password')}
@@ -230,6 +246,7 @@ function PasswordForm() {
         <Field id="confirm" label={t('auth.passwordConfirm')} error={errors.confirm?.message}>
           <PasswordInput
             id="confirm"
+            placeholder={t('auth.placeholders.passwordConfirm')}
             autoComplete="new-password"
             aria-invalid={Boolean(errors.confirm)}
             {...register('confirm')}
