@@ -8,6 +8,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 Talaba paneli (`/app/*`) ochiq sayt va auth sahifalari bilan bir xil premium uslubga o'tadi (reja: yuqori menyu saqlanadi, barcha talaba sahifalari). Mantiq va backend o'zgarmaydi.
 
+### Task 6: bosh panel hero
+- `SubjectsPage`: tepada hero-karta — kun vaqtiga qarab salomlashuv (`lib/greeting.ts`, `student.greeting.*`), bugungi sana, sarlavha, izoh; o'ngda to'q "Davom ettirish" kartasi (bosqich SVG ikonkasi, mavzu, fan, "Davom etish →"). Davom ettirish yo'q bo'lsa — fan tanlashga undovchi matn. `fadeUp`/`stagger` bilan kirish.
+- i18n (uz/ru): `student.greeting.*`, `student.heroText`, `student.startHint`, `student.continueCta`.
+- Tekshiruv: lint, typecheck.
+
 ### Task 5: premium yuqori menyu
 - `AppLayout`: shishasimon header (`backdrop-blur-xl`), gradient logo belgisi, ikonali tablar (`m.span layoutId` bilan suriladigan faol fon), talaba uchun seriya/XP chipi (`useDashboard`, `/app/results` ga havola), bosh harfli avatar (`lib/initials.ts`), ikonali "Chiqish"; `main` → `max-w-7xl`, sahifa tepasida yumshoq radial nur.
 - `paths.ts`: `NavItem.icon` (ilova menyusi ikonkalari); `MobileMenu` ikonkalarni ko'rsatadi, `LanguageSwitch`/`navClass` yangi uslubda, yangi `appNavClass`.
