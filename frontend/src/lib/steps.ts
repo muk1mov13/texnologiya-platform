@@ -1,4 +1,5 @@
 import type { StepKind } from '@/api/types'
+import type { IconName } from '@/components/icons/paths'
 
 export const STEP_KINDS: readonly StepKind[] = [
   'review',
@@ -32,6 +33,17 @@ export const STEP_ICONS: Record<StepKind, string> = {
   task: '📝',
   glossary: '🔤',
   literature: '📚',
+}
+
+/** Talaba paneli uchun SVG ikonkalar (`Icon`) — emoji o'rniga. */
+export const STEP_ICON_NAMES: Record<StepKind, IconName> = {
+  review: 'refresh',
+  lecture: 'book',
+  presentation: 'presentation',
+  practice: 'pencil',
+  task: 'clipboard',
+  glossary: 'glossary',
+  literature: 'library',
 }
 
 export function isStepKind(value: string | null | undefined): value is StepKind {
