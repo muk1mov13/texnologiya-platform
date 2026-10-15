@@ -23,21 +23,26 @@ export const PUBLIC_NAV: NavItem[] = [
 ]
 
 export function navLinksFor(role: Role): NavItem[] {
-  const items: NavItem[] = [{ to: '/app', label: 'nav.subjects', end: true }]
-  // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.
-  if (role === 'student') items.push({ to: '/app/results', label: 'nav.results' })
-  items.push({ to: '/app/tutor', label: 'nav.tutor' })
-  if (role === 'teacher' || role === 'admin') {
-    items.push(
-      { to: '/teach', label: 'nav.teach', end: true },
-      { to: '/teach/review', label: 'nav.review' },
-      { to: '/teach/stats', label: 'nav.stats' },
-    )
+  if (role === 'student') {
+    // XP va natijalar faqat talabaga yoziladi (backend), shuning uchun "Natijalarim" ham faqat unga.
+    return [
+      { to: '/app', label: 'nav.subjects', end: true },
+      { to: '/app/results', label: 'nav.results' },
+      { to: '/app/tutor', label: 'nav.tutor' },
+    ]
   }
+  // O'qituvchi (amalda — admin) ish bo'limlari oldinda; talaba sahifalari bitta havolada,
+  // AI repetitor esa mavzu pleyeridagi `TutorDock` orqali ochiladi.
+  const items: NavItem[] = [
+    { to: '/teach', label: 'nav.teach', end: true },
+    { to: '/teach/review', label: 'nav.review' },
+    { to: '/teach/stats', label: 'nav.stats' },
+  ]
   // Admin kitoblarni `/admin/books` da yuklaydi va boshqaradi.
   if (role === 'teacher') items.push({ to: '/teach/books', label: 'nav.myBooks' })
   // Admin bo'limlari ko'p — yuqori menyuda bitta havola, ichki menyu `AdminLayout` da.
   if (role === 'admin') items.push({ to: '/admin', label: 'nav.admin' })
+  items.push({ to: '/app', label: 'nav.studentView', end: true })
   return items
 }
 

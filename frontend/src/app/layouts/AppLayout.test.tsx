@@ -27,7 +27,7 @@ test('o\'qituvchi muharrir havolasini ko\'radi, admin bo\'limlarini ko\'rmaydi',
 test('admin barcha bo\'limlarni ko\'radi', () => {
   renderRoutes(routes, { url: '/app', user: adminUser })
   const nav = screen.getByRole('navigation')
-  for (const key of ['nav.subjects', 'nav.teach', 'nav.admin']) {
+  for (const key of ['nav.teach', 'nav.admin', 'nav.studentView']) {
     expect(within(nav).getByRole('link', { name: i18n.t(key) })).toBeInTheDocument()
   }
 })

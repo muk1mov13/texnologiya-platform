@@ -27,6 +27,11 @@ Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `adm
 - Unit test: rol o'zgartirish testi olib tashlandi, o'z akkaunti testi rol belgisini tekshiradi.
 - Tekshiruv: lint, typecheck.
 
+### Task 5: o'qituvchi/admin menyusi ixchamroq
+- `paths.ts: navLinksFor`: o'qituvchi va admin uchun ish bo'limlari oldinda (Mavzu muharriri, Tekshirish, Statistika, Boshqaruv), oxirida bitta "Talaba ko'rinishi" (`/app`). "AI repetitor" yuqori menyudan olindi (pleyerdagi `TutorDock` va `/app/tutor` marshruti qoldi). Admin menyusi 6 tadan 5 ta havolaga tushdi. Talaba menyusi o'zgarmadi.
+- i18n: `nav.studentView` (uz/ru); `AppLayout.test` yangi havolani tekshiradi.
+- Tekshiruv: lint, typecheck, build.
+
 ### Task 1: admin bosh sahifasi `/teach`
 - `paths.ts: homePathFor` admin uchun `/admin/users` o'rniga `/teach` (kirish, `RedirectIfAuthed`, noto'g'ri rol yo'naltirishi shu orqali).
 - Tekshiruv: lint, typecheck.
