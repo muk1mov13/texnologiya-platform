@@ -21,6 +21,12 @@ Saytdan faqat talabalar va bitta o'qituvchi foydalanadi, u admin ham (bitta `adm
 - `adminBooks.subtitle` matni uz/ru yangilandi.
 - Tekshiruv: lint, typecheck, build.
 
+### Task 4: foydalanuvchilar sahifasida rol tanlash yo'q
+- `AdminUsersPage`: rol `Select` olib tashlandi; talaba bo'lmagan foydalanuvchida (admin, eski o'qituvchi) faqat rol belgisi ko'rinadi. Sahifada tasdiqlash, bloklash va vaqtinchalik parol qoldi.
+- i18n `admin.users.roleFor` uz/ru dan olib tashlandi; backend `PATCH /api/admin/users/{id}` `role` maydoni qoldi (yangi admin — `create-admin` CLI orqali).
+- Unit test: rol o'zgartirish testi olib tashlandi, o'z akkaunti testi rol belgisini tekshiradi.
+- Tekshiruv: lint, typecheck.
+
 ### Task 1: admin bosh sahifasi `/teach`
 - `paths.ts: homePathFor` admin uchun `/admin/users` o'rniga `/teach` (kirish, `RedirectIfAuthed`, noto'g'ri rol yo'naltirishi shu orqali).
 - Tekshiruv: lint, typecheck.

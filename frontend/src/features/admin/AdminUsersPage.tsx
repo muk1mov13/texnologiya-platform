@@ -2,22 +2,17 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminUsers, useTempPassword, useUpdateUser, type UserFilter } from '@/api/admin'
 import { useCurrentUser } from '@/api/auth'
-import type { Role, User, UserStatus } from '@/api/types'
+import type { User, UserStatus } from '@/api/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Input, Select } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Field'
 import { Modal } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { Tabs } from '@/components/ui/Tabs'
 
 const FILTERS: UserFilter[] = ['pending', 'active', 'blocked', 'all']
-const ROLES: Role[] = ['student', 'teacher', 'admin']
 const STATUS_TONES: Record<UserStatus, 'amber' | 'green' | 'red'> = { pending: 'amber', active: 'green', blocked: 'red' }
-
-function isRole(value: string): value is Role {
-  return (ROLES as string[]).includes(value)
-}
 
 export function AdminUsersPage() {
   const { t } = useTranslation()
@@ -116,7 +111,7 @@ interface UserRowProps {
   user: User
   isSelf: boolean
   busy: boolean
-  onUpdate: (data: { role?: Role; status?: UserStatus }) => void
+  onUpdate: (data: { status: UserStatus }) => void
   onTempPassword: () => void
 }
 
@@ -137,23 +132,9 @@ function UserRow({ user, isSelf, busy, onUpdate, onTempPassword }: UserRowProps)
           {user.phone ? ` · ${user.phone}` : ''}
         </p>
       </div>
+      {/* Saytda bitta o'qituvchi = admin, qolganlar talaba: rol tanlanmaydi, faqat talaba bo'lmaganda ko'rsatiladi. */}
+      {user.role !== 'student' && <Badge tone="brand">{t(`roles.${user.role}`)}</Badge>}
       <Badge tone={STATUS_TONES[user.status]}>{t(`admin.users.statuses.${user.status}`)}</Badge>
-      <Select
-        aria-label={t('admin.users.roleFor', { name: user.full_name })}
-        className="w-auto"
-        value={user.role}
-        disabled={isSelf || busy}
-        onChange={(event) => {
-          const role = event.target.value
-          if (isRole(role)) onUpdate({ role })
-        }}
-      >
-        {ROLES.map((role) => (
-          <option key={role} value={role}>
-            {t(`roles.${role}`)}
-          </option>
-        ))}
-      </Select>
       {!isSelf && (
         <div className="flex flex-wrap gap-2">
           {user.status === 'pending' && (

@@ -41,21 +41,6 @@ test('tasdiqlash tugmasi status=active yuboradi', async () => {
   await waitFor(() => expect(body).toEqual({ status: 'active' }))
 })
 
-test("rol o'zgartirilganda PATCH yuboriladi", async () => {
-  let body: unknown = null
-  mockList()
-  server.use(
-    http.patch('/api/admin/users/7', async ({ request }) => {
-      body = await request.json()
-      return HttpResponse.json({ ...pending, role: 'teacher' })
-    }),
-  )
-  renderRoute(<AdminUsersPage />, { user: adminUser })
-  const row = await screen.findByRole('listitem', { name: 'Yangi Talaba' })
-  await userEvent.selectOptions(within(row).getByRole('combobox'), 'teacher')
-  await waitFor(() => expect(body).toEqual({ role: 'teacher' }))
-})
-
 test("vaqtinchalik parol modalda ko'rsatiladi", async () => {
   mockList()
   server.use(http.post('/api/admin/users/7/temp-password', () => HttpResponse.json({ temp_password: 'Abc-123-xyz' })))
@@ -71,6 +56,7 @@ test("o'z akkauntida boshqaruv elementlari o'chirilgan", async () => {
   renderRoute(<AdminUsersPage />, { user: adminUser })
   await userEvent.click(await screen.findByRole('tab', { name: i18n.t('admin.users.filters.all') }))
   const self = await screen.findByRole('listitem', { name: adminUser.full_name })
-  expect(within(self).getByRole('combobox')).toBeDisabled()
+  expect(within(self).getByText(i18n.t('roles.admin'))).toBeInTheDocument()
+  expect(within(self).queryByRole('button')).not.toBeInTheDocument()
   expect(within(self).getByText(i18n.t('admin.users.you'))).toBeInTheDocument()
 })
