@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.ai.local_embed import LocalEmbeddingProvider
 from app.ai.models import AiDraft, AiSettings, DraftStatus
 from app.ai.providers import (
     EmbeddingProvider,
@@ -67,6 +68,8 @@ def build_ai(settings: Settings, dialect_name: str) -> AiServices:
     embedder: EmbeddingProvider = fake
     if settings.ai_provider != "fake" and settings.embedding_provider == "tei":
         embedder = TeiEmbeddingProvider(settings.tei_url, settings.tei_model)
+    elif settings.ai_provider != "fake" and settings.embedding_provider == "local":
+        embedder = local_embedder(settings)
     elif gemini is not None:
         embedder = gemini
     return AiServices(
@@ -76,6 +79,15 @@ def build_ai(settings: Settings, dialect_name: str) -> AiServices:
         configured=settings.ai_configured,
         chat_model=models[0],
         fast_model=models[1],
+    )
+
+
+def local_embedder(settings: Settings) -> LocalEmbeddingProvider:
+    return LocalEmbeddingProvider(
+        settings.local_embed_repo,
+        settings.local_embed_file,
+        settings.local_embed_cache,
+        settings.local_embed_threads,
     )
 
 

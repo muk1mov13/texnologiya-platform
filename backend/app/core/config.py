@@ -46,10 +46,15 @@ class Settings(BaseSettings):
     llm_model_chat: str = "openai/gpt-oss-120b"
     llm_model_fast: str = "openai/gpt-oss-20b"
     llm_rpm: int = Field(default=30, ge=1)
-    # Embedding: `gemini` (API) yoki `tei` (lokal text-embeddings-inference konteyneri).
-    embedding_provider: Literal["gemini", "tei"] = "gemini"
+    # Embedding: `gemini` (API), `tei` (text-embeddings-inference konteyneri) yoki `local`
+    # (jarayon ichida ONNX, alohida xizmatsiz; `app/ai/local_embed.py`).
+    embedding_provider: Literal["gemini", "tei", "local"] = "gemini"
     tei_url: str = "http://embeddings:80"
     tei_model: str = "intfloat/multilingual-e5-base"
+    local_embed_repo: str = "Xenova/multilingual-e5-base"
+    local_embed_file: str = "onnx/model_quantized.onnx"
+    local_embed_cache: str = "./models"
+    local_embed_threads: int = Field(default=2, ge=1)
     ai_min_similarity: float = Field(default=0.55, ge=0, le=1)
     ai_hint_similarity: float = Field(default=0.85, ge=0, le=1)
 
@@ -69,7 +74,7 @@ class Settings(BaseSettings):
 
     @property
     def embeddings_configured(self) -> bool:
-        return self.embedding_provider == "tei" or bool(self.gemini_api_key)
+        return self.embedding_provider in ("tei", "local") or bool(self.gemini_api_key)
 
     @model_validator(mode="after")
     def _require_prod_secret(self) -> "Settings":

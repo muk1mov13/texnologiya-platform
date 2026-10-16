@@ -19,6 +19,7 @@ from app.ai.providers import (
     TeiEmbeddingProvider,
     TokenBucket,
 )
+from app.ai.services import local_embedder
 from app.core.config import Settings
 
 _SYSTEM = "Qisqa javob ber."
@@ -92,6 +93,8 @@ async def run_checks(settings: Settings) -> list[CheckResult]:
     embedder: EmbeddingProvider | None = gemini
     if settings.embedding_provider == "tei":
         embedder = TeiEmbeddingProvider(settings.tei_url, settings.tei_model)
+    elif settings.embedding_provider == "local":
+        embedder = local_embedder(settings)
     if embedder is not None:
         checks.append((f"embedding {embedder.model_name}", _embed_check(embedder)))
     return [await _timed(name, call) for name, call in checks]

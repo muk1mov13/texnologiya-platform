@@ -4,6 +4,15 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-16 — Jarayon ichidagi embedding (`EMBEDDING_PROVIDER=local`)
+
+- Sabab: bepul Gemini kalitida embedding kuniga 1000 so'rov — bitta qayta indekslash (1002 bo'lak) limitni tugatdi va tutor 6 soat 503 `AI_BUSY` qaytardi. TEI konteyneri (WSL, `cpu-1.8`) esa bo'sh turganda 2.8–3.1 GB RAM oldi — 7.7 GB'li kompyuterda backend, nginx va LibreOffice'ga joy qolmaydi.
+- Yangi `app/ai/local_embed.py`: `LocalEmbeddingProvider` — `Xenova/multilingual-e5-base` ning int8 ONNX nusxasi (`onnx/model_quantized.onnx`, ~280 MB) `onnxruntime` bilan backend jarayonining o'zida; `query: `/`passage: ` prefikslari, mean pooling, L2. Model birinchi chaqiruvda `LOCAL_EMBED_CACHE` ga yuklanadi, keyin keshdan (internetsiz). Bitta sessiya + lock, `LOCAL_EMBED_THREADS` (default 2), CPU arena o'chiq.
+- `config.py`: `embedding_provider` ga `local`, `local_embed_repo/file/cache/threads`; `services.build_ai` va `ai-check` uni quradi. Yangi bog'liqliklar: `onnxruntime`, `tokenizers`, `huggingface-hub`. `.gitignore`: `backend/models/`.
+- O'lchovlar: model yuklangach ~570 MB (64 ta uzun bo'lakda cho'qqi ~1.1 GB), ~0.5 s/bo'lak; to'liq qayta indekslash 3275 bo'lak ~6 daqiqada, xatosiz.
+- Kalibrlash (haqiqiy kurs ma'lumotlari): kurs savollari 0.82–0.85, mavzudan tashqari 0.78–0.81, topshiriq savolining aynan nusxasi 0.90–0.92. `.env.example`: `EMBEDDING_PROVIDER=local`, `AI_MIN_SIMILARITY=0.815`, `AI_HINT_SIMILARITY=0.89`.
+- Tekshiruv: ruff, mypy; `ai-check` hammasi OK; tutor SSE orqali bo'laklab javob beradi va manba (glossariy, ma'ruza sahifasi) ko'rsatadi; AI test qoralamasi (Groq) 5 savolni ~10 s'da yaratdi.
+
 ## 2026-10-15 — Gemini modellari yangilandi va so'rov timeout'i
 
 - `gemini-2.5-flash`/`-flash-lite` yangi kalitlar uchun 404 qaytaradi — default'lar (`config.py`, `.env.example`) `gemini-3.5-flash` / `gemini-3.5-flash-lite` ga o'tdi (ikkalasi ~2–3 s'da javob beradi; `gemini-3.8-flash` hozir 503/osilib qoladi).

@@ -5,6 +5,7 @@ __pycache__/
 .env
 *.db
 media/
+backend/models/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
