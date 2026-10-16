@@ -1,23 +1,41 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useAdminNewsList } from '@/api/adminCms'
+import type { NewsAdmin } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { QueryState } from '@/components/ui/QueryState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { formatDateTime } from '@/lib/format'
 import { DataList } from '../ui/DataList'
 import { ListSkeleton } from '../ui/ListSkeleton'
 import { PageHeader } from '../ui/PageHeader'
 import { NEWS_STATUS_TONE, newsStatus, type NewsStatus } from './newsStatus'
+import { useNewsCover } from './useNewsCover'
 
 /** Holatga mos belgi foni (ro'yxat qatorining chap tomonida). */
 const LEADING_TONE: Record<NewsStatus, string> = {
   draft: 'bg-slate-100 text-slate-500 ring-slate-200/70',
   scheduled: 'bg-amber-50 text-amber-700 ring-amber-200/70',
   published: 'bg-brand-50 text-brand-700 ring-brand-200/70',
+}
+
+/** Qator boshidagi muqova rasmi; muqova bo'lmasa holat rangidagi ikonka. */
+function NewsThumb({ news, status }: { news: NewsAdmin; status: NewsStatus }) {
+  const cover = useNewsCover(news)
+  const box = 'h-14 w-24 shrink-0 rounded-xl'
+  if (cover) {
+    return <img src={cover} alt="" className={cx(box, 'object-cover ring-1 ring-slate-900/5')} />
+  }
+  if (news.has_cover) return <Skeleton className={box} />
+  return (
+    <span aria-hidden="true" className={cx(box, 'grid place-items-center ring-1', LEADING_TONE[status])}>
+      <Icon name="news" className="size-5" />
+    </span>
+  )
 }
 
 export function AdminNewsPage() {
@@ -57,12 +75,7 @@ export function AdminNewsPage() {
                         'focus-visible:-outline-offset-2',
                       )}
                     >
-                      <span
-                        aria-hidden="true"
-                        className={cx('grid size-10 shrink-0 place-items-center rounded-xl ring-1', LEADING_TONE[status])}
-                      >
-                        <Icon name={item.has_cover ? 'camera' : 'news'} className="size-5" />
-                      </span>
+                      <NewsThumb news={item} status={status} />
                       <span className="min-w-48 flex-1">
                         <span className="block font-semibold break-words text-slate-900 group-hover:text-brand-800">
                           {item.title}

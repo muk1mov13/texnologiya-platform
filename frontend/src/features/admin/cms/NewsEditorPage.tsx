@@ -1,17 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router'
 import {
-  adminNewsCoverUrl,
   useAdminNews,
   useCreateNews,
   useDeleteNews,
   useSetNewsCover,
   useUpdateNews,
 } from '@/api/adminCms'
-import { ApiError, apiBuffer } from '@/api/client'
+import { ApiError } from '@/api/client'
 import type { NewsAdmin } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
@@ -32,6 +31,7 @@ import { formatDateTime } from '@/lib/format'
 import { Panel } from '../ui/Panel'
 import { NEWS_STATUS_TONE, newsStatus } from './newsStatus'
 import { newsSchema, type NewsValues } from './schemas'
+import { useNewsCover } from './useNewsCover'
 
 type Mode = 'edit' | 'preview'
 
@@ -262,31 +262,10 @@ function EditorSkeleton() {
   )
 }
 
-/** Qoralama muqovasi ochiq endpoint'dan kelmaydi — admin endpoint'idan blob URL bilan ko'rsatiladi. */
-function useCoverPreview(news: NewsAdmin): string | null {
-  const [url, setUrl] = useState<string | null>(null)
-  useEffect(() => {
-    if (!news.has_cover) return
-    const controller = new AbortController()
-    let objectUrl: string | null = null
-    apiBuffer(adminNewsCoverUrl(news.id), controller.signal)
-      .then((buffer) => {
-        objectUrl = URL.createObjectURL(new Blob([buffer]))
-        setUrl(objectUrl)
-      })
-      .catch(() => setUrl(null))
-    return () => {
-      controller.abort()
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
-    }
-  }, [news.id, news.has_cover, news.updated_at])
-  return news.has_cover ? url : null
-}
-
 function CoverCard({ news }: { news: NewsAdmin }) {
   const { t } = useTranslation()
   const setCover = useSetNewsCover()
-  const preview = useCoverPreview(news)
+  const preview = useNewsCover(news)
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (

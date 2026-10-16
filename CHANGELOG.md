@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-16 — Admin yangiliklar ro'yxatida muqova rasmi
+
+- `/admin/news` ro'yxatida har bir qator boshida endi muqova rasmi (kichik 16:9 thumb) ko'rinadi; muqova yuklanayotganda skeleton, muqova bo'lmasa holat rangidagi ikonka. Tahrirlash sahifasidagi rasm o'z joyida.
+- Blob URL bilan olish mantig'i `NewsEditorPage` dan `features/admin/cms/useNewsCover.ts` ga ko'chirildi (qoralama muqovasi ham admin endpoint'idan olinadi), ikkala sahifa shuni ishlatadi.
+- Tekshiruv: eslint, typecheck.
+
 ## 2026-10-16 — Tutor: mavzu ichida manba qidiruvi mavzu nomi bilan
 
 - `tutor.prepare`: mavzu berilgan bo'lsa, manba qidiruvi `"<mavzu nomi>. <savol>"` embedding'i bilan qilinadi (ikkalasi bitta `embed()` chaqiruvida). "Ushbu mavzu bo'yicha 3 ta atamani tushuntiring" kabi savollarda mazmunli so'z yo'q edi: o'xshashlik 0.78 → rad etilardi; nom bilan 0.82 → javob. Ishora rejimi (`_is_hint`) savolning o'zi bilan qoladi, aks holda nom uni topshiriq savollariga yaqinlashtirib yuboradi.
