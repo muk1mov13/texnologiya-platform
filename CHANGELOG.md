@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-16 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `8e75aaa..6cf412f` — oldin yuborilmagan 140 ta commit (oxirgisi `6cf412f`, yangiliklar karuseli) `origin/main` ga chiqdi.
+
 ## 2026-10-16 — Bosh sahifada yangiliklar karuseli
 
 - `/` dagi "So'nggi yangiliklar" bo'limi 3 ta kartali grid o'rniga karusel: katta muqovali slayd (butunligicha `/news/:slug` havolasi), pastdan gradient ustida sana, sarlavha, qisqa matn va "O'qish" tugmasi; burchakda `02 / 05` hisoblagich va oldingi/keyingi tugmalar. Endi so'nggi 5 ta yangilik.
