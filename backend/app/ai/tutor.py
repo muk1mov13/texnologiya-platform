@@ -194,11 +194,15 @@ async def prepare(
             text = answers.get(lang, answers["uz"])
             return Prepared(conv_id, topic_id, data.message, MessageMode.canned, canned_text=text)
     await usage.ensure_within_limit(db, user)
+    # "Bu mavzuda..." kabi savollarda mazmunli so'z yo'q: manba qidiruvi mavzu nomi bilan
+    # qilinadi. Ishora rejimi esa savolning o'zi bilan (nom topshiriqlarga ham o'xshatib yuboradi).
+    queries = [data.message] + ([f"{topic.title}. {data.message}"] if topic else [])
     try:
-        [vec] = await ai.embedder.embed([data.message], "query")
+        vecs = await ai.embedder.embed(queries, "query")
     except ProviderBusy:
         raise AppError(503, "AI_BUSY", BUSY_MESSAGE) from None
-    hits = await _retrieve(db, ai, vec, topic, settings)
+    vec = vecs[0]
+    hits = await _retrieve(db, ai, vecs[-1], topic, settings)
     if not hits:
         text = REFUSAL.get(lang, REFUSAL["uz"])
         return Prepared(conv_id, topic_id, data.message, MessageMode.refusal, canned_text=text)

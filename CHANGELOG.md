@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-16 — Tutor: mavzu ichida manba qidiruvi mavzu nomi bilan
+
+- `tutor.prepare`: mavzu berilgan bo'lsa, manba qidiruvi `"<mavzu nomi>. <savol>"` embedding'i bilan qilinadi (ikkalasi bitta `embed()` chaqiruvida). "Ushbu mavzu bo'yicha 3 ta atamani tushuntiring" kabi savollarda mazmunli so'z yo'q edi: o'xshashlik 0.78 → rad etilardi; nom bilan 0.82 → javob. Ishora rejimi (`_is_hint`) savolning o'zi bilan qoladi, aks holda nom uni topshiriq savollariga yaqinlashtirib yuboradi.
+- Mavzu ichidagi mavzudan tashqari savol endi chegaradan o'tishi mumkin, lekin LLM o'zi "materiallarda yo'q" deb javob beradi (sinovda shunday bo'ldi).
+- Tekshiruv: ruff, mypy; 5 ta haqiqiy savol — 4 tasi manba bilan javob, mavzusiz "ob-havo" savoli LLM'siz rad etildi. Bir savolda Groq 429 qaytardi va oqim birinchi bo'lakdan oldin Gemini'ga o'tdi (fallback ishlaydi).
+
 ## 2026-10-16 — Jarayon ichidagi embedding (`EMBEDDING_PROVIDER=local`)
 
 - Sabab: bepul Gemini kalitida embedding kuniga 1000 so'rov — bitta qayta indekslash (1002 bo'lak) limitni tugatdi va tutor 6 soat 503 `AI_BUSY` qaytardi. TEI konteyneri (WSL, `cpu-1.8`) esa bo'sh turganda 2.8–3.1 GB RAM oldi — 7.7 GB'li kompyuterda backend, nginx va LibreOffice'ga joy qolmaydi.
