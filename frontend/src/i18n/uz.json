@@ -280,6 +280,8 @@
     },
     "latestNews": "So'nggi yangiliklar",
     "allNews": "Barcha yangiliklar",
+    "newsPrev": "Oldingi yangilik",
+    "newsNext": "Keyingi yangilik",
     "library": {
       "eyebrow": "Ochiq kutubxona",
       "title": "Kutubxona",

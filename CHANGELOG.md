@@ -4,6 +4,14 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-16 — Bosh sahifada yangiliklar karuseli
+
+- `/` dagi "So'nggi yangiliklar" bo'limi 3 ta kartali grid o'rniga karusel: katta muqovali slayd (butunligicha `/news/:slug` havolasi), pastdan gradient ustida sana, sarlavha, qisqa matn va "O'qish" tugmasi; burchakda `02 / 05` hisoblagich va oldingi/keyingi tugmalar. Endi so'nggi 5 ta yangilik.
+- Animatsiya (`motion`): muqova crossfade + yengil "Ken Burns" (scale 1.08→1), matn yo'nalish bo'yicha blur bilan kiradi; reduced-motion'da faqat opacity.
+- Slayd ostida avtoplay chizig'li ro'yxat (desktopda sana + sarlavha, mobilda faqat chiziqlar); 6 s'lik CSS animatsiya tugaganda keyingi slayd. Sichqoncha ustida, klaviatura fokusi ichida yoki tab yashirin bo'lsa pauza; reduced-motion'da avtoplay yo'q. Mobilda swipe (masofa yoki tezlik bo'yicha), `←/→` tugmalari.
+- Yangi: `features/public/home/NewsCarousel.tsx`, `useCarousel.ts`; muqovasiz bezak `NewsCoverFallback.tsx` ga chiqarildi (`NewsCard` ham ishlatadi). i18n: `home.newsPrev`/`newsNext`.
+- Tekshiruv: eslint, typecheck, build; Playwright'da desktop (1280) va mobil (390) ko'rinish, avtoplay va tugmalar.
+
 ## 2026-10-16 — Admin yangiliklar ro'yxatida muqova rasmi
 
 - `/admin/news` ro'yxatida har bir qator boshida endi muqova rasmi (kichik 16:9 thumb) ko'rinadi; muqova yuklanayotganda skeleton, muqova bo'lmasa holat rangidagi ikonka. Tahrirlash sahifasidagi rasm o'z joyida.

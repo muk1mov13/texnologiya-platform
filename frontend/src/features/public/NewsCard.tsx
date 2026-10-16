@@ -6,22 +6,7 @@ import { Icon } from '@/components/icons/Icon'
 import { SURFACE_LINK } from '@/components/ui/styles'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
-
-/** Muqovasiz yangilik uchun bezak: brand gradient, katak naqsh va ikonka. */
-function CoverFallback() {
-  return (
-    <div
-      aria-hidden="true"
-      className="relative flex size-full items-center justify-center overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900"
-    >
-      <div className="absolute inset-0 bg-grid invert" />
-      <div className="absolute -top-10 -right-10 size-40 rounded-full bg-brand-300/30 blur-2xl" />
-      <span className="relative grid size-16 place-items-center rounded-2xl bg-white/10 text-white ring-1 ring-white/20 backdrop-blur">
-        <Icon name="news" className="size-8" />
-      </span>
-    </div>
-  )
-}
+import { NewsCoverFallback } from './NewsCoverFallback'
 
 /**
  * Yangilik kartasi: butun karta bitta havola (`/news/:slug`). `featured` — ro'yxat boshidagi
@@ -47,7 +32,7 @@ export function NewsCard({ news, featured = false }: { news: NewsCardData; featu
             className="size-full object-cover transition duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
-          <CoverFallback />
+          <NewsCoverFallback />
         )}
         {news.published_at && (
           <time

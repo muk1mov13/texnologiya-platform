@@ -1,17 +1,15 @@
-import { m } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useNewsPage } from '@/api/cms'
 import { Icon } from '@/components/icons/Icon'
 import { Reveal } from '@/components/motion/Reveal'
 import { cx, FOCUS_RING } from '@/lib/cx'
-import { fadeUp, stagger, VIEWPORT_ONCE } from '@/lib/motion'
-import { NewsCard } from '../NewsCard'
+import { NewsCarousel } from './NewsCarousel'
 import { EYEBROW, SECTION_TITLE } from './styles'
 
-const LATEST_NEWS = 3
+const LATEST_NEWS = 5
 
-/** So'nggi 3 ta yangilik; yangilik bo'lmasa bo'lim chiqmaydi. */
+/** So'nggi 5 ta yangilik karuselda; yangilik bo'lmasa bo'lim chiqmaydi. */
 export function NewsSection() {
   const { t } = useTranslation()
   const news = useNewsPage(1, LATEST_NEWS)
@@ -38,23 +36,9 @@ export function NewsSection() {
             <Icon name="arrowRight" className="size-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>
-        <m.div
-          initial="hidden"
-          whileInView="show"
-          viewport={VIEWPORT_ONCE}
-          variants={stagger(0.1)}
-          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {news.data.items.map((item) => (
-            <m.div
-              key={item.id}
-              variants={fadeUp}
-              className="flex [&>a]:flex-1"
-            >
-              <NewsCard news={item} />
-            </m.div>
-          ))}
-        </m.div>
+        <Reveal>
+          <NewsCarousel items={news.data.items} />
+        </Reveal>
       </div>
     </section>
   )

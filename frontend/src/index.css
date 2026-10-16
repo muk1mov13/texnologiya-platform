@@ -27,6 +27,7 @@
   --animate-blob: blob-float 18s ease-in-out infinite;
   --animate-shine: shine 6s ease-in-out infinite;
   --animate-float: float-y 6s ease-in-out infinite;
+  --animate-progress: progress-x 6s linear forwards;
 }
 
 /* Hero va CTA fonidagi gradient bloblar (faqat motion-safe). */
@@ -62,6 +63,16 @@
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+/* Bosh sahifa yangiliklar karuselidagi avtoplay chizig'i (tugaganda keyingi slayd). */
+@keyframes progress-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
