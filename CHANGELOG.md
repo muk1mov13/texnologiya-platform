@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `de47bd0..f34d65c` — deploy yo'l xaritasi, `deploy/` fayllari (D1) va fayl nomi tuzatishi (6 ta commit) `origin/main` ga chiqdi; server kodni shu yerdan oladi.
+
 ## 2026-10-17 — Prod'da yuklab olingan fayl asl nomi bilan saqlanadi
 
 - `core/files.py: file_response`: `MEDIA_ACCEL_REDIRECT=true` bo'lganda javobga `Content-Disposition` qo'shildi (Starlette `FileResponse` bilan bir xil, lotin bo'lmagan nom `filename*=utf-8''...`). Oldin nginx orqali berilgan kutubxona hujjatlari, kitoblar, topshiriq fayllari va o'quv dasturi brauzerda UUID nom bilan saqlanardi; lokal muhitda bu ko'rinmasdi.
