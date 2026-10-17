@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — Deploy D1: systemd xizmatlari
+
+- `deploy/systemd/texnologiya-api.service`: `texnologiya` foydalanuvchisi nomidan `uv run --no-sync uvicorn app.main:create_app --factory`, `127.0.0.1:8000`, bitta worker (inline job va xotiradagi limitlar sabab), `--proxy-headers` (login/kontakt limiti haqiqiy IP bo'yicha), `Restart=always`, `MemoryMax=2500M`.
+- `deploy/systemd/texnologiya-weekly.service` + `.timer`: har dushanba 07:00 (Asia/Tashkent) `app.cli weekly-report`, `Persistent=true`.
+
 ## 2026-10-17 — Deploy D1: nginx konfiguratsiyasi
 
 - `deploy/nginx/edubuxdpi-http.conf`: 80-port, Let's Encrypt webroot (`/var/www/certbot`) va qolgan so'rovlar `https://edubuxdpi.uz` ga.

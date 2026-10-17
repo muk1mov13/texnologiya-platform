@@ -1,0 +1,16 @@
+# Haftalik AI hisobot (o'tgan dushanba–yakshanba). texnologiya-weekly.timer ishga tushiradi.
+# Qo'lda: sudo systemctl start texnologiya-weekly
+
+[Unit]
+Description=Texnologiya platformasi: haftalik AI hisobot
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=texnologiya
+Group=texnologiya
+WorkingDirectory=/srv/texnologiya/app/backend
+Environment=HOME=/srv/texnologiya
+Environment=PATH=/srv/texnologiya/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/srv/texnologiya/.local/bin/uv run --no-sync python -m app.cli weekly-report

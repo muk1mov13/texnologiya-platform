@@ -1,0 +1,31 @@
+# API (FastAPI + uvicorn). O'rnatish: sudo cp deploy/systemd/*.service deploy/systemd/*.timer
+# /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now texnologiya-api
+#
+# Faqat bitta worker: fon ishlari (InlineJobRunner) va login/kontakt limitlari jarayon xotirasida.
+
+[Unit]
+Description=Texnologiya platformasi API
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=texnologiya
+Group=texnologiya
+WorkingDirectory=/srv/texnologiya/app/backend
+Environment=HOME=/srv/texnologiya
+Environment=PATH=/srv/texnologiya/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/srv/texnologiya/.local/bin/uv run --no-sync uvicorn app.main:create_app --factory \
+    --host 127.0.0.1 --port 8000 --workers 1 \
+    --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-server-header
+Restart=always
+RestartSec=5
+TimeoutStartSec=180
+# Xotira chegarasi (4 GB RAM'li VM; embedding modeli ~0.6 GB).
+MemoryMax=2500M
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
