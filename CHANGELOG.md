@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — Deploy D1: zaxira skripti va yo'riqnoma
+
+- `deploy/backup.sh`: kunlik `pg_dump -Fc` + `media/` arxivi `/srv/texnologiya/backups` ga, 14 kundan eskilari o'chiriladi; cron qatori va tiklash buyruqlari izohda.
+- `deploy/README.md`: Ubuntu 24.04 VM uchun D2–D5 buyruqlari — paketlar (PostgreSQL 16 + pgvector, LibreOffice nogui, Node 22, uv, certbot), `texnologiya` foydalanuvchisi, baza, `.env`, migratsiya, admin, kontent importi, frontend build, systemd, nginx + Let's Encrypt (webroot), ichki tarmoq uchun self-signed varianti, smoke test, zaxira, yangilash va kuzatish.
+- `.gitattributes`: `deploy/**` har doim LF (Windows'dan commit qilinganda ham).
+- `deploy-roadmap.md`: D0 holati (VM resurslari, domen `edubuxdpi.uz`), D1 ✅.
+
 ## 2026-10-17 — Deploy D1: systemd xizmatlari
 
 - `deploy/systemd/texnologiya-api.service`: `texnologiya` foydalanuvchisi nomidan `uv run --no-sync uvicorn app.main:create_app --factory`, `127.0.0.1:8000`, bitta worker (inline job va xotiradagi limitlar sabab), `--proxy-headers` (login/kontakt limiti haqiqiy IP bo'yicha), `Restart=always`, `MemoryMax=2500M`.

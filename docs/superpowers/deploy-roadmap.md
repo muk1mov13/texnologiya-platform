@@ -16,6 +16,8 @@ Holat belgilari: ⬜ boshlanmagan, 🟡 jarayonda, ✅ bajarildi.
 
 ## D0. Tayyorgarlik — 🟡 (siz, IT bo'limi bilan)
 
+Holat (2026-10-17): SSH kirish bor; VM 2 vCPU, 4 GB RAM, 40 GB disk; domen `edubuxdpi.uz` Arsenal-D'da olindi va faollashtirilmoqda. Qolgan: universitetning ochiq IP'si, 80/443 port yo'naltirish, DNS A-yozuvlari (`@`, `www`).
+
 **Serverni tekshirish.**
 
 - Proxmox panel: brauzerda `https://<proxmox-IP>:8006` → chapda node → sizning mashina → **Summary** (CPU, RAM, disk) va **Hardware** (VM) yoki **Resources** (LXC). Ikonka monitor bo'lsa — VM, kub bo'lsa — LXC konteyner.
@@ -48,7 +50,7 @@ Holat belgilari: ⬜ boshlanmagan, 🟡 jarayonda, ✅ bajarildi.
 
 ---
 
-## D1. Repo'da `deploy/` fayllari — ⬜ (Claude yozadi, 1 batch)
+## D1. Repo'da `deploy/` fayllari — ✅ 2026-10-17 (buyruqlar: `deploy/README.md`)
 
 - `deploy/env.prod.example` — `backend/app/core/config.py` dagi `Settings` bilan mos: `ENV=prod`, `DATABASE_URL=postgresql+asyncpg://...`, `JWT_SECRET` (`openssl rand -hex 32`), `COOKIE_SECURE=true`, `CORS_ORIGINS` va `PUBLIC_BASE_URL` = `https://<domen>`, `MEDIA_ROOT=/srv/texnologiya/media`, `MEDIA_ACCEL_REDIRECT=true`, `SOFFICE_PATH=/usr/bin/soffice`, AI kalitlari, `EMBEDDING_PROVIDER=local`, `LOCAL_EMBED_CACHE=/srv/texnologiya/models`, `AI_MIN_SIMILARITY=0.815`, `AI_HINT_SIMILARITY=0.89`.
 - `deploy/nginx/texnologiya.conf`:
@@ -122,5 +124,5 @@ Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'n
 
 ## Keyingi aniq qadam
 
-1. D0: serverni tekshirish buyruqlarini bajarib, natijani (OS, CPU, RAM, disk, internet) yuborish; IT bo'limidan domen, DNS va 80/443 port yo'naltirishni so'rash.
-2. D1: `deploy/` fayllarini yozish (domen nomi ma'lum bo'lmasa ham boshlash mumkin — `<domen>` o'rniga keyin qo'yiladi).
+1. D0: domen faollashishini kutish; IT bo'limidan ochiq IP va 80/443 port yo'naltirishni olish; Arsenal-D'da A-yozuvlar.
+2. D2–D3: `deploy/README.md` bo'yicha serverni sozlash va ilovani ishga tushirish (domen kutmasdan boshlash mumkin).
