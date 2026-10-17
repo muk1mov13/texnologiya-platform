@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — Serverga joylash yo'l xaritasi
+
+- Yangi `docs/superpowers/deploy-roadmap.md`: institut Proxmox serveriga oddiy usulda (systemd + nginx, Docker'siz, bitta uvicorn worker) joylash bosqichlari D0–D5 — tayyorgarlik (resurslar, domen, DNS, port yo'naltirish, chiquvchi internet), `deploy/` fayllari, server sozlash, ishga tushirish, HTTPS (certbot yoki ichki tarmoq uchun self-signed), smoke test va zaxira nusxa.
+- `roadmap.md` 13-band va `CLAUDE.md` shu faylga havola qiladi.
+
 ## 2026-10-16 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `8e75aaa..6cf412f` — oldin yuborilmagan 140 ta commit (oxirgisi `6cf412f`, yangiliklar karuseli) `origin/main` ga chiqdi.
