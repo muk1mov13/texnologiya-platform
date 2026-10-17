@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — Deploy D1: prod `.env` namunasi
+
+- Yangi `deploy/env.prod.example` (`edubuxdpi.uz`): `ENV=prod`, PostgreSQL URL, `JWT_SECRET`, `COOKIE_SECURE=true`, CORS va `PUBLIC_BASE_URL` domen bilan, `MEDIA_ROOT=/srv/texnologiya/media`, `MEDIA_ACCEL_REDIRECT=true`, Groq asosiy + Gemini zaxira, lokal embedding va e5 chegaralari. Parol va kalitlar o'rnida `<...>` belgilari.
+
 ## 2026-10-17 — Serverga joylash yo'l xaritasi
 
 - Yangi `docs/superpowers/deploy-roadmap.md`: institut Proxmox serveriga oddiy usulda (systemd + nginx, Docker'siz, bitta uvicorn worker) joylash bosqichlari D0–D5 — tayyorgarlik (resurslar, domen, DNS, port yo'naltirish, chiquvchi internet), `deploy/` fayllari, server sozlash, ishga tushirish, HTTPS (certbot yoki ichki tarmoq uchun self-signed), smoke test va zaxira nusxa.
