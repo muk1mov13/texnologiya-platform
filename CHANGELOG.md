@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-17 — Deploy D1: nginx konfiguratsiyasi
+
+- `deploy/nginx/edubuxdpi-http.conf`: 80-port, Let's Encrypt webroot (`/var/www/certbot`) va qolgan so'rovlar `https://edubuxdpi.uz` ga.
+- `deploy/nginx/edubuxdpi.conf`: 443-port, `www` → asosiy domen; frontend `dist/` + SPA fallback (`/assets/` 1 yil kesh, `index.html` keshsiz); `/api/` → `127.0.0.1:8000` (SSE uchun `proxy_buffering off`, `client_max_body_size 60m`); `/sitemap.xml`, `/robots.txt` → `/api/seo/...`; `internal` `/protected-media/` → `/srv/texnologiya/media/`; HSTS, CSP (faqat o'z resurslari, `blob:`, pdf.js uchun `wasm-unsafe-eval`), `nosniff`, `X-Frame-Options`, `Referrer-Policy`.
+
 ## 2026-10-17 — Deploy D1: prod `.env` namunasi
 
 - Yangi `deploy/env.prod.example` (`edubuxdpi.uz`): `ENV=prod`, PostgreSQL URL, `JWT_SECRET`, `COOKIE_SECURE=true`, CORS va `PUBLIC_BASE_URL` domen bilan, `MEDIA_ROOT=/srv/texnologiya/media`, `MEDIA_ACCEL_REDIRECT=true`, Groq asosiy + Gemini zaxira, lokal embedding va e5 chegaralari. Parol va kalitlar o'rnida `<...>` belgilari.
