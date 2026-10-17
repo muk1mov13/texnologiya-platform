@@ -2,6 +2,7 @@
 
 import mimetypes
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import Response, UploadFile
 from fastapi.responses import FileResponse
@@ -59,7 +60,21 @@ def file_response(settings: Settings, storage: Storage, rel: str, filename: str)
     to'g'ridan-to'g'ri."""
     media_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
     if settings.media_accel_redirect:
+        # nginx faylni o'zi beradi, lekin asl nomini bilmaydi: sarlavhani FileResponse
+        # bilan bir xil qilib shu yerda qo'yamiz (aks holda brauzer UUID nom bilan saqlaydi).
         return Response(
-            media_type=media_type, headers={"X-Accel-Redirect": f"/protected-media/{rel}"}
+            media_type=media_type,
+            headers={
+                "X-Accel-Redirect": f"/protected-media/{rel}",
+                "Content-Disposition": _attachment(filename),
+            },
         )
     return FileResponse(storage.path(rel), media_type=media_type, filename=filename)
+
+
+def _attachment(filename: str) -> str:
+    """Starlette FileResponse'dagi kabi: lotin bo'lmagan nom RFC 5987 (filename*) bilan."""
+    quoted = quote(filename)
+    if quoted != filename:
+        return f"attachment; filename*=utf-8''{quoted}"
+    return f'attachment; filename="{filename}"'
