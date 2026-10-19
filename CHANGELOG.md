@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: Cloudflare Tunnel uchun nginx konfiguratsiyasi
+
+- `deploy/nginx/edubuxdpi-tunnel.conf`: ochiq IP va port yo'naltirishsiz `https://edubuxdpi.uz` uchun — HTTPS'ni Cloudflare beradi, `cloudflared` so'rovni `127.0.0.1:80` ga olib keladi (tashqaridan to'g'ridan-to'g'ri ochilmaydi). `www` → asosiy domen. Haqiqiy IP `CF-Connecting-IP` dan (`set_real_ip_from 127.0.0.1`), busiz login/kontakt/AI yordamchi limitlari hammani birga bloklardi; `/api/` ga `X-Forwarded-For` faqat shu IP, `X-Forwarded-Proto https`. Qolgani `edubuxdpi.conf` bilan bir xil (SPA, `/assets/` + `.mjs`, SSE, 60 MB, `/protected-media/`, CSP, HSTS).
+
 ## 2026-10-19 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `6c4af05..040d8ff` — saytdagi AI yordamchi (backend: `support_messages`, ochiq `/api/ai/support/*`, admin endpoint'lari; frontend: vidjet, admin sozlamalari va mehmon suhbatlari sahifasi) va oldingi CHANGELOG yozuvi (7 ta commit). Serverda `git pull`, `alembic upgrade head` (migratsiya `9602e09deacc`) va frontend build kerak.
