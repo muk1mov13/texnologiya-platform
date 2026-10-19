@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: Cloudflare Tunnel yo'riqnomasi
+
+- `deploy/README.md`: "D4 (Cloudflare Tunnel). Ochiq IP'siz HTTPS" bo'limi — 7844-portga chiqishni tekshirish, domenni Cloudflare'ga o'tkazish (Arsenal-D'da NS), CSP bilan to'qnashadigan funksiyalarni o'chirish (Email Obfuscation, Rocket Loader, Web Analytics, Bot Fight Mode), dashboard orqali tunnel va Public hostnames (`127.0.0.1:80`), `edubuxdpi-tunnel.conf` ni yoqish, `.env` ni HTTPS qiymatlariga qaytarish, `ufw` da 80/443 ni yopish, tashqi tarmoqdan tekshirish, NS kechiksa `trycloudflare.com` vaqtinchalik manzili. Fayllar jadvaliga `edubuxdpi-tunnel.conf`.
+- `deploy/env.prod.example`: tunnelda ham asosiy HTTPS qiymatlari ishlatilishi haqida izoh.
+
 ## 2026-10-19 — Deploy: Cloudflare Tunnel uchun nginx konfiguratsiyasi
 
 - `deploy/nginx/edubuxdpi-tunnel.conf`: ochiq IP va port yo'naltirishsiz `https://edubuxdpi.uz` uchun — HTTPS'ni Cloudflare beradi, `cloudflared` so'rovni `127.0.0.1:80` ga olib keladi (tashqaridan to'g'ridan-to'g'ri ochilmaydi). `www` → asosiy domen. Haqiqiy IP `CF-Connecting-IP` dan (`set_real_ip_from 127.0.0.1`), busiz login/kontakt/AI yordamchi limitlari hammani birga bloklardi; `/api/` ga `X-Forwarded-For` faqat shu IP, `X-Forwarded-Proto https`. Qolgani `edubuxdpi.conf` bilan bir xil (SPA, `/assets/` + `.mjs`, SSE, 60 MB, `/protected-media/`, CSP, HSTS).

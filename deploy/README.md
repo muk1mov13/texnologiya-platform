@@ -9,6 +9,7 @@ foydalanuvchi nomidan bajariladi.
 | `env.prod.example` | `backend/.env` namunasi |
 | `nginx/edubuxdpi-http.conf` | 80-port: sertifikat tekshiruvi va HTTPS'ga yo'naltirish |
 | `nginx/edubuxdpi.conf` | 443-port: sayt, `/api`, himoyalangan fayllar |
+| `nginx/edubuxdpi-tunnel.conf` | Cloudflare Tunnel: sayt `127.0.0.1:80` da, HTTPS Cloudflare'da (ochiq IP kerak emas) |
 | `nginx/ip-http.conf` | vaqtincha, domensiz: shu sayt 80-portda, ochiq IP orqali (HTTP) |
 | `systemd/texnologiya-api.service` | API (bitta uvicorn worker) |
 | `systemd/texnologiya-weekly.{service,timer}` | haftalik AI hisobot, dushanba 07:00 |
@@ -17,6 +18,8 @@ foydalanuvchi nomidan bajariladi.
 Shartlar (D0): `edubuxdpi.uz` va `www.edubuxdpi.uz` uchun A-yozuv universitetning ochiq IP'siga,
 shu IP'ning 80/443 portlari VM'ga yo'naltirilgan, serverdan internetga chiqish bor.
 Domen hali yo'q bo'lsa — "D4 (vaqtincha). Domensiz" bo'limi (`nginx/ip-http.conf`, oddiy HTTP).
+Domen bor, lekin ochiq IP / port yo'naltirish yo'q bo'lsa — "D4 (Cloudflare Tunnel)" bo'limi
+(2026-10-19 dan asosiy yo'l).
 
 ---
 
@@ -180,6 +183,80 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 Ichki tarmoqdagi kompyuterlarda domen VM'ning ichki IP'siga ochilishi uchun IT ichki DNS'ga yozuv
 qo'shadi (yoki sinov uchun `C:\Windows\System32\drivers\etc\hosts` ga `<ichki-IP> edubuxdpi.uz`).
 Haqiqiy sertifikat olishdan oldin bu papka o'chiriladi: `sudo rm -r /etc/letsencrypt/live/edubuxdpi.uz`.
+
+---
+
+## D4 (Cloudflare Tunnel). Ochiq IP'siz HTTPS
+
+Serverdagi `cloudflared` Cloudflare'ga o'zi ulanadi (chiquvchi ulanish), shuning uchun ochiq IP,
+80/443 port yo'naltirish va certbot kerak emas. Sertifikatni Cloudflare beradi va yangilaydi; VM'ning
+ichki IP'si o'zgarsa ham sayt ishlayveradi. Yuqoridagi Let's Encrypt qadamlari o'tkazib yuboriladi.
+
+**1. Chiquvchi ulanishni tekshirish** (universitet firewall'i yopgan bo'lishi mumkin):
+
+```bash
+curl -sI https://api.cloudflare.com | head -1
+timeout 5 bash -c '</dev/tcp/region1.v2.argotunnel.com/7844' && echo "7844 OK"
+```
+
+7844 yopiq bo'lsa — IT'dan `*.argotunnel.com` ning 7844 (TCP va UDP) portiga chiqishni so'rang.
+
+**2. Domenni Cloudflare'ga o'tkazish** (brauzerda):
+
+- cloudflare.com → akkaunt → **Add a domain** → `edubuxdpi.uz` → **Free**. Mavjud DNS yozuvlari
+  import qilinadi — `edubuxdpi.uz`/`www` uchun eski A-yozuvlarni o'chiring (tunnel o'zinikini qo'yadi).
+- Cloudflare ko'rsatgan 2 ta nameserver'ni Arsenal-D panelida domenning NS'lari qilib yozing.
+  Faollashish bir necha soatdan 24–48 soatgacha (Cloudflare email yuboradi) — taqdimotdan oldin ulgurish kerak.
+- Sozlamalar: **SSL/TLS → Edge Certificates → Always Use HTTPS** yoqiq. Sahifaga skript qo'shadigan
+  funksiyalar o'chiq, aks holda bizning CSP (`script-src 'self'`) ularni bloklaydi va konsolda xato
+  chiqadi: **Scrape Shield → Email Address Obfuscation**, **Speed → Rocket Loader**, **Web Analytics**
+  (avtomatik qo'shish). **Security → Bots → Bot Fight Mode** o'chiq.
+
+**3. Tunnel** (Zero Trust → Networks → Tunnels → **Create a tunnel** → Cloudflared, nom `texnologiya`):
+
+- "Install and run a connector" bo'limida Debian, 64-bit tanlanadi va ko'rsatilgan buyruqlar serverda
+  bajariladi (`cloudflared` paketini o'rnatish va `sudo cloudflared service install <TOKEN>`).
+  Token — maxfiy, uni git'ga yoki chatga yozmang.
+- **Public hostnames:** `edubuxdpi.uz` → Service `HTTP`, URL `127.0.0.1:80`; xuddi shunday
+  `www.edubuxdpi.uz` → `HTTP` `127.0.0.1:80`. DNS yozuvlarini (CNAME → tunnel) Cloudflare o'zi yaratadi.
+
+```bash
+systemctl status cloudflared        # active (running), enabled
+journalctl -u cloudflared -n 20     # "Registered tunnel connection" 4 marta
+```
+
+**4. nginx:**
+
+```bash
+sudo rm -f /etc/nginx/sites-enabled/ip-http.conf /etc/nginx/sites-enabled/edubuxdpi*.conf
+sudo cp /srv/texnologiya/app/deploy/nginx/edubuxdpi-tunnel.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/edubuxdpi-tunnel.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+curl -sI -H 'Host: edubuxdpi.uz' http://127.0.0.1/ | head -1     # 200
+```
+
+**5. `.env`** (`sudo -iu texnologiya nano ~/app/backend/.env`) — `env.prod.example` dagi asosiy
+(HTTPS) qiymatlar: `COOKIE_SECURE=true`, `ALLOW_INSECURE_HTTP` qatori o'chiriladi,
+`CORS_ORIGINS=["https://edubuxdpi.uz","https://www.edubuxdpi.uz"]`, `PUBLIC_BASE_URL=https://edubuxdpi.uz`.
+
+```bash
+sudo systemctl restart texnologiya-api
+journalctl -u texnologiya-api -n 20     # "HTTPS'siz" ogohlantirishi endi yo'q
+```
+
+**6. Firewall:** nginx endi faqat `127.0.0.1` da, tashqaridan faqat SSH kerak:
+`sudo ufw delete allow 80,443/tcp` (yoki `ufw status numbered` → `ufw delete <N>`).
+Ichki tarmoqdan IP orqali kirish ham to'xtaydi — hamma `https://edubuxdpi.uz` dan kiradi.
+
+**Tekshirish** universitet tarmog'idan tashqarida (telefonning mobil interneti): D5 smoke testi, ustiga
+`http://` va `www` → `https://edubuxdpi.uz`; ikki qurilmadan noto'g'ri parol — faqat bittasi bloklanadi
+(haqiqiy IP ishlayapti); brauzer konsolida CSP xatosi yo'q.
+
+**Favqulodda** (NS hali faollashmagan, taqdimot bugun): akkauntsiz vaqtinchalik tunnel —
+`cloudflared tunnel --url http://127.0.0.1:80` tasodifiy `https://<so'zlar>.trycloudflare.com` manzil
+beradi (tmux ichida, oyna yopilsa manzil o'chadi). nginx'ni o'zgartirish shart emas (asosiy server
+`default_server`); `.env` da `CORS_ORIGINS`/`PUBLIC_BASE_URL` shu manzilga almashtirilib, API qayta
+ishga tushiriladi. Taqdimotdan keyin qaytariladi.
 
 ---
 
