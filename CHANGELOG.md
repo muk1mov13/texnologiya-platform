@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Admin: fan o'quv dasturini yuklab olish
+
+- Admin → Fanlar: dastur bor bo'lsa «Yuklab olish» tugmasi (`useProtectedDownload` → mavjud `/api/subjects/{slug}/syllabus`, u nashrsiz fanni ham tahrirlay oladiganga beradi; backend o'zgarmadi). i18n `admin.subjects.syllabusDownload`.
+
 ## 2026-10-19 — Material PDF va asl faylini yuklab olish
 
 - Backend: `GET /api/teach/materials/{id}/original` (`StaffUser` + `ensure_can_edit_material`) — yuklangan asl fayl (PPT/DOC ham) asl nomi bilan, holatidan qat'i nazar (`failed` ham).

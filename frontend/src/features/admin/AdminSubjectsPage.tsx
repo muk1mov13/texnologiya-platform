@@ -16,6 +16,7 @@ import { ConfirmDialog } from '@/components/ui/Modal'
 import { QueryState } from '@/components/ui/QueryState'
 import { pushToast } from '@/components/ui/toast-store'
 import { cx } from '@/lib/cx'
+import { useProtectedDownload } from '@/lib/download'
 import { SubjectFormModal } from './SubjectFormModal'
 import { ListSkeleton } from './ui/ListSkeleton'
 import { PageHeader } from './ui/PageHeader'
@@ -126,6 +127,7 @@ function SyllabusControls({ subject }: { subject: SubjectAdmin }) {
   const { t } = useTranslation()
   const upload = useUploadSyllabus()
   const remove = useDeleteSyllabus()
+  const { download, pending: downloading } = useProtectedDownload()
   const inputRef = useRef<HTMLInputElement>(null)
   const inputId = `syllabus-${subject.id}`
 
@@ -162,6 +164,17 @@ function SyllabusControls({ subject }: { subject: SubjectAdmin }) {
       <Button size="sm" variant="secondary" loading={upload.isPending} onClick={() => inputRef.current?.click()}>
         {subject.syllabus_name ? t('admin.subjects.syllabusReplace') : t('admin.subjects.syllabusUpload')}
       </Button>
+      {subject.syllabus_name && (
+        <Button
+          size="sm"
+          variant="ghost"
+          loading={downloading}
+          onClick={() => void download(`/api/subjects/${subject.slug}/syllabus`, subject.syllabus_name ?? 'dastur.pdf')}
+        >
+          <Icon name="download" className="size-4" />
+          {t('admin.subjects.syllabusDownload')}
+        </Button>
+      )}
       {subject.syllabus_name && (
         <Button size="sm" variant="ghost" loading={remove.isPending} onClick={() => remove.mutate(subject.id)}>
           {t('admin.subjects.syllabusDelete')}
