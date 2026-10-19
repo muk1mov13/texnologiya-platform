@@ -2,20 +2,23 @@ from fastapi import APIRouter, Request, Response
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
-from app.ai import tutor, usage
+from app.ai import support, tutor, usage
 from app.ai.models import AiConversation, AiMessage
 from app.ai.schemas import (
     ChatIn,
     ConversationDetailOut,
     ConversationOut,
     MessageOut,
+    SupportChatIn,
+    SupportStatusOut,
     UsageOut,
     citations_out,
 )
 from app.ai.services import ai_enabled, get_ai_settings
 from app.auth.deps import ActiveUser
 from app.auth.models import Role
-from app.core.deps import Ai, AppSettings, DbSession
+from app.core.deps import Ai, AppSettings, DbSession, SupportLimiter
+from app.core.errors import AppError
 from app.core.types import DbIdPath
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -34,6 +37,38 @@ async def chat(
     await db.commit()  # get_ai_settings qatorni yaratgan bo'lishi mumkin
     return StreamingResponse(
         tutor.stream(prepared, ai, user, request.app.state.sessionmaker),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@router.get("/support/status", response_model=SupportStatusOut)
+async def support_status(db: DbSession, ai: Ai) -> SupportStatusOut:
+    enabled = await support.public_enabled(db, ai)
+    await db.commit()
+    return SupportStatusOut(enabled=enabled)
+
+
+@router.post("/support/chat", response_class=StreamingResponse)
+async def support_chat(
+    data: SupportChatIn,
+    db: DbSession,
+    ai: Ai,
+    settings: AppSettings,
+    limiter: SupportLimiter,
+    request: Request,
+) -> StreamingResponse:
+    """Mehmon yordamchisi (login talab qilinmaydi), IP bo'yicha cheklangan."""
+    key = request.client.host if request.client else "-"
+    if limiter.is_blocked(key):
+        raise AppError(
+            429, "SUPPORT_RATE_LIMITED", "Juda ko'p savol yuborildi. Birozdan so'ng urinib ko'ring"
+        )
+    limiter.record_failure(key)  # har bir savol sanaladi (contact formadagi kabi)
+    prepared = await support.prepare(db, ai, settings, data)
+    await db.commit()  # get_ai_settings qatorni yaratgan bo'lishi mumkin
+    return StreamingResponse(
+        support.stream(prepared, ai, request.app.state.sessionmaker),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

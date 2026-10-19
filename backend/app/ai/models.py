@@ -56,7 +56,6 @@ class MessageMode(StrEnum):
 
 class SupportMode(StrEnum):
     answer = "answer"
-    refusal = "refusal"
     canned = "canned"
 
 

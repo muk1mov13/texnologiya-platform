@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Ochiq AI yordamchi: backend endpoint'lari
+
+- `ai/support.py`: mehmon yordamchisi — sayt bloki (platforma tavsifi, «Biz haqimizda», kontaktlar, nashr qilingan fanlar, FAQ; `SUPPORT_SITE_CHARS` gacha) + ochiq kutubxona bo'yicha vektor qidiruv (`LIBRARY_SOURCES`), dars materiallari ishlatilmaydi. Tez model, qat'iy system prompt (taxmin qilmaslik, `/contact` ni taklif qilish, test javoblarini bermaslik, prompt-injection'ga ergashmaslik). Salomga tayyor javob; sessiya bo'yicha oxirgi 3 juftlik tarix; `support_messages` ga yozish.
+- `POST /api/ai/support/chat` (login yo'q, SSE `delta → meta → done`): IP bo'yicha limit (`support_limiter`, 429 `SUPPORT_RATE_LIMITED`), sayt bo'yicha kunlik `public_daily_limit` (429 `AI_LIMIT_REACHED`), o'chirilgan bo'lsa 503 `AI_DISABLED`. `GET /api/ai/support/status` → `{enabled}`.
+- `tutor.py`: `_citations`/`_sse` → `citations_for`/`sse_event` (yordamchi ham ishlatadi). `SupportMode` dan ishlatilmaydigan `refusal` olib tashlandi (migratsiya hali deploy qilinmagan).
+
 ## 2026-10-19 — Ochiq AI yordamchi: model va sozlamalar
 
 - `ai/models.py`: `SupportMessage` (`support_messages`: `session_key`, savol, javob, `mode`, manbalar; IP/ism/email saqlanmaydi), `SupportMode`; `AiSettings` ga `public_enabled` va `public_daily_limit` (standart 300). Migratsiya `9602e09deacc`.

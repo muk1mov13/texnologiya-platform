@@ -154,7 +154,7 @@ _TITLE_MODELS: dict[ChunkSource, type[Material] | type[Document] | type[Book]] =
 }
 
 
-async def _citations(db: AsyncSession, hits: list[Hit]) -> list[Citation]:
+async def citations_for(db: AsyncSession, hits: list[Hit]) -> list[Citation]:
     titles: dict[tuple[ChunkSource, int], str] = {}
     for source, model in _TITLE_MODELS.items():
         ids = [h.source_id for h in hits if h.source_type == source]
@@ -228,13 +228,13 @@ async def prepare(
         topic_id,
         data.message,
         MessageMode.hint if hint else MessageMode.answer,
-        citations=await _citations(db, hits),
+        citations=await citations_for(db, hits),
         prompt=[*history, question],
         system=SYSTEM + (HINT if hint else ""),
     )
 
 
-def _sse(event: str, payload: object) -> str:
+def sse_event(event: str, payload: object) -> str:
     return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
 
@@ -284,22 +284,22 @@ async def stream(
     if prep.canned_text is not None:
         count_usage = prep.mode == MessageMode.refusal
         conv_id = await _save(sessionmaker, user, prep, prep.canned_text, [], count_usage)
-        yield _sse("delta", {"text": prep.canned_text})
-        yield _sse("meta", ChatMeta(conversation_id=conv_id, mode=prep.mode).model_dump())
-        yield _sse("done", {})
+        yield sse_event("delta", {"text": prep.canned_text})
+        yield sse_event("meta", ChatMeta(conversation_id=conv_id, mode=prep.mode).model_dump())
+        yield sse_event("done", {})
         return
     parts: list[str] = []
     try:
         async for piece in ai.llm.stream(ai.chat_model, prep.system, prep.prompt):
             parts.append(piece)
-            yield _sse("delta", {"text": piece})
+            yield sse_event("delta", {"text": piece})
     except ProviderBusy:
-        yield _sse("error", {"code": "AI_BUSY", "message": BUSY_MESSAGE})
+        yield sse_event("error", {"code": "AI_BUSY", "message": BUSY_MESSAGE})
         return
     answer = "".join(parts)
     used = {int(n) for n in _REF.findall(answer)}
     citations = [c for c in prep.citations if c.n in used]
     conv_id = await _save(sessionmaker, user, prep, answer, citations, True)
     meta = ChatMeta(conversation_id=conv_id, mode=prep.mode, citations=citations)
-    yield _sse("meta", meta.model_dump(mode="json"))
-    yield _sse("done", {})
+    yield sse_event("meta", meta.model_dump(mode="json"))
+    yield sse_event("done", {})

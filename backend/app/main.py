@@ -67,6 +67,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.contact_limiter = InMemoryRateLimiter(
         settings.contact_rate_limit, settings.contact_rate_window_seconds
     )
+    app.state.support_limiter = InMemoryRateLimiter(
+        settings.support_rate_limit, settings.support_rate_window_seconds
+    )
 
     app.add_middleware(
         CORSMiddleware,

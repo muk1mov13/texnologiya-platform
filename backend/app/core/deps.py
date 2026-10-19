@@ -36,6 +36,10 @@ def get_contact_limiter(request: Request) -> InMemoryRateLimiter:
     return request.app.state.contact_limiter  # type: ignore[no-any-return]
 
 
+def get_support_limiter(request: Request) -> InMemoryRateLimiter:
+    return request.app.state.support_limiter  # type: ignore[no-any-return]
+
+
 def get_ai(request: Request) -> AiServices:
     return request.app.state.ai  # type: ignore[no-any-return]
 
@@ -46,4 +50,5 @@ AppStorage = Annotated[Storage, Depends(get_storage)]
 Jobs = Annotated[JobRunner, Depends(get_jobs)]
 LoginLimiter = Annotated[InMemoryRateLimiter, Depends(get_login_limiter)]
 ContactLimiter = Annotated[InMemoryRateLimiter, Depends(get_contact_limiter)]
+SupportLimiter = Annotated[InMemoryRateLimiter, Depends(get_support_limiter)]
 Ai = Annotated[AiServices, Depends(get_ai)]

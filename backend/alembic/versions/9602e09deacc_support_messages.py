@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column(
             "mode",
             sa.Enum(
-                "answer", "refusal", "canned", name="supportmode", native_enum=False, length=20
+                "answer", "canned", name="supportmode", native_enum=False, length=20
             ),
             nullable=False,
         ),

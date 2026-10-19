@@ -5,8 +5,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from app.ai.constants import MAX_MESSAGE_CHARS
-from app.ai.models import DraftKind, DraftStatus, MessageMode, MessageRole
+from app.ai.constants import MAX_MESSAGE_CHARS, SUPPORT_MESSAGE_CHARS
+from app.ai.models import DraftKind, DraftStatus, MessageMode, MessageRole, SupportMode
 from app.core.types import DbId, trimmed_str
 
 
@@ -56,6 +56,26 @@ class ChatMeta(BaseModel):
     conversation_id: int
     mode: MessageMode
     citations: list[Citation] = Field(default_factory=list)
+
+
+class SupportChatIn(BaseModel):
+    message: trimmed_str(max_length=SUPPORT_MESSAGE_CHARS)  # type: ignore[valid-type]
+    # Brauzer yaratgan UUID: bir mehmonning savollarini suhbatga bog'laydi.
+    session_key: str = Field(
+        pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    )
+    lang: Literal["uz", "ru"] = "uz"
+
+
+class SupportMeta(BaseModel):
+    """Mehmon yordamchisining SSE `meta` hodisasi."""
+
+    mode: SupportMode
+    citations: list[Citation] = Field(default_factory=list)
+
+
+class SupportStatusOut(BaseModel):
+    enabled: bool
 
 
 def citations_out(raw: list[dict[str, Any]]) -> list[Citation]:
