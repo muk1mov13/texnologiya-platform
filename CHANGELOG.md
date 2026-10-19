@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Vaqtincha ngrok orqali ko'rsatish
+
+- `frontend/vite.config.ts`: `server` va `preview` ga `allowedHosts` (`.ngrok-free.app`, `.ngrok-free.dev`, `.ngrok.app`) — busiz Vite ngrok so'rovlarini "host is not allowed" bilan rad etardi.
+- `deploy/README.md`: "Vaqtincha: o'z kompyuterdan ngrok orqali ko'rsatish" bo'limi — ngrok o'rnatish va token, backend, `npm run build` + `npm run preview` (4173), `ngrok http 4173`, `PUBLIC_BASE_URL`, eslatmalar.
+
 ## 2026-10-19 — Deploy yo'l xaritasi: Cloudflare Tunnel
 
 - `deploy-roadmap.md`: D4 — asosiy yo'l Cloudflare Tunnel (ochiq IP/port yo'q, domen faol, taqdimot uchun tashqaridan kirish kerak), Let's Encrypt zaxira; "Keyingi aniq qadam" — tunnel, tashqi smoke test, zaxira, taqdimotga tayyorlik.

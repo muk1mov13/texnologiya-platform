@@ -308,6 +308,38 @@ Brauzerlarda eski `http://<IP>` sessiyasi qolmaydi — foydalanuvchilar domen or
 
 ---
 
+## Vaqtincha: o'z kompyuterdan ngrok orqali ko'rsatish
+
+Domen yoki server tayyor bo'lmaganda saytni lokal kompyuterdan ko'rsatish uchun. Bitta tunnel yetadi:
+Vite `/api` ni backend'ga proxy qiladi, brauzer uchun hammasi bitta origin (CORS va cookie
+sozlash shart emas). `vite.config.ts` da ngrok domenlariga `allowedHosts` ruxsati bor.
+Rate limiterlar uchun haqiqiy IP `X-Forwarded-For` orqali keladi (uvicorn sukut bo'yicha
+`127.0.0.1` dan kelgan proxy sarlavhalariga ishonadi).
+
+```powershell
+# 1. Bir marta: ngrok o'rnatish va token (dashboard.ngrok.com → Your Authtoken)
+winget install ngrok.ngrok
+ngrok config add-authtoken <TOKEN>
+
+# 2. Backend (1-terminal)
+cd backend
+uv run uvicorn app.main:create_app --factory
+
+# 3. Frontend — build qilingan versiya, dev serverdan tezroq (2-terminal)
+cd frontend
+npm run build
+npm run preview          # http://localhost:4173, /api proxy bilan
+
+# 4. Tunnel (3-terminal). Bepul akkauntdagi doimiy domen bilan: --url=<nom>.ngrok-free.app
+ngrok http 4173
+```
+
+- Ixtiyoriy: `backend/.env` da `PUBLIC_BASE_URL=https://<nom>.ngrok-free.app` (sitemap, OG havolalari), so'ng backendni qayta ishga tushirish.
+- Bepul ngrok birinchi kirishda "Visit Site" ogohlantirish sahifasini ko'rsatadi — bu normal.
+- Kompyuter yoqiq va uchala jarayon ishlab turishi kerak. `ENV=dev` da `/api/docs` ham ochiq — admin paroli kuchli bo'lsin.
+
+---
+
 ## D5. Tekshirish, zaxira va yangilash
 
 **Smoke test** (`https://edubuxdpi.uz`): ochiq sahifalar → admin login → mavzu va PDF → PPTX yuklash
