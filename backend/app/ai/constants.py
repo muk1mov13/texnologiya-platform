@@ -13,6 +13,9 @@ GENERATE_DRAFT_JOB = "generate_draft"
 AI_CHECK_JOB = "ai_check_submission"
 
 TOP_K = 6
+TOPIC_K = 16  # ochiq mavzu ichidan olinadigan bo'laklar
+CONTEXT_CHARS = 12_000  # repetitor promptidagi parchalar byudjeti (Groq TPM'ga sig'adi)
+FOLLOWUP_CHARS = 80  # bundan qisqa savolda qidiruvga oldingi savol ham qo'shiladi
 HISTORY_MESSAGES = 6
 MAX_MESSAGE_CHARS = 1000
 DRAFT_CONTEXT_CHARS = 24_000

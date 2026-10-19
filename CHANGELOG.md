@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — AI repetitor: mavzu ichida rad etmaslik, umumiy bilim va ergashuvchi savollar
+
+- `ai/tutor.py: _retrieve`: mavzu ochiq bo'lsa, shu mavzuning eng mos 16 bo'lagi (`TOPIC_K`) o'xshashlik chegarasisiz olinadi va 12 000 belgigacha (`CONTEXT_CHARS`) promptga qo'yiladi; ular chegaradan past bo'lsa, fan va kutubxonadan chegaradan o'tganlari qo'shiladi. Mavzusiz — platforma + kutubxona, faqat chegaradan o'tganlari. Parcha topilmasa ham rad etilmaydi.
+- Yangi `SYSTEM` prompt: avval parchalar ([n] bilan); parchalarda yo'q, lekin fan/mavzuga aloqador savolga — "Materiallarda bu haqda to'g'ridan-to'g'ri ma'lumot yo'q, umumiy ma'lumot:" bilan o'z bilimidan; aloqasiz savolga — bir jumlalik rad. Doira promptga qo'yiladi: ochiq mavzu va fani yoki platformadagi fanlar ro'yxati. Ishora rejimida umumiy bilimdan ham javob aytilmaydi.
+- Ergashuvchi savol: 80 belgidan qisqa savolda (`FOLLOWUP_CHARS`) qidiruvga suhbatdagi oldingi savol ham qo'shiladi; ishora tekshiruvi faqat joriy savol bilan.
+- `refusal` rejimi endi faqat platformada chop etilgan fan bo'lmaganda.
+
 ## 2026-10-19 — `ai-coverage` CLI: mavzu fayllari indeksini tekshirish
 
 - `ai/coverage.py` + `cli.py`: `uv run python -m app.cli ai-coverage [--subject ID]` — har mavzu uchun materiallar (holati, bo'laklar soni), glossariy va `topic_info` bo'laklari; muammolar: o'girilmagan yoki indeksga tushmagan materiallar, indekslanmagan glossariy, mavzu bo'lagi yo'qligi, eski embedding modeli. Muammo bo'lsa chiqish kodi 1.

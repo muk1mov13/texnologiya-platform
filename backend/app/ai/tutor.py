@@ -9,7 +9,7 @@ from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.ai import usage
-from app.ai.constants import HISTORY_MESSAGES, TOP_K
+from app.ai.constants import CONTEXT_CHARS, FOLLOWUP_CHARS, HISTORY_MESSAGES, TOP_K, TOPIC_K
 from app.ai.models import (
     CONTEXT_SOURCES,
     LIBRARY_SOURCES,
@@ -29,7 +29,7 @@ from app.auth.models import User
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.learning import progress
-from app.learning.models import Material, Topic
+from app.learning.models import Material, Subject, Topic
 from app.library.models import Book, Document
 
 BUSY_MESSAGE = "AI hozir band, birozdan so'ng urinib ko'ring"
@@ -58,16 +58,24 @@ CANNED = [
     ),
 ]
 SYSTEM = (
-    "Sen o'quv platformasidagi repetitorsan. Faqat quyida berilgan parchalar asosida javob ber. "
-    "Har bir fikrdan keyin manbani [n] ko'rinishida ko'rsat. Savol qaysi tilda bo'lsa, "
-    "o'sha tilda javob ber. Parchalarda javob bo'lmasa, buni ochiq ayt va taxmin qilma."
+    "Sen o'quv platformasidagi repetitorsan. Doirang: {scope}. Qoidalar:\n"
+    "1. Avval quyidagi parchalardan foydalan va har bir fikrdan keyin manbani [n] ko'rinishida "
+    "ko'rsat.\n"
+    "2. Parchalarda javob bo'lmasa, lekin savol shu doiraga aloqador bo'lsa (mavzuga yaqin "
+    "tushuncha, misol, izoh), o'z bilimingdan qisqa va aniq javob ber. Bunday javobni "
+    "\"Materiallarda bu haqda to'g'ridan-to'g'ri ma'lumot yo'q, umumiy ma'lumot:\" bilan boshla "
+    "va unga [n] qo'yma. Ishonching komil bo'lmagan faktni to'qima.\n"
+    "3. Savol bu doiraga umuman aloqador bo'lmasa, faqat bitta jumla bilan buni ayt va dars "
+    "mavzusi bo'yicha savol berishni so'ra.\n"
+    "4. Savol qaysi tilda bo'lsa, o'sha tilda javob ber."
 )
 HINT = (
     " Talaba hali yakunlamagan test yoki topshiriq savolini so'rayapti, shuning uchun javobni "
     "bevosita ham, bilvosita ham berma: variant harfi, son, sana, atama, so'z yoki ta'rifni "
     "aytma; savolga javob bo'ladigan ro'yxat yoki elementlarni to'liq sanab ham berma. "
     "Buning o'rniga 2-3 jumlada: tushunchaning umumiy ma'nosini tushuntir, materialning qaysi "
-    "qismini [n] o'qish kerakligini ko'rsat va o'zi topishi uchun bitta yo'naltiruvchi savol ber."
+    "qismini [n] o'qish kerakligini ko'rsat va o'zi topishi uchun bitta yo'naltiruvchi savol ber. "
+    "Bu rejimda umumiy bilimingdan ham javobni aytma."
 )
 _REF = re.compile(r"\[(\d+)\]")
 
@@ -97,26 +105,47 @@ async def _visible_topic_ids(db: AsyncSession, subject_id: int | None) -> list[i
     return [t.id for t in await progress.published_topics(db, ids)] if ids else []
 
 
+def _within_budget(hits: list[Hit], budget: int) -> list[Hit]:
+    """Takrorsiz, o'xshashlik tartibida, jami matn `budget` belgidan oshmaguncha."""
+    picked: list[Hit] = []
+    seen: set[tuple[ChunkSource, int, str]] = set()
+    used = 0
+    for hit in hits:
+        key = (hit.source_type, hit.source_id, hit.text)
+        if key in seen or (picked and used + len(hit.text) > budget):
+            continue
+        seen.add(key)
+        picked.append(hit)
+        used += len(hit.text)
+    return picked
+
+
 async def _retrieve(
     db: AsyncSession, ai: AiServices, vec: list[float], topic: Topic | None, settings: Settings
 ) -> list[Hit]:
-    """Mavzu → fan → platforma (+ kutubxona). Chegaradan o'tgan birinchi daraja qaytariladi."""
-    levels: list[tuple[list[int], bool]] = []
+    """Mavzu ochiq bo'lsa, uning eng mos bo'laklari chegarasiz olinadi (mavzu ichida rad etish
+    yo'q); ular yetarlicha o'xshash bo'lmasa, fan va kutubxonadan chegaradan o'tganlari
+    qo'shiladi. Mavzusiz: butun platforma + kutubxona, faqat chegaradan o'tganlari."""
+    hits: list[Hit] = []
     if topic is not None:
-        levels += [([topic.id], False), (await _visible_topic_ids(db, topic.subject_id), False)]
-    levels.append((await _visible_topic_ids(db, None), True))
-    for topic_ids, include_library in levels:
         hits = await ai.vectors.search(
-            db,
-            vec,
-            source_types=CONTEXT_SOURCES + LIBRARY_SOURCES if include_library else CONTEXT_SOURCES,
-            topic_ids=topic_ids,
-            k=TOP_K,
-            include_library=include_library,
+            db, vec, source_types=CONTEXT_SOURCES, topic_ids=[topic.id], k=TOPIC_K
         )
         if hits and hits[0].score >= settings.ai_min_similarity:
-            return hits
-    return []
+            return _within_budget(hits, CONTEXT_CHARS)
+        wider_ids = await _visible_topic_ids(db, topic.subject_id)
+    else:
+        wider_ids = await _visible_topic_ids(db, None)
+    wider = await ai.vectors.search(
+        db,
+        vec,
+        source_types=CONTEXT_SOURCES + LIBRARY_SOURCES,
+        topic_ids=wider_ids,
+        k=TOP_K,
+        include_library=True,
+    )
+    relevant = [h for h in wider if h.score >= settings.ai_min_similarity]
+    return _within_budget(sorted(hits + relevant, key=lambda h: -h.score), CONTEXT_CHARS)
 
 
 async def _is_hint(
@@ -193,19 +222,6 @@ async def prepare(
             text = answers.get(lang, answers["uz"])
             return Prepared(conv_id, topic_id, data.message, MessageMode.canned, canned_text=text)
     await usage.ensure_within_limit(db, user)
-    # "Bu mavzuda..." kabi savollarda mazmunli so'z yo'q: manba qidiruvi mavzu nomi bilan
-    # qilinadi. Ishora rejimi esa savolning o'zi bilan (nom topshiriqlarga ham o'xshatib yuboradi).
-    queries = [data.message] + ([f"{topic.title}. {data.message}"] if topic else [])
-    try:
-        vecs = await ai.embedder.embed(queries, "query")
-    except ProviderBusy:
-        raise AppError(503, "AI_BUSY", BUSY_MESSAGE) from None
-    vec = vecs[0]
-    hits = await _retrieve(db, ai, vecs[-1], topic, settings)
-    if not hits:
-        text = REFUSAL.get(lang, REFUSAL["uz"])
-        return Prepared(conv_id, topic_id, data.message, MessageMode.refusal, canned_text=text)
-    hint = await _is_hint(db, ai, vec, user, topic, settings)
     history: list[ChatMessage] = []
     if conv is not None:
         recent = await db.scalars(
@@ -218,10 +234,31 @@ async def prepare(
             ChatMessage("assistant" if m.role == MessageRole.assistant else "user", m.content)
             for m in reversed(list(recent))
         ]
+    # Qidiruv so'rovi: mavzu nomi ("Bu mavzuda..." kabi savollarda mazmunli so'z yo'q) va qisqa
+    # ergashuvchi savolda ("batafsilroq tushuntir") oldingi savol ham. Ishora rejimi esa faqat
+    # savolning o'zi bilan (nom topshiriqlarga ham o'xshatib yuboradi).
+    previous = next((m.text for m in reversed(history) if m.role == "user"), None)
+    search = data.message
+    if previous and len(data.message) < FOLLOWUP_CHARS:
+        search = f"{previous}. {search}"
+    if topic is not None:
+        search = f"{topic.title}. {search}"
+    try:
+        vecs = await ai.embedder.embed([data.message, search], "query")
+    except ProviderBusy:
+        raise AppError(503, "AI_BUSY", BUSY_MESSAGE) from None
+    hits = await _retrieve(db, ai, vecs[1], topic, settings)
+    scope = await _scope(db, topic)
+    if scope is None:
+        text = REFUSAL.get(lang, REFUSAL["uz"])
+        return Prepared(conv_id, topic_id, data.message, MessageMode.refusal, canned_text=text)
+    hint = await _is_hint(db, ai, vecs[0], user, topic, settings)
     context = "\n\n".join(
         f"[{i}] (sahifa {h.page or '-'})\n{h.text}" for i, h in enumerate(hits, start=1)
     )
-    question = ChatMessage("user", f"Parchalar:\n{context}\n\nSavol: {data.message}")
+    question = ChatMessage(
+        "user", f"Parchalar:\n{context or '(mos parcha topilmadi)'}\n\nSavol: {data.message}"
+    )
     return Prepared(
         conv_id,
         topic_id,
@@ -229,8 +266,20 @@ async def prepare(
         MessageMode.hint if hint else MessageMode.answer,
         citations=await citations_for(db, hits),
         prompt=[*history, question],
-        system=SYSTEM + (HINT if hint else ""),
+        system=SYSTEM.format(scope=scope) + (HINT if hint else ""),
     )
+
+
+async def _scope(db: AsyncSession, topic: Topic | None) -> str | None:
+    """Repetitor doirasi: ochiq mavzu va uning fani yoki platformadagi fanlar ro'yxati.
+    Chop etilgan fan bo'lmasa None (rad etiladi)."""
+    if topic is not None:
+        subject = await db.scalar(select(Subject.title).where(Subject.id == topic.subject_id))
+        return f'"{subject}" fani, "{topic.title}" mavzusi'
+    titles = [s.title for s in await progress.published_subjects(db)]
+    if not titles:
+        return None
+    return "platformadagi fanlar: " + ", ".join(f'"{t}"' for t in titles)
 
 
 def sse_event(event: str, payload: object) -> str:
