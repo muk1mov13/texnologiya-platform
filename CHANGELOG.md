@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Hujjatlar: AI repetitor qidiruvi
+
+- `CLAUDE.md`: `ai-coverage` buyrug'i, ~1600 belgilik bo'laklar va matnsiz PDF zaxirasi, `topic_info` bo'lagi, repetitorning yangi qidiruvi (mavzu ichida chegarasiz, `CONTEXT_CHARS` byudjeti), umumiy bilim va ergashuvchi savollar qoidasi.
+- `backend/.env.example`: `AI_MIN_SIMILARITY` endi faqat fan/kutubxona va mavzusiz savollarga ta'sir qilishi haqida izoh.
+
 ## 2026-10-19 — AI repetitor: mavzu ichida rad etmaslik, umumiy bilim va ergashuvchi savollar
 
 - `ai/tutor.py: _retrieve`: mavzu ochiq bo'lsa, shu mavzuning eng mos 16 bo'lagi (`TOPIC_K`) o'xshashlik chegarasisiz olinadi va 12 000 belgigacha (`CONTEXT_CHARS`) promptga qo'yiladi; ular chegaradan past bo'lsa, fan va kutubxonadan chegaradan o'tganlari qo'shiladi. Mavzusiz — platforma + kutubxona, faqat chegaradan o'tganlari. Parcha topilmasa ham rad etilmaydi.
