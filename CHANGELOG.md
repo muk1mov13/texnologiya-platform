@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: domensiz joylash yo'riqnomasi
+
+- `deploy/README.md`: "D4 (vaqtincha). Domensiz: ochiq IP + oddiy HTTP" bo'limi — `.env` qiymatlari, `ip-http.conf` ni yoqish, tekshirish (login F5'dan keyin saqlanishi), xavf eslatmasi va domen + HTTPS'ga o'tish qadamlari; fayllar jadvaliga `ip-http.conf`.
+- `deploy-roadmap.md`: D4 🟡 — vaqtincha IP + HTTP varianti, keyingi qadamlar yangilandi.
+
 ## 2026-10-19 — Deploy: `.env` namunasida domensiz variant
 
 - `deploy/env.prod.example`: ochiq IP + HTTP uchun izohlangan qatorlar — `COOKIE_SECURE=false`, `ALLOW_INSECURE_HTTP=true`, `CORS_ORIGINS`/`PUBLIC_BASE_URL` = `http://<OCHIQ_IP>`.

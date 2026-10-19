@@ -9,12 +9,14 @@ foydalanuvchi nomidan bajariladi.
 | `env.prod.example` | `backend/.env` namunasi |
 | `nginx/edubuxdpi-http.conf` | 80-port: sertifikat tekshiruvi va HTTPS'ga yo'naltirish |
 | `nginx/edubuxdpi.conf` | 443-port: sayt, `/api`, himoyalangan fayllar |
+| `nginx/ip-http.conf` | vaqtincha, domensiz: shu sayt 80-portda, ochiq IP orqali (HTTP) |
 | `systemd/texnologiya-api.service` | API (bitta uvicorn worker) |
 | `systemd/texnologiya-weekly.{service,timer}` | haftalik AI hisobot, dushanba 07:00 |
 | `backup.sh` | kunlik baza + media zaxirasi, 14 kun |
 
 Shartlar (D0): `edubuxdpi.uz` va `www.edubuxdpi.uz` uchun A-yozuv universitetning ochiq IP'siga,
 shu IP'ning 80/443 portlari VM'ga yo'naltirilgan, serverdan internetga chiqish bor.
+Domen hali yo'q bo'lsa — "D4 (vaqtincha). Domensiz" bo'limi (`nginx/ip-http.conf`, oddiy HTTP).
 
 ---
 
@@ -144,6 +146,54 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 Ichki tarmoqdagi kompyuterlarda domen VM'ning ichki IP'siga ochilishi uchun IT ichki DNS'ga yozuv
 qo'shadi (yoki sinov uchun `C:\Windows\System32\drivers\etc\hosts` ga `<ichki-IP> edubuxdpi.uz`).
 Haqiqiy sertifikat olishdan oldin bu papka o'chiriladi: `sudo rm -r /etc/letsencrypt/live/edubuxdpi.uz`.
+
+---
+
+## D4 (vaqtincha). Domensiz: ochiq IP + oddiy HTTP
+
+Domen hali yo'q, lekin IT ochiq IP'ning **80-portini** VM'ga yo'naltirgan bo'lsa, sayt
+`http://<OCHIQ_IP>` da ishga tushiriladi. Yuqoridagi Let's Encrypt qadamlari o'tkazib yuboriladi.
+
+**Diqqat:** HTTPS yo'q — parol va tokenlar tarmoqda shifrlanmagan holda uzatiladi. Bu faqat
+domen tayyor bo'lguncha; imkon qadar tez domen + HTTPS'ga o'ting.
+
+```bash
+# 1. .env (D3-2 da): domen qatorlari o'rniga env.prod.example dagi IP varianti
+#    COOKIE_SECURE=false
+#    ALLOW_INSECURE_HTTP=true
+#    CORS_ORIGINS=["http://<OCHIQ_IP>"]
+#    PUBLIC_BASE_URL=http://<OCHIQ_IP>
+sudo -iu texnologiya nano ~/app/backend/.env
+sudo systemctl restart texnologiya-api
+journalctl -u texnologiya-api -n 20     # "Prod HTTPS'siz ishlayapti" ogohlantirishi — kutilgan
+
+# 2. nginx: faqat 80-port, IP orqali kelgan har qanday so'rov
+sudo cp /srv/texnologiya/app/deploy/nginx/ip-http.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/ip-http.conf /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+
+# 3. Tekshirish (serverdan va tashqaridagi kompyuterdan)
+curl -I http://127.0.0.1/
+curl http://<OCHIQ_IP>/api/health
+```
+
+Brauzerda `http://<OCHIQ_IP>`: login → **F5** (sahifa yangilangach ham kirilgan holat saqlanadi —
+refresh cookie ishlayapti) → PDF ochish → tutor javobi oqim bo'lib keladi → `/robots.txt` da
+`http://<OCHIQ_IP>`. Sessiya F5'dan keyin yo'qolsa — `.env` dagi `COOKIE_SECURE`/`CORS_ORIGINS`
+ni tekshiring.
+
+**Domen tayyor bo'lgach** (DNS A-yozuvlari shu IP'ga, 443-port ham yo'naltirilgan):
+
+```bash
+sudo rm /etc/nginx/sites-enabled/ip-http.conf
+# so'ng yuqoridagi "D4. nginx va HTTPS" bo'limi 1–3-qadamlari (edubuxdpi-http.conf → certbot → edubuxdpi.conf)
+# .env: COOKIE_SECURE=true, ALLOW_INSECURE_HTTP qatorini o'chirish,
+#       CORS_ORIGINS=["https://edubuxdpi.uz","https://www.edubuxdpi.uz"], PUBLIC_BASE_URL=https://edubuxdpi.uz
+sudo systemctl restart texnologiya-api
+```
+
+Brauzerlarda eski `http://<IP>` sessiyasi qolmaydi — foydalanuvchilar domen orqali qaytadan kiradi.
 
 ---
 

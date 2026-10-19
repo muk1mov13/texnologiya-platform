@@ -92,14 +92,16 @@ Holat (2026-10-17): SSH kirish bor; VM 2 vCPU, 4 GB RAM, 40 GB disk; domen `edub
 
 ---
 
-## D4. Domen va HTTPS — ⬜
+## D4. Domen va HTTPS — 🟡 (vaqtincha IP + HTTP)
 
 Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'ni oddiy `http://` da saqlamaydi (login yangilanmaydi). Shuning uchun HTTPS har ikki variantda ham shart.
 
 - **Asosiy (domen + ochiq IP):** `sudo apt install certbot python3-certbot-nginx` → `sudo certbot --nginx -d <domen>`. Yangilanish certbot timer'i bilan avtomatik.
 - **Zaxira (faqat ichki tarmoq):** self-signed sertifikat (`openssl req -x509 ... -addext "subjectAltName=IP:<IP>"`) yoki IT'ning ichki sertifikati. Har qurilmada brauzer bir marta ogohlantiradi; sayt faqat universitet tarmog'ida ochiladi. Domen tayyor bo'lgach asosiy variantga o'tiladi (nginx'da 2 qator va `.env` dagi `CORS_ORIGINS`/`PUBLIC_BASE_URL`).
 
-**Tayyor:** `https://<domen>` brauzerda ogohlantirishsiz ochiladi.
+- **Vaqtincha (domensiz, ochiq IP + HTTP)** — 2026-10-19 tanlandi, domen tayyor bo'lguncha: `deploy/nginx/ip-http.conf` (80-port, ssl/HSTS'siz) va `.env` da `COOKIE_SECURE=false` + `ALLOW_INSECURE_HTTP=true` (backend bu bayroqsiz prod'da Secure'siz cookie'ni rad etadi), `CORS_ORIGINS`/`PUBLIC_BASE_URL` = `http://<OCHIQ_IP>`. Parollar shifrlanmagan holda uzatiladi. Buyruqlar va domenga o'tish: `deploy/README.md`, "D4 (vaqtincha)".
+
+**Tayyor:** `https://<domen>` brauzerda ogohlantirishsiz ochiladi (vaqtincha: `http://<OCHIQ_IP>` da login F5'dan keyin saqlanadi).
 
 ---
 
@@ -124,5 +126,6 @@ Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'n
 
 ## Keyingi aniq qadam
 
-1. D0: domen faollashishini kutish; IT bo'limidan ochiq IP va 80/443 port yo'naltirishni olish; Arsenal-D'da A-yozuvlar.
-2. D2–D3: `deploy/README.md` bo'yicha serverni sozlash va ilovani ishga tushirish (domen kutmasdan boshlash mumkin).
+1. D2–D3: `deploy/README.md` bo'yicha serverni sozlash va ilovani ishga tushirish.
+2. D4 (vaqtincha): ochiq IP'ning 80-porti VM'ga yo'naltirilgach `ip-http.conf` bilan `http://<OCHIQ_IP>` da ochish, D5 smoke test.
+3. Domen faollashgach: A-yozuvlar, 443-port, Let's Encrypt va `.env` ni HTTPS qiymatlariga qaytarish.
