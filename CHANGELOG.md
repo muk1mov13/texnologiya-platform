@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `e12c500..d1ca400` — muharrirda materialni ko'rish/yuklab olish, asl fayl endpoint'i, o'quv dasturini yuklab olish (4 ta commit); serverda `git pull` bilan olinadi.
+
 ## 2026-10-19 — CLAUDE.md: muharrirda fayllarni ko'rish
 
 - `CLAUDE.md` frontend bo'limiga MaterialsTab'dagi ko'rish/yuklab olish va `/api/teach/materials/{id}/original` haqida qisqa yozuv.
