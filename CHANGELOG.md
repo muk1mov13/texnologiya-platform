@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Ochiq AI yordamchi: model va sozlamalar
+
+- `ai/models.py`: `SupportMessage` (`support_messages`: `session_key`, savol, javob, `mode`, manbalar; IP/ism/email saqlanmaydi), `SupportMode`; `AiSettings` ga `public_enabled` va `public_daily_limit` (standart 300). Migratsiya `9602e09deacc`.
+- `config.py`: `support_rate_limit=20`, `support_rate_window_seconds=3600` (bitta IP uchun); `constants.py`: `SUPPORT_MESSAGE_CHARS`, `SUPPORT_HISTORY_PAIRS`, `SUPPORT_RETENTION_DAYS`.
+
 ## 2026-10-19 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `63ada65..6c4af05` — LibreOffice paketlari (README), konvertatsiya xatosi logi, D5 holati (3 ta commit); serverda `git pull` bilan olinadi.

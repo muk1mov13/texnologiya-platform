@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     max_avatar_mb: int = 2
     contact_rate_limit: int = 5
     contact_rate_window_seconds: int = 3600
+    # Ochiq AI yordamchi: bitta IP uchun oynadagi so'rovlar soni.
+    support_rate_limit: int = 20
+    support_rate_window_seconds: int = 3600
     # Sitemap va robots.txt dagi to'liq manzillar uchun (prod'da haqiqiy domen).
     public_base_url: str = "http://localhost:5173"
     login_rate_limit: int = 10

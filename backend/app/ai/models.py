@@ -16,6 +16,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     event,
+    true,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -49,6 +50,12 @@ class MessageRole(StrEnum):
 class MessageMode(StrEnum):
     answer = "answer"
     hint = "hint"
+    refusal = "refusal"
+    canned = "canned"
+
+
+class SupportMode(StrEnum):
+    answer = "answer"
     refusal = "refusal"
     canned = "canned"
 
@@ -183,4 +190,19 @@ class AiSettings(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     student_daily_limit: Mapped[int] = mapped_column(Integer, default=30)
+    # Ochiq saytdagi mehmonlar yordamchisi: butun sayt bo'yicha kunlik so'rovlar chegarasi.
+    public_enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    public_daily_limit: Mapped[int] = mapped_column(Integer, default=300, server_default="300")
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, onupdate=utcnow)
+
+
+class SupportMessage(IdMixin, CreatedAtMixin, Base):
+    """Mehmon yordamchisidagi bitta savol-javob. IP, ism yoki email saqlanmaydi."""
+
+    __tablename__ = "support_messages"
+
+    session_key: Mapped[str] = mapped_column(String(36), index=True)  # brauzer yaratgan UUID
+    question: Mapped[str] = mapped_column(Text)
+    answer: Mapped[str] = mapped_column(Text)
+    mode: Mapped[SupportMode] = mapped_column(str_enum(SupportMode))
+    citations: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
