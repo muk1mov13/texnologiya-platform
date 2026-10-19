@@ -1,9 +1,12 @@
 import asyncio
+import logging
 import shutil
 import subprocess
 from pathlib import Path
 
 import pymupdf
+
+logger = logging.getLogger(__name__)
 
 
 class ConversionError(Exception):
@@ -65,6 +68,13 @@ async def convert_to(
         raise ConversionError("CONVERSION_TIMEOUT") from exc
     output = out_dir / f"{source.stem}.{fmt}"
     if result.returncode != 0 or not output.is_file():
+        # Fayl nomi emas, faqat soffice javobi yoziladi — sababini journalctl'da ko'rish uchun.
+        stderr = result.stderr.decode(errors="replace").strip()
+        logger.warning(
+            "LibreOffice konvertatsiyasi muvaffaqiyatsiz: rc=%s, stderr=%s",
+            result.returncode,
+            stderr[-500:],
+        )
         raise ConversionError("CONVERSION_FAILED")
     return output
 

@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Konvertatsiya xatosi logga yoziladi
+
+- `learning/convert.py`: soffice nolmas kod bilan tugasa yoki PDF chiqarmasa, `rc` va stderr oxiri (500 belgi) `logger.warning` bilan yoziladi — sabab `journalctl -u texnologiya-api` da ko'rinadi (D5'da Signal 6 sababini faqat qo'lda ishga tushirib topish mumkin bo'ldi).
+
 ## 2026-10-19 — Deploy: LibreOffice `-nogui` paketlarisiz
 
 - `deploy/README.md` D2: `libreoffice-writer-nogui`/`-impress-nogui` o'rniga oddiy `libreoffice-writer`/`-impress` (headless'da ishlaydi). Serverda `-nogui` paketlar `libreoffice-core` bilan aralashib, soffice PPTX'ni ochishda Signal 6 bilan yiqilardi (D5 smoke testda material `CONVERSION_FAILED`); almashtirish buyrug'i qo'shildi. Serverda shu yo'l bilan tuzatildi.
