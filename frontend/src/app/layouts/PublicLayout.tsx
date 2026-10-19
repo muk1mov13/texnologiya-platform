@@ -1,8 +1,9 @@
 import { m, useMotionValueEvent, useScroll } from 'motion/react'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useMatch } from 'react-router'
 import { useCurrentUser } from '@/api/auth'
+import { useSupportStatus } from '@/api/support'
 import { buttonClasses } from '@/components/ui/button-classes'
 import { cx, FOCUS_RING } from '@/lib/cx'
 import { SPRING } from '@/lib/motion'
@@ -11,6 +12,11 @@ import { BrandLogo } from './BrandLogo'
 import { LanguageSwitch } from './LanguageSwitch'
 import { MobileMenu } from './MobileMenu'
 import { SiteFooter } from './SiteFooter'
+
+// Mehmon AI yordamchisi alohida chunk: faqat yoqilgan bo'lsa yuklanadi.
+const SupportWidget = lazy(() =>
+  import('@/features/public/support/SupportWidget').then((mod) => ({ default: mod.SupportWidget })),
+)
 
 /** Header shu masofadan keyin "yig'iladi" (soya, kichikroq balandlik). */
 const SCROLLED_AT = 12
@@ -31,6 +37,7 @@ export function PublicLayout() {
   const registerMatch = useMatch('/register')
   const pendingMatch = useMatch('/pending')
   const isAuth = loginMatch !== null || registerMatch !== null || pendingMatch !== null
+  const support = useSupportStatus()
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
   useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > SCROLLED_AT))
@@ -129,6 +136,11 @@ export function PublicLayout() {
         </main>
       )}
       <SiteFooter flush={isHome} />
+      {!isAuth && support.data?.enabled && (
+        <Suspense fallback={null}>
+          <SupportWidget />
+        </Suspense>
+      )}
     </div>
   )
 }

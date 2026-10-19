@@ -29,13 +29,13 @@ function randomUuid(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
-/** Mehmon suhbatining kaliti: brauzerda saqlanadi, storage yopiq bo'lsa sahifa umri davomida. */
+/** Mehmon suhbatining kaliti: shu tab davomida (`sessionStorage`), ekrandagi xabarlar bilan birga. */
 export function supportSessionKey(renew = false): string {
   try {
-    const saved = renew ? null : localStorage.getItem(SESSION_STORAGE_KEY)
+    const saved = renew ? null : sessionStorage.getItem(SESSION_STORAGE_KEY)
     if (saved) return saved
     const key = randomUuid()
-    localStorage.setItem(SESSION_STORAGE_KEY, key)
+    sessionStorage.setItem(SESSION_STORAGE_KEY, key)
     return key
   } catch {
     return randomUuid()

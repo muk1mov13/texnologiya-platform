@@ -139,6 +139,7 @@
     "AI_DISABLED": "AI yordamchisi hozircha o'chirilgan",
     "AI_BUSY": "AI hozir band, birozdan so'ng urinib ko'ring",
     "AI_LIMIT_REACHED": "Bugungi AI so'rovlari limiti tugadi",
+    "SUPPORT_RATE_LIMITED": "Juda ko'p savol yuborildi. Birozdan so'ng urinib ko'ring",
     "CONVERSATION_NOT_FOUND": "Suhbat topilmadi",
     "AI_DRAFT_NOT_FOUND": "Qoralama topilmadi",
     "AI_DRAFT_WRONG_STEP": "Bu tur bu bosqichga mos emas",
@@ -747,6 +748,25 @@
     "suggestion1": "Ma'ruzaning asosiy g'oyasini qisqacha tushuntirib bering",
     "suggestion2": "Bu mavzu bo'yicha o'zimni tekshirish uchun 3 ta savol tuzing",
     "suggestion3": "Lug'atdagi atamalarni oddiy misollar bilan izohlang"
+  },
+  "support": {
+    "launcher": "AI yordamchi",
+    "open": "AI yordamchini ochish",
+    "close": "Yopish",
+    "title": "AI yordamchi",
+    "subtitle": "Platforma, ro'yxatdan o'tish va kutubxona haqida",
+    "greeting": "Assalomu alaykum! Men platforma haqidagi savollaringizga javob beraman: ro'yxatdan o'tish, fanlar, kutubxona va bog'lanish.",
+    "suggestionsTitle": "Masalan, so'rang:",
+    "suggestion1": "Platformada qanday ro'yxatdan o'taman?",
+    "suggestion2": "Qaysi fanlar bor?",
+    "suggestion3": "Kutubxonada qanday materiallar bor?",
+    "tutorLink": "Dars bo'yicha savollar uchun AI repetitor",
+    "placeholder": "Savolingizni yozing…",
+    "send": "Yuborish",
+    "new": "Yangi suhbat",
+    "thinking": "O'ylayapti…",
+    "sources": "Kutubxonadan manbalar",
+    "disclaimer": "AI xato qilishi mumkin. Shaxsiy ma'lumot yozmang: savollar xizmatni yaxshilash uchun saqlanadi."
   },
   "aiDraft": {
     "create": "AI bilan yaratish",
