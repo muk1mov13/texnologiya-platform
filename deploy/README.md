@@ -22,6 +22,33 @@ Domen hali yo'q bo'lsa — "D4 (vaqtincha). Domensiz" bo'limi (`nginx/ip-http.co
 
 ## D2. Serverni sozlash
 
+**Ehtiyot choralari** (2026-10-19 tajribasidan):
+
+- Uzoq buyruqlarni `tmux new -s deploy` ichida bajaring; ulanish uzilsa `tmux attach -t deploy`.
+  `apt upgrade` SSH oynasi yopilib uzilsa, Proxmox Console'da `sudo dpkg --configure -a`.
+- "Daemons using outdated libraries" oynasida hech narsani belgilamay `<Ok>` (dbus/logind qayta
+  ishga tushsa SSH uziladi). Oynani butunlay o'chirish:
+  `echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/conf.d/no-prompt.conf`
+- VM IP'ni DHCP'dan oladi va qayta yuklashdan keyin o'zgarishi mumkin (`ip -4 addr`). IT'dan
+  doimiy IP (DHCP reservation) so'rang.
+
+**Ubuntu 22.04 bo'lsa** (`cat /etc/os-release`): standart omborda PostgreSQL 14, pgvector 16 yo'q —
+2-qadamdagi `postgresql postgresql-16-pgvector` o'rniga rasmiy PGDG ombori:
+
+```bash
+sudo install -d /usr/share/postgresql-common/pgdg
+sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc     https://www.postgresql.org/media/keys/ACCC4CF8.asc
+REPO="deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt jammy-pgdg main"
+echo "$REPO" | sudo tee /etc/apt/sources.list.d/pgdg.list
+sudo apt update
+sudo apt install -y postgresql-16 postgresql-16-pgvector
+pg_lsclusters                 # 16 main 5432 online
+```
+
+22.04 dagi nginx 1.18 — `ip-http.conf` ishlaydi; HTTPS'ga o'tganda `edubuxdpi.conf` dagi
+`http2 on;` qatorlari o'chirilib, `listen 443 ssl http2;` yoziladi. Domensiz rejimda `certbot`
+va 443-port kerak emas (`ufw allow 80/tcp` yetarli).
+
 ```bash
 # 1. Yangilash va vaqt zonasi
 sudo apt update && sudo apt upgrade -y
