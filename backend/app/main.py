@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.ai import support
 from app.ai.services import build_ai, recover_interrupted_ai
 from app.api import api_router
 from app.core.config import Settings, get_settings
@@ -31,6 +32,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         await recover_interrupted_ai(app.state.sessionmaker)
     async with app.state.sessionmaker() as session:
         await sync_badges(session)
+    await support.purge_old(app.state.sessionmaker)
     yield
 
 

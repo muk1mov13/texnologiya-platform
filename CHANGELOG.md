@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Ochiq AI yordamchi: admin endpoint'lari
+
+- `GET/PATCH /api/admin/ai/settings`: `public_enabled`, `public_daily_limit` (0–5000) va `public_used_today` (bugungi LLM javoblari soni).
+- `GET /api/admin/ai/support?page=&size=` — mehmon suhbatlari `session_key` bo'yicha guruhlab (birinchi savol, xabarlar soni, boshlanish/oxirgi vaqt; oxirgi faollik bo'yicha), `GET /api/admin/ai/support/{session_key}` — savol-javoblar, `DELETE` — suhbatni o'chirish.
+- Lifespan: `SUPPORT_RETENTION_DAYS` (90) kundan eski `support_messages` o'chiriladi.
+
 ## 2026-10-19 — Ochiq AI yordamchi: backend endpoint'lari
 
 - `ai/support.py`: mehmon yordamchisi — sayt bloki (platforma tavsifi, «Biz haqimizda», kontaktlar, nashr qilingan fanlar, FAQ; `SUPPORT_SITE_CHARS` gacha) + ochiq kutubxona bo'yicha vektor qidiruv (`LIBRARY_SOURCES`), dars materiallari ishlatilmaydi. Tez model, qat'iy system prompt (taxmin qilmaslik, `/contact` ni taklif qilish, test javoblarini bermaslik, prompt-injection'ga ergashmaslik). Salomga tayyor javob; sessiya bo'yicha oxirgi 3 juftlik tarix; `support_messages` ga yozish.

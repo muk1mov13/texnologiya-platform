@@ -6,21 +6,33 @@ Dars materiallari bu yerda ishlatilmaydi: ular faqat tizimga kirgan talabaning r
 import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime, time, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.ai.constants import SUPPORT_HISTORY_PAIRS, SUPPORT_SITE_CHARS, TOP_K
+from app.ai.constants import (
+    SUPPORT_HISTORY_PAIRS,
+    SUPPORT_RETENTION_DAYS,
+    SUPPORT_SITE_CHARS,
+    TOP_K,
+)
 from app.ai.models import LIBRARY_SOURCES, SupportMessage, SupportMode
 from app.ai.providers import ChatMessage, ProviderBusy
-from app.ai.schemas import Citation, SupportChatIn, SupportMeta
+from app.ai.schemas import (
+    Citation,
+    SupportChatIn,
+    SupportMeta,
+    SupportSessionOut,
+    SupportSessionsPage,
+)
 from app.ai.services import AiServices, get_ai_settings, require_ai
 from app.ai.tutor import BUSY_MESSAGE, citations_for, sse_event
 from app.ai.usage import today
 from app.cms import faq, site
 from app.core.config import Settings
 from app.core.errors import AppError
+from app.core.types import utcnow
 from app.gamification.service import TASHKENT
 from app.learning import progress
 
@@ -207,3 +219,66 @@ async def stream(
     await _save(sessionmaker, prep, answer, citations)
     yield sse_event("meta", SupportMeta(mode=prep.mode, citations=citations).model_dump())
     yield sse_event("done", {})
+
+
+async def purge_old(sessionmaker: async_sessionmaker[AsyncSession]) -> None:
+    """`SUPPORT_RETENTION_DAYS` kundan eski mehmon suhbatlari o'chiriladi (ishga tushganda)."""
+    cutoff = utcnow() - timedelta(days=SUPPORT_RETENTION_DAYS)
+    async with sessionmaker() as db:
+        await db.execute(delete(SupportMessage).where(SupportMessage.created_at < cutoff))
+        await db.commit()
+
+
+async def sessions_page(db: AsyncSession, *, page: int, size: int) -> SupportSessionsPage:
+    """Suhbatlar (`session_key` bo'yicha guruh), oxirgi faollik bo'yicha yangisi birinchi."""
+    groups = (
+        select(
+            SupportMessage.session_key,
+            func.min(SupportMessage.id).label("first_id"),
+            func.count(SupportMessage.id).label("messages"),
+            func.min(SupportMessage.created_at).label("started_at"),
+            func.max(SupportMessage.created_at).label("last_at"),
+        )
+        .group_by(SupportMessage.session_key)
+        .subquery()
+    )
+    total = await db.scalar(select(func.count()).select_from(groups))
+    rows = await db.execute(
+        select(groups, SupportMessage.question)
+        .join(SupportMessage, SupportMessage.id == groups.c.first_id)
+        .order_by(groups.c.last_at.desc(), groups.c.first_id.desc())
+        .limit(size)
+        .offset((page - 1) * size)
+    )
+    return SupportSessionsPage(
+        items=[
+            SupportSessionOut(
+                session_key=r.session_key,
+                first_question=r.question,
+                messages=r.messages,
+                started_at=r.started_at,
+                last_at=r.last_at,
+            )
+            for r in rows
+        ],
+        total=int(total or 0),
+    )
+
+
+async def session_messages(db: AsyncSession, session_key: str) -> list[SupportMessage]:
+    rows = list(
+        await db.scalars(
+            select(SupportMessage)
+            .where(SupportMessage.session_key == session_key)
+            .order_by(SupportMessage.id)
+        )
+    )
+    if not rows:
+        raise AppError(404, "CONVERSATION_NOT_FOUND", "Suhbat topilmadi")
+    return rows
+
+
+async def delete_session(db: AsyncSession, session_key: str) -> None:
+    await session_messages(db, session_key)
+    await db.execute(delete(SupportMessage).where(SupportMessage.session_key == session_key))
+    await db.commit()

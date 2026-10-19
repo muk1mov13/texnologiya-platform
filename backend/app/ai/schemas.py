@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.ai.constants import MAX_MESSAGE_CHARS, SUPPORT_MESSAGE_CHARS
 from app.ai.models import DraftKind, DraftStatus, MessageMode, MessageRole, SupportMode
@@ -122,6 +122,9 @@ class AiReportOut(BaseModel):
 class AiSettingsOut(BaseModel):
     enabled: bool
     student_daily_limit: int
+    public_enabled: bool
+    public_daily_limit: int
+    public_used_today: int
     configured: bool
     provider: str
     chat_model: str
@@ -131,6 +134,8 @@ class AiSettingsOut(BaseModel):
 class AiSettingsUpdate(BaseModel):
     enabled: bool | None = None
     student_daily_limit: int | None = Field(default=None, ge=0, le=500)
+    public_enabled: bool | None = None
+    public_daily_limit: int | None = Field(default=None, ge=0, le=5000)
 
 
 class AiUsageDay(BaseModel):
@@ -147,3 +152,27 @@ class AiUsageOut(BaseModel):
 
 class ReindexIn(BaseModel):
     all: bool = False
+
+
+class SupportSessionOut(BaseModel):
+    session_key: str
+    first_question: str
+    messages: int
+    started_at: datetime
+    last_at: datetime
+
+
+class SupportSessionsPage(BaseModel):
+    items: list[SupportSessionOut]
+    total: int
+
+
+class SupportMessageOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    question: str
+    answer: str
+    mode: SupportMode
+    citations: list[Citation]
+    created_at: datetime
