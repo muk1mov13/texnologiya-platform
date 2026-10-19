@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `6c4af05..040d8ff` — saytdagi AI yordamchi (backend: `support_messages`, ochiq `/api/ai/support/*`, admin endpoint'lari; frontend: vidjet, admin sozlamalari va mehmon suhbatlari sahifasi) va oldingi CHANGELOG yozuvi (7 ta commit). Serverda `git pull`, `alembic upgrade head` (migratsiya `9602e09deacc`) va frontend build kerak.
+
 ## 2026-10-19 — Ochiq AI yordamchi: admin sahifalari
 
 - `AdminAiPage`: «Saytdagi AI yordamchi» paneli — yoqish/o'chirish, sayt bo'yicha kunlik limit (0–5000, `supportSettingsSchema`), bugungi sarf va «Mehmon suhbatlari» havolasi.
