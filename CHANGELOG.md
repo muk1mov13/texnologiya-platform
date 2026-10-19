@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `63ada65..6c4af05` — LibreOffice paketlari (README), konvertatsiya xatosi logi, D5 holati (3 ta commit); serverda `git pull` bilan olinadi.
+
 ## 2026-10-19 — D5 smoke test (ichki IP)
 
 - `deploy-roadmap.md`: D5 🟡 — `http://172.20.172.121` da smoke test o'tdi (ochiq sahifalar, login + F5, PDF, PPTX → PDF, tutor SSE, admin AI, sitemap/robots); sinov materiali o'chirildi. Qolgan: zaxira cron'i va tiklab ko'rish, domen bilan takroriy test.
