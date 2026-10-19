@@ -2,6 +2,7 @@ from fastapi import APIRouter, Response, UploadFile
 
 from app.auth.deps import StaffUser
 from app.core.deps import AppSettings, AppStorage, DbSession, Jobs
+from app.core.files import file_response
 from app.core.forms import TitleForm
 from app.core.types import DbIdPath
 from app.learning import editing, materials
@@ -50,3 +51,17 @@ async def retry_material(
 ) -> Material:
     material = await materials.ensure_can_edit_material(db, user, material_id)
     return await materials.retry_material(db, material, jobs)
+
+
+@router.get("/materials/{material_id}/original", response_class=Response)
+async def material_original(
+    material_id: DbIdPath,
+    user: StaffUser,
+    db: DbSession,
+    settings: AppSettings,
+    storage: AppStorage,
+) -> Response:
+    """Yuklangan asl fayl (PPT/DOC ham), holatidan qat'i nazar: konvertatsiya xato bo'lsa ham
+    admin va fanga biriktirilgan o'qituvchi nima yuklanganini tekshira oladi."""
+    material = await materials.ensure_can_edit_material(db, user, material_id)
+    return file_response(settings, storage, material.original_file, material.original_name)

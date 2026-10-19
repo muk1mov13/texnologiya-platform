@@ -1,6 +1,6 @@
 import { lazy, Suspense, useRef, useState, type DragEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { materialFileUrl, useDeleteMaterial, useRetryMaterial, useUploadMaterial } from '@/api/teach'
+import { materialFileUrl, materialOriginalUrl, useDeleteMaterial, useRetryMaterial, useUploadMaterial } from '@/api/teach'
 import type { Material, StepEditor } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
@@ -14,6 +14,7 @@ import { DataList, ListRow, RowIcon } from '@/features/admin/ui/DataList'
 import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
 import { IconAction } from '@/features/admin/ui/IconAction'
 import { cx } from '@/lib/cx'
+import { useProtectedDownload } from '@/lib/download'
 import { formatSize } from '@/lib/format'
 
 // PdfViewer (react-pdf + pdf.js) og'ir: faqat "Ko'rish" bosilganda yuklanadi.
@@ -197,7 +198,9 @@ interface MaterialRowProps {
 
 function MaterialRow({ material, retrying, onRetry, onView, onDelete }: MaterialRowProps) {
   const { t } = useTranslation()
+  const { download, pending: downloading } = useProtectedDownload()
   const failed = material.status === 'failed'
+  const ready = material.status === 'ready'
   return (
     <ListRow
       aria-label={material.title}
@@ -241,9 +244,21 @@ function MaterialRow({ material, retrying, onRetry, onView, onDelete }: Material
               {t('common.retry')}
             </Button>
           )}
-          {material.status === 'ready' && (
-            <IconAction icon="eye" label={t('teach.viewMaterial')} onClick={onView} />
+          {ready && <IconAction icon="eye" label={t('teach.viewMaterial')} onClick={onView} />}
+          {ready && (
+            <IconAction
+              icon="download"
+              label={t('teach.downloadPdf')}
+              disabled={downloading}
+              onClick={() => void download(materialFileUrl(material.id), `${material.title}.pdf`)}
+            />
           )}
+          <IconAction
+            icon="folder"
+            label={t('teach.downloadOriginal')}
+            disabled={downloading}
+            onClick={() => void download(materialOriginalUrl(material.id), material.original_name)}
+          />
           <IconAction
             icon="trash"
             label={t('common.delete')}

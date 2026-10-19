@@ -119,6 +119,8 @@ export function useDeleteTopic() {
 
 /** Materialning PDF fayli (talaba ham, muharrir ham shu manzildan oladi). */
 export const materialFileUrl = (id: number) => `/api/materials/${id}/file`
+/** Yuklangan asl fayl (PPT/DOC ham) — faqat muharrir uchun. */
+export const materialOriginalUrl = (id: number) => `/api/teach/materials/${id}/original`
 
 export interface UploadInput {
   stepId: number

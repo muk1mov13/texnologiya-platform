@@ -1300,6 +1300,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/teach/materials/{material_id}/original": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Material Original
+         * @description Yuklangan asl fayl (PPT/DOC ham), holatidan qat'i nazar: konvertatsiya xato bo'lsa ham
+         *     admin va fanga biriktirilgan o'qituvchi nima yuklanganini tekshira oladi.
+         */
+        get: operations["material_original_api_teach_materials__material_id__original_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/teach/materials/{material_id}/retry": {
         parameters: {
             query?: never;
@@ -6383,6 +6404,35 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    material_original_api_teach_materials__material_id__original_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                material_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

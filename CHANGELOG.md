@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Material PDF va asl faylini yuklab olish
+
+- Backend: `GET /api/teach/materials/{id}/original` (`StaffUser` + `ensure_can_edit_material`) — yuklangan asl fayl (PPT/DOC ham) asl nomi bilan, holatidan qat'i nazar (`failed` ham).
+- `MaterialsTab`: «PDF yuklab olish» (tayyor bo'lsa) va «Asl faylni yuklab olish» tugmalari (`useProtectedDownload`); `materialOriginalUrl`, `schema.gen.ts` yangilandi, i18n `teach.downloadPdf`/`downloadOriginal`.
+
 ## 2026-10-19 — Muharrirda materialni ko'rish
 
 - `MaterialsTab`: tayyor material qatorida «Ko'rish» (ko'z) tugmasi — keng `Modal` ichida lazy `PdfViewer` (`/api/materials/{id}/file`, admin va biriktirilgan o'qituvchiga nashrsiz mavzuda ham ochiladi).
