@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — CLAUDE.md: muharrirda fayllarni ko'rish
+
+- `CLAUDE.md` frontend bo'limiga MaterialsTab'dagi ko'rish/yuklab olish va `/api/teach/materials/{id}/original` haqida qisqa yozuv.
+
 ## 2026-10-19 — Admin: fan o'quv dasturini yuklab olish
 
 - Admin → Fanlar: dastur bor bo'lsa «Yuklab olish» tugmasi (`useProtectedDownload` → mavjud `/api/subjects/{slug}/syllabus`, u nashrsiz fanni ham tahrirlay oladiganga beradi; backend o'zgarmadi). i18n `admin.subjects.syllabusDownload`.
