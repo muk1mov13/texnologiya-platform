@@ -92,7 +92,9 @@ Holat (2026-10-17): SSH kirish bor; VM 2 vCPU, 4 GB RAM, 40 GB disk; domen `edub
 
 ---
 
-## D4. Domen va HTTPS — 🟡 (vaqtincha IP + HTTP)
+## D4. Domen va HTTPS — 🟡 (Cloudflare Tunnel tanlandi)
+
+**2026-10-19, asosiy yo'l — Cloudflare Tunnel.** Taqdimot uchun sayt istalgan joydan ochilishi kerak, IT esa ochiq IP va port yo'naltirishni hali bermagan; domen faol. Serverdagi `cloudflared` Cloudflare'ga o'zi ulanadi, HTTPS sertifikatini Cloudflare beradi — ochiq IP, port va certbot kerak emas, VM IP'si o'zgarsa ham ishlaydi. nginx: `deploy/nginx/edubuxdpi-tunnel.conf` (`127.0.0.1:80`, haqiqiy IP `CF-Connecting-IP` dan); `.env` — asosiy HTTPS qiymatlari. Buyruqlar: `deploy/README.md`, "D4 (Cloudflare Tunnel)". IT keyin ochiq IP bersa ham tunnelda qolish mumkin; quyidagi Let's Encrypt varianti zaxira.
 
 Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'ni oddiy `http://` da saqlamaydi (login yangilanmaydi). Shuning uchun HTTPS har ikki variantda ham shart.
 
@@ -129,6 +131,6 @@ Holat (2026-10-19, `http://172.20.172.121`, ichki tarmoq): ochiq sahifalar, site
 
 ## Keyingi aniq qadam
 
-1. D2–D3: `deploy/README.md` bo'yicha serverni sozlash va ilovani ishga tushirish.
-2. D4 (vaqtincha): ochiq IP'ning 80-porti VM'ga yo'naltirilgach `ip-http.conf` bilan `http://<OCHIQ_IP>` da ochish, D5 smoke test.
-3. Domen faollashgach: A-yozuvlar, 443-port, Let's Encrypt va `.env` ni HTTPS qiymatlariga qaytarish.
+1. D4 (Cloudflare Tunnel): 7844-portga chiqishni tekshirish → domen NS'ini Arsenal-D'da Cloudflare'ga o'zgartirish (faollashish 24–48 soatgacha, taqdimotdan oldin) → tunnel va Public hostnames → `edubuxdpi-tunnel.conf` → `.env` HTTPS qiymatlari → `ufw` da 80/443 yopish.
+2. D5: smoke testni `https://edubuxdpi.uz` da universitet tarmog'idan tashqarida takrorlash; `backup.sh` cron'i va bir marta tiklab ko'rish.
+3. Taqdimotga: Proxmox'da VM "Start at boot", UptimeRobot (`/api/health`), demo akkauntlar (admin + talaba), `ai-check`.

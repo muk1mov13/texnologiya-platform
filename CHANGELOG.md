@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy yo'l xaritasi: Cloudflare Tunnel
+
+- `deploy-roadmap.md`: D4 — asosiy yo'l Cloudflare Tunnel (ochiq IP/port yo'q, domen faol, taqdimot uchun tashqaridan kirish kerak), Let's Encrypt zaxira; "Keyingi aniq qadam" — tunnel, tashqi smoke test, zaxira, taqdimotga tayyorlik.
+
 ## 2026-10-19 — Deploy: Cloudflare Tunnel yo'riqnomasi
 
 - `deploy/README.md`: "D4 (Cloudflare Tunnel). Ochiq IP'siz HTTPS" bo'limi — 7844-portga chiqishni tekshirish, domenni Cloudflare'ga o'tkazish (Arsenal-D'da NS), CSP bilan to'qnashadigan funksiyalarni o'chirish (Email Obfuscation, Rocket Loader, Web Analytics, Bot Fight Mode), dashboard orqali tunnel va Public hostnames (`127.0.0.1:80`), `edubuxdpi-tunnel.conf` ni yoqish, `.env` ni HTTPS qiymatlariga qaytarish, `ufw` da 80/443 ni yopish, tashqi tarmoqdan tekshirish, NS kechiksa `trycloudflare.com` vaqtinchalik manzili. Fayllar jadvaliga `edubuxdpi-tunnel.conf`.
