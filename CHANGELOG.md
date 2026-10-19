@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Muharrirda materialni ko'rish
+
+- `MaterialsTab`: tayyor material qatorida «Ko'rish» (ko'z) tugmasi — keng `Modal` ichida lazy `PdfViewer` (`/api/materials/{id}/file`, admin va biriktirilgan o'qituvchiga nashrsiz mavzuda ham ochiladi).
+- `Modal`: ixtiyoriy `size="xl"`; `api/teach.ts`: `materialFileUrl`; i18n `teach.viewMaterial`.
+
 ## 2026-10-19 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `943bebb..ea1c35c` — nginx `.mjs` MIME tuzatishi; serverda `git pull` bilan olinadi.

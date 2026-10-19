@@ -1,20 +1,23 @@
-import { useRef, useState, type DragEvent, type FormEvent } from 'react'
+import { lazy, Suspense, useRef, useState, type DragEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDeleteMaterial, useRetryMaterial, useUploadMaterial } from '@/api/teach'
+import { materialFileUrl, useDeleteMaterial, useRetryMaterial, useUploadMaterial } from '@/api/teach'
 import type { Material, StepEditor } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
-import { ConfirmDialog } from '@/components/ui/Modal'
-import { Spinner } from '@/components/ui/Spinner'
+import { ConfirmDialog, Modal } from '@/components/ui/Modal'
+import { PageSpinner, Spinner } from '@/components/ui/Spinner'
 import { pushToast } from '@/components/ui/toast-store'
 import { DataList, ListRow, RowIcon } from '@/features/admin/ui/DataList'
 import { EmptyBlock } from '@/features/admin/ui/EmptyBlock'
 import { IconAction } from '@/features/admin/ui/IconAction'
 import { cx } from '@/lib/cx'
 import { formatSize } from '@/lib/format'
+
+// PdfViewer (react-pdf + pdf.js) og'ir: faqat "Ko'rish" bosilganda yuklanadi.
+const PdfViewer = lazy(() => import('@/features/student/PdfViewer').then((module) => ({ default: module.PdfViewer })))
 
 const EXTENSIONS = ['.pdf', '.ppt', '.pptx', '.doc', '.docx']
 const ACCEPT = EXTENSIONS.join(',')
@@ -39,6 +42,7 @@ export function MaterialsTab({ topicId, step }: { topicId: number; step: StepEdi
   const [file, setFile] = useState<File | null>(null)
   const [dragging, setDragging] = useState(false)
   const [toDelete, setToDelete] = useState<Material | null>(null)
+  const [viewing, setViewing] = useState<Material | null>(null)
   const titleId = `material-title-${step.id}`
   const fileId = `material-file-${step.id}`
   const canSubmit = file !== null && title.trim() !== ''
@@ -92,6 +96,7 @@ export function MaterialsTab({ topicId, step }: { topicId: number; step: StepEdi
               material={material}
               retrying={retry.isPending && retry.variables === material.id}
               onRetry={() => retry.mutate(material.id)}
+              onView={() => setViewing(material)}
               onDelete={() => setToDelete(material)}
             />
           ))}
@@ -159,6 +164,14 @@ export function MaterialsTab({ topicId, step }: { topicId: number; step: StepEdi
         </div>
       </form>
 
+      <Modal open={viewing !== null} size="xl" title={viewing?.title ?? ''} onClose={() => setViewing(null)}>
+        {viewing && (
+          <Suspense fallback={<PageSpinner />}>
+            <PdfViewer key={viewing.id} url={materialFileUrl(viewing.id)} title={viewing.title} />
+          </Suspense>
+        )}
+      </Modal>
+
       <ConfirmDialog
         open={toDelete !== null}
         title={t('teach.deleteMaterialTitle')}
@@ -178,10 +191,11 @@ interface MaterialRowProps {
   material: Material
   retrying: boolean
   onRetry: () => void
+  onView: () => void
   onDelete: () => void
 }
 
-function MaterialRow({ material, retrying, onRetry, onDelete }: MaterialRowProps) {
+function MaterialRow({ material, retrying, onRetry, onView, onDelete }: MaterialRowProps) {
   const { t } = useTranslation()
   const failed = material.status === 'failed'
   return (
@@ -226,6 +240,9 @@ function MaterialRow({ material, retrying, onRetry, onDelete }: MaterialRowProps
               <Icon name="refresh" className="size-4" />
               {t('common.retry')}
             </Button>
+          )}
+          {material.status === 'ready' && (
+            <IconAction icon="eye" label={t('teach.viewMaterial')} onClick={onView} />
           )}
           <IconAction
             icon="trash"

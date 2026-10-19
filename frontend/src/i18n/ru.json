@@ -452,6 +452,7 @@
     "materialFileHint": "PDF, PPT, PPTX, DOC или DOCX · до 50 МБ",
     "upload": "Загрузить",
     "materialUploaded": "Файл загружен",
+    "viewMaterial": "Просмотр",
     "noMaterials": "На этом этапе пока нет материалов",
     "noMaterialsText": "Загрузите файл ниже — PDF готов сразу, другие форматы конвертируются в PDF",
     "addMaterial": "Новый материал",

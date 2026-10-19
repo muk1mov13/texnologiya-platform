@@ -452,6 +452,7 @@
     "materialFileHint": "PDF, PPT, PPTX, DOC yoki DOCX · 50 MB gacha",
     "upload": "Yuklash",
     "materialUploaded": "Fayl yuklandi",
+    "viewMaterial": "Ko'rish",
     "noMaterials": "Bu bosqichda hali material yo'q",
     "noMaterialsText": "Quyida fayl yuklang — PDF darhol tayyor bo'ladi, boshqa formatlar PDF'ga o'giriladi",
     "addMaterial": "Yangi material",

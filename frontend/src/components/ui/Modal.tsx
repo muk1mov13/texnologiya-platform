@@ -10,6 +10,8 @@ interface ModalProps {
   children: ReactNode
   footer?: ReactNode
   describedBy?: string
+  /** `xl` — keng oyna (masalan, PDF ko'rish uchun). */
+  size?: 'md' | 'xl'
 }
 
 const FOCUSABLE_SELECTOR =
@@ -41,7 +43,7 @@ function unlockBodyScroll(): void {
   }
 }
 
-export function Modal({ open, title, onClose, children, footer, describedBy }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, describedBy, size = 'md' }: ModalProps) {
   const { t } = useTranslation()
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
@@ -114,7 +116,7 @@ export function Modal({ open, title, onClose, children, footer, describedBy }: M
         aria-labelledby={titleId}
         aria-describedby={describedBy}
         tabIndex={-1}
-        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl outline-hidden"
+        className={`max-h-[90dvh] w-full ${size === 'xl' ? 'max-w-5xl' : 'max-w-lg'} overflow-y-auto rounded-2xl bg-white p-6 shadow-xl outline-hidden`}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <h2 id={titleId} className="text-lg font-bold">

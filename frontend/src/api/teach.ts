@@ -117,6 +117,9 @@ export function useDeleteTopic() {
   })
 }
 
+/** Materialning PDF fayli (talaba ham, muharrir ham shu manzildan oladi). */
+export const materialFileUrl = (id: number) => `/api/materials/${id}/file`
+
 export interface UploadInput {
   stepId: number
   title: string
