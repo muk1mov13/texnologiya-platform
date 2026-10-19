@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `353e68d..4bdcbc6` — domensiz (IP + HTTP) rejim va deploy yo'riqnomasi (5 ta commit); server D3'da kodni shu yerdan oladi.
+
 ## 2026-10-19 — Deploy: Ubuntu 22.04 va server tajribasi yo'riqnomada
 
 - `deploy/README.md` D2: ehtiyot choralari (tmux, uzilgan `apt upgrade` → `dpkg --configure -a`, needrestart oynasi, DHCP'da IP o'zgarishi), Ubuntu 22.04 uchun PGDG ombori orqali PostgreSQL 16 + pgvector, nginx 1.18 da `http2` eslatmasi. Institut VM'i 22.04 ekani aniqlandi; D2 shu yo'l bilan bajarildi.
