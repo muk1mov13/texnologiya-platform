@@ -80,6 +80,10 @@ export type ResponseContract = [
   Check<Receives<T.AiSettingsView, S['AiSettingsOut']>>,
   Check<Receives<T.AiUsageDay, S['AiUsageDay']>>,
   Check<Receives<T.AiUsageStats, S['AiUsageOut']>>,
+  Check<Receives<T.SupportStatus, S['SupportStatusOut']>>,
+  Check<Receives<T.SupportSession, S['SupportSessionOut']>>,
+  Check<Receives<T.SupportSessionsPage, S['SupportSessionsPage']>>,
+  Check<Receives<T.SupportMessage, S['SupportMessageOut']>>,
   // Ichma-ich sxemalar alohida tekshiriladi: `Required` faqat yuqori darajaga ta'sir qiladi.
   Check<Receives<T.LibraryDocument, S['DocumentOut']>>,
   Check<Receives<Omit<T.FolderNode, 'documents' | 'children'>, Omit<S['FolderOut'], 'documents' | 'children'>>>,
@@ -121,6 +125,7 @@ export type RequestContract = [
   Check<Sends<Extract<T.ActivityIn, { type: 'yesno' }>, S['YesNoActivityIn']>>,
   Check<Sends<Extract<T.ActivityIn, { type: 'crossword' }>, S['CrosswordActivityIn']>>,
   Check<Sends<T.ChatIn, S['ChatIn']>>,
+  Check<Sends<T.SupportChatIn, S['SupportChatIn']>>,
   Check<Sends<T.DraftCreateIn, S['DraftCreateIn']>>,
   Check<Sends<T.DraftUpdateIn, S['DraftUpdateIn']>>,
   Check<Sends<T.AiSettingsUpdate, S['AiSettingsUpdate']>>,

@@ -53,6 +53,41 @@ export interface paths {
         patch: operations["update_ai_settings_api_admin_ai_settings_patch"];
         trace?: never;
     };
+    "/api/admin/ai/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Sessions */
+        get: operations["support_sessions_api_admin_ai_support_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/ai/support/{session_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Session */
+        get: operations["support_session_api_admin_ai_support__session_key__get"];
+        put?: never;
+        post?: never;
+        /** Delete Support Session */
+        delete: operations["delete_support_session_api_admin_ai_support__session_key__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/ai/usage": {
         parameters: {
             query?: never;
@@ -528,6 +563,43 @@ export interface paths {
         post?: never;
         /** Delete Conversation */
         delete: operations["delete_conversation_api_ai_conversations__conversation_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/support/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Support Chat
+         * @description Mehmon yordamchisi (login talab qilinmaydi), IP bo'yicha cheklangan.
+         */
+        post: operations["support_chat_api_ai_support_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/support/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Status */
+        get: operations["support_status_api_ai_support_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1852,6 +1924,12 @@ export interface components {
             enabled: boolean;
             /** Provider */
             provider: string;
+            /** Public Daily Limit */
+            public_daily_limit: number;
+            /** Public Enabled */
+            public_enabled: boolean;
+            /** Public Used Today */
+            public_used_today: number;
             /** Student Daily Limit */
             student_daily_limit: number;
         };
@@ -1859,6 +1937,10 @@ export interface components {
         AiSettingsUpdate: {
             /** Enabled */
             enabled?: boolean | null;
+            /** Public Daily Limit */
+            public_daily_limit?: number | null;
+            /** Public Enabled */
+            public_enabled?: boolean | null;
             /** Student Daily Limit */
             student_daily_limit?: number | null;
         };
@@ -3207,6 +3289,72 @@ export interface components {
             step: components["schemas"]["StepBrief"];
             submission: components["schemas"]["SubmissionView"];
         };
+        /** SupportChatIn */
+        SupportChatIn: {
+            /**
+             * Lang
+             * @default uz
+             * @enum {string}
+             */
+            lang?: "uz" | "ru";
+            /** Message */
+            message: string;
+            /** Session Key */
+            session_key: string;
+        };
+        /** SupportMessageOut */
+        SupportMessageOut: {
+            /** Answer */
+            answer: string;
+            /** Citations */
+            citations: components["schemas"]["Citation"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            mode: components["schemas"]["SupportMode"];
+            /** Question */
+            question: string;
+        };
+        /**
+         * SupportMode
+         * @enum {string}
+         */
+        SupportMode: "answer" | "canned";
+        /** SupportSessionOut */
+        SupportSessionOut: {
+            /** First Question */
+            first_question: string;
+            /**
+             * Last At
+             * Format: date-time
+             */
+            last_at: string;
+            /** Messages */
+            messages: number;
+            /** Session Key */
+            session_key: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+        };
+        /** SupportSessionsPage */
+        SupportSessionsPage: {
+            /** Items */
+            items: components["schemas"]["SupportSessionOut"][];
+            /** Total */
+            total: number;
+        };
+        /** SupportStatusOut */
+        SupportStatusOut: {
+            /** Enabled */
+            enabled: boolean;
+        };
         /** TaskIn */
         TaskIn: {
             /** Deadline */
@@ -3668,6 +3816,98 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AiSettingsOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_sessions_api_admin_ai_support_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportSessionsPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_session_api_admin_ai_support__session_key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportMessageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_support_session_api_admin_ai_support__session_key__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -4968,6 +5208,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_chat_api_ai_support_chat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportChatIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_status_api_ai_support_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatusOut"];
                 };
             };
         };

@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Ochiq AI yordamchi: frontend API
+
+- `api/support.ts`: `useSupportStatus`, `streamSupport` (SSE, `streamChat` kabi), `supportSessionKey()` — UUID `localStorage` da (`crypto.randomUUID` HTTPS'siz yo'q, `getRandomValues` bilan zaxira).
+- `api/adminAi.ts`: `useSupportSessions`, `useSupportSession`, `useDeleteSupportSession`; sozlama o'zgarsa vidjet holati ham yangilanadi. `types.ts` + kontrakt (`Support*`, `AiSettingsView/Update` ga `public_*`), `schema.gen.ts` qayta yaratildi; test serverida `/api/ai/support/status` sukut bo'yicha o'chiq.
+
 ## 2026-10-19 — Ochiq AI yordamchi: admin endpoint'lari
 
 - `GET/PATCH /api/admin/ai/settings`: `public_enabled`, `public_daily_limit` (0–5000) va `public_used_today` (bugungi LLM javoblari soni).

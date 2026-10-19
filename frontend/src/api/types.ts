@@ -662,6 +662,9 @@ export interface AiReport {
 export interface AiSettingsView {
   enabled: boolean
   student_daily_limit: number
+  public_enabled: boolean
+  public_daily_limit: number
+  public_used_today: number
   configured: boolean
   provider: string
   chat_model: string
@@ -671,6 +674,8 @@ export interface AiSettingsView {
 export interface AiSettingsUpdate {
   enabled?: boolean | null
   student_daily_limit?: number | null
+  public_enabled?: boolean | null
+  public_daily_limit?: number | null
 }
 
 export interface AiUsageDay {
@@ -687,6 +692,47 @@ export interface AiUsageStats {
 
 export interface ReindexIn {
   all?: boolean
+}
+
+export type SupportMode = 'answer' | 'canned'
+export type SupportLang = 'uz' | 'ru'
+
+export interface SupportChatIn {
+  message: string
+  session_key: string
+  lang?: SupportLang
+}
+
+/** Mehmon yordamchisining SSE `meta` hodisasi (OpenAPI'da yo'q — kontraktsiz). */
+export interface SupportMeta {
+  mode: SupportMode
+  citations: Citation[]
+}
+
+export interface SupportStatus {
+  enabled: boolean
+}
+
+export interface SupportSession {
+  session_key: string
+  first_question: string
+  messages: number
+  started_at: string
+  last_at: string
+}
+
+export interface SupportSessionsPage {
+  items: SupportSession[]
+  total: number
+}
+
+export interface SupportMessage {
+  id: number
+  question: string
+  answer: string
+  mode: SupportMode
+  citations: Citation[]
+  created_at: string
 }
 
 // --- Kutubxona (4-bosqich) ----------------------------------------------------------------
