@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: LibreOffice `-nogui` paketlarisiz
+
+- `deploy/README.md` D2: `libreoffice-writer-nogui`/`-impress-nogui` o'rniga oddiy `libreoffice-writer`/`-impress` (headless'da ishlaydi). Serverda `-nogui` paketlar `libreoffice-core` bilan aralashib, soffice PPTX'ni ochishda Signal 6 bilan yiqilardi (D5 smoke testda material `CONVERSION_FAILED`); almashtirish buyrug'i qo'shildi. Serverda shu yo'l bilan tuzatildi.
+
 ## 2026-10-19 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `e12c500..d1ca400` — muharrirda materialni ko'rish/yuklab olish, asl fayl endpoint'i, o'quv dasturini yuklab olish (4 ta commit); serverda `git pull` bilan olinadi.

@@ -54,9 +54,12 @@ va 443-port kerak emas (`ufw allow 80/tcp` yetarli).
 sudo apt update && sudo apt upgrade -y
 sudo timedatectl set-timezone Asia/Tashkent
 
-# 2. Paketlar: nginx, PostgreSQL 16 + pgvector, LibreOffice (grafik interfeyssiz), shriftlar
+# 2. Paketlar: nginx, PostgreSQL 16 + pgvector, LibreOffice, shriftlar
+#    LibreOffice'ning oddiy paketlari --headless rejimda ham ishlaydi. `*-nogui` variantlari
+#    `libreoffice-core` bilan aralashib qolsa (22.04 da shunday bo'ldi), soffice PPTX'ni
+#    ochishda Signal 6 bilan yiqiladi va material `CONVERSION_FAILED` bo'ladi.
 sudo apt install -y git curl nginx postgresql postgresql-16-pgvector \
-    libreoffice-writer-nogui libreoffice-impress-nogui fonts-dejavu fonts-liberation \
+    libreoffice-writer libreoffice-impress fonts-dejavu fonts-liberation \
     certbot
 
 # Node 22 (frontend build uchun)
@@ -85,6 +88,10 @@ CREATE DATABASE texnologiya OWNER texnologiya;
 CREATE EXTENSION IF NOT EXISTS vector;
 SQL
 ```
+
+Avval `*-nogui` o'rnatilgan bo'lsa, ularni bitta tranzaksiyada almashtirish (oxiridagi `-` —
+o'chirish): `sudo apt install -y libreoffice-impress libreoffice-writer libreoffice-draw
+$(dpkg -l | awk '/^ii +libreoffice.*-nogui/{print $2"-"}')`.
 
 Tekshirish: `soffice --version`, `node -v`, `sudo -iu texnologiya uv --version`,
 `psql "postgresql://texnologiya:PAROL@localhost/texnologiya" -c 'select 1'`.
