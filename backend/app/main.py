@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -17,6 +18,8 @@ from app.core.storage import Storage
 from app.gamification.service import sync_badges
 from app.learning.materials import recover_interrupted_conversions
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -33,6 +36,11 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    if settings.is_prod and not settings.cookie_secure:
+        logger.warning(
+            "Prod HTTPS'siz ishlayapti (ALLOW_INSECURE_HTTP): parollar shifrlanmagan holda "
+            "uzatiladi, imkon qadar tez domen va HTTPS'ga o'ting"
+        )
     app = FastAPI(
         title="Texnologiya platformasi API",
         docs_url=None if settings.is_prod else "/api/docs",

@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     refresh_token_days: int = 30
     refresh_reuse_grace_seconds: int = Field(default=30, ge=0)
     cookie_secure: bool = False
+    # Domen va HTTPS hali yo'q bo'lsa, prod'ni oddiy HTTP'da (Secure'siz cookie bilan)
+    # ishga tushirishga ongli ruxsat. Parol va tokenlar shifrlanmagan holda uzatiladi.
+    allow_insecure_http: bool = False
     cors_origins: list[str] = ["http://localhost:5173"]
     media_root: str = "./media"
     media_accel_redirect: bool = False
@@ -80,8 +83,10 @@ class Settings(BaseSettings):
     def _require_prod_secret(self) -> "Settings":
         if self.env == "prod" and self.jwt_secret == DEV_JWT_SECRET:
             raise ValueError("JWT_SECRET must be set in production")
-        if self.env == "prod" and not self.cookie_secure:
-            raise ValueError("COOKIE_SECURE must be true in production")
+        if self.env == "prod" and not self.cookie_secure and not self.allow_insecure_http:
+            raise ValueError(
+                "COOKIE_SECURE must be true in production (or set ALLOW_INSECURE_HTTP=true)"
+            )
         return self
 
 

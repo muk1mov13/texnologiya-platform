@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Prod domensiz, oddiy HTTP'da ishga tushishi mumkin
+
+- `core/config.py`: yangi `ALLOW_INSECURE_HTTP` (standart `false`). `true` bo'lsa prod `COOKIE_SECURE=false` bilan ham yuklanadi — domen va HTTPS hali yo'q, sayt ochiq IP orqali `http://` da ochiladi (Secure cookie HTTP'da saqlanmaydi, login yangilanmay qolardi). `JWT_SECRET` tekshiruvi o'zgarmadi.
+- `main.py`: prod HTTPS'siz ishga tushganda ogohlantirish logi. `.env.example` ga izoh.
+- Tekshiruv: ruff, mypy; `Settings()` bayroq bilan yuklanadi, bayroqsiz xato beradi.
+
 ## 2026-10-17 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `de47bd0..f34d65c` — deploy yo'l xaritasi, `deploy/` fayllari (D1) va fayl nomi tuzatishi (6 ta commit) `origin/main` ga chiqdi; server kodni shu yerdan oladi.
