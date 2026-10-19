@@ -2,10 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { useAiSettings, useAiUsageStats, useReindex, useUpdateAiSettings } from '@/api/adminAi'
 import type { AiSettingsView } from '@/api/types'
 import { Icon } from '@/components/icons/Icon'
 import { Button } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/button-classes'
 import { Checkbox, Field, Input, Select } from '@/components/ui/Field'
 import { FormError } from '@/components/ui/FormError'
 import { ConfirmDialog } from '@/components/ui/Modal'
@@ -13,7 +15,12 @@ import { QueryState } from '@/components/ui/QueryState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { pushToast } from '@/components/ui/toast-store'
 import { formatDate } from '@/lib/format'
-import { aiSettingsSchema, type AiSettingsValues } from './schemas'
+import {
+  aiSettingsSchema,
+  supportSettingsSchema,
+  type AiSettingsValues,
+  type SupportSettingsValues,
+} from './schemas'
 import { PageHeader } from './ui/PageHeader'
 import { Panel } from './ui/Panel'
 import { StatCard } from './ui/StatCard'
@@ -34,6 +41,7 @@ export function AdminAiPage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <SettingsCard />
         <div className="flex flex-col gap-6">
+          <SupportCard />
           <IndexCard />
           <p className="flex gap-3 rounded-2xl bg-slate-100/70 p-4 text-sm text-pretty text-slate-600 ring-1 ring-slate-200/60">
             <Icon name="lock" className="mt-0.5 size-4 shrink-0 text-slate-500" />
@@ -122,6 +130,66 @@ function SettingsForm({ data }: { data: AiSettingsView }) {
         </div>
       </form>
     </div>
+  )
+}
+
+/** Ochiq saytdagi mehmon yordamchisi: yoqish, sayt bo'yicha kunlik limit va bugungi sarf. */
+function SupportCard() {
+  const { t } = useTranslation()
+  const settings = useAiSettings()
+  return (
+    <Panel title={t('adminAi.public')} description={t('adminAi.publicText')}>
+      <QueryState query={settings} loading={<Skeleton className="h-40" />}>
+        {(data) => <SupportForm key={`${data.public_enabled}-${data.public_daily_limit}`} data={data} />}
+      </QueryState>
+    </Panel>
+  )
+}
+
+function SupportForm({ data }: { data: AiSettingsView }) {
+  const { t } = useTranslation()
+  const update = useUpdateAiSettings()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SupportSettingsValues>({
+    resolver: zodResolver(supportSettingsSchema),
+    defaultValues: { public_enabled: data.public_enabled, public_daily_limit: data.public_daily_limit },
+  })
+
+  const onSubmit = handleSubmit((values) =>
+    update.mutate(values, { onSuccess: () => pushToast('success', t('adminAi.saved')) }),
+  )
+
+  return (
+    <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">
+      {update.error && <FormError error={update.error} />}
+      <p className="text-sm text-slate-600 tabular-nums">
+        {t('adminAi.publicUsed', { used: data.public_used_today, limit: data.public_daily_limit })}
+      </p>
+      <Checkbox label={t('adminAi.publicEnabled')} {...register('public_enabled')} />
+      <Field id="ai-public-limit" label={t('adminAi.publicLimit')} error={errors.public_daily_limit?.message}>
+        <div className="w-36">
+          <Input
+            id="ai-public-limit"
+            type="number"
+            min={0}
+            max={5000}
+            {...register('public_daily_limit', { valueAsNumber: true })}
+          />
+        </div>
+      </Field>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="submit" size="sm" loading={update.isPending}>
+          {t('common.save')}
+        </Button>
+        <Link to="/admin/ai/support" className={buttonClasses('ghost', 'sm')}>
+          <Icon name="chat" className="size-4" />
+          {t('adminAi.publicChats')}
+        </Link>
+      </div>
+    </form>
   )
 }
 

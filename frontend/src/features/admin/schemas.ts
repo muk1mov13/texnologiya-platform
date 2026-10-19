@@ -29,3 +29,14 @@ export const aiSettingsSchema = z.object({
 })
 
 export type AiSettingsValues = z.infer<typeof aiSettingsSchema>
+
+export const supportSettingsSchema = z.object({
+  public_enabled: z.boolean(),
+  public_daily_limit: z
+    .number({ error: 'adminAi.publicLimitRange' })
+    .int({ error: 'adminAi.publicLimitRange' })
+    .min(0, { error: 'adminAi.publicLimitRange' })
+    .max(5000, { error: 'adminAi.publicLimitRange' }),
+})
+
+export type SupportSettingsValues = z.infer<typeof supportSettingsSchema>

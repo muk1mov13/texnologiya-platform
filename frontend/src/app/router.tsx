@@ -1,5 +1,6 @@
 import { createBrowserRouter, type RouteObject } from 'react-router'
 import { AdminAiPage } from '@/features/admin/AdminAiPage'
+import { AdminSupportPage } from '@/features/admin/AdminSupportPage'
 import { AdminOverviewPage } from '@/features/admin/AdminOverviewPage'
 import { AdminSubjectsPage } from '@/features/admin/AdminSubjectsPage'
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
@@ -114,6 +115,7 @@ export const routes: RouteObject[] = [
               { path: 'admin/users', element: <AdminUsersPage /> },
               { path: 'admin/subjects', element: <AdminSubjectsPage /> },
               { path: 'admin/ai', element: <AdminAiPage /> },
+              { path: 'admin/ai/support', element: <AdminSupportPage /> },
               { path: 'admin/library', element: <AdminLibraryPage /> },
               { path: 'admin/books', element: <AdminBooksPage /> },
               { path: 'admin/news', element: <AdminNewsPage /> },

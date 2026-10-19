@@ -72,7 +72,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: '/teach/review', label: 'nav.review', icon: 'clipboard' },
       { to: '/teach/stats', label: 'nav.stats', icon: 'chart' },
       { to: '/admin/subjects', label: 'nav.adminSubjects', icon: 'layers' },
-      { to: '/admin/ai', label: 'nav.adminAi', icon: 'sparkles' },
+      { to: '/admin/ai', label: 'nav.adminAi', end: true, icon: 'sparkles' },
     ],
   },
   {
@@ -83,6 +83,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: '/admin/news', label: 'nav.adminNews', icon: 'news' },
       { to: '/admin/faq', label: 'nav.adminFaq', icon: 'help' },
       { to: '/admin/messages', label: 'nav.adminMessages', icon: 'inbox' },
+      { to: '/admin/ai/support', label: 'nav.adminSupport', icon: 'chat' },
       { to: '/admin/site', label: 'nav.adminSite', icon: 'settings' },
     ],
   },

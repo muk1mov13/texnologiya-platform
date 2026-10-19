@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Ochiq AI yordamchi: admin sahifalari
+
+- `AdminAiPage`: «Saytdagi AI yordamchi» paneli — yoqish/o'chirish, sayt bo'yicha kunlik limit (0–5000, `supportSettingsSchema`), bugungi sarf va «Mehmon suhbatlari» havolasi.
+- `/admin/ai/support` (`AdminSupportPage`): suhbatlar ro'yxati (birinchi savol, savollar soni, oxirgi vaqt; sahifalash), qatorni ochganda savol-javoblar va manbalar, suhbatni o'chirish. `ADMIN_NAV` «Sayt» guruhiga band; `/admin/ai` bandi `end` bilan (ichki sahifada ikkalasi faol bo'lmasin). i18n `adminAi.public*`, `adminSupport.*`, `nav.adminSupport` (uz/ru).
+
 ## 2026-10-19 — Ochiq AI yordamchi: saytdagi vidjet
 
 - `features/public/support/`: `SupportWidget` — o'ng pastdagi «AI yordamchi» tugmasi va suhbat oynasi (kompyuterda 380px panel, telefonda to'liq ekran, orqadagi sahifa aylanmaydi, Escape yopadi, fokus tugmaga qaytadi). Bo'sh suhbatda salomlashuv va FAQ'ning dastlabki 3 savoli (FAQ bo'lmasa i18n takliflari), faol talabaga `/app/tutor` havolasi; javobdagi `/contact`, `/register`, `/library` kabi yo'llar ichki havolaga aylanadi, kutubxona manbalari ochiq faylga olib boradi; pastda «AI xato qilishi mumkin, savollar saqlanadi» ogohlantirishi.

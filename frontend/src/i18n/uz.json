@@ -18,6 +18,7 @@
     "language": "Interfeys tili",
     "tutor": "AI repetitor",
     "adminAi": "AI sozlamalari",
+    "adminSupport": "Mehmon suhbatlari",
     "news": "Yangiliklar",
     "library": "Kutubxona",
     "faq": "Savol-javob",
@@ -828,6 +829,13 @@
     "title": "Haftalik AI tahlili ({{from}} – {{to}})"
   },
   "adminAi": {
+    "public": "Saytdagi AI yordamchi",
+    "publicText": "Mehmonlar ochiq sahifalarda platforma va kutubxona haqida so'raydi. Dars materiallari ishlatilmaydi.",
+    "publicEnabled": "Saytda yordamchini ko'rsatish",
+    "publicLimit": "Sayt bo'yicha kunlik limit",
+    "publicLimitRange": "0 dan 5000 gacha butun son kiriting",
+    "publicUsed": "Bugun: {{used}} / {{limit}} javob",
+    "publicChats": "Mehmon suhbatlari",
     "subtitle": "Repetitor, kunlik limit, sarf statistikasi va qidiruv indeksi",
     "chunksLabel": "Indekslangan bo'laklar",
     "staleLabel": "Eskirgan bo'laklar",
@@ -1084,6 +1092,14 @@
     "publishedLabel": "Saytda ko'rsatish",
     "deleteTitle": "Savolni o'chirish",
     "deleteText": "\"{{title}}\" savoli o'chiriladi."
+  },
+  "adminSupport": {
+    "title": "Mehmon suhbatlari",
+    "subtitle": "Saytdagi AI yordamchiga berilgan savollar: tez-tez so'raladiganlarini FAQ'ga qo'shing. 90 kundan keyin o'chiriladi.",
+    "empty": "Hali savollar yo'q",
+    "messages": "{{count}} ta savol",
+    "deleteTitle": "Suhbatni o'chirish",
+    "deleteText": "Ushbu suhbatdagi barcha savol-javoblar o'chiriladi."
   },
   "adminMessages": {
     "filter": "Xabarlar filtri",
