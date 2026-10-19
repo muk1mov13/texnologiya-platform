@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: domensiz nginx konfiguratsiyasi (IP + HTTP)
+
+- `deploy/nginx/ip-http.conf`: 80-port, `default_server` (IP orqali kelgan har qanday so'rov). `edubuxdpi.conf` dagi hamma narsa — SPA, `/assets/` keshi, `/api/` (SSE, 60 MB yuklash), `/protected-media/` (internal), sitemap/robots, CSP — faqat ssl va HSTS'siz. Domen tayyor bo'lgach o'chiriladi (u bilan bir vaqtda yoqilmaydi: `upstream` nomi bir xil).
+
 ## 2026-10-19 — Prod domensiz, oddiy HTTP'da ishga tushishi mumkin
 
 - `core/config.py`: yangi `ALLOW_INSECURE_HTTP` (standart `false`). `true` bo'lsa prod `COOKIE_SECURE=false` bilan ham yuklanadi — domen va HTTPS hali yo'q, sayt ochiq IP orqali `http://` da ochiladi (Secure cookie HTTP'da saqlanmaydi, login yangilanmay qolardi). `JWT_SECRET` tekshiruvi o'zgarmadi.
