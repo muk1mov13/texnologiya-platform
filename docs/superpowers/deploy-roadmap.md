@@ -105,7 +105,10 @@ Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'n
 
 ---
 
-## D5. Smoke test va ekspluatatsiya — ⬜
+## D5. Smoke test va ekspluatatsiya — 🟡 (smoke test ✅ 2026-10-19, zaxira qoldi)
+
+Holat (2026-10-19, `http://172.20.172.121`, ichki tarmoq): ochiq sahifalar, sitemap/robots (IP manzil bilan), xavfsizlik sarlavhalari, admin login + F5, mavzu PDF (protected-media, pdf.js worker), PPTX → PDF, tutor SSE (manbalar bilan), admin AI — hammasi ishladi. PPTX avval `CONVERSION_FAILED` bo'ldi: `*-nogui` LibreOffice paketlari `libreoffice-core` bilan aralashgan, soffice Signal 6 bilan yiqilardi; oddiy `libreoffice-impress`/`-writer` ga almashtirildi (`deploy/README.md` D2). Qolgan: `backup.sh` cron'ga va bir marta tiklab ko'rish; domen + HTTPS bo'lgach smoke testni `https://edubuxdpi.uz` da takrorlash.
+
 
 **Smoke test** (brauzerda, `https://<domen>`): ochiq sahifalar → admin login → mavzu ochish va PDF ko'rish (protected-media) → PPTX yuklash va PDF'ga aylanishi (LibreOffice) → tutor javobi oqim bo'lib kelishi (SSE) → admin AI sahifasida AI yoqilgan → `/sitemap.xml` va `/robots.txt` to'g'ri domen bilan.
 

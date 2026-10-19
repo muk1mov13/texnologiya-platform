@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — D5 smoke test (ichki IP)
+
+- `deploy-roadmap.md`: D5 🟡 — `http://172.20.172.121` da smoke test o'tdi (ochiq sahifalar, login + F5, PDF, PPTX → PDF, tutor SSE, admin AI, sitemap/robots); sinov materiali o'chirildi. Qolgan: zaxira cron'i va tiklab ko'rish, domen bilan takroriy test.
+
 ## 2026-10-19 — Konvertatsiya xatosi logga yoziladi
 
 - `learning/convert.py`: soffice nolmas kod bilan tugasa yoki PDF chiqarmasa, `rc` va stderr oxiri (500 belgi) `logger.warning` bilan yoziladi — sabab `journalctl -u texnologiya-api` da ko'rinadi (D5'da Signal 6 sababini faqat qo'lda ishga tushirib topish mumkin bo'ldi).
