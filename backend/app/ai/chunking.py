@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pymupdf
 
-CHUNK_CHARS = 3200  # ~800 token
-OVERLAP_CHARS = 400  # ~100 token
+CHUNK_CHARS = 1600  # ~400 token
+OVERLAP_CHARS = 200  # ~50 token
 MIN_CHUNK_CHARS = 40
 
 

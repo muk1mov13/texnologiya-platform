@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — AI repetitor: kichikroq parchalar va matnsiz PDF zaxirasi
+
+- `ai/chunking.py`: parcha 3200 → 1600 belgi, ustma-ustlik 400 → 200 — qidiruv aniqroq, kontekstga ma'ruzaning ko'proq joyi sig'adi. Admin → AI → "Qayta indekslash (hammasi)" talab qilinadi.
+- `ai/indexing.py`: material PDF'ida matn juda kam bo'lsa (< 200 belgi: skan/rasm), matn asl DOC/DOCX'dan (`resource_parse.read_lines`) olinadi; o'qilmasa — log va PDF natijasi.
+
 ## 2026-10-19 — Vaqtincha ngrok orqali ko'rsatish
 
 - `frontend/vite.config.ts`: `server` va `preview` ga `allowedHosts` (`.ngrok-free.app`, `.ngrok-free.dev`, `.ngrok.app`) — busiz Vite ngrok so'rovlarini "host is not allowed" bilan rad etardi.

@@ -10,7 +10,7 @@ from typing import Literal
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.chunking import chunk_pages, pdf_pages
+from app.ai.chunking import TextChunk, chunk_pages, pdf_pages
 from app.ai.constants import (
     INDEX_GLOSSARY_JOB,
     INDEX_LIBRARY_JOB,
@@ -24,11 +24,15 @@ from app.ai.vectors import ChunkRow
 from app.assessment.models import Activity, CrosswordWord, QuizQuestion, Task, YesNoItem
 from app.core.jobs import JobContext, JobRunner, job
 from app.learning.models import GlossaryTerm, Material, MaterialStatus, Step, Topic
+from app.learning.resource_parse import read_lines
 from app.library.models import Book, Document
 
 logger = logging.getLogger(__name__)
 
 TASK_TEXT_CHARS = 3200
+# PDF'da bundan kam matn bo'lsa (skan yoki rasm), matn asl DOC/DOCX'dan olinadi.
+MIN_PDF_TEXT_CHARS = 200
+ORIGINAL_TEXT_EXTS = (".doc", ".docx")
 
 
 async def _ready_ai(ctx: JobContext) -> AiServices | None:
@@ -44,6 +48,23 @@ async def _topic_subject(db: AsyncSession, topic_id: int) -> int | None:
     return await db.scalar(select(Topic.subject_id).where(Topic.id == topic_id))
 
 
+async def _original_text_chunks(ctx: JobContext, original_file: str) -> list[TextChunk]:
+    """Matnsiz (skan, rasmli) PDF uchun zaxira: matn asl DOC/DOCX fayldan olinadi.
+    `.doc` uchun LibreOffice kerak; o'girilmasa bo'sh ro'yxat (xato faqat logga)."""
+    if not original_file.lower().endswith(ORIGINAL_TEXT_EXTS):
+        return []
+    try:
+        lines = await read_lines(
+            ctx.storage.path(original_file),
+            soffice=ctx.settings.soffice_path,
+            timeout=ctx.settings.conversion_timeout_seconds,
+        )
+    except Exception:
+        logger.exception("Asl fayl matni o'qilmadi: %s", original_file)
+        return []
+    return chunk_pages(["\n".join(lines)])
+
+
 @job(INDEX_MATERIAL_JOB)
 async def index_material_job(ctx: JobContext, material_id: int) -> None:
     ai = await _ready_ai(ctx)
@@ -52,7 +73,13 @@ async def index_material_job(ctx: JobContext, material_id: int) -> None:
     async with ctx.sessionmaker() as db:
         row = (
             await db.execute(
-                select(Material.pdf_file, Material.status, Topic.id, Topic.subject_id)
+                select(
+                    Material.pdf_file,
+                    Material.original_file,
+                    Material.status,
+                    Topic.id,
+                    Topic.subject_id,
+                )
                 .join(Step, Step.id == Material.step_id)
                 .join(Topic, Topic.id == Step.topic_id)
                 .where(Material.id == material_id)
@@ -62,6 +89,8 @@ async def index_material_job(ctx: JobContext, material_id: int) -> None:
         return
     pages = await asyncio.to_thread(pdf_pages, ctx.storage.path(row.pdf_file))
     chunks = chunk_pages(pages)
+    if sum(len(c.text) for c in chunks) < MIN_PDF_TEXT_CHARS:
+        chunks = await _original_text_chunks(ctx, row.original_file) or chunks
     vectors = await ai.embedder.embed([c.text for c in chunks], "document") if chunks else []
     async with ctx.sessionmaker() as db:
         if await db.get(Material, material_id) is None:  # orada o'chirilgan
