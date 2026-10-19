@@ -70,25 +70,35 @@ async def list_literature(
 
 @router.post("/literature", response_model=LiteratureOut, status_code=201)
 async def add_literature(
-    topic_id: DbIdPath, data: LiteratureIn, user: StaffUser, db: DbSession
+    topic_id: DbIdPath, data: LiteratureIn, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> LiteratureItem:
     await editing.ensure_can_edit_topic(db, user, topic_id)
-    return await topic_items.add_literature(db, topic_id, data)
+    item = await topic_items.add_literature(db, topic_id, data)
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)  # mavzu haqidagi bo'lak
+    return item
 
 
 @router.patch("/literature/{item_id}", response_model=LiteratureOut)
 async def update_literature(
-    topic_id: DbIdPath, item_id: DbIdPath, data: LiteratureUpdate, user: StaffUser, db: DbSession
+    topic_id: DbIdPath,
+    item_id: DbIdPath,
+    data: LiteratureUpdate,
+    user: StaffUser,
+    db: DbSession,
+    jobs: Jobs,
 ) -> LiteratureItem:
     await editing.ensure_can_edit_topic(db, user, topic_id)
     item = await topic_items.get_literature_item(db, topic_id, item_id)
-    return await topic_items.update_literature_item(db, item, data)
+    item = await topic_items.update_literature_item(db, item, data)
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
+    return item
 
 
 @router.delete("/literature/{item_id}", status_code=204)
 async def delete_literature(
-    topic_id: DbIdPath, item_id: DbIdPath, user: StaffUser, db: DbSession
+    topic_id: DbIdPath, item_id: DbIdPath, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> Response:
     await editing.ensure_can_edit_topic(db, user, topic_id)
     await topic_items.delete_item(db, await topic_items.get_literature_item(db, topic_id, item_id))
+    await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
     return Response(status_code=204)

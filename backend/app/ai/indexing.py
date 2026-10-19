@@ -23,7 +23,16 @@ from app.ai.services import AiServices, ai_enabled
 from app.ai.vectors import ChunkRow
 from app.assessment.models import Activity, CrosswordWord, QuizQuestion, Task, YesNoItem
 from app.core.jobs import JobContext, JobRunner, job
-from app.learning.models import GlossaryTerm, Material, MaterialStatus, Step, Topic
+from app.learning.models import (
+    GlossaryTerm,
+    LessonType,
+    LiteratureItem,
+    Material,
+    MaterialStatus,
+    Step,
+    Subject,
+    Topic,
+)
 from app.learning.resource_parse import read_lines
 from app.library.models import Book, Document
 
@@ -33,6 +42,13 @@ TASK_TEXT_CHARS = 3200
 # PDF'da bundan kam matn bo'lsa (skan yoki rasm), matn asl DOC/DOCX'dan olinadi.
 MIN_PDF_TEXT_CHARS = 200
 ORIGINAL_TEXT_EXTS = (".doc", ".docx")
+TOPIC_INFO_CHARS = 1600
+LESSON_TYPE_NAMES = {
+    LessonType.lecture: "ma'ruza",
+    LessonType.practical: "amaliy mashg'ulot",
+    LessonType.seminar: "seminar",
+    LessonType.lab: "laboratoriya ishi",
+}
 
 
 async def _ready_ai(ctx: JobContext) -> AiServices | None:
@@ -109,14 +125,38 @@ async def index_material_job(ctx: JobContext, material_id: int) -> None:
         await db.commit()
 
 
+def _topic_info_text(
+    subject: str, topic: Topic, terms: list[GlossaryTerm], literature: list[LiteratureItem]
+) -> str:
+    """Mavzu haqida umumiy bo'lak: savol mavzu nomiga yoki atamaga ishora qilsa topiladi."""
+    parts = [f"Fan: {subject}. Mavzu: {topic.title} ({LESSON_TYPE_NAMES[topic.lesson_type]})."]
+    if terms:
+        parts.append("Asosiy atamalar: " + ", ".join(t.term for t in terms) + ".")
+    if literature:
+        books = [f"{i.author}. {i.title}".strip(". ") for i in literature]
+        parts.append("Adabiyotlar: " + "; ".join(books) + ".")
+    return " ".join(parts)[:TOPIC_INFO_CHARS]
+
+
 @job(INDEX_GLOSSARY_JOB)
 async def index_topic_glossary_job(ctx: JobContext, topic_id: int) -> None:
-    """Mavzu glossariysi bitta manba (`source_id = topic_id`), har atama — alohida bo'lak."""
+    """Mavzu glossariysi bitta manba (`source_id = topic_id`), har atama — alohida bo'lak.
+    Shu job mavzu haqidagi umumiy bo'lakni (`topic_info`) ham yangilaydi."""
     ai = await _ready_ai(ctx)
     if ai is None:
         return
     async with ctx.sessionmaker() as db:
-        subject_id = await _topic_subject(db, topic_id)
+        row = (
+            await db.execute(
+                select(Topic, Subject.title)
+                .join(Subject, Subject.id == Topic.subject_id)
+                .where(Topic.id == topic_id)
+            )
+        ).first()
+        if row is None:
+            return
+        topic, subject_title = row
+        subject_id = topic.subject_id
         terms = list(
             await db.scalars(
                 select(GlossaryTerm)
@@ -124,17 +164,37 @@ async def index_topic_glossary_job(ctx: JobContext, topic_id: int) -> None:
                 .order_by(GlossaryTerm.order, GlossaryTerm.id)
             )
         )
+        literature = list(
+            await db.scalars(
+                select(LiteratureItem)
+                .where(LiteratureItem.topic_id == topic_id)
+                .order_by(LiteratureItem.order, LiteratureItem.id)
+            )
+        )
         texts = [f"{t.term} — {t.definition}" for t in terms]
-    if subject_id is None:
-        return
-    vectors = await ai.embedder.embed(texts, "document") if texts else []
+        info = _topic_info_text(subject_title, topic, terms, literature)
+    vectors = await ai.embedder.embed([*texts, info], "document")
     async with ctx.sessionmaker() as db:
-        await ai.vectors.delete(db, source_types=[ChunkSource.glossary], source_id=topic_id)
+        await ai.vectors.delete(
+            db, source_types=[ChunkSource.glossary, ChunkSource.topic_info], source_id=topic_id
+        )
         await ai.vectors.add(
             db,
             [
                 ChunkRow(ChunkSource.glossary, topic_id, subject_id, topic_id, None, i, text, v)
-                for i, (text, v) in enumerate(zip(texts, vectors, strict=True))
+                for i, (text, v) in enumerate(zip(texts, vectors, strict=False))
+            ]
+            + [
+                ChunkRow(
+                    ChunkSource.topic_info,
+                    topic_id,
+                    subject_id,
+                    topic_id,
+                    None,
+                    0,
+                    info,
+                    vectors[-1],
+                )
             ],
             ai.embedder.model_name,
         )

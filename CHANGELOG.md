@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — AI repetitor: mavzu haqidagi umumiy bo'lak (`topic_info`)
+
+- `ai/models.py`: yangi manba `ChunkSource.topic_info` (repetitor kontekstiga kiradi; VARCHAR, migratsiyasiz).
+- `ai/indexing.py`: `index_topic_glossary_job` glossariy bilan birga mavzuning umumiy bo'lagini yozadi: fan, mavzu nomi, mashg'ulot turi, atamalar ro'yxati, adabiyotlar. Test javoblari va topshiriq matni kirmaydi.
+- Adabiyot qo'shish/tahrirlash/o'chirish va mavzu nomi yoki turi o'zgarganda shu job qayta navbatga qo'yiladi (`teach_items_router.py`, `teach_router.py`).
+- `ai/tutor.py`: bu manba iqtibosda "Mavzu haqida" deb ko'rsatiladi.
+
 ## 2026-10-19 — AI repetitor: kichikroq parchalar va matnsiz PDF zaxirasi
 
 - `ai/chunking.py`: parcha 3200 → 1600 belgi, ustma-ustlik 400 → 200 — qidiruv aniqroq, kontekstga ma'ruzaning ko'proq joyi sig'adi. Admin → AI → "Qayta indekslash (hammasi)" talab qilinadi.

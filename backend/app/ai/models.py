@@ -32,10 +32,11 @@ class ChunkSource(StrEnum):
     task = "task"
     document = "document"  # 4-bosqich
     book = "book"  # 4-bosqich
+    topic_info = "topic_info"  # mavzu nomi, atamalar, adabiyotlar (`source_id = topic_id`)
 
 
 # Repetitor kontekstiga kiradigan manbalar. `activity`/`task` — faqat maslahat rejimi uchun.
-CONTEXT_SOURCES = (ChunkSource.material, ChunkSource.glossary)
+CONTEXT_SOURCES = (ChunkSource.material, ChunkSource.glossary, ChunkSource.topic_info)
 QUESTION_SOURCES = (ChunkSource.activity, ChunkSource.task)
 # Kutubxona bo'laklari hech qaysi fan/mavzuga bog'lanmagan (`subject_id`, `topic_id` NULL):
 # repetitor ularni faqat oxirgi (butun platforma) darajada qidiradi.

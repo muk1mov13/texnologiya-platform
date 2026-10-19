@@ -152,6 +152,7 @@ _TITLE_MODELS: dict[ChunkSource, type[Material] | type[Document] | type[Book]] =
     ChunkSource.document: Document,
     ChunkSource.book: Book,
 }
+_FIXED_TITLES = {ChunkSource.glossary: "Glossariy", ChunkSource.topic_info: "Mavzu haqida"}
 
 
 async def citations_for(db: AsyncSession, hits: list[Hit]) -> list[Citation]:
@@ -167,9 +168,7 @@ async def citations_for(db: AsyncSession, hits: list[Hit]) -> list[Citation]:
             source_type=h.source_type.value,
             source_id=h.source_id,
             page=h.page,
-            title="Glossariy"
-            if h.source_type == ChunkSource.glossary
-            else titles.get((h.source_type, h.source_id), ""),
+            title=_FIXED_TITLES.get(h.source_type) or titles.get((h.source_type, h.source_id), ""),
         )
         for i, h in enumerate(hits, start=1)
     ]

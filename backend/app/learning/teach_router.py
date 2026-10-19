@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Response
 
+from app.ai.constants import INDEX_GLOSSARY_JOB
 from app.auth.deps import StaffUser
-from app.core.deps import AppStorage, DbSession
+from app.core.deps import AppStorage, DbSession, Jobs
 from app.core.types import DbIdPath
 from app.learning import editing
 from app.learning.schemas import (
@@ -47,10 +48,13 @@ async def get_topic(topic_id: DbIdPath, user: StaffUser, db: DbSession) -> Topic
 
 @router.patch("/topics/{topic_id}", response_model=TopicEditorOut)
 async def update_topic(
-    topic_id: DbIdPath, data: TopicUpdate, user: StaffUser, db: DbSession
+    topic_id: DbIdPath, data: TopicUpdate, user: StaffUser, db: DbSession, jobs: Jobs
 ) -> TopicEditorOut:
     topic = await editing.ensure_can_edit_topic(db, user, topic_id)
+    old = (topic.title, topic.lesson_type)
     topic = await editing.update_topic(db, topic, data)
+    if (topic.title, topic.lesson_type) != old:  # AI: mavzu haqidagi bo'lak yangilanadi
+        await jobs.enqueue(INDEX_GLOSSARY_JOB, topic_id=topic_id)
     return await editing.topic_editor_view(db, topic)
 
 
