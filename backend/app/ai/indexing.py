@@ -130,6 +130,8 @@ def _topic_info_text(
 ) -> str:
     """Mavzu haqida umumiy bo'lak: savol mavzu nomiga yoki atamaga ishora qilsa topiladi."""
     parts = [f"Fan: {subject}. Mavzu: {topic.title} ({LESSON_TYPE_NAMES[topic.lesson_type]})."]
+    if topic.summary.strip():
+        parts.append(topic.summary.strip())
     if terms:
         parts.append("Asosiy atamalar: " + ", ".join(t.term for t in terms) + ".")
     if literature:

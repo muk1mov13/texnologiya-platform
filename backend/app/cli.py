@@ -128,6 +128,26 @@ def _ai_check(args: argparse.Namespace) -> int:
     return 0 if all(r.ok for r in results) and settings.ai_configured else 1
 
 
+def _ai_coverage(args: argparse.Namespace) -> int:
+    from app.ai.coverage import run_coverage
+
+    topics = asyncio.run(run_coverage(get_settings(), args.subject))
+    problems = 0
+    for topic in topics:
+        ready = sum(1 for m in topic.materials if m.chunks)
+        draft = "" if topic.published else " [qoralama]"
+        print(
+            f"{topic.subject} / {topic.title}{draft}: materiallar {ready}/{len(topic.materials)}, "
+            f"bo'laklar {sum(m.chunks for m in topic.materials)}, "
+            f"atamalar {topic.glossary_chunks}/{topic.glossary_terms}"
+        )
+        for problem in topic.problems:
+            problems += 1
+            print(f"  ! {problem}")
+    print(f"Mavzular: {len(topics)}, muammolar: {problems}")
+    return 0 if problems == 0 else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -161,6 +181,10 @@ def main(argv: list[str] | None = None) -> int:
         "--dry-run", action="store_true", help="Bazaga yozmasdan faqat o'qish hisobotini ko'rsatish"
     )
     commands.add_parser("ai-check", help="AI provayderlari va embedding ishlashini tekshirish")
+    coverage = commands.add_parser(
+        "ai-coverage", help="Mavzu fayllari AI repetitor indeksiga tushganini tekshirish"
+    )
+    coverage.add_argument("--subject", type=int, default=None)
     args = parser.parse_args(argv)
 
     if args.command == "weekly-report":
@@ -171,6 +195,8 @@ def main(argv: list[str] | None = None) -> int:
         return _import_resources(args)
     if args.command == "ai-check":
         return _ai_check(args)
+    if args.command == "ai-coverage":
+        return _ai_coverage(args)
 
     try:
         email = _resolve_email(args)

@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `ai-coverage` CLI: mavzu fayllari indeksini tekshirish
+
+- `ai/coverage.py` + `cli.py`: `uv run python -m app.cli ai-coverage [--subject ID]` — har mavzu uchun materiallar (holati, bo'laklar soni), glossariy va `topic_info` bo'laklari; muammolar: o'girilmagan yoki indeksga tushmagan materiallar, indekslanmagan glossariy, mavzu bo'lagi yo'qligi, eski embedding modeli. Muammo bo'lsa chiqish kodi 1.
+- `ai/indexing.py`: mavzu qisqacha tavsifi (`Topic.summary`) ham `topic_info` bo'lagiga qo'shiladi.
+
 ## 2026-10-19 — AI repetitor: mavzu haqidagi umumiy bo'lak (`topic_info`)
 
 - `ai/models.py`: yangi manba `ChunkSource.topic_info` (repetitor kontekstiga kiradi; VARCHAR, migratsiyasiz).
