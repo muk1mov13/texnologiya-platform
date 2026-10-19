@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — `main` GitHub'ga push qilindi
+
+- `git push origin main`: `943bebb..ea1c35c` — nginx `.mjs` MIME tuzatishi; serverda `git pull` bilan olinadi.
+
 ## 2026-10-19 — Deploy: pdf.js worker (.mjs) to'g'ri MIME bilan
 
 - `deploy/nginx/ip-http.conf`, `edubuxdpi.conf`: `/assets/` ichida `.mjs` uchun `text/javascript`. Ubuntu 22.04 dagi nginx 1.18 `.mjs` ni `application/octet-stream` deb berardi, brauzer modul worker'ni rad etib, talabaga "PDF faylni ochib bo'lmadi" chiqardi (serverda aniqlandi).
