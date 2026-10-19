@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-19 — Deploy: `.env` namunasida domensiz variant
+
+- `deploy/env.prod.example`: ochiq IP + HTTP uchun izohlangan qatorlar — `COOKIE_SECURE=false`, `ALLOW_INSECURE_HTTP=true`, `CORS_ORIGINS`/`PUBLIC_BASE_URL` = `http://<OCHIQ_IP>`.
+
 ## 2026-10-19 — Deploy: domensiz nginx konfiguratsiyasi (IP + HTTP)
 
 - `deploy/nginx/ip-http.conf`: 80-port, `default_server` (IP orqali kelgan har qanday so'rov). `edubuxdpi.conf` dagi hamma narsa — SPA, `/assets/` keshi, `/api/` (SSE, 60 MB yuklash), `/protected-media/` (internal), sitemap/robots, CSP — faqat ssl va HSTS'siz. Domen tayyor bo'lgach o'chiriladi (u bilan bir vaqtda yoqilmaydi: `upstream` nomi bir xil).
