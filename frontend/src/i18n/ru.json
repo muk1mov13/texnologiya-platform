@@ -1,5 +1,5 @@
 {
-  "app": { "name": "EDU" },
+  "app": { "name": "BioAkademiya" },
   "nav": {
     "main": "Главное меню",
     "subjects": "Предметы",
@@ -869,7 +869,7 @@
   "socials": { "telegram": "Telegram", "instagram": "Instagram", "facebook": "Facebook", "youtube": "YouTube" },
   "pagination": { "label": "Страницы", "prev": "Назад", "next": "Вперёд", "status": "{{page}} / {{pages}}" },
   "meta": {
-    "siteTitle": "EDU — методическая платформа биологического образования",
+    "siteTitle": "BioAkademiya — методическая платформа биологического образования",
     "description": "Методическая платформа направления биологического образования Бухарского государственного педагогического института: уроки, библиотека, новости."
   },
   "library": {

@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-20 — Logo: "BIO 🔬 AKADEMIYA"
+
+- `BrandLogo` (ochiq sayt, footer, talaba paneli) va `AdminShell` sidebar: "EDU [mikroskop]" o'rniga "BIO [mikroskop] AKADEMIYA"; matn va belgi kichraytirildi (telefonda yanada kichik). Yig'ilgan admin menyusida avvalgidek faqat mikroskop.
+- `app.name` → "BioAkademiya", `siteTitle` va `index.html` sarlavhasi shunga mos (uz/ru). `favicon.svg` o'zgarmadi.
+
 ## 2026-10-20 — `main` GitHub'ga push qilindi
 
 - `git push origin main`: `040d8ff..447e276` — AI repetitor o'zgarishlari va `edu-metod.uz` deploy fayllari. Serverda `git pull`, so'ng `deploy/README.md` "D4. nginx va HTTPS".

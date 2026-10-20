@@ -226,7 +226,7 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
       />
 
       <div className={cx('flex h-14 shrink-0 items-center gap-3', collapsed ? 'justify-center px-3' : 'px-5')}>
-        {/* Logo "EDU [mikroskop]"; yig'ilgan menyuda faqat mikroskop belgisi. */}
+        {/* Logo "BIO [mikroskop] AKADEMIYA"; yig'ilgan menyuda faqat mikroskop belgisi. */}
         <Link to="/admin" className={cx('group flex min-w-0 items-center gap-3 rounded-xl', DARK_FOCUS)}>
           {collapsed && (
             <span
@@ -237,11 +237,15 @@ function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
             </span>
           )}
           <span className={cx('min-w-0 leading-tight', collapsed && 'sr-only')}>
-            <span className="flex items-center gap-0.5">
-              <span className="text-[1.3rem] leading-none font-bold tracking-[0.06em] text-brand-300">
-                {t('app.name')}
+            <span className="sr-only">{t('app.name')}</span>
+            <span aria-hidden="true" className="flex items-center gap-0.5">
+              <span className="text-[1.05rem] leading-none font-bold tracking-[0.06em] text-brand-300">
+                BIO
               </span>
-              <MicroscopeMark className="h-7 w-auto shrink-0 origin-bottom text-brand-100 transition-transform duration-300 group-hover:-rotate-6 motion-reduce:transition-none" />
+              <MicroscopeMark className="h-6 w-auto shrink-0 origin-bottom text-brand-100 transition-transform duration-300 group-hover:-rotate-6 motion-reduce:transition-none" />
+              <span className="text-[1.05rem] leading-none font-bold tracking-[0.06em] text-brand-300">
+                AKADEMIYA
+              </span>
             </span>
             <span className="block text-[0.65rem] font-semibold tracking-[0.14em] text-brand-300/80 uppercase">
               {t('adminShell.root')}

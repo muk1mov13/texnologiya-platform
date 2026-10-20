@@ -1,4 +1,4 @@
-/** "EDU 🔬" logotipidagi mikroskop belgisi (chiziqli, `currentColor`). */
+/** "BIO 🔬 AKADEMIYA" logotipidagi mikroskop belgisi (chiziqli, `currentColor`). */
 export function MicroscopeMark({ className }: { className?: string }) {
   return (
     <svg
