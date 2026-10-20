@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-20 — Deploy hujjatlari: `edu-metod.uz` va Let's Encrypt
+
+- `deploy/env.prod.example`: `CORS_ORIGINS=["https://edu-metod.uz"]`, `PUBLIC_BASE_URL=https://edu-metod.uz`, tunnel izohi olib tashlandi.
+- `deploy/README.md`: shartlar (A-yozuv `edu-metod.uz` → 87.192.233.178, 80/443 VM'ga, `www` yo'q); "D4. nginx va HTTPS" qayta yozildi — DNS/port tekshiruvi, `certbot` o'rnatish, `ip-http.conf` ni o'chirib `edu-metod-http.conf` → sertifikat → `edu-metod.conf`, `.env` HTTPS qiymatlari, `curl` tekshiruvlari, universitet ichidan ochilmasa (NAT hairpin) ichki DNS yozuvi. Cloudflare Tunnel va self-signed bo'limlari olib tashlandi.
+
 ## 2026-10-20 — Deploy: yangi domen `edu-metod.uz` uchun nginx
 
 - `deploy/nginx/edubuxdpi-http.conf` → `edu-metod-http.conf`: 80-port, `default_server` (ochiq IP 87.192.233.178 orqali kelgan so'rov ham), Let's Encrypt webroot, qolgani `https://edu-metod.uz` ga. `www` yo'q.
