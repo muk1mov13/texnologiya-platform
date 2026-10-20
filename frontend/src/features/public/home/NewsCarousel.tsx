@@ -15,14 +15,19 @@ import { useCarousel } from './useCarousel'
 const SWIPE_OFFSET = 80
 const SWIPE_VELOCITY = 500
 
+/**
+ * Yangi muqova eskisining ustida paydo bo'ladi; eskisi esa to'liq ko'rinib turib, yangisi
+ * opak bo'lgach olinadi — ikkalasi yarim shaffof bo'lib, orqadagi to'q fon ko'rinib qolmasin.
+ */
 const coverVariants: Variants = {
-  enter: { opacity: 0, scale: 1.08 },
+  enter: { opacity: 0, scale: 1.08, zIndex: 1 },
   center: {
     opacity: 1,
     scale: 1,
+    zIndex: 1,
     transition: { opacity: { duration: 0.7, ease: EASE_OUT }, scale: { duration: 1.6, ease: EASE_OUT } },
   },
-  exit: { opacity: 0, transition: { duration: 0.7, ease: EASE_OUT } },
+  exit: { opacity: 0, zIndex: 0, transition: { opacity: { delay: 0.7, duration: 0 } } },
 }
 
 /** Matn yo'nalish bo'yicha kiradi; blur ikki holatning ustma-ust ko'rinishini yashiradi. */
@@ -94,7 +99,8 @@ export function NewsCarousel({ items }: { items: NewsCard[] }) {
         <Link
           to={`/news/${item.slug}`}
           draggable={false}
-          className="group absolute inset-0 block rounded-3xl focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-white/80"
+          // clip-path animatsiyadagi (transform) muqovani ham burchakda aniq kesadi.
+          className="group absolute inset-0 block rounded-3xl [clip-path:inset(0_round_1.5rem)] focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-white/80"
         >
           <AnimatePresence initial={false}>
             <m.div
