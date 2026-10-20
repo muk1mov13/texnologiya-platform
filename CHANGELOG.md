@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-20 — `main` GitHub'ga push qilindi (logo)
+
+- `git push origin main`: `447e276..38d7c67` — "BIO 🔬 AKADEMIYA" logosi va changelog yozuvlari. Serverda `git pull` va frontend qayta build qilinishi kerak.
+
 ## 2026-10-20 — Logo: "BIO 🔬 AKADEMIYA"
 
 - `BrandLogo` (ochiq sayt, footer, talaba paneli) va `AdminShell` sidebar: "EDU [mikroskop]" o'rniga "BIO [mikroskop] AKADEMIYA"; matn va belgi kichraytirildi (telefonda yanada kichik). Yig'ilgan admin menyusida avvalgidek faqat mikroskop.
