@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-20 — Deploy: yangi domen `edu-metod.uz` uchun nginx
+
+- `deploy/nginx/edubuxdpi-http.conf` → `edu-metod-http.conf`: 80-port, `default_server` (ochiq IP 87.192.233.178 orqali kelgan so'rov ham), Let's Encrypt webroot, qolgani `https://edu-metod.uz` ga. `www` yo'q.
+- `deploy/nginx/edubuxdpi.conf` → `edu-metod.conf`: `www` bloki olib tashlandi, sertifikat `/etc/letsencrypt/live/edu-metod.uz/`; nginx 1.18 (Ubuntu 22.04) uchun `listen 443 ssl http2` (`http2 on;` o'rniga).
+- `deploy/nginx/edubuxdpi-tunnel.conf` o'chirildi: ochiq IP va 80/443 yo'naltirish bor, Cloudflare Tunnel kerak emas. `ip-http.conf` izohidagi fayl nomlari yangilandi.
+
 ## 2026-10-19 — Hujjatlar: AI repetitor qidiruvi
 
 - `CLAUDE.md`: `ai-coverage` buyrug'i, ~1600 belgilik bo'laklar va matnsiz PDF zaxirasi, `topic_info` bo'lagi, repetitorning yangi qidiruvi (mavzu ichida chegarasiz, `CONTEXT_CHARS` byudjeti), umumiy bilim va ergashuvchi savollar qoidasi.
