@@ -18,6 +18,8 @@ Holat belgilari: ⬜ boshlanmagan, 🟡 jarayonda, ✅ bajarildi.
 
 Holat (2026-10-17): SSH kirish bor; VM 2 vCPU, 4 GB RAM, 40 GB disk; domen `edubuxdpi.uz` Arsenal-D'da olindi va faollashtirilmoqda. Qolgan: universitetning ochiq IP'si, 80/443 port yo'naltirish, DNS A-yozuvlari (`@`, `www`).
 
+Holat (2026-10-20): domen `edu-metod.uz` ga almashtirildi (`www` ishlatilmaydi); IT ochiq IP `87.192.233.178` ning 80/443 portlarini VM'ga yo'naltirdi; DNS — registrator panelida A-yozuv shu IP'ga.
+
 **Serverni tekshirish.**
 
 - Proxmox panel: brauzerda `https://<proxmox-IP>:8006` → chapda node → sizning mashina → **Summary** (CPU, RAM, disk) va **Hardware** (VM) yoki **Resources** (LXC). Ikonka monitor bo'lsa — VM, kub bo'lsa — LXC konteyner.
@@ -92,13 +94,13 @@ Holat (2026-10-17): SSH kirish bor; VM 2 vCPU, 4 GB RAM, 40 GB disk; domen `edub
 
 ---
 
-## D4. Domen va HTTPS — 🟡 (Cloudflare Tunnel tanlandi)
+## D4. Domen va HTTPS — 🟡 (Let's Encrypt, `edu-metod.uz`)
 
-**2026-10-19, asosiy yo'l — Cloudflare Tunnel.** Taqdimot uchun sayt istalgan joydan ochilishi kerak, IT esa ochiq IP va port yo'naltirishni hali bermagan; domen faol. Serverdagi `cloudflared` Cloudflare'ga o'zi ulanadi, HTTPS sertifikatini Cloudflare beradi — ochiq IP, port va certbot kerak emas, VM IP'si o'zgarsa ham ishlaydi. nginx: `deploy/nginx/edubuxdpi-tunnel.conf` (`127.0.0.1:80`, haqiqiy IP `CF-Connecting-IP` dan); `.env` — asosiy HTTPS qiymatlari. Buyruqlar: `deploy/README.md`, "D4 (Cloudflare Tunnel)". IT keyin ochiq IP bersa ham tunnelda qolish mumkin; quyidagi Let's Encrypt varianti zaxira.
+**2026-10-20, asosiy yo'l — ochiq IP + Let's Encrypt.** Domen `edu-metod.uz` A-yozuv bilan `87.192.233.178` ga, 80/443 VM'ga yo'naltirilgan. nginx: `deploy/nginx/edu-metod-http.conf` (80: certbot webroot, qolgani — IP orqali ham — `https://edu-metod.uz` ga) va `edu-metod.conf` (443). `.env` — asosiy HTTPS qiymatlari. Buyruqlar: `deploy/README.md`, "D4. nginx va HTTPS". Cloudflare Tunnel rejasi (2026-10-19) bekor qilindi, konfiguratsiyasi o'chirildi.
 
 Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'ni oddiy `http://` da saqlamaydi (login yangilanmaydi). Shuning uchun HTTPS har ikki variantda ham shart.
 
-- **Asosiy (domen + ochiq IP):** `sudo apt install certbot python3-certbot-nginx` → `sudo certbot --nginx -d <domen>`. Yangilanish certbot timer'i bilan avtomatik.
+- **Asosiy (domen + ochiq IP):** `certbot certonly --webroot -d edu-metod.uz`, yangilanish certbot timer'i bilan avtomatik (deploy hook nginx'ni qayta yuklaydi).
 - **Zaxira (faqat ichki tarmoq):** self-signed sertifikat (`openssl req -x509 ... -addext "subjectAltName=IP:<IP>"`) yoki IT'ning ichki sertifikati. Har qurilmada brauzer bir marta ogohlantiradi; sayt faqat universitet tarmog'ida ochiladi. Domen tayyor bo'lgach asosiy variantga o'tiladi (nginx'da 2 qator va `.env` dagi `CORS_ORIGINS`/`PUBLIC_BASE_URL`).
 
 - **Vaqtincha (domensiz, ochiq IP + HTTP)** — 2026-10-19 tanlandi, domen tayyor bo'lguncha: `deploy/nginx/ip-http.conf` (80-port, ssl/HSTS'siz) va `.env` da `COOKIE_SECURE=false` + `ALLOW_INSECURE_HTTP=true` (backend bu bayroqsiz prod'da Secure'siz cookie'ni rad etadi), `CORS_ORIGINS`/`PUBLIC_BASE_URL` = `http://<OCHIQ_IP>`. Parollar shifrlanmagan holda uzatiladi. Buyruqlar va domenga o'tish: `deploy/README.md`, "D4 (vaqtincha)".
@@ -109,7 +111,7 @@ Prod sozlamasi `COOKIE_SECURE=true` ni talab qiladi, brauzer esa Secure cookie'n
 
 ## D5. Smoke test va ekspluatatsiya — 🟡 (smoke test ✅ 2026-10-19, zaxira qoldi)
 
-Holat (2026-10-19, `http://172.20.172.121`, ichki tarmoq): ochiq sahifalar, sitemap/robots (IP manzil bilan), xavfsizlik sarlavhalari, admin login + F5, mavzu PDF (protected-media, pdf.js worker), PPTX → PDF, tutor SSE (manbalar bilan), admin AI — hammasi ishladi. PPTX avval `CONVERSION_FAILED` bo'ldi: `*-nogui` LibreOffice paketlari `libreoffice-core` bilan aralashgan, soffice Signal 6 bilan yiqilardi; oddiy `libreoffice-impress`/`-writer` ga almashtirildi (`deploy/README.md` D2). Qolgan: `backup.sh` cron'ga va bir marta tiklab ko'rish; domen + HTTPS bo'lgach smoke testni `https://edubuxdpi.uz` da takrorlash.
+Holat (2026-10-19, `http://172.20.172.121`, ichki tarmoq): ochiq sahifalar, sitemap/robots (IP manzil bilan), xavfsizlik sarlavhalari, admin login + F5, mavzu PDF (protected-media, pdf.js worker), PPTX → PDF, tutor SSE (manbalar bilan), admin AI — hammasi ishladi. PPTX avval `CONVERSION_FAILED` bo'ldi: `*-nogui` LibreOffice paketlari `libreoffice-core` bilan aralashgan, soffice Signal 6 bilan yiqilardi; oddiy `libreoffice-impress`/`-writer` ga almashtirildi (`deploy/README.md` D2). Qolgan: `backup.sh` cron'ga va bir marta tiklab ko'rish; domen + HTTPS bo'lgach smoke testni `https://edu-metod.uz` da takrorlash.
 
 
 **Smoke test** (brauzerda, `https://<domen>`): ochiq sahifalar → admin login → mavzu ochish va PDF ko'rish (protected-media) → PPTX yuklash va PDF'ga aylanishi (LibreOffice) → tutor javobi oqim bo'lib kelishi (SSE) → admin AI sahifasida AI yoqilgan → `/sitemap.xml` va `/robots.txt` to'g'ri domen bilan.
@@ -131,6 +133,6 @@ Holat (2026-10-19, `http://172.20.172.121`, ichki tarmoq): ochiq sahifalar, site
 
 ## Keyingi aniq qadam
 
-1. D4 (Cloudflare Tunnel): 7844-portga chiqishni tekshirish → domen NS'ini Arsenal-D'da Cloudflare'ga o'zgartirish (faollashish 24–48 soatgacha, taqdimotdan oldin) → tunnel va Public hostnames → `edubuxdpi-tunnel.conf` → `.env` HTTPS qiymatlari → `ufw` da 80/443 yopish.
-2. D5: smoke testni `https://edubuxdpi.uz` da universitet tarmog'idan tashqarida takrorlash; `backup.sh` cron'i va bir marta tiklab ko'rish.
+1. D4: `nslookup edu-metod.uz` → 87.192.233.178 → serverda `git pull` → `certbot` o'rnatish, `ufw allow 80,443/tcp` → `ip-http.conf` o'rniga `edu-metod-http.conf` → sertifikat → `edu-metod.conf` → `.env` HTTPS qiymatlari → API qayta ishga tushirish.
+2. D5: smoke testni `https://edu-metod.uz` da universitet tarmog'idan tashqarida takrorlash; `backup.sh` cron'i va bir marta tiklab ko'rish.
 3. Taqdimotga: Proxmox'da VM "Start at boot", UptimeRobot (`/api/health`), demo akkauntlar (admin + talaba), `ai-check`.

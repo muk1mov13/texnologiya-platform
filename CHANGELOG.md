@@ -4,6 +4,10 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-20 — Deploy yo'l xaritasi: `edu-metod.uz`
+
+- `deploy-roadmap.md`: D0 holati (yangi domen `edu-metod.uz`, ochiq IP 87.192.233.178, 80/443 yo'naltirilgan); D4 asosiy yo'li — Let's Encrypt (`edu-metod-http.conf` + `edu-metod.conf`), Cloudflare Tunnel bekor qilindi; D5 va "Keyingi aniq qadam" yangi domen bilan.
+
 ## 2026-10-20 — Deploy hujjatlari: `edu-metod.uz` va Let's Encrypt
 
 - `deploy/env.prod.example`: `CORS_ORIGINS=["https://edu-metod.uz"]`, `PUBLIC_BASE_URL=https://edu-metod.uz`, tunnel izohi olib tashlandi.
