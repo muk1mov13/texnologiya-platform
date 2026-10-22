@@ -4,6 +4,12 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-22 — Server: `https://edu-metod.uz` yoqildi
+
+- Proxmox'dagi tashqi nginx proksisida 443 va sertifikat yoqildi (sherik tomonidan); `http://` → 301 `https://`, sertifikat tasdiqlanadi.
+- `.env` HTTPS qiymatlariga qaytarildi: `COOKIE_SECURE=true`, `ALLOW_INSECURE_HTTP` olib tashlandi, `CORS_ORIGINS=["https://edu-metod.uz"]`, `PUBLIC_BASE_URL=https://edu-metod.uz`; API qayta ishga tushirildi.
+- Tekshirildi: `/api/health` ok, `robots.txt` da `https://edu-metod.uz/sitemap.xml`, login endpoint javob beradi, nginx logida mijozning haqiqiy IP'si.
+
 ## 2026-10-22 — Server: `edu-metod.uz` 80-portda ishga tushirildi
 
 - VM (`172.20.172.38`, eski `.121` ham shu interfeysda): `git pull` (`8ada34f`), `uv sync --frozen`, `alembic upgrade head`, `npm ci && npm run build`.
