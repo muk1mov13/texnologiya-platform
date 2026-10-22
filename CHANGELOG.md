@@ -4,6 +4,11 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-22 — Deploy: Proxmox proksisi orqasida `edu-metod.uz`
+
+- `deploy/nginx/edu-metod-proxy.conf`: domen va HTTPS Proxmox'dagi tashqi nginx (`172.20.172.5`) da, VM'dagi nginx saytni 80-portda oddiy HTTP bilan beradi (`default_server`). Haqiqiy IP `X-Forwarded-For` dan (`set_real_ip_from 172.20.172.5`), API'ga faqat shu IP va `X-Forwarded-Proto https`. Qolgani `edu-metod.conf` bilan bir xil.
+- `deploy/README.md`: fayllar jadvali va D4 boshida "Hozirgi holat" — proksi konfiguratsiyasini yoqish.
+
 ## 2026-10-20 — Yangiliklar slayderi: almashganda qoramtir fon chiqmaydi
 
 - `NewsCarousel`: muqovalar cross-fade'da ikkalasi ham yarim shaffof bo'lib, konteynerning `bg-slate-900` foni (ayniqsa yumaloq burchaklarda) lip etib ko'rinardi. Endi yangi muqova eskisining ustida paydo bo'ladi, eskisi to'liq ko'rinib turib, yangisi opak bo'lgach olinadi; muqovalar qatlamiga `clip-path` bilan aniq yumaloq kesish qo'shildi (soya kesilmaydi).

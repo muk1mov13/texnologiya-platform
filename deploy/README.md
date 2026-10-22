@@ -9,6 +9,7 @@ foydalanuvchi nomidan bajariladi.
 | `env.prod.example` | `backend/.env` namunasi |
 | `nginx/edu-metod-http.conf` | 80-port: sertifikat tekshiruvi, qolgani (IP orqali ham) HTTPS'ga yo'naltirish |
 | `nginx/edu-metod.conf` | 443-port: sayt, `/api`, himoyalangan fayllar |
+| `nginx/edu-metod-proxy.conf` | Proxmox'dagi tashqi nginx proksisi orqasida: sayt 80-portda (HTTP), HTTPS proksida (hozirgi holat) |
 | `nginx/ip-http.conf` | vaqtincha, domensiz: shu sayt 80-portda, ochiq IP orqali (HTTP) |
 | `systemd/texnologiya-api.service` | API (bitta uvicorn worker) |
 | `systemd/texnologiya-weekly.{service,timer}` | haftalik AI hisobot, dushanba 07:00 |
@@ -144,6 +145,19 @@ curl http://127.0.0.1:8000/api/health
 ---
 
 ## D4. nginx va HTTPS (Let's Encrypt)
+
+**Hozirgi holat (2026-10-22):** domen va HTTPS Proxmox'dagi tashqi nginx proksisida (`172.20.172.5`),
+u so'rovni VM'ning 80-portiga uzatadi. VM'da certbot kerak emas, faqat `edu-metod-proxy.conf`:
+
+```bash
+sudo rm -f /etc/nginx/sites-enabled/*
+sudo cp /srv/texnologiya/app/deploy/nginx/edu-metod-proxy.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/edu-metod-proxy.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+`.env` — quyidagi 5-qadamdagi HTTPS qiymatlari. Quyidagi certbot yo'li — VM'ga 80/443 to'g'ridan-to'g'ri
+yo'naltirilgan holat uchun.
 
 Avval DNS va portni tekshiring (serverdan yoki istalgan kompyuterdan):
 
