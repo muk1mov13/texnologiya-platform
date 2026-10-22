@@ -4,6 +4,13 @@ Loyihadagi barcha o'zgarishlar shu yerda sana bo'yicha qayd etiladi: kod, hujjat
 
 ---
 
+## 2026-10-22 — Server: `edu-metod.uz` 80-portda ishga tushirildi
+
+- VM (`172.20.172.38`, eski `.121` ham shu interfeysda): `git pull` (`8ada34f`), `uv sync --frozen`, `alembic upgrade head`, `npm ci && npm run build`.
+- nginx: `sites-enabled` da faqat `edu-metod-proxy.conf` (eski `edu-metod-http.conf` HTTPS'ga yo'naltirib, proksi ortida halqa berardi). `texnologiya-api` qayta ishga tushirildi (eski uvicorn jarayonlari to'xtadi).
+- `.env` (zaxira `.env.bak-20261022`): Proxmox proksisida HTTPS hali yo'q (443 javob bermaydi), shuning uchun vaqtincha `COOKIE_SECURE=false`, `ALLOW_INSECURE_HTTP=true`, `CORS_ORIGINS=["http://edu-metod.uz","https://edu-metod.uz"]`, `PUBLIC_BASE_URL=http://edu-metod.uz`. HTTPS yoqilgach `COOKIE_SECURE=true`, `ALLOW_INSECURE_HTTP` o'chiriladi, `PUBLIC_BASE_URL=https://edu-metod.uz`.
+- Tekshirildi: `http://edu-metod.uz` sahifa 200, `/api/health` ok, `robots.txt` da domen, login endpoint javob beradi.
+
 ## 2026-10-22 — Deploy: Proxmox proksisi orqasida `edu-metod.uz`
 
 - `deploy/nginx/edu-metod-proxy.conf`: domen va HTTPS Proxmox'dagi tashqi nginx (`172.20.172.5`) da, VM'dagi nginx saytni 80-portda oddiy HTTP bilan beradi (`default_server`). Haqiqiy IP `X-Forwarded-For` dan (`set_real_ip_from 172.20.172.5`), API'ga faqat shu IP va `X-Forwarded-Proto https`. Qolgani `edu-metod.conf` bilan bir xil.
